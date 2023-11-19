@@ -1,0 +1,1 @@
+# PoC Spike to convert Aspire Configuration file to Kustomize Manifests for K8s.
