@@ -18,7 +18,9 @@ spec:
         image: {{name}}:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        {{#each containerPorts}}
+        - containerPort: {{this}}
+        {{/each}}
         envFrom:
         - configMapRef:
             name: {{name}}-env

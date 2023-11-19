@@ -1,3 +1,7 @@
+using Aspirational.Manifests.ManifestHandlers.Components.Final;
+using Aspirational.Manifests.ManifestHandlers.Components.Postgresql;
+using Aspirational.Manifests.ManifestHandlers.Components.Project;
+
 namespace Aspirational.Manifests.Mapping;
 
 /// <summary>
@@ -8,7 +12,7 @@ public static class HandlerMapping
     /// <summary>
     /// The mapping of aspire resource types to handlers
     /// </summary>
-    public static readonly Dictionary<string, BaseHandler> ResourceTypeToHandlerMap = new()
+    public static readonly Dictionary<string, IHandler> ResourceTypeToHandlerMap = new()
     {
         [AspireResourceLiterals.PostgresServer] = new PostgresServerHandler(),
         [AspireResourceLiterals.PostgresDatabase] = new PostgresDatabaseHandler(),
