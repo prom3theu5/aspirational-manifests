@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspirate", "src\Aspirate\Aspirate.csproj", "{EFBECAE3-3385-4FB3-BAA7-631F695A6665}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{796B4241-81DD-4233-8DB5-FAE145D55F46}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{52460A37-4C13-45BA-BB17-C2C430A55BCD}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		Directory.Packages.props = Directory.Packages.props
+		LICENSE.TXT = LICENSE.TXT
+		nuget.config = nuget.config
+		README.md = README.md
+		renovate.json = renovate.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Spectre.DependencyInjection", "src\Aspirate.Spectre.DependencyInjection\Aspirate.Spectre.DependencyInjection.csproj", "{02D60B8D-6219-435B-A58C-5D98C0ABB1DB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02D60B8D-6219-435B-A58C-5D98C0ABB1DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D60B8D-6219-435B-A58C-5D98C0ABB1DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D60B8D-6219-435B-A58C-5D98C0ABB1DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D60B8D-6219-435B-A58C-5D98C0ABB1DB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+		{02D60B8D-6219-435B-A58C-5D98C0ABB1DB} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4990E3C8-4D86-44BB-BC2B-7D055DBC7958}
+	EndGlobalSection
+EndGlobal
