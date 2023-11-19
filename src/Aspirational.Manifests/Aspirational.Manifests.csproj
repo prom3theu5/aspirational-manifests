@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>AspFest</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Humanizer" />
+    <PackageReference Include="Oakton" />
+    <PackageReference Include="Handlebars.Net" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Example\aspire-manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\*.hbs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

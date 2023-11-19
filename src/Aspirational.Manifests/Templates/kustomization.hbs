@@ -1,0 +1,13 @@
+resources:
+{{#each manifests}}
+- {{this}}
+{{/each}}
+
+{{#if isService}}
+configMapGenerator:
+- name: {{name}}-env
+  literals:
+  {{#each env}}
+    - {{@key}}={{this}}
+  {{/each}}
+{{/if}}
