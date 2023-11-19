@@ -1,16 +1,27 @@
-namespace Aspirational.Manifests.ManifestHandlers.Components;
+namespace Aspirational.Manifests.ManifestHandlers.Components.Project;
 
 /// <summary>
 /// A project component for version 0 of Aspire.
 /// </summary>
-public class ProjectHandler : BaseHandler
+public class ProjectHandler : BaseHandler<ProjectTemplateData>
 {
     /// <inheritdoc />
     public override string ResourceType => AspireResourceLiterals.Project;
 
+    private readonly IReadOnlyCollection<string> _manifests =
+    [
+        "deployment.yaml",
+        "service.yaml",
+    ];
+
+    private readonly IReadOnlyCollection<int> _containerPorts =
+    [
+        8080,
+    ];
+
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<Project>(ref reader);
+        JsonSerializer.Deserialize<Models.Components.V0.Project>(ref reader);
 
     public override bool CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
     {
@@ -19,23 +30,14 @@ public class ProjectHandler : BaseHandler
 
         EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var project = resource.Value as Project;
+        var project = resource.Value as Models.Components.V0.Project;
 
-        var manifests = new List<string>
-        {
-            "deployment.yaml",
-            "service.yaml",
-        };
-
-        var data = new
-        {
-            Name = resource.Key,
+        var data = new ProjectTemplateData(
+            resource.Key,
             project.Env,
-            project.Path,
-            project.Bindings,
-            Manifests = manifests,
-            IsService = true,
-        };
+            _containerPorts,
+            _manifests,
+            true);
 
         CreateDeployment(resourceOutputPath, data);
         CreateService(resourceOutputPath, data);
@@ -44,3 +46,5 @@ public class ProjectHandler : BaseHandler
         return true;
     }
 }
+
+
