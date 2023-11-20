@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{name}}-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{name}}
+  template:
+    metadata:
+      labels:
+        app: {{name}}
+    spec:
+      containers:
+      - name: {{name}}
+        image: {{containerImage}}
+        imagePullPolicy: Always
+        {{#if hasContainerPorts}}
+        ports:
+        {{#each containerPorts}}
+        - containerPort: {{this}}
+        {{/each}}
+        {{/if}}
+        envFrom:
+        - configMapRef:
+            name: {{name}}-env
+      restartPolicy: Always
