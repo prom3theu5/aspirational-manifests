@@ -12,8 +12,6 @@ public class ManifestFileParserService(IFileSystem fileSystem, ILogger<ManifestF
     /// <inheritdoc />
     public Dictionary<string, Resource> LoadAndParseAspireManifest(string manifestFile)
     {
-        logger.LogExecuteService(nameof(LoadAndParseAspireManifest), nameof(ManifestFileParserService));
-
         var resources = new Dictionary<string, Resource>();
 
         if (!fileSystem.File.Exists(manifestFile))

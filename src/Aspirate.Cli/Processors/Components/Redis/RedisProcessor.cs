@@ -34,7 +34,4 @@ public partial class RedisProcessor(IFileSystem fileSystem, ILogger<RedisProcess
 
         return Task.FromResult(true);
     }
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "Creating manifest in handler {Handler} at output path: {OutputPath}")]
-    static partial void LogHandlerExecution(ILogger logger, string handler, string outputPath);
 }

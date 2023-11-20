@@ -5,7 +5,7 @@ internal static class ServiceCollectionExtensions
         services
             .AddSerilogLogging()
             .AddFileParserSupport()
-            .AddProjectPropertySupport()
+            .AddContainerDetailsSupport()
             .AddHandlers();
 
     private static IServiceCollection AddFileParserSupport(this IServiceCollection services) =>
@@ -13,8 +13,10 @@ internal static class ServiceCollectionExtensions
             .AddScoped<IFileSystem, FileSystem>()
             .AddScoped<IManifestFileParserService, ManifestFileParserService>();
 
-    private static IServiceCollection AddProjectPropertySupport(this IServiceCollection services) =>
-        services.AddScoped<IProjectPropertyService, ProjectPropertyService>();
+    private static IServiceCollection AddContainerDetailsSupport(this IServiceCollection services) =>
+        services
+            .AddScoped<IProjectPropertyService, ProjectPropertyService>()
+            .AddScoped<IContainerDetailsService, ContainerDetailsService>();
 
     private static IServiceCollection AddSerilogLogging(this IServiceCollection services) =>
         services.AddLogging(ConfigureLogging);

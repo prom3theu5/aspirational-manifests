@@ -7,14 +7,12 @@ namespace Aspirate.Cli.Processors.Components.Project;
 /// </summary>
 public partial class ProjectProcessor(
     IFileSystem fileSystem,
-    ILogger<ProjectProcessor> logger,
-    IProjectPropertyService propertyService)
+    IContainerDetailsService containerDetailsService,
+    ILogger<ProjectProcessor> logger)
         : BaseProcessor<ProjectTemplateData>(fileSystem, logger)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireResourceLiterals.Project;
-
-    private static readonly char[] _filePathSeparator = { '\\', '/' };
 
     private readonly IReadOnlyCollection<string> _manifests =
     [
@@ -36,13 +34,17 @@ public partial class ProjectProcessor(
 
         var project = resource.Value as AspireProject;
 
-        var containerDetails = await GetContainerDetails(resource.Key, project);
+        var containerDetails = await containerDetailsService.GetContainerDetails(resource.Key, project);
+
+        ArgumentNullException.ThrowIfNull(containerDetails, nameof(containerDetails));
 
         var data = new ProjectTemplateData(
             resource.Key,
-            containerDetails.GetFullImage(),
+            containerDetailsService.GetFullImage(containerDetails, resource.Key),
             project.Env,
             _manifests);
+
+        AugmentData(data);
 
         CreateDeployment(resourceOutputPath, data);
         CreateService(resourceOutputPath, data);
@@ -51,37 +53,66 @@ public partial class ProjectProcessor(
         return true;
     }
 
-    private async Task<ContainerDetails> GetContainerDetails(string resourceName, AspireProject project)
+    private static void AugmentData(ProjectTemplateData data)
     {
-        var containerPropertiesJson = await propertyService.GetProjectPropertiesAsync(
-            project.Path,
-            ContainerBuilderLiterals.ContainerRegistry,
-            ContainerBuilderLiterals.ContainerRepository,
-            ContainerBuilderLiterals.ContainerImageName,
-            ContainerBuilderLiterals.ContainerImageTag);
-
-        var containerProperties = JsonSerializer.Deserialize<ContainerProperties>(containerPropertiesJson ?? "{}");
-
-        return new(
-            resourceName,
-            containerProperties.Properties.ContainerRegistry,
-            containerProperties.Properties.ContainerRepository,
-            containerProperties.Properties.ContainerImage ?? GetDefaultImageName(project),
-            containerProperties.Properties.ContainerImageTag);
+        RemoveTlsServiceMappingForNow(data.Env);
+        MapCorrectServiceAddressesForDeployment(data.Env);
+        MapCache(data.Env);
+        MapPostgres(data.Env);
     }
 
-    private static string GetDefaultImageName(AspireProject project)
-    {
-        var pathSpan = project.Path.AsSpan();
-        int lastSeparatorIndex = pathSpan.LastIndexOfAny(_filePathSeparator);
-        int dotIndex = pathSpan.LastIndexOf('.');
-        var fileNameSpan = pathSpan.Slice(lastSeparatorIndex + 1, dotIndex - lastSeparatorIndex - 1);
 
-        return fileNameSpan.ToString().Kebaberize();
+    // TODO: Handle the port once TLS is supported from the Binging value set in the value prior to augmentation.
+    private static void MapCorrectServiceAddressesForDeployment(Dictionary<string, string>? env)
+    {
+        foreach (var key in env.Keys.ToList())
+        {
+            if (key.StartsWith("services__"))
+            {
+                ReadOnlySpan<char> span = env[key].AsSpan();
+                int start = span.IndexOf('{') + 1;
+                int end = span.IndexOf('.');
+                string serviceName = span[start..end].ToString();
+                env[key] = $"http://{serviceName}:8080";
+            }
+        }
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Creating manifest in handler {Handler} at output path: {OutputPath}")]
-    static partial void LogHandlerExecution(ILogger logger, string handler, string outputPath);
+    // TODO: Handle this once service types are included in bindings maybe?
+    private static void MapCache(Dictionary<string, string>? env)
+    {
+        foreach (var key in env.Keys.ToList())
+        {
+            if (key.AsSpan()[^5..].ToString() == "cache")
+            {
+                env[key] = "redis";
+            }
+        }
+    }
+
+    // TODO: Handle this once service types are included in bindings maybe?
+    private static void MapPostgres(Dictionary<string, string>? env)
+    {
+        foreach (var key in env.Keys.ToList())
+        {
+            if (key.AsSpan()[^2..].ToString() == "db")
+            {
+                env[key] = "host=postgres-service;username=postgres;password=postgres;database=catalogdb";
+            }
+        }
+    }
+
+    // TODO: Remove this once TLS is supported.
+    private static void RemoveTlsServiceMappingForNow(Dictionary<string, string>? env)
+    {
+        foreach (var key in env.Keys.ToList())
+        {
+            if (key.AsSpan()[^3..].ToString() == "__1")
+            {
+                env.Remove(key);
+            }
+        }
+    }
 }
 
 

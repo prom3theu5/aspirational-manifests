@@ -21,6 +21,11 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
 
         foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource))
         {
+            if (IsInfrastructure(resource.Value) && !AskIfShouldDeployInfrastructure(resource.Value.Type))
+            {
+                continue;
+            }
+
             await ProcessIndividualResources(scope, input, resource, finalManifests);
         }
 
@@ -29,6 +34,9 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
 
         return 0;
     }
+
+    private bool IsInfrastructure(Resource resource) =>
+        resource is PostgresServer or Redis or PostgresDatabase;
 
     public override ValidationResult Validate(CommandContext context, EndToEndInput input)
     {
@@ -73,6 +81,13 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
         {
             finalManifests.Add(resource.Key, resource.Value);
         }
+    }
+
+    private static bool AskIfShouldDeployInfrastructure(string typeName)
+    {
+        AnsiConsole.MarkupLine($"[yellow]Detected Infrastructure Resource [green]'{typeName}'[/].[/]");
+
+        return AnsiConsole.Confirm("Do you wish to also deploy this?");
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping resource '{ResourceName}' as its type is unknown.")]

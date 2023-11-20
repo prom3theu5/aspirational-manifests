@@ -103,4 +103,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Handler {Handler} has not been configured. CreateFinalManifest must be overridden in the FinalHandler.")]
     static partial void LogMustOverrideCreateFinalManifest(ILogger logger, string handler);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Creating manifest in handler {Handler} at output path: {OutputPath}")]
+    protected static partial void LogHandlerExecution(ILogger logger, string handler, string outputPath);
 }
