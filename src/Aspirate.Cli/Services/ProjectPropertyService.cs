@@ -19,7 +19,7 @@ public class ProjectPropertyService : IProjectPropertyService
         var executionCommand = CliWrap.Cli.Wrap("dotnet")
             .WithArguments("msbuild");
 
-        executionCommand = propertyNames.Aggregate(executionCommand, (current, propertyName) => current.WithArguments($"-p:{propertyName}"));
+        executionCommand = propertyNames.Aggregate(executionCommand, (current, propertyName) => current.WithArguments($"--getProperty:{propertyName}"));
 
         var commandResult = await executionCommand.WithWorkingDirectory(workingDirectory)
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
