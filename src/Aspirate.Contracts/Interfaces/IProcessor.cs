@@ -20,7 +20,7 @@ public interface IProcessor
     Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath);
 
     /// <summary>
-    /// Produces the final kustomization.yaml file in the root output folder.
+    /// Produces the final kustomization.yml file in the root output folder.
     /// </summary>
     void CreateFinalManifest(Dictionary<string, Resource> resources, string outputPath);
 }

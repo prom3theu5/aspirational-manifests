@@ -18,13 +18,8 @@ public partial class ProjectProcessor(
 
     private readonly IReadOnlyCollection<string> _manifests =
     [
-        "deployment.yaml",
-        "service.yaml",
-    ];
-
-    private readonly IReadOnlyCollection<int> _containerPorts =
-    [
-        8080,
+        "deployment.yml",
+        "service.yml",
     ];
 
     /// <inheritdoc />
@@ -47,7 +42,6 @@ public partial class ProjectProcessor(
             resource.Key,
             containerDetails.GetFullImage(),
             project.Env,
-            _containerPorts,
             _manifests);
 
         CreateDeployment(resourceOutputPath, data);

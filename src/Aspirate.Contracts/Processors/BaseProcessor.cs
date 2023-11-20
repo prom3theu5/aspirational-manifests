@@ -14,7 +14,8 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         [TemplateLiterals.DeploymentType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "deployment.hbs"),
         [TemplateLiterals.ServiceType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "service.hbs"),
         [TemplateLiterals.ComponentKustomizeType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "kustomization.hbs"),
-        // Add more as needed
+        [TemplateLiterals.RedisType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "redis.hbs"),
+        [TemplateLiterals.PostgresServerType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "postgres-server.hbs"),
     };
 
     /// <summary>
@@ -59,7 +60,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     protected void CreateDeployment(string outputPath, TTemplateData data)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.DeploymentType, out var templateFile);
-        var deploymentOutputPath = Path.Combine(outputPath, "deployment.yaml");
+        var deploymentOutputPath = Path.Combine(outputPath, "deployment.yml");
 
         CreateFile(templateFile, deploymentOutputPath, data);
     }
@@ -67,7 +68,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     protected void CreateService(string outputPath, TTemplateData data)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ServiceType, out var templateFile);
-        var serviceOutputPath = Path.Combine(outputPath, "service.yaml");
+        var serviceOutputPath = Path.Combine(outputPath, "service.yml");
 
         CreateFile(templateFile, serviceOutputPath, data);
     }
@@ -75,9 +76,17 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     protected void CreateComponentKustomizeManifest(string outputPath, TTemplateData data)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ComponentKustomizeType, out var templateFile);
-        var kustomizeOutputPath = Path.Combine(outputPath, "kustomization.yaml");
+        var kustomizeOutputPath = Path.Combine(outputPath, "kustomization.yml");
 
         CreateFile(templateFile, kustomizeOutputPath, data);
+    }
+
+    protected void CreateCustomManifest(string outputPath, string fileName, string templateType, TTemplateData data)
+    {
+        _templateFileMapping.TryGetValue(templateType, out var templateFile);
+        var deploymentOutputPath = Path.Combine(outputPath, fileName);
+
+        CreateFile(templateFile, deploymentOutputPath, data);
     }
 
     private void CreateFile(string inputFile, string outputPath, TTemplateData data)

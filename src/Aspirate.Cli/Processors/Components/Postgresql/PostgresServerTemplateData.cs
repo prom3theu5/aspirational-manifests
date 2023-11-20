@@ -1,9 +1,4 @@
 namespace Aspirate.Cli.Processors.Components.Postgresql;
 
-public sealed class PostgresServerTemplateData(
-    string name,
-    Dictionary<string, string> env,
-    IReadOnlyCollection<int> containerPorts,
-    IReadOnlyCollection<string> manifests,
-    bool isService)
-    : BaseTemplateData(name, env, containerPorts, manifests, isService);
+public sealed class PostgresServerTemplateData(IReadOnlyCollection<string> manifests)
+    : BaseTemplateData(null, null, manifests, false);

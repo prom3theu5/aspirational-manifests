@@ -4,10 +4,10 @@ kind: Service
 metadata:
   name: {{name}}-service
 spec:
+  type: {{serviceType}}
   selector:
     app: {{name}}
   ports:
-  {{#each containerPorts}}
-  - port: {{this}}
-    targetPort: {{this}}
-  {{/each}}
+  - name: http
+    port: 8080
+    targetPort: 8080
