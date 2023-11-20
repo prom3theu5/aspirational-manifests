@@ -2,12 +2,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{name}}-deployment
+  name: {{name}}
 spec:
+  minReadySeconds: 60
   replicas: 1
   selector:
     matchLabels:
       app: {{name}}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   template:
     metadata:
       labels:
@@ -22,10 +27,4 @@ spec:
         envFrom:
         - configMapRef:
             name: {{name}}-env
-      restartPolicy: Always
       terminationGracePeriodSeconds: 180
-    minReadySeconds: 60
-    strategy:
-      rollingUpdate:
-        maxUnavailable: 0
-        maxSurge: 1
