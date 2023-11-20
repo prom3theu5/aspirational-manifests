@@ -3,7 +3,7 @@ namespace Aspirate.Cli.Processors.Components.Postgresql;
 /// <summary>
 /// Handles producing the Postgres component as Kustomize manifest.
 /// </summary>
-public class PostgresDatabaseProcessor(IFileSystem fileSystem) : BaseProcessor<PostgresDatabaseTemplateData>(fileSystem)
+public class PostgresDatabaseProcessor(IFileSystem fileSystem, ILogger<PostgresDatabaseProcessor> logger) : BaseProcessor<PostgresDatabaseTemplateData>(fileSystem, logger)
 {
 
     /// <inheritdoc />

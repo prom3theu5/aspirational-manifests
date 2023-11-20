@@ -3,7 +3,7 @@ namespace Aspirate.Cli.Commands.EndToEnd;
 /// <summary>
 /// The command to convert Aspire Manifests to Kustomize Manifests.
 /// </summary>
-public sealed class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
+public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<EndToEndCommand> logger) : AsyncCommand<EndToEndInput>
 {
     public static void RegisterEndToEndCommand(IConfigurator config) =>
         config.AddCommand<EndToEndCommand>("endtoend")
@@ -45,7 +45,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCom
         return ValidationResult.Success();
     }
 
-    private static async Task ProcessIndividualResources(
+    private async Task ProcessIndividualResources(
         IServiceScope scope,
         EndToEndInput input,
         KeyValuePair<string, Resource> resource,
@@ -55,7 +55,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCom
 
         if (resource.Value.Type is null)
         {
-            AnsiConsole.MarkupLine($"Skipping resource [green]'{resource.Key}'[/] as its type is unknown.");
+            LogTypeUnknown(logger, resource.Key);
             return;
         }
 
@@ -63,7 +63,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCom
 
         if (handler is null)
         {
-            AnsiConsole.MarkupLine($"Skipping resource [green]'{resource.Key}'[/] as its type [green]'{resource.Value.Type}'[/] is not supported.");
+            LogUnsupportedType(logger, resource.Key);
             return;
         }
 
@@ -74,4 +74,10 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCom
             finalManifests.Add(resource.Key, resource.Value);
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping resource '{ResourceName}' as its type is unknown.")]
+    static partial void LogTypeUnknown(ILogger logger, string resourceName);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping resource '{ResourceName}' as its type is not supported.")]
+    static partial void LogUnsupportedType(ILogger logger, string resourceName);
 }

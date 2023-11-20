@@ -7,4 +7,5 @@ global using Aspirate.Contracts.Literals;
 global using Aspirate.Contracts.Models;
 global using Aspirate.Contracts.Models.AspireManifests;
 global using HandlebarsDotNet;
+global using Microsoft.Extensions.Logging;
 global using Spectre.Console;
