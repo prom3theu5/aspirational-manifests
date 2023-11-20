@@ -5,10 +5,12 @@ namespace Aspirate.Cli.Processors.Components.Project;
 /// <summary>
 /// A project component for version 0 of Aspire.
 /// </summary>
-public class ProjectProcessor(IFileSystem fileSystem) : BaseProcessor<ProjectTemplateData>(fileSystem)
+public class ProjectProcessor(IFileSystem fileSystem, IProjectPropertyService propertyService) : BaseProcessor<ProjectTemplateData>(fileSystem)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireResourceLiterals.Project;
+
+    private static readonly char[] _filePathSeparator = { '\\', '/' };
 
     private readonly IReadOnlyCollection<string> _manifests =
     [
@@ -25,7 +27,7 @@ public class ProjectProcessor(IFileSystem fileSystem) : BaseProcessor<ProjectTem
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireProject>(ref reader);
 
-    public override bool CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
+    public override async Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
         AnsiConsole.MarkupLine($"[green]Creating manifest in handler {GetType().Name} at output path: {resourceOutputPath}[/]");
@@ -34,8 +36,11 @@ public class ProjectProcessor(IFileSystem fileSystem) : BaseProcessor<ProjectTem
 
         var project = resource.Value as AspireProject;
 
+        var containerDetails = await GetContainerDetails(resource.Key, project);
+
         var data = new ProjectTemplateData(
             resource.Key,
+            containerDetails.GetFullImage(),
             project.Env,
             _containerPorts,
             _manifests);
@@ -45,6 +50,35 @@ public class ProjectProcessor(IFileSystem fileSystem) : BaseProcessor<ProjectTem
         CreateComponentKustomizeManifest(resourceOutputPath, data);
 
         return true;
+    }
+
+    private async Task<ContainerDetails> GetContainerDetails(string resourceName, AspireProject project)
+    {
+        var containerPropertiesJson = await propertyService.GetProjectPropertiesAsync(
+            project.Path,
+            ContainerBuilderLiterals.ContainerRegistry,
+            ContainerBuilderLiterals.ContainerRepository,
+            ContainerBuilderLiterals.ContainerImageName,
+            ContainerBuilderLiterals.ContainerImageTag);
+
+        var containerProperties = JsonSerializer.Deserialize<ContainerProperties>(containerPropertiesJson ?? "{}");
+
+        return new(
+            resourceName,
+            containerProperties.Properties.ContainerRegistry,
+            containerProperties.Properties.ContainerRepository,
+            containerProperties.Properties.ContainerImage ?? GetDefaultImageName(project),
+            containerProperties.Properties.ContainerImageTag);
+    }
+
+    private static string GetDefaultImageName(AspireProject project)
+    {
+        var pathSpan = project.Path.AsSpan();
+        int lastSeparatorIndex = pathSpan.LastIndexOfAny(_filePathSeparator);
+        int dotIndex = pathSpan.LastIndexOf('.');
+        var fileNameSpan = pathSpan.Slice(lastSeparatorIndex + 1, dotIndex - lastSeparatorIndex - 1);
+
+        return fileNameSpan.ToString().Kebaberize();
     }
 }
 

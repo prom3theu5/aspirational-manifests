@@ -415,6 +415,9 @@ dotnet_diagnostic.CS8667.severity = error
 # CS8714: The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 dotnet_diagnostic.CS8714.severity = error
 
+# CS9113: Primary COnstructor value never accessed
+dotnet_diagnostic.CS9113.severity = none
+
 
 ###########################
 # Code Quality            #

@@ -3,7 +3,7 @@ namespace Aspirate.Cli.Commands.EndToEnd;
 /// <summary>
 /// The command to convert Aspire Manifests to Kustomize Manifests.
 /// </summary>
-public sealed class EndToEndCommand(IServiceProvider serviceProvider) : Command<EndToEndInput>
+public sealed class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
 {
     public static void RegisterEndToEndCommand(IConfigurator config) =>
         config.AddCommand<EndToEndCommand>("endtoend")
@@ -11,7 +11,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : Command<
             .WithDescription("Fully convert an aspire manifest to kustomize manifests.")
             .WithExample(["endtoend", "-m", "./Example/aspire-manifest.json", "-o", "./output"]);
 
-    public override int Execute([NotNull] CommandContext context, [NotNull] EndToEndInput input)
+    public override async Task<int> ExecuteAsync(CommandContext context, EndToEndInput input)
     {
         using var scope = serviceProvider.CreateScope();
 
@@ -21,7 +21,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : Command<
 
         foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource))
         {
-            ProcessIndividualResources(scope, input, resource, finalManifests);
+            await ProcessIndividualResources(scope, input, resource, finalManifests);
         }
 
         var finalHandler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireResourceLiterals.Final);
@@ -30,7 +30,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : Command<
         return 0;
     }
 
-    public override ValidationResult Validate([NotNull] CommandContext context, [NotNull] EndToEndInput input)
+    public override ValidationResult Validate(CommandContext context, EndToEndInput input)
     {
         if (string.IsNullOrWhiteSpace(input.PathToAspireManifestFlag))
         {
@@ -45,7 +45,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : Command<
         return ValidationResult.Success();
     }
 
-    private static void ProcessIndividualResources(
+    private static async Task ProcessIndividualResources(
         IServiceScope scope,
         EndToEndInput input,
         KeyValuePair<string, Resource> resource,
@@ -67,7 +67,7 @@ public sealed class EndToEndCommand(IServiceProvider serviceProvider) : Command<
             return;
         }
 
-        var success = handler.CreateManifests(resource, input.OutputPathFlag);
+        var success = await handler.CreateManifests(resource, input.OutputPathFlag);
 
         if (success)
         {

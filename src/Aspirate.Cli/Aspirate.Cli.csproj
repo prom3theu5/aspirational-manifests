@@ -19,5 +19,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="CliWrap" />
+    <PackageReference Include="Humanizer" />
+  </ItemGroup>
 
 </Project>

@@ -15,12 +15,14 @@ spec:
     spec:
       containers:
       - name: {{name}}
-        image: {{name}}:latest
+        image: {{containerImage}}
         imagePullPolicy: Always
+        {{#if hasContainerPorts}}
         ports:
         {{#each containerPorts}}
         - containerPort: {{this}}
         {{/each}}
+        {{/if}}
         envFrom:
         - configMapRef:
             name: {{name}}-env

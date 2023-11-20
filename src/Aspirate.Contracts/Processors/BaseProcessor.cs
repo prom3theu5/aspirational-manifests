@@ -29,12 +29,12 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
     public abstract Resource? Deserialize(ref Utf8JsonReader reader);
 
     /// <inheritdoc />
-    public virtual bool CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
+    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
     {
         AnsiConsole.MarkupLine(
             $"[yellow]Handler {GetType().Name} has not been configured. CreateManifest must be overridden.[/]");
 
-        return false;
+        return Task.FromResult(false);
     }
 
     /// <inheritdoc />
@@ -82,6 +82,6 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
         var handlebarTemplate = Handlebars.Compile(template);
         var output = handlebarTemplate(data);
 
-        File.WriteAllText(outputPath, output);
+        _fileSystem.File.WriteAllText(outputPath, output);
     }
 }

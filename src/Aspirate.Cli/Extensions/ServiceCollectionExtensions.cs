@@ -5,6 +5,7 @@ internal static class ServiceCollectionExtensions
     {
         services
             .AddFileParserSupport()
+            .AddProjectPropertySupport()
             .AddHandlers();
 
         return services;
@@ -14,6 +15,13 @@ internal static class ServiceCollectionExtensions
     {
         services.AddScoped<IFileSystem, FileSystem>();
         services.AddScoped<IManifestFileParserService, ManifestFileParserService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddProjectPropertySupport(this IServiceCollection services)
+    {
+        services.AddScoped<IProjectPropertyService, ProjectPropertyService>();
 
         return services;
     }
