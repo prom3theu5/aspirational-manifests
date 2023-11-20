@@ -1,11 +1,13 @@
 namespace Aspirate.Cli.Services;
 
-public class ProjectPropertyService : IProjectPropertyService
+public sealed class ProjectPropertyService(ILogger<ProjectPropertyService> logger) : IProjectPropertyService
 {
     private readonly StringBuilder _stdOutBuffer = new();
 
     public async Task<string?> GetProjectPropertiesAsync(string projectPath, params string[] propertyNames)
     {
+        logger.LogExecuteService(nameof(GetProjectPropertiesAsync), nameof(ProjectPropertyService));
+
         var workingDirectory = Path.GetDirectoryName(projectPath) ?? throw new($"Could not get directory name from {projectPath}");
         var propertyValues = await ExecuteDotnetMsBuildGetPropertyCommand(workingDirectory, propertyNames);
 
@@ -28,5 +30,4 @@ public class ProjectPropertyService : IProjectPropertyService
 
         return commandResult.ExitCode != 0 ? null : _stdOutBuffer.ToString();
     }
-
 }

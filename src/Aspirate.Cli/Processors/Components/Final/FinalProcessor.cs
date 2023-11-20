@@ -4,7 +4,7 @@ namespace Aspirate.Cli.Processors.Components.Final;
 /// <summary>
 /// A project component for version 0 of Aspire.
 /// </summary>
-public class FinalProcessor(IFileSystem fileSystem) : BaseProcessor<FinalTemplateData>(fileSystem)
+public partial class FinalProcessor(IFileSystem fileSystem, ILogger<FinalProcessor> logger) : BaseProcessor<FinalTemplateData>(fileSystem, logger)
 {
 
     /// <inheritdoc />
@@ -16,7 +16,7 @@ public class FinalProcessor(IFileSystem fileSystem) : BaseProcessor<FinalTemplat
 
     public override void CreateFinalManifest(Dictionary<string, Resource> resources, string outputPath)
     {
-        AnsiConsole.MarkupLine($"[green]Creating final kustomize manifest for aspire manifest[/]");
+        LogHandlerExecution(logger, outputPath);
 
         var manifests = resources.Select(x => x.Key).ToList();
 
@@ -24,4 +24,7 @@ public class FinalProcessor(IFileSystem fileSystem) : BaseProcessor<FinalTemplat
 
         CreateComponentKustomizeManifest(outputPath, templateData);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Creating final kustomize manifest for aspire manifest at output path: {OutputPath}")]
+    static partial void LogHandlerExecution(ILogger logger, string outputPath);
 }

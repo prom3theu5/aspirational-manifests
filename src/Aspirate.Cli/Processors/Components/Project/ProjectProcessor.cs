@@ -5,7 +5,11 @@ namespace Aspirate.Cli.Processors.Components.Project;
 /// <summary>
 /// A project component for version 0 of Aspire.
 /// </summary>
-public class ProjectProcessor(IFileSystem fileSystem, IProjectPropertyService propertyService) : BaseProcessor<ProjectTemplateData>(fileSystem)
+public partial class ProjectProcessor(
+    IFileSystem fileSystem,
+    ILogger<ProjectProcessor> logger,
+    IProjectPropertyService propertyService)
+        : BaseProcessor<ProjectTemplateData>(fileSystem, logger)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireResourceLiterals.Project;
@@ -30,7 +34,8 @@ public class ProjectProcessor(IFileSystem fileSystem, IProjectPropertyService pr
     public override async Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
-        AnsiConsole.MarkupLine($"[green]Creating manifest in handler {GetType().Name} at output path: {resourceOutputPath}[/]");
+
+        LogHandlerExecution(logger, nameof(ProjectProcessor), resourceOutputPath);
 
         EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
@@ -80,6 +85,9 @@ public class ProjectProcessor(IFileSystem fileSystem, IProjectPropertyService pr
 
         return fileNameSpan.ToString().Kebaberize();
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Creating manifest in handler {Handler} at output path: {OutputPath}")]
+    static partial void LogHandlerExecution(ILogger logger, string handler, string outputPath);
 }
 
 

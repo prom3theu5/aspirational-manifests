@@ -1,18 +1,19 @@
-using Aspirate.Cli.Processors;
-
 namespace Aspirate.Cli.Services;
 
 /// <inheritdoc />
 /// <summary>
-/// Initialises a new instance of <see cref="ManifestFileParserService"/>. 
+/// Initialises a new instance of <see cref="ManifestFileParserService"/>.
 /// </summary>
 /// <param name="fileSystem">The file system accessor.</param>
+/// <param name="logger">The logger instance.</param>
 /// <param name="serviceProvider">The service provider to resolve handlers from.</param>
-public class ManifestFileParserService(IFileSystem fileSystem, IServiceProvider serviceProvider) : IManifestFileParserService
+public class ManifestFileParserService(IFileSystem fileSystem, ILogger<ManifestFileParserService> logger, IServiceProvider serviceProvider) : IManifestFileParserService
 {
     /// <inheritdoc />
     public Dictionary<string, Resource> LoadAndParseAspireManifest(string manifestFile)
     {
+        logger.LogExecuteService(nameof(LoadAndParseAspireManifest), nameof(ManifestFileParserService));
+
         var resources = new Dictionary<string, Resource>();
 
         if (!fileSystem.File.Exists(manifestFile))
