@@ -10,4 +10,5 @@ configMapGenerator:
   {{#each env}}
     - {{@key}}={{this}}
   {{/each}}
+    - ASPNETCORE_URLS=http://+:8080
 {{/if}}
