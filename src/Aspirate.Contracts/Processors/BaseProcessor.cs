@@ -11,11 +11,12 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
 
     protected static readonly Dictionary<string, string> _templateFileMapping = new()
     {
-        [TemplateLiterals.DeploymentType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "deployment.hbs"),
-        [TemplateLiterals.ServiceType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "service.hbs"),
-        [TemplateLiterals.ComponentKustomizeType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "kustomization.hbs"),
-        [TemplateLiterals.RedisType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "redis.hbs"),
-        [TemplateLiterals.PostgresServerType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, "postgres-server.hbs"),
+        [TemplateLiterals.DeploymentType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.DeploymentType}.hbs"),
+        [TemplateLiterals.ServiceType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.ServiceType}.hbs"),
+        [TemplateLiterals.ComponentKustomizeType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.ComponentKustomizeType}.hbs"),
+        [TemplateLiterals.RedisType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.RedisType}.hbs"),
+        [TemplateLiterals.RabbitMqType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.RabbitMqType}.hbs"),
+        [TemplateLiterals.PostgresServerType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.PostgresServerType}.hbs"),
     };
 
     /// <summary>
@@ -60,7 +61,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     protected void CreateDeployment(string outputPath, TTemplateData data)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.DeploymentType, out var templateFile);
-        var deploymentOutputPath = Path.Combine(outputPath, "deployment.yml");
+        var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DeploymentType}.yml");
 
         CreateFile(templateFile, deploymentOutputPath, data);
     }
@@ -68,7 +69,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     protected void CreateService(string outputPath, TTemplateData data)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ServiceType, out var templateFile);
-        var serviceOutputPath = Path.Combine(outputPath, "service.yml");
+        var serviceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ServiceType}.yml");
 
         CreateFile(templateFile, serviceOutputPath, data);
     }
@@ -76,7 +77,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     protected void CreateComponentKustomizeManifest(string outputPath, TTemplateData data)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ComponentKustomizeType, out var templateFile);
-        var kustomizeOutputPath = Path.Combine(outputPath, "kustomization.yml");
+        var kustomizeOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ComponentKustomizeType}.yml");
 
         CreateFile(templateFile, kustomizeOutputPath, data);
     }

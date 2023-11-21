@@ -1,13 +1,9 @@
 {
   "profiles": {
-    "WSL": {
-      "commandName": "WSL2",
-      "distributionName": ""
-    },
     "Debug Manifest Locally": {
       "commandName": "Project",
-      "commandLineArgs": "e2e -m ./aspire-manifest.json -o ./output2",
-      "workingDirectory": "C:\\git\\aspire\\samples\\eShopLite\\AppHost",
+      "commandLineArgs": "e2e -m ./aspire-manifest.json -o ./output",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     }
   }

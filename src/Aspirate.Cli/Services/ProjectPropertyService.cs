@@ -6,7 +6,10 @@ public sealed class ProjectPropertyService(IFileSystem filesystem, ILogger<Proje
 
     public async Task<string?> GetProjectPropertiesAsync(string projectPath, params string[] propertyNames)
     {
-        var projectDirectory = filesystem.Path.GetDirectoryName(projectPath) ?? throw new($"Could not get directory name from {projectPath}");
+        var currentDirectory = filesystem.Directory.GetCurrentDirectory();
+        var normalizedProjectPath = projectPath.Replace('\\', filesystem.Path.DirectorySeparatorChar);
+        var fullProjectPath = filesystem.Path.Combine(currentDirectory, normalizedProjectPath);
+        var projectDirectory = filesystem.Path.GetDirectoryName(fullProjectPath) ?? throw new($"Could not get directory name from {fullProjectPath}");
         var propertyValues = await ExecuteDotnetMsBuildGetPropertyCommand(projectDirectory, propertyNames);
 
         return propertyValues ?? null;
@@ -16,15 +19,12 @@ public sealed class ProjectPropertyService(IFileSystem filesystem, ILogger<Proje
     {
         _stdOutBuffer.Clear();
 
-        var arguments = new List<string>()
+        var arguments = new List<string>
         {
-            "msbuild"
+            "msbuild",
         };
 
-        foreach (var propertyName in propertyNames)
-        {
-            arguments.Add($"--getProperty:{propertyName}");
-        }
+        arguments.AddRange(propertyNames.Select(propertyName => $"--getProperty:{propertyName}"));
 
         var executionCommand = CliWrap.Cli.Wrap("dotnet")
             .WithArguments(arguments);

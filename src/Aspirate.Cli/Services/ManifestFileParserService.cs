@@ -9,6 +9,19 @@ namespace Aspirate.Cli.Services;
 /// <param name="serviceProvider">The service provider to resolve handlers from.</param>
 public class ManifestFileParserService(IFileSystem fileSystem, ILogger<ManifestFileParserService> logger, IServiceProvider serviceProvider) : IManifestFileParserService
 {
+    private static readonly Dictionary<string, Func<string, string>> _aspireTypeHandlers = new()
+    {
+        [AspireResourceLiterals.PostgresDatabase] = resourceName => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
+        [AspireResourceLiterals.RabbitMq] = _ => "amqp://guest:guest@rabbitmq-service:5672",
+        [AspireResourceLiterals.Redis] = _ => "redis",
+    };
+
+    private static readonly Dictionary<string, Func<string, string>> _bindingHandlers = new()
+    {
+        ["bindings.http.url"] = serviceName => $"http://{serviceName}:8080",
+        ["bindings.https.url"] = serviceName => $"https://{serviceName}:8443",
+    };
+
     /// <inheritdoc />
     public Dictionary<string, Resource> LoadAndParseAspireManifest(string manifestFile)
     {
@@ -55,6 +68,45 @@ public class ManifestFileParserService(IFileSystem fileSystem, ILogger<ManifestF
             }
         }
 
+        ReplacePlaceholdersInParsedResources(resources);
+
         return resources;
+    }
+
+    private static void ReplacePlaceholdersInParsedResources(Dictionary<string, Resource> resources)
+    {
+        foreach (var resource in resources.Values)
+        {
+            if (resource.Env == null)
+            {
+                continue;
+            }
+
+            foreach (var key in resource.Env.Keys)
+            {
+                var value = resource.Env[key];
+
+                if (!value.StartsWith('{') || !value.EndsWith('}'))
+                {
+                    continue;
+                }
+
+                var parts = value.Trim('{', '}').Split('.');
+                var resourceName = parts[0];
+                var resourceType = resources[resourceName].Type;
+                var propertyPath = string.Join('.', parts.Skip(1));
+
+                if (_aspireTypeHandlers.TryGetValue(resourceType, out var typeHandler))
+                {
+                    resource.Env[key] = typeHandler(resourceName);
+                    continue;
+                }
+
+                if (_bindingHandlers.TryGetValue(propertyPath, out var bindingHandler))
+                {
+                    resource.Env[key] = bindingHandler(resourceName);
+                }
+            }
+        }
     }
 }

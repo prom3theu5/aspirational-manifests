@@ -1,7 +1,6 @@
 namespace Aspirate.Cli.Services;
 public class ContainerDetailsService(IProjectPropertyService propertyService) : IContainerDetailsService
 {
-    private static readonly char[] _filePathSeparator = ['\\', '/'];
     private static readonly StringBuilder _imageBuilder = new();
 
     public async Task<ContainerDetails> GetContainerDetails(string resourceName, Project project)
@@ -14,7 +13,6 @@ public class ContainerDetailsService(IProjectPropertyService propertyService) : 
             ContainerBuilderLiterals.ContainerImageTag);
 
         var containerProperties = JsonSerializer.Deserialize<ContainerProperties>(containerPropertiesJson ?? "{}");
-        HandleEmptyContainerImageName(resourceName, containerProperties, project);
 
         return new(
             resourceName,
@@ -24,54 +22,53 @@ public class ContainerDetailsService(IProjectPropertyService propertyService) : 
             containerProperties.Properties.ContainerImageTag);
     }
 
-    public string GetDefaultImageName(Project project)
-    {
-        var pathSpan = project.Path.AsSpan();
-        int lastSeparatorIndex = pathSpan.LastIndexOfAny(_filePathSeparator);
-        int dotIndex = pathSpan.LastIndexOf('.');
-        var fileNameSpan = pathSpan.Slice(lastSeparatorIndex + 1, dotIndex - lastSeparatorIndex - 1);
-
-        return fileNameSpan.ToString().Kebaberize();
-    }
-
-    public string GetFullImage(ContainerDetails containerDetails, string defaultImageName)
+    public string GetFullImage(ContainerDetails containerDetails, Project project)
     {
         _imageBuilder.Clear();
 
-        if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
-        {
-            _imageBuilder.Append($"{containerDetails.ContainerRegistry}");
-            _imageBuilder.Append('/');
-        }
+        HandleRegistry(containerDetails);
 
-        //if (!string.IsNullOrEmpty(containerDetails.ContainerRepository))
-        //{
-        //    _imageBuilder.Append($"{containerDetails.ContainerRepository}");
-        //    _imageBuilder.Append('/');
-        //}
+        HandleRepository(containerDetails);
 
-        _imageBuilder.Append($"{(!string.IsNullOrEmpty(containerDetails.ContainerImage) ? containerDetails.ContainerImage : defaultImageName)}");
-        _imageBuilder.Append(':');
-        _imageBuilder.Append($"{(!string.IsNullOrEmpty(containerDetails.ContainerTag) ? containerDetails.ContainerTag : "latest")}");
+        HandleImage(containerDetails);
+
+        HandleTag(containerDetails);
 
         return _imageBuilder.ToString();
     }
 
-    private void HandleEmptyContainerImageName(string serviceName, ContainerProperties? containerProperties, Project project)
+    private static void HandleTag(ContainerDetails containerDetails)
     {
-        if (string.IsNullOrEmpty(containerProperties.Properties.ContainerImage))
+        if (!string.IsNullOrEmpty(containerDetails.ContainerTag))
         {
-            var defaultName = GetDefaultImageName(project);
-            var useDefaultImageName = AskIfShouldUseDefaultImageName(serviceName, defaultName);
-            containerProperties.Properties.ContainerImage = useDefaultImageName ? defaultName : AnsiConsole.Ask<string>("Enter the container image name");
+            _imageBuilder.Append($":{containerDetails.ContainerTag}");
+            return;
+        }
+
+        _imageBuilder.Append(":latest");
+    }
+
+    private static void HandleImage(ContainerDetails containerDetails)
+    {
+        if (!string.IsNullOrEmpty(containerDetails.ContainerImage))
+        {
+            _imageBuilder.Append($"/{containerDetails.ContainerImage}");
         }
     }
 
-    private static bool AskIfShouldUseDefaultImageName(string serviceName, string defaultName)
+    private static void HandleRepository(ContainerDetails containerDetails)
     {
-        AnsiConsole.MarkupLine($"[yellow]No container image name was specified for project [green]{serviceName}[/].[/]");
-        AnsiConsole.MarkupLine($"[yellow]The default image name will be used: [green]{defaultName}[/][/]");
+        if (!string.IsNullOrEmpty(containerDetails.ContainerRepository))
+        {
+            _imageBuilder.Append($"/{containerDetails.ContainerRepository}");
+        }
+    }
 
-        return AnsiConsole.Confirm("Do you want to use the default image name?");
+    private static void HandleRegistry(ContainerDetails containerDetails)
+    {
+        if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
+        {
+            _imageBuilder.Append($"{containerDetails.ContainerRegistry}");
+        }
     }
 }
