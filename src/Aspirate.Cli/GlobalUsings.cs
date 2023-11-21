@@ -12,6 +12,7 @@ global using Aspirate.Cli.Logging;
 global using Aspirate.Cli.Processors.Components.Final;
 global using Aspirate.Cli.Processors.Components.Postgresql;
 global using Aspirate.Cli.Processors.Components.Project;
+global using Aspirate.Cli.Processors.Components.RabbitMQ;
 global using Aspirate.Cli.Processors.Components.Redis;
 global using Aspirate.Cli.Services;
 global using Aspirate.Contracts.Interfaces;

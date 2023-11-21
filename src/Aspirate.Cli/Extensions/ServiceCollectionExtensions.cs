@@ -27,6 +27,7 @@ internal static class ServiceCollectionExtensions
             .AddKeyedScoped<IProcessor, PostgresDatabaseProcessor>(AspireResourceLiterals.PostgresDatabase)
             .AddKeyedScoped<IProcessor, ProjectProcessor>(AspireResourceLiterals.Project)
             .AddKeyedScoped<IProcessor, RedisProcessor>(AspireResourceLiterals.Redis)
+            .AddKeyedScoped<IProcessor, RabbitMqProcessor>(AspireResourceLiterals.RabbitMq)
             .AddKeyedScoped<IProcessor, FinalProcessor>(AspireResourceLiterals.Final);
 
     private static void ConfigureLogging(ILoggingBuilder builder)

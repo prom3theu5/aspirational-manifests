@@ -12,12 +12,6 @@ public class Project : Resource
     public string? Path { get; set; }
 
     /// <summary>
-    /// The environment variables for the project.
-    /// </summary>
-    [JsonPropertyName("env")]
-    public Dictionary<string, string>? Env { get; set; }
-
-    /// <summary>
     /// The bindings for the project.
     /// </summary>
     [JsonPropertyName("bindings")]

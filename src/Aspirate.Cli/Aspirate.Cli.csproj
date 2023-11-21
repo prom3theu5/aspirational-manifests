@@ -12,9 +12,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="Example\aspire-manifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Templates\*.hbs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

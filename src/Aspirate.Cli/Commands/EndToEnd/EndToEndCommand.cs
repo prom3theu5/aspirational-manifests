@@ -13,15 +13,17 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
 
     public override async Task<int> ExecuteAsync(CommandContext context, EndToEndInput input)
     {
+        var shouldSelectivelyProcessInfrastructure = AskIfShouldSelectivelyProcessInfrastructure();
+
         using var scope = serviceProvider.CreateScope();
 
-        var _manifestFileParserService = scope.ServiceProvider.GetRequiredService<IManifestFileParserService>();
-        var aspireManifest = _manifestFileParserService.LoadAndParseAspireManifest(input.PathToAspireManifestFlag);
+        var manifestFileParserService = scope.ServiceProvider.GetRequiredService<IManifestFileParserService>();
+        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(input.PathToAspireManifestFlag);
         var finalManifests = new Dictionary<string, Resource>();
 
         foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource))
         {
-            if (IsInfrastructure(resource.Value) && !AskIfShouldDeployInfrastructure(resource.Value.Type))
+            if (IsInfrastructure(resource.Value) && shouldSelectivelyProcessInfrastructure && !AskIfShouldDeployInfrastructure(resource.Value.Type))
             {
                 continue;
             }
@@ -34,9 +36,6 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
 
         return 0;
     }
-
-    private bool IsInfrastructure(Resource resource) =>
-        resource is PostgresServer or Redis or PostgresDatabase;
 
     public override ValidationResult Validate(CommandContext context, EndToEndInput input)
     {
@@ -57,7 +56,7 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
         IServiceScope scope,
         EndToEndInput input,
         KeyValuePair<string, Resource> resource,
-        Dictionary<string, Resource> finalManifests)
+        IDictionary<string, Resource> finalManifests)
     {
         ArgumentNullException.ThrowIfNull(scope, nameof(scope));
 
@@ -77,17 +76,30 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
 
         var success = await handler.CreateManifests(resource, input.OutputPathFlag);
 
-        if (success)
+        if (success && !IsDatabase(resource.Value))
         {
             finalManifests.Add(resource.Key, resource.Value);
         }
     }
+
+    private static bool IsInfrastructure(Resource resource) =>
+        resource is PostgresServer or Redis or PostgresDatabase;
+
+    private static bool IsDatabase(Resource resource) =>
+        resource is PostgresDatabase;
 
     private static bool AskIfShouldDeployInfrastructure(string typeName)
     {
         AnsiConsole.MarkupLine($"[yellow]Detected Infrastructure Resource [green]'{typeName}'[/].[/]");
 
         return AnsiConsole.Confirm("Do you wish to also deploy this?");
+    }
+
+    private static bool AskIfShouldSelectivelyProcessInfrastructure()
+    {
+        AnsiConsole.MarkupLine("[blue]Do you wish to selectively process Infrastructure?[/]");
+
+        return AnsiConsole.Confirm("(Selecting No will generate all manifests)?");
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping resource '{ResourceName}' as its type is unknown.")]
