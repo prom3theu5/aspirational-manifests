@@ -5,7 +5,7 @@ namespace Aspirate.Cli.Processors.Components.Redis;
 /// <summary>
 /// Handles producing the Redis component as Kustomize manifest.
 /// </summary>
-public class RedisProcessor(IFileSystem fileSystem, ILogger<RedisProcessor> logger) : BaseProcessor<RedisTemplateData>(fileSystem, logger)
+public class RedisProcessor(IFileSystem fileSystem) : BaseProcessor<RedisTemplateData>(fileSystem)
 {
     private readonly IReadOnlyCollection<string> _manifests =
     [
@@ -23,14 +23,14 @@ public class RedisProcessor(IFileSystem fileSystem, ILogger<RedisProcessor> logg
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
-        LogHandlerExecution(logger, nameof(RedisProcessor), resourceOutputPath);
-
         EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
         var data = new RedisTemplateData(_manifests);
 
         CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RedisType}.yml", TemplateLiterals.RedisType, data);
         CreateComponentKustomizeManifest(resourceOutputPath, data);
+
+        LogCompletion(resourceOutputPath);
 
         return Task.FromResult(true);
     }

@@ -20,10 +20,6 @@
   <ItemGroup>
     <PackageReference Include="CliWrap" />
     <PackageReference Include="Humanizer" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Serilog" />
-    <PackageReference Include="Serilog.Extensions.Hosting" />
-    <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 
 </Project>

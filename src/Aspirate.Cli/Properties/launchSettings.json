@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Debug Manifest Locally": {
+    "end-to-end": {
       "commandName": "Project",
       "commandLineArgs": "e2e -m ./aspire-manifest.json -o ./output",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",

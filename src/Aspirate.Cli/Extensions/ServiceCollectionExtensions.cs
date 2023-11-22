@@ -3,9 +3,8 @@ internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterAspirateEssential(this IServiceCollection services) =>
         services
-            .AddSerilogLogging()
             .AddFileParserSupport()
-            .AddContainerDetailsSupport()
+            .AddContainerSupport()
             .AddHandlers();
 
     private static IServiceCollection AddFileParserSupport(this IServiceCollection services) =>
@@ -13,13 +12,11 @@ internal static class ServiceCollectionExtensions
             .AddScoped<IFileSystem, FileSystem>()
             .AddScoped<IManifestFileParserService, ManifestFileParserService>();
 
-    private static IServiceCollection AddContainerDetailsSupport(this IServiceCollection services) =>
+    private static IServiceCollection AddContainerSupport(this IServiceCollection services) =>
         services
             .AddScoped<IProjectPropertyService, ProjectPropertyService>()
+            .AddScoped<IContainerCompositionService, ContainerCompositionService>()
             .AddScoped<IContainerDetailsService, ContainerDetailsService>();
-
-    private static IServiceCollection AddSerilogLogging(this IServiceCollection services) =>
-        services.AddLogging(ConfigureLogging);
 
     private static IServiceCollection AddHandlers(this IServiceCollection services) =>
         services
@@ -29,19 +26,4 @@ internal static class ServiceCollectionExtensions
             .AddKeyedScoped<IProcessor, RedisProcessor>(AspireResourceLiterals.Redis)
             .AddKeyedScoped<IProcessor, RabbitMqProcessor>(AspireResourceLiterals.RabbitMq)
             .AddKeyedScoped<IProcessor, FinalProcessor>(AspireResourceLiterals.Final);
-
-    private static void ConfigureLogging(ILoggingBuilder builder)
-    {
-        var serilogConfig = new LoggerConfiguration()
-            .WriteTo.Console()
-#if DEBUG
-            .MinimumLevel.Verbose()
-#else
-            .MinimumLevel.Warning()
-#endif
-            .CreateLogger();
-
-        builder.ClearProviders();
-        builder.AddSerilog(serilogConfig);
-    }
 }
