@@ -8,9 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Handlebars.Net" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Spectre.Console" />
     <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
   </ItemGroup>
-  
+
 </Project>

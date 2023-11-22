@@ -3,66 +3,79 @@ namespace Aspirate.Cli.Commands.EndToEnd;
 /// <summary>
 /// The command to convert Aspire Manifests to Kustomize Manifests.
 /// </summary>
-public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<EndToEndCommand> logger) : AsyncCommand<EndToEndInput>
+public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
 {
-    public static void RegisterEndToEndCommand(IConfigurator config) =>
-        config.AddCommand<EndToEndCommand>("endtoend")
-            .WithAlias("e2e")
-            .WithDescription("Fully convert an aspire manifest to kustomize manifests.")
-            .WithExample(["endtoend", "-m", "./Example/aspire-manifest.json", "-o", "./output"]);
+    public const string EndToEndCommandName = "endtoend";
+    public const string EndToEndDescription = "Builds, pushes containers, generates aspire manifest and kustomize manifests.";
 
-    public override async Task<int> ExecuteAsync(CommandContext context, EndToEndInput input)
+    public override async Task<int> ExecuteAsync(CommandContext context, EndToEndInput settings)
     {
-        var shouldSelectivelyProcessInfrastructure = AskIfShouldSelectivelyProcessInfrastructure();
-
         using var scope = serviceProvider.CreateScope();
 
         var manifestFileParserService = scope.ServiceProvider.GetRequiredService<IManifestFileParserService>();
-        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(input.PathToAspireManifestFlag);
+        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(settings.PathToAspireManifestFlag);
         var finalManifests = new Dictionary<string, Resource>();
 
-        foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource))
-        {
-            if (IsInfrastructure(resource.Value) && shouldSelectivelyProcessInfrastructure && !AskIfShouldDeployInfrastructure(resource.Value.Type))
-            {
-                continue;
-            }
+        var componentsToProcess = SelectManifestItemsToProcess(aspireManifest.Keys.ToList());
 
-            await ProcessIndividualResources(scope, input, resource, finalManifests);
-        }
+        await BuildAndPushProjectContainers(aspireManifest, componentsToProcess, scope);
 
-        var finalHandler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireResourceLiterals.Final);
-        finalHandler.CreateFinalManifest(finalManifests, input.OutputPathFlag);
+        await GenerateManifests(settings, aspireManifest, componentsToProcess, scope, finalManifests);
 
         return 0;
     }
 
-    public override ValidationResult Validate(CommandContext context, EndToEndInput input)
+    private static async Task BuildAndPushProjectContainers(
+        Dictionary<string, Resource> aspireManifest,
+        ICollection<string> componentsToProcess,
+        IServiceScope scope)
     {
-        if (string.IsNullOrWhiteSpace(input.PathToAspireManifestFlag))
+        Console.Clear();
+
+        LogBuildingAndPushingContainers();
+
+        var handler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireResourceLiterals.Project) as ProjectProcessor;
+
+        foreach (var resource in aspireManifest.Where(x => x.Value is Project && componentsToProcess.Contains(x.Key)))
         {
-            return ValidationResult.Error("The path to the aspire manifest file is required.");
+            await handler.BuildAndPushProjectContainer(resource);
         }
 
-        if (string.IsNullOrWhiteSpace(input.OutputPathFlag))
-        {
-            return ValidationResult.Error("The output path is required.");
-        }
-
-        return ValidationResult.Success();
+        await LogContainerCompositionCompleted();
     }
 
-    private async Task ProcessIndividualResources(
+    private static async Task GenerateManifests(EndToEndInput settings,
+        Dictionary<string, Resource> aspireManifest,
+        ICollection<string> componentsToProcess,
+        IServiceScope scope,
+        Dictionary<string, Resource> finalManifests)
+    {
+        Console.Clear();
+
+        LogGeneratingManifests();
+
+        foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource && componentsToProcess.Contains(x.Key)))
+        {
+            await ProcessIndividualResourceManifests(scope, settings, resource, finalManifests);
+        }
+
+        var finalHandler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireResourceLiterals.Final);
+        finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag);
+
+        await LogGenerationComplete();
+    }
+
+    private static async Task ProcessIndividualResourceManifests(
         IServiceScope scope,
         EndToEndInput input,
         KeyValuePair<string, Resource> resource,
-        IDictionary<string, Resource> finalManifests)
+        Dictionary<string, Resource> finalManifests)
     {
         ArgumentNullException.ThrowIfNull(scope, nameof(scope));
 
         if (resource.Value.Type is null)
         {
-            LogTypeUnknown(logger, resource.Key);
+            LogTypeUnknown(resource.Key);
             return;
         }
 
@@ -70,7 +83,7 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
 
         if (handler is null)
         {
-            LogUnsupportedType(logger, resource.Key);
+            LogUnsupportedType(resource.Key);
             return;
         }
 
@@ -82,29 +95,45 @@ public partial class EndToEndCommand(IServiceProvider serviceProvider, ILogger<E
         }
     }
 
-    private static bool IsInfrastructure(Resource resource) =>
-        resource is PostgresServer or Redis or PostgresDatabase;
+    private static void LogGeneratingManifests() =>
+        AnsiConsole.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
+
+    private static void LogBuildingAndPushingContainers() =>
+        AnsiConsole.MarkupLine("\r\n[bold]Building all project resources, and pushing containers:[/]\r\n");
 
     private static bool IsDatabase(Resource resource) =>
         resource is PostgresDatabase;
 
-    private static bool AskIfShouldDeployInfrastructure(string typeName)
-    {
-        AnsiConsole.MarkupLine($"[yellow]Detected Infrastructure Resource [green]'{typeName}'[/].[/]");
+    private static void LogTypeUnknown(string resourceName) =>
+        AnsiConsole.MarkupLine($"[yellow]Skipping resource '{resourceName}' as its type is unknown.[/]");
 
-        return AnsiConsole.Confirm("Do you wish to also deploy this?");
+    private static void LogUnsupportedType(string resourceName) =>
+        AnsiConsole.MarkupLine($"[yellow]Skipping resource '{resourceName}' as its type is unsupported.[/]");
+
+    private static Task LogGenerationComplete()
+    {
+        AnsiConsole.MarkupLine("\r\n[bold slowblink]Generation completed.[/]");
+
+        return Task.Delay(2000);
     }
 
-    private static bool AskIfShouldSelectivelyProcessInfrastructure()
+    private static Task LogContainerCompositionCompleted()
     {
-        AnsiConsole.MarkupLine("[blue]Do you wish to selectively process Infrastructure?[/]");
+        AnsiConsole.MarkupLine("\r\n[bold slowblink]Generation completed.[/]");
 
-        return AnsiConsole.Confirm("(Selecting No will generate all manifests)?");
+        return Task.Delay(2000);
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping resource '{ResourceName}' as its type is unknown.")]
-    static partial void LogTypeUnknown(ILogger logger, string resourceName);
+    private static List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
+        AnsiConsole.Prompt(
+            new MultiSelectionPrompt<string>()
+                .Title("Select [green]components[/] to process from the loaded file")
+                .PageSize(10)
+                .Required()
+                .MoreChoicesText("[grey](Move up and down to reveal more components)[/]")
+                .InstructionsText(
+                    "[grey](Press [blue]<space>[/] to toggle a component, " +
+                    "[green]<enter>[/] to accept)[/]")
+                .AddChoiceGroup("All Components", manifestItems));
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping resource '{ResourceName}' as its type is not supported.")]
-    static partial void LogUnsupportedType(ILogger logger, string resourceName);
 }

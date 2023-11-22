@@ -3,11 +3,9 @@ namespace Aspirate.Contracts.Processors;
 /// <summary>
 /// Base class for all manifest handlers.
 /// </summary>
-public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TTemplateData : BaseTemplateData
+public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateData : BaseTemplateData
 {
     protected readonly IFileSystem _fileSystem;
-
-    protected ILogger<BaseProcessor<TTemplateData>> _logger { get; }
 
     protected static readonly Dictionary<string, string> _templateFileMapping = new()
     {
@@ -23,12 +21,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     /// Initialises a new instance of <see cref="BaseProcessor{TTemplateData}"/>.
     /// </summary>
     /// <param name="fileSystem">The file system accessor.</param>
-    /// <param name="logger">The logging instance.</param>
-    protected BaseProcessor(IFileSystem fileSystem, ILogger<BaseProcessor<TTemplateData>> logger)
-    {
-        _fileSystem = fileSystem;
-        _logger = logger;
-    }
+    protected BaseProcessor(IFileSystem fileSystem) => _fileSystem = fileSystem;
 
     /// <inheritdoc />
     public abstract string ResourceType { get; }
@@ -39,14 +32,14 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     /// <inheritdoc />
     public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
     {
-        LogMustOverrideCreateManifest(_logger, GetType().Name);
+        AnsiConsole.MarkupLine($"\t[bold yellow]Handler {GetType().Name} has not been configured. CreateManifest must be overridden.[/]");
 
         return Task.FromResult(false);
     }
 
     /// <inheritdoc />
     public virtual void CreateFinalManifest(Dictionary<string, Resource> resources, string outputPath) =>
-        LogMustOverrideCreateFinalManifest(_logger, GetType().Name);
+        AnsiConsole.MarkupLine($"\t[bold yellow]Handler {GetType().Name} has not been configured. CreateFinalManifest must be overridden in the FinalHandler.[/]");
 
     protected void EnsureOutputDirectoryExistsAndIsClean(string outputPath)
     {
@@ -99,12 +92,6 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         _fileSystem.File.WriteAllText(outputPath, output);
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Handler {Handler} has not been configured. CreateManifest must be overridden.")]
-    static partial void LogMustOverrideCreateManifest(ILogger logger, string handler);
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Handler {Handler} has not been configured. CreateFinalManifest must be overridden in the FinalHandler.")]
-    static partial void LogMustOverrideCreateFinalManifest(ILogger logger, string handler);
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "Creating manifest in handler {Handler} at output path: {OutputPath}")]
-    protected static partial void LogHandlerExecution(ILogger logger, string handler, string outputPath);
+    protected static void LogCompletion(string outputPath) =>
+        AnsiConsole.MarkupLine($"\t[green](✔) Done: [/] Generating [blue]{outputPath}[/]");
 }

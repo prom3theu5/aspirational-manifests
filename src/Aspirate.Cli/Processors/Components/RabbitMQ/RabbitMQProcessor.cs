@@ -5,7 +5,7 @@ namespace Aspirate.Cli.Processors.Components.RabbitMQ;
 /// <summary>
 /// Handles producing the RabbitMq component as Kustomize manifest.
 /// </summary>
-public class RabbitMqProcessor(IFileSystem fileSystem, ILogger<RabbitMqProcessor> logger) : BaseProcessor<RabbitMqTemplateData>(fileSystem, logger)
+public class RabbitMqProcessor(IFileSystem fileSystem) : BaseProcessor<RabbitMqTemplateData>(fileSystem)
 {
     private readonly IReadOnlyCollection<string> _manifests =
     [
@@ -23,14 +23,14 @@ public class RabbitMqProcessor(IFileSystem fileSystem, ILogger<RabbitMqProcessor
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
-        LogHandlerExecution(logger, nameof(RabbitMqProcessor), resourceOutputPath);
-
         EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
         var data = new RabbitMqTemplateData(_manifests);
 
         CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RabbitMqType}.yml", TemplateLiterals.RabbitMqType, data);
         CreateComponentKustomizeManifest(resourceOutputPath, data);
+
+        LogCompletion(resourceOutputPath);
 
         return Task.FromResult(true);
     }

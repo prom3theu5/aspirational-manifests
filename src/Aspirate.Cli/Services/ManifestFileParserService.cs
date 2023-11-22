@@ -5,9 +5,8 @@ namespace Aspirate.Cli.Services;
 /// Initialises a new instance of <see cref="ManifestFileParserService"/>.
 /// </summary>
 /// <param name="fileSystem">The file system accessor.</param>
-/// <param name="logger">The logger instance.</param>
 /// <param name="serviceProvider">The service provider to resolve handlers from.</param>
-public class ManifestFileParserService(IFileSystem fileSystem, ILogger<ManifestFileParserService> logger, IServiceProvider serviceProvider) : IManifestFileParserService
+public class ManifestFileParserService(IFileSystem fileSystem, IServiceProvider serviceProvider) : IManifestFileParserService
 {
     private static readonly Dictionary<string, Func<string, string>> _aspireTypeHandlers = new()
     {

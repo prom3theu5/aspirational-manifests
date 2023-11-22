@@ -1,6 +1,6 @@
 namespace Aspirate.Cli.Services;
 
-public sealed class ProjectPropertyService(IFileSystem filesystem, ILogger<ProjectPropertyService> logger) : IProjectPropertyService
+public sealed class ProjectPropertyService(IFileSystem filesystem) : IProjectPropertyService
 {
     private readonly StringBuilder _stdOutBuffer = new();
 

@@ -3,7 +3,7 @@ namespace Aspirate.Cli.Processors.Components.Postgresql;
 /// <summary>
 /// Handles producing the Postgres component as Kustomize manifest.
 /// </summary>
-public class PostgresServerProcessor(IFileSystem fileSystem, ILogger<PostgresServerProcessor> logger) : BaseProcessor<PostgresServerTemplateData>(fileSystem, logger)
+public class PostgresServerProcessor(IFileSystem fileSystem) : BaseProcessor<PostgresServerTemplateData>(fileSystem)
 {
     private readonly IReadOnlyCollection<string> _manifests =
     [
@@ -21,14 +21,14 @@ public class PostgresServerProcessor(IFileSystem fileSystem, ILogger<PostgresSer
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
-        LogHandlerExecution(logger, nameof(PostgresServerProcessor), resourceOutputPath);
-
         EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
         var data = new PostgresServerTemplateData(_manifests);
 
         CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.PostgresServerType}.yml", TemplateLiterals.PostgresServerType, data);
         CreateComponentKustomizeManifest(resourceOutputPath, data);
+
+        LogCompletion(resourceOutputPath);
 
         return Task.FromResult(true);
     }

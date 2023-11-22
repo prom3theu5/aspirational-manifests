@@ -7,9 +7,9 @@ namespace Aspirate.Cli.Processors.Components.Project;
 /// </summary>
 public class ProjectProcessor(
     IFileSystem fileSystem,
-    IContainerDetailsService containerDetailsService,
-    ILogger<ProjectProcessor> logger)
-        : BaseProcessor<ProjectTemplateData>(fileSystem, logger)
+    IContainerCompositionService containerCompositionService,
+    IContainerDetailsService containerDetailsService)
+        : BaseProcessor<ProjectTemplateData>(fileSystem)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireResourceLiterals.Project;
@@ -27,8 +27,6 @@ public class ProjectProcessor(
     public override async Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
-
-        LogHandlerExecution(logger, nameof(ProjectProcessor), resourceOutputPath);
 
         EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
@@ -49,7 +47,20 @@ public class ProjectProcessor(
         CreateService(resourceOutputPath, data);
         CreateComponentKustomizeManifest(resourceOutputPath, data);
 
+        LogCompletion(resourceOutputPath);
+
         return true;
+    }
+
+    public async Task<bool> BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource)
+    {
+        var project = resource.Value as AspireProject;
+
+        var result = await containerCompositionService.BuildAndPushContainerForProject(project);
+
+        AnsiConsole.MarkupLine($"\t[green](✔) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
+
+        return result;
     }
 }
 
