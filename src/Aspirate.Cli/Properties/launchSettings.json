@@ -2,7 +2,7 @@
   "profiles": {
     "end-to-end": {
       "commandName": "Project",
-      "commandLineArgs": "e2e -m ./aspire-manifest.json -o ./output",
+      "commandLineArgs": "e2e -p ./AppHost.csproj -o ./output",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     }

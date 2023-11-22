@@ -13,7 +13,7 @@ public class RabbitMqProcessor(IFileSystem fileSystem) : BaseProcessor<RabbitMqT
     ];
 
     /// <inheritdoc />
-    public override string ResourceType => AspireResourceLiterals.RabbitMq;
+    public override string ResourceType => AspireLiterals.RabbitMq;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>

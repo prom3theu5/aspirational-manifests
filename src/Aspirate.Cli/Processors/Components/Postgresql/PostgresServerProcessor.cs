@@ -11,7 +11,7 @@ public class PostgresServerProcessor(IFileSystem fileSystem) : BaseProcessor<Pos
     ];
 
     /// <inheritdoc />
-    public override string ResourceType => AspireResourceLiterals.PostgresServer;
+    public override string ResourceType => AspireLiterals.PostgresServer;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>

@@ -12,8 +12,10 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
     {
         using var scope = serviceProvider.CreateScope();
 
+        var appManifestFilePath = await GenerateAspireManifest(settings.PathToAspireProjectFlag, scope);
+
         var manifestFileParserService = scope.ServiceProvider.GetRequiredService<IManifestFileParserService>();
-        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(settings.PathToAspireManifestFlag);
+        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(appManifestFilePath);
         var finalManifests = new Dictionary<string, Resource>();
 
         var componentsToProcess = SelectManifestItemsToProcess(aspireManifest.Keys.ToList());
@@ -22,7 +24,38 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
 
         await GenerateManifests(settings, aspireManifest, componentsToProcess, scope, finalManifests);
 
+        LogCommandCompleted();
+
         return 0;
+    }
+
+    private static async Task<string> GenerateAspireManifest(
+        string appHostPath,
+        IServiceScope scope)
+    {
+        Console.Clear();
+
+        LogGeneratingAspireManifest();
+
+        var compositionService = scope.ServiceProvider.GetRequiredService<IAspireManifestCompositionService>();
+
+        var result = await compositionService.BuildManifestForProject(appHostPath);
+
+        if (result.Success)
+        {
+            await LogCreatedManifestAtPath(result.FullPath);
+            return result.FullPath;
+        }
+
+        AnsiConsole.MarkupLine($"[red]Failed to generate Aspire Manifest at: {result.FullPath}[/]");
+        throw new InvalidOperationException("Failed to generate Aspire Manifest.");
+    }
+
+    private static async Task LogCreatedManifestAtPath(string resultFullPath)
+    {
+        AnsiConsole.MarkupLine($"\t[green](✔) Done: [/] Created Aspire Manifest At Path: [blue]{resultFullPath}[/]");
+        await Task.Delay(2000);
+        Console.Clear();
     }
 
     private static async Task BuildAndPushProjectContainers(
@@ -34,7 +67,7 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
 
         LogBuildingAndPushingContainers();
 
-        var handler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireResourceLiterals.Project) as ProjectProcessor;
+        var handler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Project) as ProjectProcessor;
 
         foreach (var resource in aspireManifest.Where(x => x.Value is Project && componentsToProcess.Contains(x.Key)))
         {
@@ -59,10 +92,8 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
             await ProcessIndividualResourceManifests(scope, settings, resource, finalManifests);
         }
 
-        var finalHandler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireResourceLiterals.Final);
+        var finalHandler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final);
         finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag);
-
-        await LogGenerationComplete();
     }
 
     private static async Task ProcessIndividualResourceManifests(
@@ -98,6 +129,9 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
     private static void LogGeneratingManifests() =>
         AnsiConsole.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
 
+    private static void LogGeneratingAspireManifest() =>
+        AnsiConsole.MarkupLine("\r\n[bold]Generating Aspire Manifest for supplied App Host:[/]\r\n");
+
     private static void LogBuildingAndPushingContainers() =>
         AnsiConsole.MarkupLine("\r\n[bold]Building all project resources, and pushing containers:[/]\r\n");
 
@@ -123,6 +157,9 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
 
         return Task.Delay(2000);
     }
+
+    private static void LogCommandCompleted() =>
+        AnsiConsole.MarkupLine("\r\n[bold slowblink] 🚀 Execution Completed - Happy Deployment 😃[/]");
 
     private static List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
         AnsiConsole.Prompt(
