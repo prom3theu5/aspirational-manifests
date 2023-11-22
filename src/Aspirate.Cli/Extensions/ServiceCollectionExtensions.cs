@@ -3,13 +3,14 @@ internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterAspirateEssential(this IServiceCollection services) =>
         services
-            .AddFileParserSupport()
+            .AddAspireManifestSupport()
             .AddContainerSupport()
             .AddHandlers();
 
-    private static IServiceCollection AddFileParserSupport(this IServiceCollection services) =>
+    private static IServiceCollection AddAspireManifestSupport(this IServiceCollection services) =>
         services
             .AddScoped<IFileSystem, FileSystem>()
+            .AddScoped<IAspireManifestCompositionService, AspireManifestCompositionService>()
             .AddScoped<IManifestFileParserService, ManifestFileParserService>();
 
     private static IServiceCollection AddContainerSupport(this IServiceCollection services) =>
@@ -20,10 +21,10 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection AddHandlers(this IServiceCollection services) =>
         services
-            .AddKeyedScoped<IProcessor, PostgresServerProcessor>(AspireResourceLiterals.PostgresServer)
-            .AddKeyedScoped<IProcessor, PostgresDatabaseProcessor>(AspireResourceLiterals.PostgresDatabase)
-            .AddKeyedScoped<IProcessor, ProjectProcessor>(AspireResourceLiterals.Project)
-            .AddKeyedScoped<IProcessor, RedisProcessor>(AspireResourceLiterals.Redis)
-            .AddKeyedScoped<IProcessor, RabbitMqProcessor>(AspireResourceLiterals.RabbitMq)
-            .AddKeyedScoped<IProcessor, FinalProcessor>(AspireResourceLiterals.Final);
+            .AddKeyedScoped<IProcessor, PostgresServerProcessor>(AspireLiterals.PostgresServer)
+            .AddKeyedScoped<IProcessor, PostgresDatabaseProcessor>(AspireLiterals.PostgresDatabase)
+            .AddKeyedScoped<IProcessor, ProjectProcessor>(AspireLiterals.Project)
+            .AddKeyedScoped<IProcessor, RedisProcessor>(AspireLiterals.Redis)
+            .AddKeyedScoped<IProcessor, RabbitMqProcessor>(AspireLiterals.RabbitMq)
+            .AddKeyedScoped<IProcessor, FinalProcessor>(AspireLiterals.Final);
 }

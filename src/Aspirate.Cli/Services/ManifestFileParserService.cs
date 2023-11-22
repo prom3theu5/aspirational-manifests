@@ -10,9 +10,9 @@ public class ManifestFileParserService(IFileSystem fileSystem, IServiceProvider 
 {
     private static readonly Dictionary<string, Func<string, string>> _aspireTypeHandlers = new()
     {
-        [AspireResourceLiterals.PostgresDatabase] = resourceName => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
-        [AspireResourceLiterals.RabbitMq] = _ => "amqp://guest:guest@rabbitmq-service:5672",
-        [AspireResourceLiterals.Redis] = _ => "redis",
+        [AspireLiterals.PostgresDatabase] = resourceName => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
+        [AspireLiterals.RabbitMq] = _ => "amqp://guest:guest@rabbitmq-service:5672",
+        [AspireLiterals.Redis] = _ => "redis",
     };
 
     private static readonly Dictionary<string, Func<string, string>> _bindingHandlers = new()

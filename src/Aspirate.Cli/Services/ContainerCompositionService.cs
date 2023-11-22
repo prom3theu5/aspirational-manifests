@@ -41,7 +41,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem) : IConta
             {
                 case StartedCommandEvent _:
                     AnsiConsole.WriteLine();
-                    AnsiConsole.MarkupLine($"[cyan](⚙) Executing: {command} {arguments}[/]");
+                    AnsiConsole.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
                     break;
                 case StandardOutputCommandEvent stdOut:
                     AnsiConsole.WriteLine(stdOut.Text);

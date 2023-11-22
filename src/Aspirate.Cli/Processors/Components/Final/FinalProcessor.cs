@@ -7,7 +7,7 @@ public class FinalProcessor(IFileSystem fileSystem) : BaseProcessor<FinalTemplat
 {
 
     /// <inheritdoc />
-    public override string ResourceType => AspireResourceLiterals.Final;
+    public override string ResourceType => AspireLiterals.Final;
 
     /// <inheritdoc />
     public override Resource Deserialize(ref Utf8JsonReader reader) =>

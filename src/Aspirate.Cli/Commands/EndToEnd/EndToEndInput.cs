@@ -8,9 +8,9 @@ public sealed class EndToEndInput : CommandSettings
     /// <summary>
     /// The path to the Aspire manifest
     /// </summary>
-    [CommandOption("-m|--manifest")]
-    [Description("The path to the Aspire manifest")]
-    public required string PathToAspireManifestFlag { get; init; }
+    [CommandOption("-p|--project")]
+    [Description("The path to the Aspire AppHost project")]
+    public required string PathToAspireProjectFlag { get; init; }
 
     /// <summary>
     /// The path to the output kustomize manifest

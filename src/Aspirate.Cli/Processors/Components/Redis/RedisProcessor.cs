@@ -13,7 +13,7 @@ public class RedisProcessor(IFileSystem fileSystem) : BaseProcessor<RedisTemplat
     ];
 
     /// <inheritdoc />
-    public override string ResourceType => AspireResourceLiterals.Redis;
+    public override string ResourceType => AspireLiterals.Redis;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
