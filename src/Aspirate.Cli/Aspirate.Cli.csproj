@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Aspirate</AssemblyName>
+    <PackAsTool>true</PackAsTool>
   </PropertyGroup>
 
   <ItemGroup>
