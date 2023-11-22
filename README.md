@@ -3,9 +3,7 @@
 
 Test with:
 ```bash
-dotnet run -- endtoend -m ./Example/aspire-manifest.json -o ./output
+dotnet run -- e2e -p ./Example/AppHost -o ./output
 cd ./output
 kustomize build .
 ```
-
-Currently just supports Projects as a test - but postgres server and database resources do get deserialized.
