@@ -1,0 +1,7 @@
+﻿{
+  ContainerRegistry: test-registry,
+  ContainerRepository: test-repository,
+  ContainerImage: test-image,
+  ContainerTag: test-tag,
+  FullContainerImage: test-registry/test-repository/test-image:test-tag
+}

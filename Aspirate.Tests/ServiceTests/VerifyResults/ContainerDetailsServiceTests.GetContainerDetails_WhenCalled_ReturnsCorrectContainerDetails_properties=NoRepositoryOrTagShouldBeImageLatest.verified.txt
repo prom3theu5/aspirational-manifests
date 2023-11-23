@@ -1,0 +1,5 @@
+﻿{
+  ContainerRegistry: test-registry,
+  ContainerImage: test-image,
+  FullContainerImage: test-registry/test-image:latest
+}

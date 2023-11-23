@@ -5,26 +5,26 @@ internal static class ServiceCollectionExtensions
         services
             .AddAspireManifestSupport()
             .AddContainerSupport()
-            .AddHandlers();
+            .AddProcessors();
 
     private static IServiceCollection AddAspireManifestSupport(this IServiceCollection services) =>
         services
-            .AddScoped<IFileSystem, FileSystem>()
-            .AddScoped<IAspireManifestCompositionService, AspireManifestCompositionService>()
-            .AddScoped<IManifestFileParserService, ManifestFileParserService>();
+            .AddSingleton<IFileSystem, FileSystem>()
+            .AddSingleton<IAspireManifestCompositionService, AspireManifestCompositionService>()
+            .AddSingleton<IManifestFileParserService, ManifestFileParserService>();
 
     private static IServiceCollection AddContainerSupport(this IServiceCollection services) =>
         services
-            .AddScoped<IProjectPropertyService, ProjectPropertyService>()
-            .AddScoped<IContainerCompositionService, ContainerCompositionService>()
-            .AddScoped<IContainerDetailsService, ContainerDetailsService>();
+            .AddSingleton<IProjectPropertyService, ProjectPropertyService>()
+            .AddSingleton<IContainerCompositionService, ContainerCompositionService>()
+            .AddSingleton<IContainerDetailsService, ContainerDetailsService>();
 
-    private static IServiceCollection AddHandlers(this IServiceCollection services) =>
+    private static IServiceCollection AddProcessors(this IServiceCollection services) =>
         services
-            .AddKeyedScoped<IProcessor, PostgresServerProcessor>(AspireLiterals.PostgresServer)
-            .AddKeyedScoped<IProcessor, PostgresDatabaseProcessor>(AspireLiterals.PostgresDatabase)
-            .AddKeyedScoped<IProcessor, ProjectProcessor>(AspireLiterals.Project)
-            .AddKeyedScoped<IProcessor, RedisProcessor>(AspireLiterals.Redis)
-            .AddKeyedScoped<IProcessor, RabbitMqProcessor>(AspireLiterals.RabbitMq)
-            .AddKeyedScoped<IProcessor, FinalProcessor>(AspireLiterals.Final);
+            .AddKeyedSingleton<IProcessor, PostgresServerProcessor>(AspireLiterals.PostgresServer)
+            .AddKeyedSingleton<IProcessor, PostgresDatabaseProcessor>(AspireLiterals.PostgresDatabase)
+            .AddKeyedSingleton<IProcessor, ProjectProcessor>(AspireLiterals.Project)
+            .AddKeyedSingleton<IProcessor, RedisProcessor>(AspireLiterals.Redis)
+            .AddKeyedSingleton<IProcessor, RabbitMqProcessor>(AspireLiterals.RabbitMq)
+            .AddKeyedSingleton<IProcessor, FinalProcessor>(AspireLiterals.Final);
 }

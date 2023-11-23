@@ -1,5 +1,6 @@
 namespace Aspirate.Contracts.Literals;
 
+[ExcludeFromCodeCoverage]
 public static class AspireLiterals
 {
     public const string PostgresServer = "postgres.server.v0";

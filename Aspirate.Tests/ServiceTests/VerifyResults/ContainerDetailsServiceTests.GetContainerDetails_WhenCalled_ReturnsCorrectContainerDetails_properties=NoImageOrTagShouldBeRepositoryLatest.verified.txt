@@ -1,0 +1,5 @@
+﻿{
+  ContainerRegistry: test-registry,
+  ContainerRepository: test-repository,
+  FullContainerImage: test-registry/test-repository:latest
+}

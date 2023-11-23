@@ -14,15 +14,19 @@ public class ContainerDetailsService(IProjectPropertyService propertyService) : 
 
         var containerProperties = JsonSerializer.Deserialize<ContainerProperties>(containerPropertiesJson ?? "{}");
 
-        return new(
+        var details = new ContainerDetails(
             resourceName,
             containerProperties.Properties.ContainerRegistry,
             containerProperties.Properties.ContainerRepository,
             containerProperties.Properties.ContainerImage,
             containerProperties.Properties.ContainerImageTag);
+
+        details.FullContainerImage = GetFullImage(details, resourceName);
+
+        return details;
     }
 
-    public string GetFullImage(ContainerDetails containerDetails, Project project)
+    public string GetFullImage(ContainerDetails containerDetails, string resourceName)
     {
         _imageBuilder.Clear();
 
@@ -30,11 +34,11 @@ public class ContainerDetailsService(IProjectPropertyService propertyService) : 
 
         HandleRepository(containerDetails);
 
-        HandleImage(containerDetails);
+        HandleImage(containerDetails, resourceName);
 
         HandleTag(containerDetails);
 
-        return _imageBuilder.ToString();
+        return _imageBuilder.ToString().Trim('/');
     }
 
     private static void HandleTag(ContainerDetails containerDetails)
@@ -48,11 +52,17 @@ public class ContainerDetailsService(IProjectPropertyService propertyService) : 
         _imageBuilder.Append(":latest");
     }
 
-    private static void HandleImage(ContainerDetails containerDetails)
+    private static void HandleImage(ContainerDetails containerDetails, string resourceName)
     {
         if (!string.IsNullOrEmpty(containerDetails.ContainerImage))
         {
             _imageBuilder.Append($"/{containerDetails.ContainerImage}");
+        }
+
+        // Fallback to service name if image name is not provided from anywhere.
+        if (string.IsNullOrEmpty(containerDetails.ContainerRepository) && string.IsNullOrEmpty(containerDetails.ContainerImage))
+        {
+            _imageBuilder.Append($"/{resourceName}");
         }
     }
 

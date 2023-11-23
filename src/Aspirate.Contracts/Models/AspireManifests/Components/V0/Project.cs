@@ -3,6 +3,7 @@ namespace Aspirate.Contracts.Models.AspireManifests.Components.V0;
 /// <summary>
 /// A project within an aspire manifest.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class Project : Resource
 {
     /// <summary>

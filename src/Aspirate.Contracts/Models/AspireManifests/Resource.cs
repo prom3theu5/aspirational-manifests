@@ -3,6 +3,7 @@ namespace Aspirate.Contracts.Models.AspireManifests;
 /// <summary>
 /// A resource in a manifest.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public abstract class Resource
 {
     /// <summary>
