@@ -3,9 +3,13 @@ internal static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterAspirateEssential(this IServiceCollection services) =>
         services
+            .AddSpectreConsole()
             .AddAspireManifestSupport()
             .AddContainerSupport()
             .AddProcessors();
+
+    private static IServiceCollection AddSpectreConsole(this IServiceCollection services) =>
+        services.AddSingleton<IAnsiConsole>(AnsiConsole.Console);
 
     private static IServiceCollection AddAspireManifestSupport(this IServiceCollection services) =>
         services

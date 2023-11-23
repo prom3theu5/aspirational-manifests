@@ -1,6 +1,6 @@
 namespace Aspirate.Cli.Services;
 
-public sealed class ContainerCompositionService(IFileSystem filesystem) : IContainerCompositionService
+public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiConsole console) : IContainerCompositionService
 {
     private readonly StringBuilder _stdOutBuffer = new();
     private readonly StringBuilder _stdErrBuffer = new();
@@ -40,14 +40,14 @@ public sealed class ContainerCompositionService(IFileSystem filesystem) : IConta
             switch (cmdEvent)
             {
                 case StartedCommandEvent _:
-                    AnsiConsole.WriteLine();
-                    AnsiConsole.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
+                    console.WriteLine();
+                    console.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
                     break;
                 case StandardOutputCommandEvent stdOut:
-                    AnsiConsole.WriteLine(stdOut.Text);
+                    console.WriteLine(stdOut.Text);
                     break;
                 case StandardErrorCommandEvent stdErr:
-                    AnsiConsole.MarkupLine($"[red]{stdErr.Text}[/]");
+                    console.MarkupLine($"[red]{stdErr.Text}[/]");
                     break;
                 case ExitedCommandEvent exited:
                     if (exited.ExitCode != 0)
@@ -90,7 +90,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem) : IConta
 
         if (errors.Contains(DotNetSdkLiterals.UnknownContainerRegistryAddress, StringComparison.OrdinalIgnoreCase))
         {
-            AnsiConsole.MarkupLine($"\r\n[red bold]{DotNetSdkLiterals.UnknownContainerRegistryAddress}: Unknown container registry address, or container registry address not accessible.[/]");
+            console.MarkupLine($"\r\n[red bold]{DotNetSdkLiterals.UnknownContainerRegistryAddress}: Unknown container registry address, or container registry address not accessible.[/]");
 
             Environment.Exit(1013);
         }
@@ -133,18 +133,18 @@ public sealed class ContainerCompositionService(IFileSystem filesystem) : IConta
         }
     }
 
-    private static bool AskIfShouldRetryHandlingDuplicateFiles() =>
-        AnsiConsole.Confirm("\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
+    private bool AskIfShouldRetryHandlingDuplicateFiles() =>
+        console.Confirm("\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
 
-    private static bool AskIfShouldLoginToDocker() =>
-        AnsiConsole.Confirm("\r\nWe could not access the container registry during build. Do you want to login to the registry and retry?\r\n");
+    private bool AskIfShouldLoginToDocker() =>
+        console.Confirm("\r\nWe could not access the container registry during build. Do you want to login to the registry and retry?\r\n");
 
-    private static Dictionary<string, string?> GatherDockerCredentials()
+    private Dictionary<string, string?> GatherDockerCredentials()
     {
-        AnsiConsole.WriteLine();
-        var registry = AnsiConsole.Ask<string>("What's the registry [green]address[/]?");
-        var username = AnsiConsole.Ask<string>("Enter [green]username[/]?");
-        var password = AnsiConsole.Prompt(
+        console.WriteLine();
+        var registry = console.Ask<string>("What's the registry [green]address[/]?");
+        var username = console.Ask<string>("Enter [green]username[/]?");
+        var password = console.Prompt(
             new TextPrompt<string>("Enter [green]password[/]?")
                 .PromptStyle("red")
                 .Secret());

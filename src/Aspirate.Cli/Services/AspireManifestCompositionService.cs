@@ -1,6 +1,6 @@
 namespace Aspirate.Cli.Services;
 
-public class AspireManifestCompositionService(IFileSystem fileSystem) : IAspireManifestCompositionService
+public class AspireManifestCompositionService(IFileSystem fileSystem, IAnsiConsole console) : IAspireManifestCompositionService
 {
     private readonly StringBuilder _stdOutBuffer = new();
     private readonly StringBuilder _stdErrBuffer = new();
@@ -45,19 +45,19 @@ public class AspireManifestCompositionService(IFileSystem fileSystem) : IAspireM
             switch (cmdEvent)
             {
                 case StartedCommandEvent _:
-                    AnsiConsole.WriteLine();
-                    AnsiConsole.MarkupLine($"[cyan]Executing: dotnet {arguments}[/]");
+                    console.WriteLine();
+                    console.MarkupLine($"[cyan]Executing: dotnet {arguments}[/]");
                     break;
                 case StandardOutputCommandEvent stdOut:
-                    AnsiConsole.WriteLine(stdOut.Text);
+                    console.WriteLine(stdOut.Text);
                     break;
                 case StandardErrorCommandEvent stdErr:
-                    AnsiConsole.MarkupLine($"[red]{stdErr.Text}[/]");
+                    console.MarkupLine($"[red]{stdErr.Text}[/]");
                     break;
                 case ExitedCommandEvent exited:
                     if (exited.ExitCode != 0)
                     {
-                        AnsiConsole.MarkupLine($"[red]{_stdErrBuffer.Append(_stdOutBuffer)}[/]");
+                        console.MarkupLine($"[red]{_stdErrBuffer.Append(_stdOutBuffer)}[/]");
                         Environment.Exit(exited.ExitCode);
                     }
                     break;

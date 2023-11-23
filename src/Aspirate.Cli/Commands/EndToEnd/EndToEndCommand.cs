@@ -3,8 +3,9 @@ namespace Aspirate.Cli.Commands.EndToEnd;
 /// <summary>
 /// The command to convert Aspire Manifests to Kustomize Manifests.
 /// </summary>
-public partial class EndToEndCommand(
+public sealed class EndToEndCommand(
     IManifestFileParserService manifestFileParserService,
+    IAnsiConsole console,
     IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
 {
     public const string EndToEndCommandName = "endtoend";
@@ -30,7 +31,7 @@ public partial class EndToEndCommand(
 
         await GenerateManifests(settings, aspireManifest, componentsToProcess, finalManifests);
 
-        LogCommandCompleted();
+        console.LogCommandCompleted();
 
         return 0;
     }
@@ -38,7 +39,7 @@ public partial class EndToEndCommand(
     private async Task<string> GenerateAspireManifest(
         string appHostPath)
     {
-        LogGeneratingAspireManifest();
+        console.LogGeneratingAspireManifest();
 
         var compositionService = serviceProvider.GetRequiredService<IAspireManifestCompositionService>();
 
@@ -46,38 +47,38 @@ public partial class EndToEndCommand(
 
         if (result.Success)
         {
-            await LogCreatedManifestAtPath(result.FullPath);
+            await console.LogCreatedManifestAtPath(result.FullPath);
             return result.FullPath;
         }
 
-        AnsiConsole.MarkupLine($"[red]Failed to generate Aspire Manifest at: {result.FullPath}[/]");
+        console.LogFailedToGenerateAspireManifest(result.FullPath);
         throw new InvalidOperationException("Failed to generate Aspire Manifest.");
     }
 
     private async Task PopulateProjectContainerDetailsCache(IReadOnlyCollection<KeyValuePair<string, Resource>> projectsToProcess, ProjectProcessor? projectProcessor)
     {
-        LogGatheringContainerDetailsFromProjects();
+        console.LogGatheringContainerDetailsFromProjects();
 
         foreach (var resource in projectsToProcess)
         {
             await projectProcessor.PopulateContainerDetailsCacheForProject(resource);
         }
 
-        await LogGatheringContainerDetailsFromProjectsCompleted();
+        await console.LogGatheringContainerDetailsFromProjectsCompleted();
     }
 
-    private static async Task BuildAndPushProjectContainers(
+    private async Task BuildAndPushProjectContainers(
         IReadOnlyCollection<KeyValuePair<string, Resource>> projectsToProcess,
         ProjectProcessor? projectProcessor)
     {
-        LogBuildingAndPushingContainers();
+        console.LogBuildingAndPushingContainers();
 
         foreach (var resource in projectsToProcess)
         {
             await projectProcessor.BuildAndPushProjectContainer(resource);
         }
 
-        await LogContainerCompositionCompleted();
+        await console.LogContainerCompositionCompleted();
     }
 
     private async Task GenerateManifests(EndToEndInput settings,
@@ -85,14 +86,14 @@ public partial class EndToEndCommand(
         ICollection<string> componentsToProcess,
         Dictionary<string, Resource> finalManifests)
     {
-        LogGeneratingManifests();
+        console.LogGeneratingManifests();
 
         foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource && componentsToProcess.Contains(x.Key)))
         {
             await ProcessIndividualResourceManifests(settings, resource, finalManifests);
         }
 
-        var finalHandler = serviceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final);
+        var finalHandler = serviceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
         finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag);
     }
 
@@ -103,7 +104,7 @@ public partial class EndToEndCommand(
     {
         if (resource.Value.Type is null)
         {
-            LogTypeUnknown(resource.Key);
+            console.LogTypeUnknown(resource.Key);
             return;
         }
 
@@ -111,7 +112,7 @@ public partial class EndToEndCommand(
 
         if (handler is null)
         {
-            LogUnsupportedType(resource.Key);
+            console.LogUnsupportedType(resource.Key);
             return;
         }
 
@@ -123,8 +124,8 @@ public partial class EndToEndCommand(
         }
     }
 
-    private static List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
-        AnsiConsole.Prompt(
+    private List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
+        console.Prompt(
             new MultiSelectionPrompt<string>()
                 .Title("Select [green]components[/] to process from the loaded file")
                 .PageSize(10)
