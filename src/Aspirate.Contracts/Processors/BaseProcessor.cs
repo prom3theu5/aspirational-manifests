@@ -93,5 +93,5 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
     }
 
     protected static void LogCompletion(string outputPath) =>
-        AnsiConsole.MarkupLine($"\t[green](✔) Done: [/] Generating [blue]{outputPath}[/]");
+        AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}[/]");
 }
