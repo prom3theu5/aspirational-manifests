@@ -58,7 +58,7 @@ public class ProjectProcessor(
 
         var result = await containerCompositionService.BuildAndPushContainerForProject(project);
 
-        AnsiConsole.MarkupLine($"\t[green](✔) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
+        AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
 
         return result;
     }

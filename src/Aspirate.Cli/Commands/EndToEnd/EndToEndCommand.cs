@@ -53,7 +53,7 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
 
     private static async Task LogCreatedManifestAtPath(string resultFullPath)
     {
-        AnsiConsole.MarkupLine($"\t[green](✔) Done: [/] Created Aspire Manifest At Path: [blue]{resultFullPath}[/]");
+        AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Created Aspire Manifest At Path: [blue]{resultFullPath}[/]");
         await Task.Delay(2000);
         Console.Clear();
     }
@@ -144,13 +144,6 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
     private static void LogUnsupportedType(string resourceName) =>
         AnsiConsole.MarkupLine($"[yellow]Skipping resource '{resourceName}' as its type is unsupported.[/]");
 
-    private static Task LogGenerationComplete()
-    {
-        AnsiConsole.MarkupLine("\r\n[bold slowblink]Generation completed.[/]");
-
-        return Task.Delay(2000);
-    }
-
     private static Task LogContainerCompositionCompleted()
     {
         AnsiConsole.MarkupLine("\r\n[bold slowblink]Generation completed.[/]");
@@ -159,7 +152,7 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
     }
 
     private static void LogCommandCompleted() =>
-        AnsiConsole.MarkupLine("\r\n[bold slowblink] 🚀 Execution Completed - Happy Deployment 😃[/]");
+        AnsiConsole.MarkupLine($"\r\n[bold] {EmojiLiterals.Rocket} Execution Completed - Happy Deployment {EmojiLiterals.Smiley}[/]");
 
     private static List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
         AnsiConsole.Prompt(
