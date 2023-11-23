@@ -5,8 +5,12 @@ namespace Aspirate.Cli.Services;
 /// Initialises a new instance of <see cref="ManifestFileParserService"/>.
 /// </summary>
 /// <param name="fileSystem">The file system accessor.</param>
+/// <param name="console">The ansi-console instance used for console interaction.</param>
 /// <param name="serviceProvider">The service provider to resolve handlers from.</param>
-public class ManifestFileParserService(IFileSystem fileSystem, IServiceProvider serviceProvider) : IManifestFileParserService
+public class ManifestFileParserService(
+    IFileSystem fileSystem,
+    IAnsiConsole console,
+    IServiceProvider serviceProvider) : IManifestFileParserService
 {
     private static readonly Dictionary<string, Func<string, string>> _aspireTypeHandlers = new()
     {
@@ -49,7 +53,7 @@ public class ManifestFileParserService(IFileSystem fileSystem, IServiceProvider 
 
             if (type == null)
             {
-                AnsiConsole.MarkupLine($"[yellow]Resource {resourceName} does not have a type. Skipping as UnsupportedResource.[/]");
+                console.MarkupLine($"[yellow]Resource {resourceName} does not have a type. Skipping as UnsupportedResource.[/]");
                 resources.Add(resourceName, new UnsupportedResource());
                 continue;
             }

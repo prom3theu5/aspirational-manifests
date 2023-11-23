@@ -18,9 +18,4 @@ public interface IProcessor
     /// Produces the output manifest file.
     /// </summary>
     Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath);
-
-    /// <summary>
-    /// Produces the final kustomization.yml file in the root output folder.
-    /// </summary>
-    void CreateFinalManifest(Dictionary<string, Resource> resources, string outputPath);
 }

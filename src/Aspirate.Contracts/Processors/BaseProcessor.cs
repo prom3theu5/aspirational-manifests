@@ -6,8 +6,9 @@ namespace Aspirate.Contracts.Processors;
 public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateData : BaseTemplateData
 {
     protected readonly IFileSystem _fileSystem;
+    protected readonly IAnsiConsole _console;
 
-    protected static readonly Dictionary<string, string> _templateFileMapping = new()
+    protected readonly Dictionary<string, string> _templateFileMapping = new()
     {
         [TemplateLiterals.DeploymentType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.DeploymentType}.hbs"),
         [TemplateLiterals.ServiceType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.ServiceType}.hbs"),
@@ -21,7 +22,12 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
     /// Initialises a new instance of <see cref="BaseProcessor{TTemplateData}"/>.
     /// </summary>
     /// <param name="fileSystem">The file system accessor.</param>
-    protected BaseProcessor(IFileSystem fileSystem) => _fileSystem = fileSystem;
+    /// <param name="console">The ansi-console instance used for console interaction.</param>
+    protected BaseProcessor(IFileSystem fileSystem, IAnsiConsole console)
+    {
+        _fileSystem = fileSystem;
+        _console = console;
+    }
 
     /// <inheritdoc />
     public abstract string ResourceType { get; }
@@ -32,14 +38,10 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
     /// <inheritdoc />
     public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
     {
-        AnsiConsole.MarkupLine($"\t[bold yellow]Handler {GetType().Name} has not been configured. CreateManifest must be overridden.[/]");
+        _console.LogCreateManifestNotOverridden(GetType().Name);
 
         return Task.FromResult(false);
     }
-
-    /// <inheritdoc />
-    public virtual void CreateFinalManifest(Dictionary<string, Resource> resources, string outputPath) =>
-        AnsiConsole.MarkupLine($"\t[bold yellow]Handler {GetType().Name} has not been configured. CreateFinalManifest must be overridden in the FinalHandler.[/]");
 
     protected void EnsureOutputDirectoryExistsAndIsClean(string outputPath)
     {
@@ -92,6 +94,6 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
         _fileSystem.File.WriteAllText(outputPath, output);
     }
 
-    protected static void LogCompletion(string outputPath) =>
-        AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}[/]");
+    protected void LogCompletion(string outputPath) =>
+        _console.LogCompletion(outputPath);
 }

@@ -5,7 +5,7 @@ namespace Aspirate.Cli.Processors.Components.Redis;
 /// <summary>
 /// Handles producing the Redis component as Kustomize manifest.
 /// </summary>
-public class RedisProcessor(IFileSystem fileSystem) : BaseProcessor<RedisTemplateData>(fileSystem)
+public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console) : BaseProcessor<RedisTemplateData>(fileSystem, console)
 {
     private readonly IReadOnlyCollection<string> _manifests =
     [

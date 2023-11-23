@@ -5,7 +5,7 @@ namespace Aspirate.Cli.Processors.Components.RabbitMQ;
 /// <summary>
 /// Handles producing the RabbitMq component as Kustomize manifest.
 /// </summary>
-public class RabbitMqProcessor(IFileSystem fileSystem) : BaseProcessor<RabbitMqTemplateData>(fileSystem)
+public class RabbitMqProcessor(IFileSystem fileSystem, IAnsiConsole console) : BaseProcessor<RabbitMqTemplateData>(fileSystem, console)
 {
     private readonly IReadOnlyCollection<string> _manifests =
     [

@@ -7,9 +7,10 @@ namespace Aspirate.Cli.Processors.Components.Project;
 /// </summary>
 public class ProjectProcessor(
     IFileSystem fileSystem,
+    IAnsiConsole console,
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService)
-        : BaseProcessor<ProjectTemplateData>(fileSystem)
+        : BaseProcessor<ProjectTemplateData>(fileSystem, console)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireLiterals.Project;
@@ -60,7 +61,7 @@ public class ProjectProcessor(
 
         await containerCompositionService.BuildAndPushContainerForProject(project);
 
-        AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
+        _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }
 
     public async Task PopulateContainerDetailsCacheForProject(KeyValuePair<string, Resource> resource)
@@ -78,17 +79,17 @@ public class ProjectProcessor(
             throw new InvalidOperationException($"Failed to add container details for project {resource.Key} to cache.");
         }
 
-        AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
+        _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
     }
 
-    private static void ErrorIfContainerRegistryIsEmpty(ContainerDetails details, AspireProject project)
+    private void ErrorIfContainerRegistryIsEmpty(ContainerDetails details, AspireProject project)
     {
         if (!string.IsNullOrEmpty(details.ContainerRegistry))
         {
             return;
         }
 
-        AnsiConsole.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
+        _console.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
         Environment.Exit(1);
     }
 }
