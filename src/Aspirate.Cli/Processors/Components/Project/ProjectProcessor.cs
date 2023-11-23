@@ -69,6 +69,8 @@ public class ProjectProcessor(
 
         var details = await containerDetailsService.GetContainerDetails(resource.Key, project);
 
+        ErrorIfContainerRegistryIsEmpty(details, project);
+
         var success = _containerDetailsCache.TryAdd(resource.Key, details);
 
         if (!success)
@@ -77,6 +79,17 @@ public class ProjectProcessor(
         }
 
         AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
+    }
+
+    private static void ErrorIfContainerRegistryIsEmpty(ContainerDetails details, AspireProject project)
+    {
+        if (!string.IsNullOrEmpty(details.ContainerRegistry))
+        {
+            return;
+        }
+
+        AnsiConsole.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
+        Environment.Exit(1);
     }
 }
 
