@@ -11,11 +11,11 @@ app.Configure(
         config.AddCommand<EndToEndCommand>(EndToEndCommand.EndToEndCommandName)
             .WithDescription(EndToEndCommand.EndToEndDescription)
             .WithAlias("e2e")
-            .WithExample(["e2e", "-m", "./Example/AppHost", "-o", "./output"]);
+            .WithExample(["e2e", "-p", ".", "-o", "./output"]);
 
         config.AddCommand<InitCommand>(InitCommand.InitCommandName)
             .WithDescription(InitCommand.InitDescription)
-            .WithExample(["init", "-m", "./Example/AppHost"]);
+            .WithExample(["init", "-p", "."]);
     });
 
 return app.Run(args);
