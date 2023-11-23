@@ -15,13 +15,30 @@ cd aspirational-manifests
 dotnet pack -c Release -o ./artifacts
 dotnet tool install -g aspirate --add-source ./artifacts/
 ```
+---
+### Generating Manifests (end-to-end)
+#### ContainerRegistry
+You're csproj files (projects) that will be build as containers **MUST** contain ContainerRegistry as a minimum, or the sdk will raise a CONTAINERS1013 error.
+To get around this - you can either add it as required, or use the 'init' command.
+The init command allows you to bootstrap certain settings for an asire project that Aspir8 will use.
 
-Now navigate to your Aspire project's AppHost directory, and run:
+- ContainerRegistry: setting this means you do not need one in your csproj, and if it isn't found - all builds will use this.
+- ContainerTag - will override the container tag used if not in your csproj - if not specified in settings, will fall-back to latest.
+- TemplatePath - this customises the path used when loading templates that get transformed to manifests, you can take the templates folder from the source, and modify to your hearts content with all your custom changes, and as long as you don't remove the placeholders, aspirate will use those instead of its built in.
+  More on this and possible use cases (such as adding jobs to create databases etc) when we have docs....
+
+To use the init command, you simply run:
+```bash
+aspirate init -p .
+```
+from withinn your AppHost directory - and it'll ask you which settings you'd like to override.
+
+#### Produce Manifests
+Navigate to your Aspire project's AppHost directory, and run:
 ```bash
 aspirate e2e -p . -o ./output
 ```
 Your manifests will be in the AppHost/output directory
-
 ---
 ### Uninstall tool
 ```bash
