@@ -4,6 +4,7 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using Aspirate.Contracts.Interfaces;
 global using Aspirate.Contracts.Literals;
+global using Aspirate.Contracts.Models.Aspirate;
 global using Aspirate.Contracts.Models.AspireManifests;
 global using Aspirate.Contracts.Models.AspireManifests.Components.V0;
 global using Aspirate.Contracts.Models.MsBuild;

@@ -11,7 +11,11 @@ app.Configure(
         config.AddCommand<EndToEndCommand>(EndToEndCommand.EndToEndCommandName)
             .WithDescription(EndToEndCommand.EndToEndDescription)
             .WithAlias("e2e")
-            .WithExample(["e2e", "-m", "./Example/aspire-manifest.json", "-o", "./output"]);
+            .WithExample(["e2e", "-m", "./Example/AppHost", "-o", "./output"]);
+
+        config.AddCommand<InitCommand>(InitCommand.InitCommandName)
+            .WithDescription(InitCommand.InitDescription)
+            .WithExample(["init", "-m", "./Example/AppHost"]);
     });
 
 return app.Run(args);

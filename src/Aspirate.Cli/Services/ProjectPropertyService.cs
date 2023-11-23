@@ -6,10 +6,8 @@ public sealed class ProjectPropertyService(IFileSystem filesystem) : IProjectPro
 
     public async Task<string?> GetProjectPropertiesAsync(string projectPath, params string[] propertyNames)
     {
-        var currentDirectory = filesystem.Directory.GetCurrentDirectory();
-        var normalizedProjectPath = projectPath.Replace('\\', filesystem.Path.DirectorySeparatorChar);
-        var fullProjectPath = filesystem.Path.Combine(currentDirectory, normalizedProjectPath);
-        var projectDirectory = filesystem.Path.GetDirectoryName(fullProjectPath) ?? throw new($"Could not get directory name from {fullProjectPath}");
+        var fullProjectPath = filesystem.NormalizePath(projectPath);
+        var projectDirectory = filesystem.Path.GetDirectoryName(fullProjectPath);
         var propertyValues = await ExecuteDotnetMsBuildGetPropertyCommand(projectDirectory, propertyNames);
 
         return propertyValues ?? null;

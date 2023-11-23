@@ -27,7 +27,7 @@ public class ProjectProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireProject>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -46,9 +46,9 @@ public class ProjectProcessor(
             project.Env,
             _manifests);
 
-        CreateDeployment(resourceOutputPath, data);
-        CreateService(resourceOutputPath, data);
-        CreateComponentKustomizeManifest(resourceOutputPath, data);
+        CreateDeployment(resourceOutputPath, data, aspirateSettings);
+        CreateService(resourceOutputPath, data, aspirateSettings);
+        CreateComponentKustomizeManifest(resourceOutputPath, data, aspirateSettings);
 
         LogCompletion(resourceOutputPath);
 
@@ -69,11 +69,13 @@ public class ProjectProcessor(
         _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }
 
-    public async Task PopulateContainerDetailsCacheForProject(KeyValuePair<string, Resource> resource)
+    public async Task PopulateContainerDetailsCacheForProject(
+        KeyValuePair<string, Resource> resource,
+        AspirateSettings? aspirateSettings)
     {
         var project = resource.Value as AspireProject;
 
-        var details = await containerDetailsService.GetContainerDetails(resource.Key, project);
+        var details = await containerDetailsService.GetContainerDetails(resource.Key, project, aspirateSettings);
 
         var success = _containerDetailsCache.TryAdd(resource.Key, details);
 

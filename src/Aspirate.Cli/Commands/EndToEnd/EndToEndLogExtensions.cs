@@ -41,6 +41,9 @@ public static class EndToEndLogExtensions
     public static void LogCommandCompleted(this IAnsiConsole console) =>
         console.MarkupLine($"\r\n[bold] {EmojiLiterals.Rocket} Execution Completed - Happy Deployment {EmojiLiterals.Smiley}[/]");
 
+    public static void LogLoadedConfigurationFile(this IAnsiConsole console, string pathToFile) =>
+        console.MarkupLine($"\r\n[bold] Successfully loaded existing aspirate bootstrap settings from [blue]'{pathToFile}'[/].[/]");
+
     public static void LogFailedToGenerateAspireManifest(this IAnsiConsole console, string path) =>
         console.MarkupLine($"[red]Failed to generate Aspire Manifest at: {path}[/]");
 }

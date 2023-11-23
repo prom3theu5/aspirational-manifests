@@ -12,8 +12,4 @@
     <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Containers\" />
-  </ItemGroup>
-
 </Project>

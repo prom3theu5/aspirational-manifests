@@ -7,15 +7,16 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
 {
     protected readonly IFileSystem _fileSystem;
     protected readonly IAnsiConsole _console;
+    protected readonly string _defaultTemplatePath = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder);
 
     protected readonly Dictionary<string, string> _templateFileMapping = new()
     {
-        [TemplateLiterals.DeploymentType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.DeploymentType}.hbs"),
-        [TemplateLiterals.ServiceType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.ServiceType}.hbs"),
-        [TemplateLiterals.ComponentKustomizeType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.ComponentKustomizeType}.hbs"),
-        [TemplateLiterals.RedisType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.RedisType}.hbs"),
-        [TemplateLiterals.RabbitMqType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.RabbitMqType}.hbs"),
-        [TemplateLiterals.PostgresServerType] = Path.Combine(AppContext.BaseDirectory, TemplateLiterals.TemplatesFolder, $"{TemplateLiterals.PostgresServerType}.hbs"),
+        [TemplateLiterals.DeploymentType] = $"{TemplateLiterals.DeploymentType}.hbs",
+        [TemplateLiterals.ServiceType] = $"{TemplateLiterals.ServiceType}.hbs",
+        [TemplateLiterals.ComponentKustomizeType] = $"{TemplateLiterals.ComponentKustomizeType}.hbs",
+        [TemplateLiterals.RedisType] = $"{TemplateLiterals.RedisType}.hbs",
+        [TemplateLiterals.RabbitMqType] = $"{TemplateLiterals.RabbitMqType}.hbs",
+        [TemplateLiterals.PostgresServerType] = $"{TemplateLiterals.PostgresServerType}.hbs",
     };
 
     /// <summary>
@@ -36,7 +37,7 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
     public abstract Resource? Deserialize(ref Utf8JsonReader reader);
 
     /// <inheritdoc />
-    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
+    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null)
     {
         _console.LogCreateManifestNotOverridden(GetType().Name);
 
@@ -53,46 +54,59 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
         _fileSystem.Directory.CreateDirectory(outputPath);
     }
 
-    protected void CreateDeployment(string outputPath, TTemplateData data)
+    protected void CreateDeployment(string outputPath, TTemplateData data, AspirateSettings? aspirateSettings = null)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.DeploymentType, out var templateFile);
         var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DeploymentType}.yml");
 
-        CreateFile(templateFile, deploymentOutputPath, data);
+        CreateFile(templateFile, deploymentOutputPath, data, aspirateSettings);
     }
 
-    protected void CreateService(string outputPath, TTemplateData data)
+    protected void CreateService(string outputPath, TTemplateData data, AspirateSettings? aspirateSettings = null)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ServiceType, out var templateFile);
         var serviceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ServiceType}.yml");
 
-        CreateFile(templateFile, serviceOutputPath, data);
+        CreateFile(templateFile, serviceOutputPath, data, aspirateSettings);
     }
 
-    protected void CreateComponentKustomizeManifest(string outputPath, TTemplateData data)
+    protected void CreateComponentKustomizeManifest(
+        string outputPath,
+        TTemplateData data,
+        AspirateSettings? aspirateSettings = null)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ComponentKustomizeType, out var templateFile);
         var kustomizeOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ComponentKustomizeType}.yml");
 
-        CreateFile(templateFile, kustomizeOutputPath, data);
+        CreateFile(templateFile, kustomizeOutputPath, data, aspirateSettings);
     }
 
-    protected void CreateCustomManifest(string outputPath, string fileName, string templateType, TTemplateData data)
+    protected void CreateCustomManifest(
+        string outputPath,
+        string fileName,
+        string templateType,
+        TTemplateData data,
+        AspirateSettings? aspirateSettings = null)
     {
         _templateFileMapping.TryGetValue(templateType, out var templateFile);
         var deploymentOutputPath = Path.Combine(outputPath, fileName);
 
-        CreateFile(templateFile, deploymentOutputPath, data);
+        CreateFile(templateFile, deploymentOutputPath, data, aspirateSettings);
     }
 
-    private void CreateFile(string inputFile, string outputPath, TTemplateData data)
+    private void CreateFile(string inputFile, string outputPath, TTemplateData data, AspirateSettings? aspirateSettings = null)
     {
-        var template = _fileSystem.File.ReadAllText(inputFile);
+        var templateFile = GetTemplateFilePath(inputFile, aspirateSettings);
+
+        var template = _fileSystem.File.ReadAllText(templateFile);
         var handlebarTemplate = Handlebars.Compile(template);
         var output = handlebarTemplate(data);
 
         _fileSystem.File.WriteAllText(outputPath, output);
     }
+
+    private string GetTemplateFilePath(string templateFile, AspirateSettings? aspirateSettings = null) =>
+        Path.Combine(aspirateSettings?.TemplatePath ?? _defaultTemplatePath, templateFile);
 
     protected void LogCompletion(string outputPath) =>
         _console.LogCompletion(outputPath);

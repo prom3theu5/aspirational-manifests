@@ -6,6 +6,7 @@ namespace Aspirate.Cli.Commands.EndToEnd;
 public sealed class EndToEndCommand(
     IManifestFileParserService manifestFileParserService,
     IAnsiConsole console,
+    IAspirateConfigurationService configurationService,
     IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
 {
     public const string EndToEndCommandName = "endtoend";
@@ -15,6 +16,13 @@ public sealed class EndToEndCommand(
 
     public override async Task<int> ExecuteAsync(CommandContext context, EndToEndInput settings)
     {
+        var aspirateSettings = configurationService.LoadConfigurationFile(settings.PathToAspireProjectFlag);
+
+        if (aspirateSettings is not null)
+        {
+            console.LogLoadedConfigurationFile(settings.PathToAspireProjectFlag);
+        }
+
         var appManifestFilePath = await GenerateAspireManifest(settings.PathToAspireProjectFlag);
         var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(appManifestFilePath);
         var finalManifests = new Dictionary<string, Resource>();
@@ -25,11 +33,11 @@ public sealed class EndToEndCommand(
 
         var projectProcessor = serviceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Project) as ProjectProcessor;
 
-        await PopulateProjectContainerDetailsCache(projectsToProcess, projectProcessor);
+        await PopulateProjectContainerDetailsCache(projectsToProcess, projectProcessor, aspirateSettings);
 
         await BuildAndPushProjectContainers(projectsToProcess, projectProcessor);
 
-        await GenerateManifests(settings, aspireManifest, componentsToProcess, finalManifests);
+        await GenerateManifests(settings, aspireManifest, componentsToProcess, finalManifests, aspirateSettings);
 
         console.LogCommandCompleted();
 
@@ -55,13 +63,15 @@ public sealed class EndToEndCommand(
         throw new InvalidOperationException("Failed to generate Aspire Manifest.");
     }
 
-    private async Task PopulateProjectContainerDetailsCache(IReadOnlyCollection<KeyValuePair<string, Resource>> projectsToProcess, ProjectProcessor? projectProcessor)
+    private async Task PopulateProjectContainerDetailsCache(IReadOnlyCollection<KeyValuePair<string, Resource>> projectsToProcess,
+        ProjectProcessor? projectProcessor,
+        AspirateSettings? aspirateSettings)
     {
         console.LogGatheringContainerDetailsFromProjects();
 
         foreach (var resource in projectsToProcess)
         {
-            await projectProcessor.PopulateContainerDetailsCacheForProject(resource);
+            await projectProcessor.PopulateContainerDetailsCacheForProject(resource, aspirateSettings);
         }
 
         await console.LogGatheringContainerDetailsFromProjectsCompleted();
@@ -84,7 +94,8 @@ public sealed class EndToEndCommand(
     private async Task GenerateManifests(EndToEndInput settings,
         Dictionary<string, Resource> aspireManifest,
         ICollection<string> componentsToProcess,
-        Dictionary<string, Resource> finalManifests)
+        Dictionary<string, Resource> finalManifests,
+        AspirateSettings? aspirateSettings)
     {
         console.LogGeneratingManifests();
 
@@ -94,7 +105,7 @@ public sealed class EndToEndCommand(
         }
 
         var finalHandler = serviceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
-        finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag);
+        finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag, aspirateSettings);
     }
 
     private async Task ProcessIndividualResourceManifests(

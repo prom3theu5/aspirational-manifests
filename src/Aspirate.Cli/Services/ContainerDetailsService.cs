@@ -3,7 +3,10 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
 {
     private static readonly StringBuilder _imageBuilder = new();
 
-    public async Task<MsBuildContainerProperties> GetContainerDetails(string resourceName, Project project)
+    public async Task<MsBuildContainerProperties> GetContainerDetails(
+        string resourceName,
+        Project project,
+        AspirateSettings? aspirateSettings = null)
     {
         var containerPropertiesJson = await propertyService.GetProjectPropertiesAsync(
             project.Path,
@@ -15,7 +18,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         var msBuildProperties = JsonSerializer.Deserialize<MsBuildProperties<MsBuildContainerProperties>>(containerPropertiesJson ?? "{}");
 
         // Exit app if container registry is empty. We need it.
-        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, project);
+        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, project, aspirateSettings);
 
         // Fallback to service name if image name is not provided from anywhere.
         if (string.IsNullOrEmpty(msBuildProperties.Properties.ContainerRepository) && string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImage))
@@ -24,10 +27,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         // Fallback to latest tag if tag not specified.
-        if (string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImageTag))
-        {
-            msBuildProperties.Properties.ContainerImageTag = "latest";
-        }
+        HandleTag(msBuildProperties, aspirateSettings);
 
         msBuildProperties.Properties.FullContainerImage = GetFullImage(msBuildProperties.Properties);
 
@@ -71,14 +71,43 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
     private static void HandleRegistry(MsBuildContainerProperties containerDetails) =>
         _imageBuilder.Append($"{containerDetails.ContainerRegistry}");
 
-    private void EnsureContainerRegistryIsNotEmpty(MsBuildContainerProperties details, Project project)
+    private void EnsureContainerRegistryIsNotEmpty(
+        MsBuildContainerProperties details,
+        Project project,
+        AspirateSettings? aspirateSettings)
     {
         if (!string.IsNullOrEmpty(details.ContainerRegistry))
         {
             return;
         }
 
+        // Use our custom fall-back value if it exists
+        if (!string.IsNullOrEmpty(aspirateSettings?.ContainerSettings?.Registry))
+        {
+            details.ContainerRegistry = aspirateSettings.ContainerSettings.Registry;
+            return;
+        }
+
         console.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
         Environment.Exit(1);
+    }
+
+    private static void HandleTag(
+        MsBuildProperties<MsBuildContainerProperties> msBuildProperties,
+        AspirateSettings? aspirateSettings)
+    {
+        if (!string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImageTag))
+        {
+            return;
+        }
+
+        // Use our custom fall-back value if it exists
+        if (!string.IsNullOrEmpty(aspirateSettings?.ContainerSettings?.Tag))
+        {
+            msBuildProperties.Properties.ContainerImageTag = aspirateSettings.ContainerSettings.Tag;
+            return;
+        }
+
+        msBuildProperties.Properties.ContainerImageTag = "latest";
     }
 }

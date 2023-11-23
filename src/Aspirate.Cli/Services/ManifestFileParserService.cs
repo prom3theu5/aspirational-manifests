@@ -32,7 +32,7 @@ public class ManifestFileParserService(
 
         if (!fileSystem.File.Exists(manifestFile))
         {
-            throw new InvalidOperationException("The input file does not exist.");
+            throw new InvalidOperationException($"The manifest file could not be loaded from: '{manifestFile}'");
         }
 
         var inputJson = fileSystem.File.ReadAllText(manifestFile);

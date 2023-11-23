@@ -17,7 +17,7 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<PostgresServer>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -25,8 +25,8 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
 
         var data = new PostgresServerTemplateData(_manifests);
 
-        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.PostgresServerType}.yml", TemplateLiterals.PostgresServerType, data);
-        CreateComponentKustomizeManifest(resourceOutputPath, data);
+        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.PostgresServerType}.yml", TemplateLiterals.PostgresServerType, data, aspirateSettings);
+        CreateComponentKustomizeManifest(resourceOutputPath, data, aspirateSettings);
 
         LogCompletion(resourceOutputPath);
 
