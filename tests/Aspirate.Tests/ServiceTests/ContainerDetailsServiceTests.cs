@@ -5,7 +5,7 @@ public class ContainerDetailsServiceTests
 {
     [ModuleInitializer]
     internal static void Initialize() =>
-        VerifierSettings.NameForParameter<TestContainerProperties>(_ => _.Value);
+        VerifierSettings.NameForParameter<TestContainerProperties>(name => name.Value);
 
     [Theory]
     [MemberData(nameof(MockContainerProperties))]
@@ -13,6 +13,7 @@ public class ContainerDetailsServiceTests
     {
         // Arrange
         var projectPropertyService = Substitute.For<IProjectPropertyService>();
+        var testConsole = new TestConsole();
 
         var responseJson = JsonSerializer.Serialize(properties.Properties);
 
@@ -21,7 +22,7 @@ public class ContainerDetailsServiceTests
             .ReturnsForAnyArgs(responseJson);
 
 
-        var containerDetailsService = new ContainerDetailsService(projectPropertyService);
+        var containerDetailsService = new ContainerDetailsService(projectPropertyService, testConsole);
 
         // Act
         var containerDetails = await containerDetailsService.GetContainerDetails("test-service", new());
@@ -67,7 +68,7 @@ public class ContainerDetailsServiceTests
             },
         };
 
-    private static ContainerProperties CreateContainerProperties(string? registry = null,
+    private static MsBuildProperties<MsBuildContainerProperties> CreateContainerProperties(string? registry = null,
         string? repo = null,
         string? image = null,
         string? tag = null) =>
@@ -79,5 +80,5 @@ public class ContainerDetailsServiceTests
             },
         };
 
-    public record TestContainerProperties(string Value, ContainerProperties Properties);
+    public record TestContainerProperties(string Value, MsBuildProperties<MsBuildContainerProperties> Properties);
 }

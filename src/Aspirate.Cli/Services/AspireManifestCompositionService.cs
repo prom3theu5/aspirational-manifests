@@ -17,24 +17,31 @@ public class AspireManifestCompositionService(IFileSystem fileSystem, IAnsiConso
             appHostProject = fileSystem.Path.Combine(currentDirectory, normalizedProjectPath);
         }
 
-        var outputFile = await BuildManifest(appHostProject);
+        var argumentsBuilder = ArgumentsBuilder.Create()
+            .AppendArgument(DotNetSdkLiterals.RunArgument, string.Empty, quoteValue: false)
+            .AppendArgument(DotNetSdkLiterals.ProjectArgument, appHostProject)
+            .AppendArgument(DotNetSdkLiterals.ArgumentDelimiter, string.Empty, quoteValue: false)
+            .AppendArgument(DotNetSdkLiterals.PublisherArgument, AspireLiterals.ManifestPublisherArgument, quoteValue: false)
+            .AppendArgument(DotNetSdkLiterals.OutputPathArgument, AspireLiterals.DefaultManifestFile, quoteValue: false);
+
+        var outputFile = await BuildManifest(appHostProject, argumentsBuilder);
 
         return (true, outputFile);
     }
 
-    private async Task<string> BuildManifest(string projectPath, string outputFileName = "manifest.json")
+    private async Task<string> BuildManifest(string projectPath, ArgumentsBuilder argumentsBuilder)
     {
         var appHostDirectory = fileSystem.Path.GetDirectoryName(projectPath);
-        var outputFile = fileSystem.Path.Combine(appHostDirectory, outputFileName);
+        var outputFile = fileSystem.Path.Combine(appHostDirectory, AspireLiterals.DefaultManifestFile);
 
         if (fileSystem.File.Exists(outputFile))
         {
             fileSystem.File.Delete(outputFile);
         }
 
-        var arguments = AspireLiterals.BuildManifestCommand(projectPath, outputFile);
+        var arguments = argumentsBuilder.RenderArguments();
 
-        var executeCommand = CliWrap.Cli.Wrap("dotnet")
+        var executeCommand = CliWrap.Cli.Wrap(DotNetSdkLiterals.DotNetCommand)
             .WithArguments(arguments)
             .WithValidation(CommandResultValidation.None)
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))

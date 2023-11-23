@@ -9,5 +9,6 @@ public static class AspireLiterals
     public const string Redis = "redis.v0";
     public const string RabbitMq = "rabbitmq.server.v0";
     public const string Final = "final";
-    public static string BuildManifestCommand(string appHostProjectPath, string outputFile = "manifest.json") => $"run --project {appHostProjectPath} -- --publisher manifest --output-path {outputFile}";
+    public const string DefaultManifestFile = "manifest.json";
+    public const string ManifestPublisherArgument = "manifest";
 }
