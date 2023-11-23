@@ -3,6 +3,7 @@ namespace Aspirate.Contracts.Models.AspireManifests.Components;
 /// <summary>
 /// A resource that is not yet supported by Aspirational Manifests.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UnsupportedResource : Resource
 {
     /// <summary>

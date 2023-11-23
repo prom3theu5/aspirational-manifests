@@ -1,5 +1,6 @@
 namespace Aspirate.Contracts.Models.Containers;
 
+[ExcludeFromCodeCoverage]
 public sealed class ContainerDetails(
     string resourceName,
     string? containerRegistry,
@@ -7,7 +8,6 @@ public sealed class ContainerDetails(
     string? containerImage,
     string? containerTag)
 {
-    public string ResourceName { get; } = resourceName;
     public string? ContainerRegistry { get; } = containerRegistry;
 
     public string? ContainerRepository { get; } = containerRepository;
@@ -15,4 +15,6 @@ public sealed class ContainerDetails(
     public string? ContainerImage { get; } = containerImage;
 
     public string? ContainerTag { get; } = containerTag;
+
+    public string? FullContainerImage { get; set; }
 }

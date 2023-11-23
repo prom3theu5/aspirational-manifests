@@ -1,5 +1,6 @@
 namespace Aspirate.Contracts.Models.Containers;
 
+[ExcludeFromCodeCoverage]
 public sealed class Properties
 {
     [JsonPropertyName("ContainerRegistry")]

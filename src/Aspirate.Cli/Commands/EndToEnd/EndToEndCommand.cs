@@ -3,41 +3,44 @@ namespace Aspirate.Cli.Commands.EndToEnd;
 /// <summary>
 /// The command to convert Aspire Manifests to Kustomize Manifests.
 /// </summary>
-public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
+public partial class EndToEndCommand(
+    IManifestFileParserService manifestFileParserService,
+    IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
 {
     public const string EndToEndCommandName = "endtoend";
     public const string EndToEndDescription = "Builds, pushes containers, generates aspire manifest and kustomize manifests.";
+    private static bool IsDatabase(Resource resource) =>
+        resource is PostgresDatabase;
 
     public override async Task<int> ExecuteAsync(CommandContext context, EndToEndInput settings)
     {
-        using var scope = serviceProvider.CreateScope();
-
-        var appManifestFilePath = await GenerateAspireManifest(settings.PathToAspireProjectFlag, scope);
-
-        var manifestFileParserService = scope.ServiceProvider.GetRequiredService<IManifestFileParserService>();
+        var appManifestFilePath = await GenerateAspireManifest(settings.PathToAspireProjectFlag);
         var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(appManifestFilePath);
         var finalManifests = new Dictionary<string, Resource>();
 
         var componentsToProcess = SelectManifestItemsToProcess(aspireManifest.Keys.ToList());
 
-        await BuildAndPushProjectContainers(aspireManifest, componentsToProcess, scope);
+        var projectsToProcess = aspireManifest.Where(x => x.Value is Project && componentsToProcess.Contains(x.Key)).ToList();
 
-        await GenerateManifests(settings, aspireManifest, componentsToProcess, scope, finalManifests);
+        var projectProcessor = serviceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Project) as ProjectProcessor;
+
+        await PopulateProjectContainerDetailsCache(projectsToProcess, projectProcessor);
+
+        await BuildAndPushProjectContainers(projectsToProcess, projectProcessor);
+
+        await GenerateManifests(settings, aspireManifest, componentsToProcess, finalManifests);
 
         LogCommandCompleted();
 
         return 0;
     }
 
-    private static async Task<string> GenerateAspireManifest(
-        string appHostPath,
-        IServiceScope scope)
+    private async Task<string> GenerateAspireManifest(
+        string appHostPath)
     {
-        Console.Clear();
-
         LogGeneratingAspireManifest();
 
-        var compositionService = scope.ServiceProvider.GetRequiredService<IAspireManifestCompositionService>();
+        var compositionService = serviceProvider.GetRequiredService<IAspireManifestCompositionService>();
 
         var result = await compositionService.BuildManifestForProject(appHostPath);
 
@@ -51,66 +54,60 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
         throw new InvalidOperationException("Failed to generate Aspire Manifest.");
     }
 
-    private static async Task LogCreatedManifestAtPath(string resultFullPath)
+    private async Task PopulateProjectContainerDetailsCache(IReadOnlyCollection<KeyValuePair<string, Resource>> projectsToProcess, ProjectProcessor? projectProcessor)
     {
-        AnsiConsole.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Created Aspire Manifest At Path: [blue]{resultFullPath}[/]");
-        await Task.Delay(2000);
-        Console.Clear();
+        LogGatheringContainerDetailsFromProjects();
+
+        foreach (var resource in projectsToProcess)
+        {
+            await projectProcessor.PopulateContainerDetailsCacheForProject(resource);
+        }
+
+        await LogGatheringContainerDetailsFromProjectsCompleted();
     }
 
     private static async Task BuildAndPushProjectContainers(
-        Dictionary<string, Resource> aspireManifest,
-        ICollection<string> componentsToProcess,
-        IServiceScope scope)
+        IReadOnlyCollection<KeyValuePair<string, Resource>> projectsToProcess,
+        ProjectProcessor? projectProcessor)
     {
-        Console.Clear();
-
         LogBuildingAndPushingContainers();
 
-        var handler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Project) as ProjectProcessor;
-
-        foreach (var resource in aspireManifest.Where(x => x.Value is Project && componentsToProcess.Contains(x.Key)))
+        foreach (var resource in projectsToProcess)
         {
-            await handler.BuildAndPushProjectContainer(resource);
+            await projectProcessor.BuildAndPushProjectContainer(resource);
         }
 
         await LogContainerCompositionCompleted();
     }
 
-    private static async Task GenerateManifests(EndToEndInput settings,
+    private async Task GenerateManifests(EndToEndInput settings,
         Dictionary<string, Resource> aspireManifest,
         ICollection<string> componentsToProcess,
-        IServiceScope scope,
         Dictionary<string, Resource> finalManifests)
     {
-        Console.Clear();
-
         LogGeneratingManifests();
 
         foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource && componentsToProcess.Contains(x.Key)))
         {
-            await ProcessIndividualResourceManifests(scope, settings, resource, finalManifests);
+            await ProcessIndividualResourceManifests(settings, resource, finalManifests);
         }
 
-        var finalHandler = scope.ServiceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final);
+        var finalHandler = serviceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final);
         finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag);
     }
 
-    private static async Task ProcessIndividualResourceManifests(
-        IServiceScope scope,
+    private async Task ProcessIndividualResourceManifests(
         EndToEndInput input,
         KeyValuePair<string, Resource> resource,
         Dictionary<string, Resource> finalManifests)
     {
-        ArgumentNullException.ThrowIfNull(scope, nameof(scope));
-
         if (resource.Value.Type is null)
         {
             LogTypeUnknown(resource.Key);
             return;
         }
 
-        var handler = scope.ServiceProvider.GetKeyedService<IProcessor>(resource.Value.Type);
+        var handler = serviceProvider.GetKeyedService<IProcessor>(resource.Value.Type);
 
         if (handler is null)
         {
@@ -125,34 +122,6 @@ public class EndToEndCommand(IServiceProvider serviceProvider) : AsyncCommand<En
             finalManifests.Add(resource.Key, resource.Value);
         }
     }
-
-    private static void LogGeneratingManifests() =>
-        AnsiConsole.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
-
-    private static void LogGeneratingAspireManifest() =>
-        AnsiConsole.MarkupLine("\r\n[bold]Generating Aspire Manifest for supplied App Host:[/]\r\n");
-
-    private static void LogBuildingAndPushingContainers() =>
-        AnsiConsole.MarkupLine("\r\n[bold]Building all project resources, and pushing containers:[/]\r\n");
-
-    private static bool IsDatabase(Resource resource) =>
-        resource is PostgresDatabase;
-
-    private static void LogTypeUnknown(string resourceName) =>
-        AnsiConsole.MarkupLine($"[yellow]Skipping resource '{resourceName}' as its type is unknown.[/]");
-
-    private static void LogUnsupportedType(string resourceName) =>
-        AnsiConsole.MarkupLine($"[yellow]Skipping resource '{resourceName}' as its type is unsupported.[/]");
-
-    private static Task LogContainerCompositionCompleted()
-    {
-        AnsiConsole.MarkupLine("\r\n[bold slowblink]Generation completed.[/]");
-
-        return Task.Delay(2000);
-    }
-
-    private static void LogCommandCompleted() =>
-        AnsiConsole.MarkupLine($"\r\n[bold] {EmojiLiterals.Rocket} Execution Completed - Happy Deployment {EmojiLiterals.Smiley}[/]");
 
     private static List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
         AnsiConsole.Prompt(

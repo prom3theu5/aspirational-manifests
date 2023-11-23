@@ -1,5 +1,6 @@
 namespace Aspirate.Contracts.Literals;
 
+[ExcludeFromCodeCoverage]
 public static class ContainerBuilderLiterals
 {
     public const string ContainerRegistry = "ContainerRegistry";

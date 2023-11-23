@@ -11,16 +11,15 @@
     <ProjectReference Include="..\Aspirate.Spectre.DependencyInjection\Aspirate.Spectre.DependencyInjection.csproj" />
     <ProjectReference Include="..\Aspirate.Contracts\Aspirate.Contracts.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Update="Templates\*.hbs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="CliWrap" />
-    <PackageReference Include="Humanizer" />
   </ItemGroup>
 
 </Project>

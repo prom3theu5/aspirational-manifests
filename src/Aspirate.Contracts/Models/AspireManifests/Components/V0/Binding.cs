@@ -3,6 +3,7 @@ namespace Aspirate.Contracts.Models.AspireManifests.Components.V0;
 /// <summary>
 /// A binding for a project.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class Binding
 {
     /// <summary>

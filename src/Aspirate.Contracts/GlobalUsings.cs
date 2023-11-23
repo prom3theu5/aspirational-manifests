@@ -1,3 +1,4 @@
+global using System.Diagnostics.CodeAnalysis;
 global using System.IO.Abstractions;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;

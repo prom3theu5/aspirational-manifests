@@ -1,5 +1,6 @@
 namespace Aspirate.Contracts.Literals;
 
+[ExcludeFromCodeCoverage]
 public class TemplateLiterals
 {
     public const string TemplatesFolder = "Templates";

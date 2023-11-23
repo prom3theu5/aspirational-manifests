@@ -1,5 +1,6 @@
 namespace Aspirate.Contracts.Literals;
 
+[ExcludeFromCodeCoverage]
 public static class DotNetSdkLiterals
 {
     public const string DuplicateFileOutputError = "NETSDK1152";
