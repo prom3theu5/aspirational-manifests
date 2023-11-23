@@ -10,9 +10,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         _stdErrBuffer.Clear();
         _stdOutBuffer.Clear();
 
-        var currentDirectory = filesystem.Directory.GetCurrentDirectory();
-        var normalizedProjectPath = project.Path.Replace('\\', filesystem.Path.DirectorySeparatorChar);
-        var fullProjectPath = filesystem.Path.Combine(currentDirectory, normalizedProjectPath);
+        var fullProjectPath = filesystem.NormalizePath(project.Path);
 
         var argumentsBuilder = ArgumentsBuilder.Create();
 

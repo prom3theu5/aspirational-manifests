@@ -19,7 +19,7 @@ public class RabbitMqProcessor(IFileSystem fileSystem, IAnsiConsole console) : B
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireRabbit>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -27,8 +27,8 @@ public class RabbitMqProcessor(IFileSystem fileSystem, IAnsiConsole console) : B
 
         var data = new RabbitMqTemplateData(_manifests);
 
-        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RabbitMqType}.yml", TemplateLiterals.RabbitMqType, data);
-        CreateComponentKustomizeManifest(resourceOutputPath, data);
+        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RabbitMqType}.yml", TemplateLiterals.RabbitMqType, data, aspirateSettings);
+        CreateComponentKustomizeManifest(resourceOutputPath, data, aspirateSettings);
 
         LogCompletion(resourceOutputPath);
 

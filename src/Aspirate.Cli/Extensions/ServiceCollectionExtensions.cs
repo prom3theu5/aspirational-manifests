@@ -5,17 +5,22 @@ internal static class ServiceCollectionExtensions
         services
             .AddSpectreConsole()
             .AddAspireManifestSupport()
+            .AddAspirateConfigurationSupport()
             .AddContainerSupport()
             .AddProcessors();
 
     private static IServiceCollection AddSpectreConsole(this IServiceCollection services) =>
-        services.AddSingleton<IAnsiConsole>(AnsiConsole.Console);
+        services.AddSingleton(AnsiConsole.Console);
 
     private static IServiceCollection AddAspireManifestSupport(this IServiceCollection services) =>
         services
             .AddSingleton<IFileSystem, FileSystem>()
             .AddSingleton<IAspireManifestCompositionService, AspireManifestCompositionService>()
             .AddSingleton<IManifestFileParserService, ManifestFileParserService>();
+
+    private static IServiceCollection AddAspirateConfigurationSupport(this IServiceCollection services) =>
+        services
+            .AddSingleton<IAspirateConfigurationService, AspirateConfigurationService>();
 
     private static IServiceCollection AddContainerSupport(this IServiceCollection services) =>
         services

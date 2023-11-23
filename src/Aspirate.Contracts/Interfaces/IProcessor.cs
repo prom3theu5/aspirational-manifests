@@ -17,5 +17,5 @@ public interface IProcessor
     /// <summary>
     /// Produces the output manifest file.
     /// </summary>
-    Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath);
+    Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null);
 }

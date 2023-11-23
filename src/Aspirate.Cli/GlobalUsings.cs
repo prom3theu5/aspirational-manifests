@@ -5,6 +5,7 @@ global using System.ComponentModel;
 global using System.Text;
 global using System.Text.Json;
 global using Aspirate.Cli.Commands.EndToEnd;
+global using Aspirate.Cli.Commands.Init;
 global using Microsoft.Extensions.DependencyInjection;
 
 global using Aspirate.Cli.Extensions;
@@ -17,6 +18,7 @@ global using Aspirate.Cli.Services;
 global using Aspirate.Contracts.Interfaces;
 global using Aspirate.Contracts.Literals;
 global using Aspirate.Contracts.Models;
+global using Aspirate.Contracts.Models.Aspirate;
 global using Aspirate.Contracts.Models.AspireManifests;
 global using Aspirate.Contracts.Models.AspireManifests.Components;
 global using Aspirate.Contracts.Models.AspireManifests.Components.V0;

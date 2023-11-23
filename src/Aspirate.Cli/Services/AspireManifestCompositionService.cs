@@ -10,21 +10,16 @@ public class AspireManifestCompositionService(IFileSystem fileSystem, IAnsiConso
         _stdErrBuffer.Clear();
         _stdOutBuffer.Clear();
 
-        if (appHostProject.StartsWith('.'))
-        {
-            var currentDirectory = fileSystem.Directory.GetCurrentDirectory();
-            var normalizedProjectPath = appHostProject.Replace('\\', fileSystem.Path.DirectorySeparatorChar);
-            appHostProject = fileSystem.Path.Combine(currentDirectory, normalizedProjectPath);
-        }
+        var normalizedPath = fileSystem.NormalizePath(appHostProject);
 
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(DotNetSdkLiterals.RunArgument, string.Empty, quoteValue: false)
-            .AppendArgument(DotNetSdkLiterals.ProjectArgument, appHostProject)
+            .AppendArgument(DotNetSdkLiterals.ProjectArgument, normalizedPath)
             .AppendArgument(DotNetSdkLiterals.ArgumentDelimiter, string.Empty, quoteValue: false)
             .AppendArgument(DotNetSdkLiterals.PublisherArgument, AspireLiterals.ManifestPublisherArgument, quoteValue: false)
             .AppendArgument(DotNetSdkLiterals.OutputPathArgument, AspireLiterals.DefaultManifestFile, quoteValue: false);
 
-        var outputFile = await BuildManifest(appHostProject, argumentsBuilder);
+        var outputFile = await BuildManifest(normalizedPath, argumentsBuilder);
 
         return (true, outputFile);
     }

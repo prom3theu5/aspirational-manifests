@@ -19,7 +19,7 @@ public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console) : Base
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireRedis>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -27,8 +27,8 @@ public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console) : Base
 
         var data = new RedisTemplateData(_manifests);
 
-        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RedisType}.yml", TemplateLiterals.RedisType, data);
-        CreateComponentKustomizeManifest(resourceOutputPath, data);
+        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RedisType}.yml", TemplateLiterals.RedisType, data, aspirateSettings);
+        CreateComponentKustomizeManifest(resourceOutputPath, data, aspirateSettings);
 
         LogCompletion(resourceOutputPath);
 
