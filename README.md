@@ -7,6 +7,27 @@ dotnet run -- e2e -p ./Example/AppHost -o ./output
 ```
 
 ---
+### To Install as a global tool, until this hits release phase
+
+```bash
+gh repo clone prom3theu5/aspirational-manifests
+cd aspirational-manifests
+dotnet pack -c Release -o ./artifacts
+dotnet tool install -g aspirate --add-source ./artifacts/
+```
+
+Now navigate to your Aspire project's AppHost directory, and run:
+```bash
+aspirate e2e -p . -o ./output
+```
+Your manifests will be in the AppHost/output directory
+
+---
+### Uninstall tool
+```bash
+dotnet tool uninstall -g aspirate
+```
+---
 
 ### Configuring the Windows Terminal For Unicode and Emoji Support
 
