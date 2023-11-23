@@ -20,10 +20,10 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         // Exit app if container registry is empty. We need it.
         EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, project, aspirateSettings);
 
-        // Fallback to service name if image name is not provided from anywhere.
+        // Fallback to service name if image name is not provided from anywhere. (imageName is deprecated using repository like it says to).
         if (string.IsNullOrEmpty(msBuildProperties.Properties.ContainerRepository) && string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImage))
         {
-            msBuildProperties.Properties.ContainerImage = resourceName;
+            msBuildProperties.Properties.ContainerRepository = resourceName;
         }
 
         // Fallback to latest tag if tag not specified.
