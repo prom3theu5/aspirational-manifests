@@ -21,7 +21,7 @@ public class ProjectProcessor(
         $"{TemplateLiterals.ServiceType}.yml",
     ];
 
-    private readonly Dictionary<string, ContainerDetails> _containerDetailsCache = [];
+    private readonly Dictionary<string, MsBuildContainerProperties> _containerDetailsCache = [];
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
@@ -59,7 +59,12 @@ public class ProjectProcessor(
     {
         var project = resource.Value as AspireProject;
 
-        await containerCompositionService.BuildAndPushContainerForProject(project);
+        if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
+        {
+            throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
+        }
+
+        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails);
 
         _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }
@@ -70,8 +75,6 @@ public class ProjectProcessor(
 
         var details = await containerDetailsService.GetContainerDetails(resource.Key, project);
 
-        ErrorIfContainerRegistryIsEmpty(details, project);
-
         var success = _containerDetailsCache.TryAdd(resource.Key, details);
 
         if (!success)
@@ -80,17 +83,6 @@ public class ProjectProcessor(
         }
 
         _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
-    }
-
-    private void ErrorIfContainerRegistryIsEmpty(ContainerDetails details, AspireProject project)
-    {
-        if (!string.IsNullOrEmpty(details.ContainerRegistry))
-        {
-            return;
-        }
-
-        _console.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
-        Environment.Exit(1);
     }
 }
 

@@ -19,14 +19,17 @@ public sealed class ProjectPropertyService(IFileSystem filesystem) : IProjectPro
     {
         _stdOutBuffer.Clear();
 
-        var arguments = new List<string>
+        var argumentsBuilder = ArgumentsBuilder.Create()
+            .AppendArgument(DotNetSdkLiterals.MsBuildArgument, string.Empty, quoteValue: false);
+
+        foreach (var propertyName in propertyNames)
         {
-            "msbuild",
-        };
+            argumentsBuilder.AppendArgument(DotNetSdkLiterals.GetPropertyArgument, propertyName, true);
+        }
 
-        arguments.AddRange(propertyNames.Select(propertyName => $"--getProperty:{propertyName}"));
+        var arguments = argumentsBuilder.RenderArguments(propertyKeySeparator: ':');
 
-        var executionCommand = CliWrap.Cli.Wrap("dotnet")
+        var executionCommand = CliWrap.Cli.Wrap(DotNetSdkLiterals.DotNetCommand)
             .WithArguments(arguments);
 
         var commandResult = await executionCommand.WithWorkingDirectory(workingDirectory)

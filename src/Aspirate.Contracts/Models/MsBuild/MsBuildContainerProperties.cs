@@ -1,7 +1,7 @@
-namespace Aspirate.Contracts.Models.Containers;
+namespace Aspirate.Contracts.Models.MsBuild;
 
 [ExcludeFromCodeCoverage]
-public sealed class Properties
+public sealed class MsBuildContainerProperties : BaseMsBuildProperties
 {
     [JsonPropertyName("ContainerRegistry")]
     public string? ContainerRegistry { get; set; }
@@ -14,4 +14,7 @@ public sealed class Properties
 
     [JsonPropertyName("ContainerImageTag")]
     public string? ContainerImageTag { get; set; }
+
+    [JsonIgnore]
+    public string? FullContainerImage { get; set; }
 }

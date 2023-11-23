@@ -1,11 +1,11 @@
 namespace Aspirate.Cli.Services;
 
-public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiConsole console) : IContainerCompositionService
+public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiConsole console, IProjectPropertyService projectPropertyService) : IContainerCompositionService
 {
     private readonly StringBuilder _stdOutBuffer = new();
     private readonly StringBuilder _stdErrBuffer = new();
 
-    public async Task<bool> BuildAndPushContainerForProject(Project project)
+    public async Task<bool> BuildAndPushContainerForProject(Project project, MsBuildContainerProperties containerDetails)
     {
         _stdErrBuffer.Clear();
         _stdOutBuffer.Clear();
@@ -14,22 +14,21 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         var normalizedProjectPath = project.Path.Replace('\\', filesystem.Path.DirectorySeparatorChar);
         var fullProjectPath = filesystem.Path.Combine(currentDirectory, normalizedProjectPath);
 
-        await ExecuteCommand(
-            ContainerBuilderLiterals.DotNetCommand,
-            fullProjectPath,
-            onFailed: HandleBuildErrors);
+        var argumentsBuilder = ArgumentsBuilder.Create();
+
+        await AddProjectPublishArguments(argumentsBuilder, fullProjectPath);
+        AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
+
+        await ExecuteCommand(argumentsBuilder, onFailed: HandleBuildErrors);
 
         return true;
     }
 
-    private async Task ExecuteCommand(string command, string projectPath, string? arguments = null, Func<string, string, string, Task>? onFailed = default)
+    private async Task ExecuteCommand(ArgumentsBuilder argumentsBuilder, Func<ArgumentsBuilder, string, Task>? onFailed = default)
     {
-        if (string.IsNullOrEmpty(arguments))
-        {
-            arguments = ContainerBuilderLiterals.DefaultBuildArguments(projectPath);
-        }
+        var arguments = argumentsBuilder.RenderArguments();
 
-        var executeCommand = CliWrap.Cli.Wrap(command)
+        var executeCommand = CliWrap.Cli.Wrap(DotNetSdkLiterals.DotNetCommand)
             .WithArguments(arguments)
             .WithValidation(CommandResultValidation.None)
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
@@ -41,7 +40,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             {
                 case StartedCommandEvent _:
                     console.WriteLine();
-                    console.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
+                    console.MarkupLine($"[cyan]Executing: {DotNetSdkLiterals.DotNetCommand} {arguments}[/]");
                     break;
                 case StandardOutputCommandEvent stdOut:
                     console.WriteLine(stdOut.Text);
@@ -52,7 +51,9 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
                 case ExitedCommandEvent exited:
                     if (exited.ExitCode != 0)
                     {
-                        await onFailed?.Invoke(command, projectPath, _stdErrBuffer.Append(_stdOutBuffer).ToString());
+                        await onFailed?.Invoke(
+                            argumentsBuilder,
+                            _stdErrBuffer.Append(_stdOutBuffer).ToString());
                     }
                     break;
             }
@@ -76,16 +77,16 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         return commandResult.ExitCode != 0;
     }
 
-    private Task HandleBuildErrors(string command, string fullProjectPath, string errors)
+    private Task HandleBuildErrors(ArgumentsBuilder argumentsBuilder, string errors)
     {
         if (errors.Contains(DotNetSdkLiterals.DuplicateFileOutputError, StringComparison.OrdinalIgnoreCase))
         {
-            return HandleDuplicateFilesInOutput(command, fullProjectPath);
+            return HandleDuplicateFilesInOutput(argumentsBuilder);
         }
 
         if (errors.Contains(DotNetSdkLiterals.NoContainerRegistryAccess, StringComparison.OrdinalIgnoreCase))
         {
-            return HandleNoDockerRegistryAccess(command, fullProjectPath);
+            return HandleNoDockerRegistryAccess(argumentsBuilder);
         }
 
         if (errors.Contains(DotNetSdkLiterals.UnknownContainerRegistryAddress, StringComparison.OrdinalIgnoreCase))
@@ -98,23 +99,23 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         return Task.CompletedTask;
     }
 
-    private Task HandleDuplicateFilesInOutput(string command, string projectPath)
+    private Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder)
     {
         var shouldRetry = AskIfShouldRetryHandlingDuplicateFiles();
         if (shouldRetry)
         {
-            var arguments = ContainerBuilderLiterals.DuplicateFileOutputBuildArguments(projectPath);
+            argumentsBuilder.AppendArgument(DotNetSdkLiterals.ErrorOnDuplicatePublishOutputFilesArgument, "false");
 
             _stdErrBuffer.Clear();
             _stdOutBuffer.Clear();
 
-            return ExecuteCommand(command, projectPath, arguments, HandleBuildErrors);
+            return ExecuteCommand(argumentsBuilder, HandleBuildErrors);
         }
 
         return Task.CompletedTask;
     }
 
-    private async Task HandleNoDockerRegistryAccess(string command, string projectPath)
+    private async Task HandleNoDockerRegistryAccess(ArgumentsBuilder argumentsBuilder)
     {
         var shouldLogin = AskIfShouldLoginToDocker();
         if (shouldLogin)
@@ -126,8 +127,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             if (loginResult)
             {
                 await ExecuteCommand(
-                    command,
-                    projectPath,
+                    argumentsBuilder,
                     onFailed: HandleBuildErrors);
             }
         }
@@ -155,5 +155,52 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             { "DOCKER_USER", username },
             { "DOCKER_PASS", password },
         };
+    }
+
+    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath)
+    {
+        var propertiesJson = await projectPropertyService.GetProjectPropertiesAsync(
+            fullProjectPath,
+            MsBuildPropertiesLiterals.PublishSingleFileArgument,
+            MsBuildPropertiesLiterals.PublishTrimmedArgument);
+
+        var msbuildProperties = JsonSerializer.Deserialize<MsBuildProperties<MsBuildPublishingProperties>>(propertiesJson ?? "{}");
+
+        if (string.IsNullOrEmpty(msbuildProperties.Properties.PublishSingleFile))
+        {
+            msbuildProperties.Properties.PublishSingleFile = DotNetSdkLiterals.DefaultSingleFile;
+        }
+
+        if (string.IsNullOrEmpty(msbuildProperties.Properties.PublishTrimmed))
+        {
+            msbuildProperties.Properties.PublishTrimmed = DotNetSdkLiterals.DefaultPublishTrimmed;
+        }
+
+        argumentsBuilder
+            .AppendArgument(DotNetSdkLiterals.PublishArgument, fullProjectPath)
+            .AppendArgument(DotNetSdkLiterals.PublishProfileArgument, DotNetSdkLiterals.ContainerPublishProfile)
+            .AppendArgument(DotNetSdkLiterals.PublishSingleFileArgument, msbuildProperties.Properties.PublishSingleFile)
+            .AppendArgument(DotNetSdkLiterals.PublishTrimmedArgument, msbuildProperties.Properties.PublishTrimmed)
+            .AppendArgument(DotNetSdkLiterals.SelfContainedArgument, DotNetSdkLiterals.DefaultSelfContained)
+            .AppendArgument(DotNetSdkLiterals.OsArgument, DotNetSdkLiterals.DefaultOs)
+            .AppendArgument(DotNetSdkLiterals.ArchArgument, DotNetSdkLiterals.DefaultArch);
+
+    }
+
+    private static void AddContainerDetailsToArguments(ArgumentsBuilder argumentsBuilder, MsBuildContainerProperties containerDetails)
+    {
+        argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerRegistryArgument, containerDetails.ContainerRegistry);
+
+        if (!string.IsNullOrEmpty(containerDetails.ContainerRepository))
+        {
+            argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerRepositoryArgument, containerDetails.ContainerRepository);
+        }
+
+        if (!string.IsNullOrEmpty(containerDetails.ContainerImage))
+        {
+            argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageNameArgument, containerDetails.ContainerImage);
+        }
+
+        argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageTagArgument, containerDetails.ContainerImageTag);
     }
 }
