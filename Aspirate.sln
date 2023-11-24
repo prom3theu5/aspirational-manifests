@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{52460A37-4C1
 		nuget.config = nuget.config
 		README.md = README.md
 		renovate.json = renovate.json
+		build.cake = build.cake
+		dotnet-tools.json = dotnet-tools.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Spectre.DependencyInjection", "src\Aspirate.Spectre.DependencyInjection\Aspirate.Spectre.DependencyInjection.csproj", "{02D60B8D-6219-435B-A58C-5D98C0ABB1DB}"
@@ -27,6 +29,21 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A093C5FC-06FF-4DD3-B0D6-55CEF555A55E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Tests", "tests\Aspirate.Tests\Aspirate.Tests.csproj", "{71D29864-F6B4-4E68-9345-94123C0BD1CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{8B1FEC50-8212-47F4-A2AC-7940C076B1DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{8F2F0EB2-5569-496F-8258-D19D570FC464}"
+	ProjectSection(SolutionItems) = preProject
+		.github\PULL_REQUEST_TEMPLATE\pull_request_template.md = .github\PULL_REQUEST_TEMPLATE\pull_request_template.md
+		.github\ISSUE_TEMPLATE\user-story.md = .github\ISSUE_TEMPLATE\user-story.md
+		.github\ISSUE_TEMPLATE\bug.md = .github\ISSUE_TEMPLATE\bug.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "actions", "actions", "{5644B29D-6060-409C-B1A8-04D7A26EF958}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pull-requests.yml = .github\workflows\pull-requests.yml
+		.github\workflows\main.yml = .github\workflows\main.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +76,9 @@ Global
 		{02D60B8D-6219-435B-A58C-5D98C0ABB1DB} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
 		{5524CA16-0E5E-4F0D-965E-94E3B18DDD20} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
 		{71D29864-F6B4-4E68-9345-94123C0BD1CC} = {A093C5FC-06FF-4DD3-B0D6-55CEF555A55E}
+		{8B1FEC50-8212-47F4-A2AC-7940C076B1DC} = {52460A37-4C13-45BA-BB17-C2C430A55BCD}
+		{8F2F0EB2-5569-496F-8258-D19D570FC464} = {8B1FEC50-8212-47F4-A2AC-7940C076B1DC}
+		{5644B29D-6060-409C-B1A8-04D7A26EF958} = {8B1FEC50-8212-47F4-A2AC-7940C076B1DC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4990E3C8-4D86-44BB-BC2B-7D055DBC7958}
