@@ -194,9 +194,9 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerRepositoryArgument, containerDetails.ContainerRepository);
         }
 
-        if (!string.IsNullOrEmpty(containerDetails.ContainerImage))
+        if (!string.IsNullOrEmpty(containerDetails.ContainerImageName))
         {
-            argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageNameArgument, containerDetails.ContainerImage);
+            argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageNameArgument, containerDetails.ContainerImageName);
         }
 
         argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageTagArgument, containerDetails.ContainerImageTag);
