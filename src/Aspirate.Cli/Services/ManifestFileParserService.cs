@@ -76,6 +76,18 @@ public class ManifestFileParserService(
         return resources;
     }
 
+    public List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
+        console.Prompt(
+            new MultiSelectionPrompt<string>()
+                .Title("Select [green]components[/] to process from the loaded file")
+                .PageSize(10)
+                .Required()
+                .MoreChoicesText("[grey](Move up and down to reveal more components)[/]")
+                .InstructionsText(
+                    "[grey](Press [blue]<space>[/] to toggle a component, " +
+                    "[green]<enter>[/] to accept)[/]")
+                .AddChoiceGroup("All Components", manifestItems));
+
     private static void ReplacePlaceholdersInParsedResources(Dictionary<string, Resource> resources)
     {
         foreach (var resource in resources.Values)

@@ -1,14 +1,26 @@
 {
   "profiles": {
-    "end-to-end": {
-      "commandName": "Project",
-      "commandLineArgs": "e2e -o ./output",
-      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
-      "hotReloadEnabled": false
-    },
     "init": {
       "commandName": "Project",
       "commandLineArgs": "init",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "generate": {
+      "commandName": "Project",
+      "commandLineArgs": "generate",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "apply": {
+      "commandName": "Project",
+      "commandLineArgs": "apply",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "destroy": {
+      "commandName": "Project",
+      "commandLineArgs": "destroy",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     }

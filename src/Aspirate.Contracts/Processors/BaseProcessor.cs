@@ -1,3 +1,5 @@
+using Aspirate.Contracts.Extensions;
+
 namespace Aspirate.Contracts.Processors;
 
 /// <summary>
@@ -109,5 +111,5 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
         _fileSystem.Path.Combine(aspirateSettings?.TemplatePath ?? _defaultTemplatePath, templateFile);
 
     protected void LogCompletion(string outputPath) =>
-        _console.LogCompletion(outputPath);
+        _console.LogCompletion(_fileSystem.GetFullPath(outputPath));
 }

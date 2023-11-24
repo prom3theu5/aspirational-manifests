@@ -1,33 +1,35 @@
-namespace Aspirate.Cli.Commands.EndToEnd;
+namespace Aspirate.Cli.Commands.Generate;
 
 /// <summary>
 /// The command to convert Aspire Manifests to Kustomize Manifests.
 /// </summary>
-public sealed class EndToEndCommand(
+public sealed class GenerateCommand(
     IManifestFileParserService manifestFileParserService,
     IAnsiConsole console,
     IAspirateConfigurationService configurationService,
-    IServiceProvider serviceProvider) : AsyncCommand<EndToEndInput>
+    IKubeCtlService kubeCtlService,
+    IFileSystem fileSystem,
+    IServiceProvider serviceProvider) : AsyncCommand<GenerateInput>
 {
-    public const string EndToEndCommandName = "endtoend";
-    public const string EndToEndDescription = "Builds, pushes containers, generates aspire manifest and kustomize manifests.";
+    public const string CommandName = "generate";
+    public const string CommandDescription = "Builds, pushes containers, generates aspire manifest and kustomize manifests.";
     private static bool IsDatabase(Resource resource) =>
         resource is PostgresDatabase;
 
-    public override async Task<int> ExecuteAsync(CommandContext context, EndToEndInput settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, GenerateInput settings)
     {
         var aspirateSettings = configurationService.LoadConfigurationFile(settings.PathToAspireProjectFlag);
 
         if (aspirateSettings is not null)
         {
-            console.LogLoadedConfigurationFile(settings.PathToAspireProjectFlag);
+            console.LogLoadedConfigurationFile(fileSystem.GetFullPath(settings.PathToAspireProjectFlag));
         }
 
         var appManifestFilePath = await GenerateAspireManifest(settings.PathToAspireProjectFlag);
         var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(appManifestFilePath);
         var finalManifests = new Dictionary<string, Resource>();
 
-        var componentsToProcess = SelectManifestItemsToProcess(aspireManifest.Keys.ToList());
+        var componentsToProcess = manifestFileParserService.SelectManifestItemsToProcess(aspireManifest.Keys.ToList());
 
         var projectsToProcess = aspireManifest.Where(x => x.Value is Project && componentsToProcess.Contains(x.Key)).ToList();
 
@@ -91,7 +93,7 @@ public sealed class EndToEndCommand(
         await console.LogContainerCompositionCompleted();
     }
 
-    private async Task GenerateManifests(EndToEndInput settings,
+    private async Task GenerateManifests(GenerateInput settings,
         Dictionary<string, Resource> aspireManifest,
         ICollection<string> componentsToProcess,
         Dictionary<string, Resource> finalManifests,
@@ -108,7 +110,7 @@ public sealed class EndToEndCommand(
         finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag, aspirateSettings);
     }
 
-    private async Task ProcessIndividualResourceManifests(EndToEndInput input,
+    private async Task ProcessIndividualResourceManifests(GenerateInput input,
         KeyValuePair<string, Resource> resource,
         Dictionary<string, Resource> finalManifests,
         AspirateSettings? aspirateSettings)
@@ -134,17 +136,4 @@ public sealed class EndToEndCommand(
             finalManifests.Add(resource.Key, resource.Value);
         }
     }
-
-    private List<string> SelectManifestItemsToProcess(IEnumerable<string> manifestItems) =>
-        console.Prompt(
-            new MultiSelectionPrompt<string>()
-                .Title("Select [green]components[/] to process from the loaded file")
-                .PageSize(10)
-                .Required()
-                .MoreChoicesText("[grey](Move up and down to reveal more components)[/]")
-                .InstructionsText(
-                    "[grey](Press [blue]<space>[/] to toggle a component, " +
-                    "[green]<enter>[/] to accept)[/]")
-                .AddChoiceGroup("All Components", manifestItems));
-
 }

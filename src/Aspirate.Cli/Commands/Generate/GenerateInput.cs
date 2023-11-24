@@ -1,21 +1,18 @@
-namespace Aspirate.Cli.Commands.EndToEnd;
+namespace Aspirate.Cli.Commands.Generate;
 
-/// <summary>
-/// The input for the EndToEndCommand
-/// </summary>
-public sealed class EndToEndInput : CommandSettings
+public sealed class GenerateInput : CommandSettings
 {
     /// <summary>
     /// The path to the Aspire manifest
     /// </summary>
     [CommandOption("-p|--project")]
     [Description("The path to the Aspire AppHost project")]
-    public string PathToAspireProjectFlag { get; init; } = ".";
+    public string PathToAspireProjectFlag { get; init; } = AspirateLiterals.DefaultAspireProjectPath;
 
     /// <summary>
     /// The path to the output kustomize manifest
     /// </summary>
     [CommandOption("-o|--output")]
     [Description("The output path for the generated kustomize manifests")]
-    public required string OutputPathFlag { get; init; }
+    public string OutputPathFlag { get; init; } = AspirateLiterals.DefaultOutputPath;
 }
