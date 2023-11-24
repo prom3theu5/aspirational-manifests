@@ -1,19 +1,25 @@
 # Aspirate (Aspir8)
-### Automate deployment of an Aspire AppHost to a Kubernetes Cluster.
+
+### Automate deployment of a .NET Aspire AppHost to a Kubernetes Cluster
 
 ---
+
 ### To Install as a global tool
 
 ```bash
-dotnet tool install -g aspirate
+dotnet tool install -g aspirate --prerelease
 ```
+
+> NOTE: While Aspirate is in development the package will be versioned as a preview and the `--prelease` option will get the latest preview.
 
 ---
 
-https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2
+<https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
 
 ### Generating Manifests (apply)
+
 #### ContainerRegistry
+
 You're csproj files (projects) that will be build as containers **MUST** contain ContainerRegistry as a minimum, or the sdk will raise a CONTAINERS1013 error.
 To get around this - you can either add it as required, or use the 'init' command.
 The init command allows you to bootstrap certain settings for an asire project that Aspir8 will use.
@@ -24,40 +30,52 @@ The init command allows you to bootstrap certain settings for an asire project t
   More on this and possible use cases (such as adding jobs to create databases etc) when we have docs....
 
 To use the init command, you simply run:
+
 ```bash
 aspirate init
 ```
+
 from withinn your AppHost directory - and it'll ask you which settings you'd like to override.
 
 #### Produce Manifests
+
 Navigate to your Aspire project's AppHost directory, and run:
+
 ```bash
 aspirate generate
 ```
+
 Your manifests will be in the AppHost/aspirate-output directory
 
 ---
 > **_INFORMATION:_**  Both the following commands will first ask you which context they would like you to operate on, and will confirm first that you wish to act.
 
 #### Apply Manifests
+
 To apply the manifests to your cluster, run:
+
 ```bash
 aspirate apply
 ```
 
 #### Remove Manifests
+
 To remove the manifests from your cluster, run:
+
 ```bash
 aspirate destroy
 ```
 
 ---
+
 ### Uninstall tool
+
 ```bash
 dotnet tool uninstall -g aspirate
 ```
 
 ---
+
 ### Configuring the Windows Terminal For Unicode and Emoji Support
 
 Windows Terminal supports Unicode and Emoji. However, the shells such as Powershell and cmd.exe do not.
