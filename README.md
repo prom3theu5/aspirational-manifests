@@ -29,14 +29,14 @@ The init command allows you to bootstrap certain settings for an asire project t
 
 To use the init command, you simply run:
 ```bash
-aspirate init -p .
+aspirate init
 ```
 from withinn your AppHost directory - and it'll ask you which settings you'd like to override.
 
 #### Produce Manifests
 Navigate to your Aspire project's AppHost directory, and run:
 ```bash
-aspirate e2e -p . -o ./output
+aspirate e2e -o ./output
 ```
 Your manifests will be in the AppHost/output directory
 ---

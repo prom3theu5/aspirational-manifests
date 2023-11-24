@@ -10,5 +10,5 @@ public sealed class InitInput : CommandSettings
     /// </summary>
     [CommandOption("-p|--project")]
     [Description("The path to the Aspire AppHost project")]
-    public required string PathToAspireProjectFlag { get; init; }
+    public string PathToAspireProjectFlag { get; init; } = ".";
 }
