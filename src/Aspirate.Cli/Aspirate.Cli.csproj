@@ -7,19 +7,38 @@
     <PackAsTool>true</PackAsTool>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Title>Aspirate</Title>
+    <Authors>David Sekula / Prom3theu5</Authors>
+    <Description>Automatic kustomize manifest generation for applications powered by the Microsoft .Net Aspire Cloud framework.</Description>
+    <PackageProjectUrl>https://github.com/prom3theu5/aspirational-manifests</PackageProjectUrl>
+    <PackageLicense>MIT</PackageLicense>
+    <RepositoryUrl>https://github.com/prom3theu5/aspirational-manifests.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>aspire;kubernetes;aspirate;kustomize;manifests</PackageTags>
+    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Aspirate.Spectre.DependencyInjection\Aspirate.Spectre.DependencyInjection.csproj" />
     <ProjectReference Include="..\Aspirate.Contracts\Aspirate.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Templates\*.hbs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <PackageReference Include="CliWrap" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CliWrap" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\*.hbs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

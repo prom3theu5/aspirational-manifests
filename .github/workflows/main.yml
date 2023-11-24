@@ -1,0 +1,36 @@
+name: Main CI-CD
+
+env:
+  NUGET_SERVER: https://api.nuget.org/v3/index.json
+  NUGET_API_KEY: ${{ secrets.PUBLIC_NUGET_TOKEN }}
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  CAKE_SETTINGS_SKIPVERIFICATION: true
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build-test-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build, Test and Pack
+        run: |
+          dotnet tool restore
+          dotnet cake --pack true --settings_skipverification=true
+
+      - name: Push to nuget
+        working-directory: artifacts/
+        run: dotnet nuget push *.nupkg -s $NUGET_SERVER -k $NUGET_API_KEY
