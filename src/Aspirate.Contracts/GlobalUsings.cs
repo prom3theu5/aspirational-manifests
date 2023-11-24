@@ -6,6 +6,7 @@ global using Aspirate.Contracts.Interfaces;
 global using Aspirate.Contracts.Literals;
 global using Aspirate.Contracts.Models.Aspirate;
 global using Aspirate.Contracts.Models.AspireManifests;
+global using Aspirate.Contracts.Models.AspireManifests.Components;
 global using Aspirate.Contracts.Models.AspireManifests.Components.V0;
 global using Aspirate.Contracts.Models.MsBuild;
 global using HandlebarsDotNet;
