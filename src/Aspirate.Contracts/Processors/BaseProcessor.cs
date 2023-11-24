@@ -106,7 +106,7 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
     }
 
     private string GetTemplateFilePath(string templateFile, AspirateSettings? aspirateSettings = null) =>
-        Path.Combine(aspirateSettings?.TemplatePath ?? _defaultTemplatePath, templateFile);
+        _fileSystem.Path.Combine(aspirateSettings?.TemplatePath ?? _defaultTemplatePath, templateFile);
 
     protected void LogCompletion(string outputPath) =>
         _console.LogCompletion(outputPath);
