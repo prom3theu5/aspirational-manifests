@@ -11,11 +11,15 @@ app.Configure(
         config.AddCommand<EndToEndCommand>(EndToEndCommand.EndToEndCommandName)
             .WithDescription(EndToEndCommand.EndToEndDescription)
             .WithAlias("e2e")
-            .WithExample(["e2e", "-p", ".", "-o", "./output"]);
+            .WithExample(["e2e", "-o", "./output"])
+            .WithExample(["e2e", "-p", "/path/to/appHost", "-o", "./output"]);
 
         config.AddCommand<InitCommand>(InitCommand.InitCommandName)
             .WithDescription(InitCommand.InitDescription)
-            .WithExample(["init", "-p", "."]);
+            .WithExample(["init"])
+            .WithExample(["init", "-p", "/path/to/appHost"]);
+
+        config.SetApplicationName("aspirate");
     });
 
 return app.Run(args);
