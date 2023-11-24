@@ -1,22 +1,15 @@
 # Aspirate (Aspir8)
-### Convert Aspire Configuration file to Kustomize Manifests for K8s.
+### Automate deployment of an Aspire AppHost to a Kubernetes Cluster.
 
-Test with:
+---
+### To Install as a global tool
+
 ```bash
-dotnet run -- e2e -p ./Example/AppHost -o ./output
+dotnet tool install -g aspirate
 ```
 
 ---
-### To Install as a global tool, until this hits release phase
-
-```bash
-gh repo clone prom3theu5/aspirational-manifests
-cd aspirational-manifests
-dotnet pack -c Release -o ./artifacts
-dotnet tool install -g aspirate --add-source ./artifacts/
-```
----
-### Generating Manifests (end-to-end)
+### Generating Manifests (apply)
 #### ContainerRegistry
 You're csproj files (projects) that will be build as containers **MUST** contain ContainerRegistry as a minimum, or the sdk will raise a CONTAINERS1013 error.
 To get around this - you can either add it as required, or use the 'init' command.
@@ -36,16 +29,32 @@ from withinn your AppHost directory - and it'll ask you which settings you'd lik
 #### Produce Manifests
 Navigate to your Aspire project's AppHost directory, and run:
 ```bash
-aspirate e2e -o ./output
+aspirate generate
 ```
-Your manifests will be in the AppHost/output directory
+Your manifests will be in the AppHost/aspirate-output directory
+
+---
+> **_INFORMATION:_**  Both the following commands will first ask you which context they would like you to operate on, and will confirm first that you wish to act.
+
+#### Apply Manifests
+To apply the manifests to your cluster, run:
+```bash
+aspirate apply
+```
+
+#### Remove Manifests
+To remove the manifests from your cluster, run:
+```bash
+aspirate destroy
+```
+
 ---
 ### Uninstall tool
 ```bash
 dotnet tool uninstall -g aspirate
 ```
----
 
+---
 ### Configuring the Windows Terminal For Unicode and Emoji Support
 
 Windows Terminal supports Unicode and Emoji. However, the shells such as Powershell and cmd.exe do not.

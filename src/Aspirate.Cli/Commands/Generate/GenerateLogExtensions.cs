@@ -1,6 +1,6 @@
-namespace Aspirate.Cli.Commands.EndToEnd;
+namespace Aspirate.Cli.Commands.Generate;
 
-public static class EndToEndLogExtensions
+public static class GenerateLogExtensions
 {
     public static void LogGeneratingManifests(this IAnsiConsole console) =>
         console.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");

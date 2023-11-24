@@ -1,4 +1,4 @@
-namespace Aspirate.Cli.Extensions;
+namespace Aspirate.Contracts.Extensions;
 
 public static class PathExtensions
 {

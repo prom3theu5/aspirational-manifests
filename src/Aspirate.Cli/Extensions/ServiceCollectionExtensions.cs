@@ -7,6 +7,7 @@ internal static class ServiceCollectionExtensions
             .AddAspireManifestSupport()
             .AddAspirateConfigurationSupport()
             .AddContainerSupport()
+            .AddKubeCtlSupport()
             .AddProcessors();
 
     private static IServiceCollection AddSpectreConsole(this IServiceCollection services) =>
@@ -21,6 +22,10 @@ internal static class ServiceCollectionExtensions
     private static IServiceCollection AddAspirateConfigurationSupport(this IServiceCollection services) =>
         services
             .AddSingleton<IAspirateConfigurationService, AspirateConfigurationService>();
+
+    private static IServiceCollection AddKubeCtlSupport(this IServiceCollection services) =>
+        services
+            .AddSingleton<IKubeCtlService, KubeCtlService>();
 
     private static IServiceCollection AddContainerSupport(this IServiceCollection services) =>
         services

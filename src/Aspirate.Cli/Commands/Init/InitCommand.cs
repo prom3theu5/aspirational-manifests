@@ -6,8 +6,8 @@ public sealed class InitCommand(
     IFileSystem filesystem,
     IServiceProvider serviceProvider) : AsyncCommand<InitInput>
 {
-    public const string InitCommandName = "init";
-    public const string InitDescription = "Initializes aspirate settings within your AppHost directory.";
+    public const string CommandName = "init";
+    public const string CommandDescription = "Initializes aspirate settings within your AppHost directory.";
 
     public override Task<int> ExecuteAsync(CommandContext context, InitInput settings)
     {

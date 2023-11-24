@@ -4,7 +4,9 @@ global using System.IO.Abstractions;
 global using System.ComponentModel;
 global using System.Text;
 global using System.Text.Json;
-global using Aspirate.Cli.Commands.EndToEnd;
+global using Aspirate.Cli.Commands.Apply;
+global using Aspirate.Cli.Commands.Destroy;
+global using Aspirate.Cli.Commands.Generate;
 global using Aspirate.Cli.Commands.Init;
 global using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +17,7 @@ global using Aspirate.Cli.Processors.Components.Project;
 global using Aspirate.Cli.Processors.Components.RabbitMQ;
 global using Aspirate.Cli.Processors.Components.Redis;
 global using Aspirate.Cli.Services;
+global using Aspirate.Contracts.Extensions;
 global using Aspirate.Contracts.Interfaces;
 global using Aspirate.Contracts.Literals;
 global using Aspirate.Contracts.Models;
