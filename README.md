@@ -9,6 +9,9 @@ dotnet tool install -g aspirate
 ```
 
 ---
+
+https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2
+
 ### Generating Manifests (apply)
 #### ContainerRegistry
 You're csproj files (projects) that will be build as containers **MUST** contain ContainerRegistry as a minimum, or the sdk will raise a CONTAINERS1013 error.
