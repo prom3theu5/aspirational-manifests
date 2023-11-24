@@ -1,6 +1,6 @@
 ﻿{
   ContainerRegistry: test-registry,
-  ContainerImage: test-image,
+  ContainerImageName: test-image,
   ContainerImageTag: latest,
   FullContainerImage: test-registry/test-image:latest
 }

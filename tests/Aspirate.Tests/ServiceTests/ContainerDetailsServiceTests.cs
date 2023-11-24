@@ -76,7 +76,7 @@ public class ContainerDetailsServiceTests
         {
             Properties = new()
             {
-                ContainerRegistry = registry, ContainerRepository = repo, ContainerImage = image, ContainerImageTag = tag,
+                ContainerRegistry = registry, ContainerRepository = repo, ContainerImageName = image, ContainerImageTag = tag,
             },
         };
 
