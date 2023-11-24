@@ -15,4 +15,19 @@ public static class PathExtensions
 
         return fileSystem.Path.Combine(currentDirectory, normalizedProjectPath);
     }
+
+    public static string GetFullPath(this IFileSystem fileSystem, string path)
+    {
+        if (fileSystem.Path.IsPathRooted(path))
+        {
+            return fileSystem.Path.GetFullPath(path);
+        }
+
+        string homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        return path.StartsWith($"~{fileSystem.Path.DirectorySeparatorChar}") ?
+            // The path is relative to the user's home directory
+            fileSystem.Path.Combine(homePath, path.TrimStart('~', fileSystem.Path.DirectorySeparatorChar)) :
+            // The path is relative to the current working directory
+            fileSystem.Path.GetFullPath(path);
+    }
 }

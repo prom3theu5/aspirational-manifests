@@ -101,17 +101,17 @@ public sealed class EndToEndCommand(
 
         foreach (var resource in aspireManifest.Where(x => x.Value is not UnsupportedResource && componentsToProcess.Contains(x.Key)))
         {
-            await ProcessIndividualResourceManifests(settings, resource, finalManifests);
+            await ProcessIndividualResourceManifests(settings, resource, finalManifests, aspirateSettings);
         }
 
         var finalHandler = serviceProvider.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
         finalHandler.CreateFinalManifest(finalManifests, settings.OutputPathFlag, aspirateSettings);
     }
 
-    private async Task ProcessIndividualResourceManifests(
-        EndToEndInput input,
+    private async Task ProcessIndividualResourceManifests(EndToEndInput input,
         KeyValuePair<string, Resource> resource,
-        Dictionary<string, Resource> finalManifests)
+        Dictionary<string, Resource> finalManifests,
+        AspirateSettings? aspirateSettings)
     {
         if (resource.Value.Type is null)
         {
@@ -127,7 +127,7 @@ public sealed class EndToEndCommand(
             return;
         }
 
-        var success = await handler.CreateManifests(resource, input.OutputPathFlag);
+        var success = await handler.CreateManifests(resource, input.OutputPathFlag, aspirateSettings);
 
         if (success && !IsDatabase(resource.Value))
         {
