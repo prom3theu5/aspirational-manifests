@@ -12,18 +12,29 @@
     <Authors>David Sekula / Prom3theu5</Authors>
     <Description>Automatic kustomize manifest generation for applications powered by the Microsoft .Net Aspire Cloud framework.</Description>
     <PackageProjectUrl>https://github.com/prom3theu5/aspirational-manifests</PackageProjectUrl>
-    <PackageLicense>MIT</PackageLicense>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/prom3theu5/aspirational-manifests.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>aspire;kubernetes;aspirate;kustomize;manifests</PackageTags>
     <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>nuget-icon.png</PackageIcon>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Aspirate.Spectre.DependencyInjection\Aspirate.Spectre.DependencyInjection.csproj" />
     <ProjectReference Include="..\Aspirate.Contracts\Aspirate.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
