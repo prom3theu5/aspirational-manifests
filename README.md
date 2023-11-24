@@ -7,8 +7,10 @@
 ### To Install as a global tool
 
 ```bash
-dotnet tool install -g aspirate
+dotnet tool install -g aspirate --prerelease
 ```
+
+> NOTE: While Aspirate is in development the package will be versioned as a preview and the `--prelease` option will get the latest preview.
 
 ---
 
