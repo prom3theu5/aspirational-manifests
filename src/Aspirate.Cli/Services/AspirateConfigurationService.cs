@@ -21,7 +21,7 @@ public class AspirateConfigurationService(IAnsiConsole console, IFileSystem file
         if (!shouldDelete)
         {
             LogExistingNotDeleted();
-            Environment.Exit(1);
+            throw new ActionCausesExitException(1);
         }
 
         File.Delete(configurationFile);

@@ -89,7 +89,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         console.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
-        Environment.Exit(1);
+        throw new ActionCausesExitException(1);
     }
 
     private static void HandleTag(

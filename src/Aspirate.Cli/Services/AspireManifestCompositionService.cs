@@ -60,7 +60,7 @@ public class AspireManifestCompositionService(IFileSystem fileSystem, IAnsiConso
                     if (exited.ExitCode != 0)
                     {
                         console.MarkupLine($"[red]{_stdErrBuffer.Append(_stdOutBuffer)}[/]");
-                        Environment.Exit(exited.ExitCode);
+                        throw new ActionCausesExitException(exited.ExitCode);
                     }
                     break;
             }
