@@ -1,9 +1,18 @@
 // Global using directives
 
+global using System.CommandLine;
+global using System.CommandLine.Builder;
+global using System.CommandLine.Invocation;
+global using System.CommandLine.NamingConventionBinder;
+global using System.CommandLine.Parsing;
 global using System.IO.Abstractions;
 global using System.ComponentModel;
 global using System.Text;
 global using System.Text.Json;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
+
+global using Aspirate.Cli;
 global using Aspirate.Cli.Actions;
 global using Aspirate.Cli.Actions.Configuration;
 global using Aspirate.Cli.Actions.Containers;
@@ -12,9 +21,8 @@ global using Aspirate.Cli.Commands.Apply;
 global using Aspirate.Cli.Commands.Destroy;
 global using Aspirate.Cli.Commands.Generate;
 global using Aspirate.Cli.Commands.Init;
-global using Microsoft.Extensions.DependencyInjection;
-
 global using Aspirate.Cli.Extensions;
+global using Aspirate.Cli.Middleware;
 global using Aspirate.Cli.Processors.Components.Final;
 global using Aspirate.Cli.Processors.Components.Postgresql;
 global using Aspirate.Cli.Processors.Components.Project;
@@ -32,8 +40,6 @@ global using Aspirate.Contracts.Models.AspireManifests.Components.V0;
 global using Aspirate.Contracts.Models.MsBuild;
 global using Aspirate.Contracts.Models.State;
 global using Aspirate.Contracts.Processors;
-global using Aspirate.Spectre.DependencyInjection;
 global using CliWrap;
 global using CliWrap.EventStream;
 global using Spectre.Console;
-global using Spectre.Console.Cli;

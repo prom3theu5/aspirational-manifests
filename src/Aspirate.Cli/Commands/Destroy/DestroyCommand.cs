@@ -1,16 +1,21 @@
 namespace Aspirate.Cli.Commands.Destroy;
 
-/// <summary>
-/// The command to roll back an apply.
-/// </summary>
-public sealed class DestroyCommand(AspirateState currentState, IServiceProvider serviceProvider) : AsyncCommand<DestroyInput>
+public sealed class DestroyCommand : BaseCommand<DestroyOptions, DestroyCommandHandler>
 {
-    public const string CommandName = "destroy";
-    public const string CommandDescription = "Removes the manifests from your cluster.";
+    public DestroyCommand() : base("destroy", "Removes the manifests from your cluster..") =>
+        AddOption(new Option<string>(new[] { "-i", "--input-path" })
+        {
+            Description = "The input path for the kustomize manifests to remove from the cluster",
+            Arity = ArgumentArity.ExactlyOne,
+            IsRequired = false,
+        });
+}
 
-    public override async Task<int> ExecuteAsync(CommandContext context, DestroyInput settings)
+public sealed class DestroyCommandHandler(AspirateState currentState, IServiceProvider serviceProvider) : ICommandOptionsHandler<DestroyOptions>
+{
+    public async Task<int> HandleAsync(DestroyOptions options, CancellationToken cancellationToken)
     {
-        currentState.ComputedParameters.SetKustomizeManifestPath(settings.OutputPathFlag);
+        currentState.ComputedParameters.SetKustomizeManifestPath(options.InputPath);
 
         var actionExecutor = ActionExecutor.CreateInstance(serviceProvider);
 

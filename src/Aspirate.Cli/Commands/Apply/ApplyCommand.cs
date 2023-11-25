@@ -1,16 +1,21 @@
 namespace Aspirate.Cli.Commands.Apply;
 
-/// <summary>
-/// The command to convert Aspire Manifests to Kustomize Manifests.
-/// </summary>
-public sealed class ApplyCommand(AspirateState currentState, IServiceProvider serviceProvider) : AsyncCommand<ApplyInput>
+public sealed class ApplyCommand : BaseCommand<ApplyOptions, ApplyCommandHandler>
 {
-    public const string CommandName = "apply";
-    public const string CommandDescription = "Deployes the manifests to the kubernetes context after asking which you'd like to use.";
+    public ApplyCommand() : base("apply", "Apply the generated kustomize manifest to the cluster.") =>
+        AddOption(new Option<string>(new[] { "-o", "--output-path" })
+        {
+            Description = "The input path for the generated kustomize manifests",
+            Arity = ArgumentArity.ExactlyOne,
+            IsRequired = false,
+        });
+}
 
-    public override async Task<int> ExecuteAsync(CommandContext context, ApplyInput settings)
+public sealed class ApplyCommandHandler(AspirateState currentState, IServiceProvider serviceProvider) : ICommandOptionsHandler<ApplyOptions>
+{
+    public async Task<int> HandleAsync(ApplyOptions options, CancellationToken cancellationToken)
     {
-        currentState.ComputedParameters.SetKustomizeManifestPath(settings.OutputPathFlag);
+        currentState.ComputedParameters.SetKustomizeManifestPath(options.OutputPath);
 
         var actionExecutor = ActionExecutor.CreateInstance(serviceProvider);
 

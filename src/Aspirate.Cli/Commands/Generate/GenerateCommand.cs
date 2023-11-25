@@ -1,17 +1,31 @@
 namespace Aspirate.Cli.Commands.Generate;
 
-/// <summary>
-/// The command to convert Aspire Manifests to Kustomize Manifests.
-/// </summary>
-public sealed class GenerateCommand(AspirateState currentState, IServiceProvider serviceProvider) : AsyncCommand<GenerateInput>
+public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateCommandHandler>
 {
-    public const string CommandName = "generate";
-    public const string CommandDescription = "Builds, pushes containers, generates aspire manifest and kustomize manifests.";
-
-    public override async Task<int> ExecuteAsync(CommandContext context, GenerateInput settings)
+    public GenerateCommand() : base("generate", "Builds, pushes containers, generates aspire manifest and kustomize manifests.")
     {
-        currentState.InputParameters.AspireManifestPath = settings.PathToAspireProjectFlag;
-        currentState.ComputedParameters.SetKustomizeManifestPath(settings.OutputPathFlag);
+        AddOption(new Option<string>(new[] { "-p", "--project-path"})
+            {
+                Description = "The path to the aspire project",
+                Arity = ArgumentArity.ExactlyOne,
+                IsRequired = false,
+            });
+
+        AddOption(new Option<string>(new[] { "-o", "--output-path"})
+        {
+            Description = "The output path for generated manifests",
+            Arity = ArgumentArity.ExactlyOne,
+            IsRequired = false,
+        });
+    }
+}
+
+public sealed class GenerateCommandHandler(AspirateState currentState, IServiceProvider serviceProvider) : ICommandOptionsHandler<GenerateOptions>
+{
+    public async Task<int> HandleAsync(GenerateOptions options, CancellationToken cancellationToken)
+    {
+        currentState.InputParameters.AspireManifestPath = options.ProjectPath;
+        currentState.ComputedParameters.SetKustomizeManifestPath(options.OutputPath);
 
         var actionExecutor = ActionExecutor.CreateInstance(serviceProvider);
 
