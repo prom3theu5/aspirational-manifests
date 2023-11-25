@@ -36,6 +36,7 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
             catch (ActionCausesExitException exitException)
             {
                 // Do nothing - the action is planned, and will skip the rest of the queue, returning the exit code.
+                console.MarkupLine($"[red bold]({exitException.ExitCode}): Aspirate will now exit.[/]");
                 return exitException.ExitCode;
             }
             catch (Exception)
