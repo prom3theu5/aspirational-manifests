@@ -90,8 +90,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         if (errors.Contains(DotNetSdkLiterals.UnknownContainerRegistryAddress, StringComparison.OrdinalIgnoreCase))
         {
             console.MarkupLine($"\r\n[red bold]{DotNetSdkLiterals.UnknownContainerRegistryAddress}: Unknown container registry address, or container registry address not accessible.[/]");
-
-            Environment.Exit(1013);
+            throw new ActionCausesExitException(1013);
         }
 
         return Task.CompletedTask;

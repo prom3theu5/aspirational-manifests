@@ -19,25 +19,3 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
         });
     }
 }
-
-public sealed class GenerateCommandHandler(AspirateState currentState, IServiceProvider serviceProvider) : ICommandOptionsHandler<GenerateOptions>
-{
-    public async Task<int> HandleAsync(GenerateOptions options, CancellationToken cancellationToken)
-    {
-        currentState.InputParameters.AspireManifestPath = options.ProjectPath;
-        currentState.ComputedParameters.SetKustomizeManifestPath(options.OutputPath);
-
-        var actionExecutor = ActionExecutor.CreateInstance(serviceProvider);
-
-        await actionExecutor
-            .QueueAction(LoadConfigurationAction.ActionKey)
-            .QueueAction(GenerateAspireManifestAction.ActionKey)
-            .QueueAction(LoadAspireManifestAction.ActionKey)
-            .QueueAction(PopulateContainerDetailsAction.ActionKey)
-            .QueueAction(BuildAndPushContainersAction.ActionKey)
-            .QueueAction(GenerateKustomizeManifestAction.ActionKey)
-            .ExecuteCommandsAsync();
-
-        return 0;
-    }
-}

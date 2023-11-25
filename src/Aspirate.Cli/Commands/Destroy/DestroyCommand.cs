@@ -10,19 +10,3 @@ public sealed class DestroyCommand : BaseCommand<DestroyOptions, DestroyCommandH
             IsRequired = false,
         });
 }
-
-public sealed class DestroyCommandHandler(AspirateState currentState, IServiceProvider serviceProvider) : ICommandOptionsHandler<DestroyOptions>
-{
-    public async Task<int> HandleAsync(DestroyOptions options, CancellationToken cancellationToken)
-    {
-        currentState.ComputedParameters.SetKustomizeManifestPath(options.InputPath);
-
-        var actionExecutor = ActionExecutor.CreateInstance(serviceProvider);
-
-        await actionExecutor
-            .QueueAction(RemoveManifestsFromClusterAction.ActionKey)
-            .ExecuteCommandsAsync();
-
-        return 0;
-    }
-}

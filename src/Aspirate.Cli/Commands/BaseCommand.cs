@@ -17,3 +17,19 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         return handler.HandleAsync(options, cancellationToken);
     }
 }
+
+public abstract class BaseCommandOptionsHandler<TOptions> : ICommandOptionsHandler<TOptions> where TOptions : class, ICommandOptions
+{
+    protected BaseCommandOptionsHandler(IServiceProvider serviceProvider)
+    {
+        Services = serviceProvider;
+        CurrentState = Services.GetRequiredService<AspirateState>();
+        ActionExecutor = ActionExecutor.CreateInstance(serviceProvider);
+    }
+
+    protected IServiceProvider Services { get; }
+    protected AspirateState CurrentState { get; set; }
+    protected ActionExecutor ActionExecutor { get; set; }
+
+    public abstract Task<int> HandleAsync(TOptions options, CancellationToken cancellationToken);
+}

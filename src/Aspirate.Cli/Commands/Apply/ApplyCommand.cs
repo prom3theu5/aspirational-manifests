@@ -10,19 +10,3 @@ public sealed class ApplyCommand : BaseCommand<ApplyOptions, ApplyCommandHandler
             IsRequired = false,
         });
 }
-
-public sealed class ApplyCommandHandler(AspirateState currentState, IServiceProvider serviceProvider) : ICommandOptionsHandler<ApplyOptions>
-{
-    public async Task<int> HandleAsync(ApplyOptions options, CancellationToken cancellationToken)
-    {
-        currentState.ComputedParameters.SetKustomizeManifestPath(options.OutputPath);
-
-        var actionExecutor = ActionExecutor.CreateInstance(serviceProvider);
-
-        await actionExecutor
-            .QueueAction(ApplyManifestsToClusterAction.ActionKey)
-            .ExecuteCommandsAsync();
-
-        return 0;
-    }
-}

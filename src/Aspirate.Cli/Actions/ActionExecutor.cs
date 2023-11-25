@@ -14,7 +14,7 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
         return this;
     }
 
-    public async Task ExecuteCommandsAsync()
+    public async Task<int> ExecuteCommandsAsync()
     {
         while (_actionQueue.Count > 0)
         {
@@ -23,20 +23,30 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
 
             try
             {
-                var result = await action.ExecuteAsync();
+                var successfullyCompleted = await action.ExecuteAsync();
 
-                if (!result)
+                if (successfullyCompleted)
                 {
-                    await HandleActionFailure(executionAction.OnFailure);
+                    continue;
                 }
+
+                await HandleActionFailure(executionAction.OnFailure);
+                return 1;
             }
-            catch
+            catch (ActionCausesExitException exitException)
+            {
+                // Do nothing - the action is planned, and will skip the rest of the queue, returning the exit code.
+                return exitException.ExitCode;
+            }
+            catch (Exception)
             {
                 await HandleActionFailure(executionAction.OnFailure);
+                return 1;
             }
         }
 
         console.MarkupLine($"\r\n[bold] {EmojiLiterals.Rocket} Execution Completed[/]");
+        return 0;
     }
 
     private static Task HandleActionFailure(Func<Task>? onFailure = null) =>
