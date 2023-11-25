@@ -7,6 +7,11 @@ public sealed class PopulateContainerDetailsAction(
 
     public override async Task<bool> ExecuteAsync()
     {
+        if (NoSelectedProjectComponents())
+        {
+            return true;
+        }
+
         var projectProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Project) as ProjectProcessor;
 
         Logger.MarkupLine("\r\n[bold]Gathering container details for each project in selected components[/]\r\n");
@@ -19,5 +24,17 @@ public sealed class PopulateContainerDetailsAction(
         Logger.MarkupLine("\r\n[bold]Gathering Tasks Completed - Cache Populated.[/]");
 
         return true;
+    }
+
+    private bool NoSelectedProjectComponents()
+    {
+        if (CurrentState.ComputedParameters.SelectedProjectComponents.Count != 0)
+        {
+            return false;
+        }
+
+        Logger.MarkupLine("\r\n[bold]No project components selected. Skipping execution of container detail gathering.[/]");
+        return true;
+
     }
 }

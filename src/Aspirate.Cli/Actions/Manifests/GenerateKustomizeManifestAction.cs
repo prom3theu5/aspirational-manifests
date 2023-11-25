@@ -11,17 +11,34 @@ public sealed class GenerateKustomizeManifestAction(
 
     public override async Task<bool> ExecuteAsync()
     {
-        Logger.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
+         if (NoSupportedComponentsExitAction())
+         {
+             return true;
+         }
 
-        foreach (var resource in CurrentState.ComputedParameters.AllSelectedSupportedComponents)
+         Logger.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
+
+         foreach (var resource in CurrentState.ComputedParameters.AllSelectedSupportedComponents)
+         {
+             await ProcessIndividualResourceManifests(resource);
+         }
+
+         var finalHandler = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
+         finalHandler.CreateFinalManifest(CurrentState.ComputedParameters.FinalResources, CurrentState.ComputedParameters.KustomizeManifestPath, CurrentState.InputParameters.LoadedAspirateSettings);
+
+         return true;
+    }
+
+    private bool NoSupportedComponentsExitAction()
+    {
+        if (CurrentState.ComputedParameters.AllSelectedSupportedComponents.Count != 0)
         {
-            await ProcessIndividualResourceManifests(resource);
+            return false;
         }
 
-        var finalHandler = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
-        finalHandler.CreateFinalManifest(CurrentState.ComputedParameters.FinalResources, CurrentState.ComputedParameters.KustomizeManifestPath, CurrentState.InputParameters.LoadedAspirateSettings);
-
+        Logger.MarkupLine("\r\n[bold]No supported components selected. Skipping generation of kustomize manifests.[/]");
         return true;
+
     }
 
     private async Task ProcessIndividualResourceManifests(KeyValuePair<string, Resource> resource)
