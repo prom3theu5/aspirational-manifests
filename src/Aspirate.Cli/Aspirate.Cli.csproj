@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Aspirate</AssemblyName>
     <PackAsTool>true</PackAsTool>
+    <Version>0.1.0-preview</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,7 +30,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Aspirate.Spectre.DependencyInjection\Aspirate.Spectre.DependencyInjection.csproj" />
     <ProjectReference Include="..\Aspirate.Contracts\Aspirate.Contracts.csproj" />
   </ItemGroup>
 
@@ -39,7 +39,10 @@
 
   <ItemGroup>
     <PackageReference Include="CliWrap" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" />
   </ItemGroup>
 
   <ItemGroup>

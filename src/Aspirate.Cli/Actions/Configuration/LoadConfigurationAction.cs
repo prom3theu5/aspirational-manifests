@@ -13,7 +13,8 @@ public class LoadConfigurationAction(
         if (aspirateSettings is not null)
         {
             CurrentState.InputParameters.LoadedAspirateSettings = aspirateSettings;
-            Logger.MarkupLine($"\r\n[bold] Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.InputParameters.AspireManifestPath}'[/].[/]");
+            Logger.MarkupLine($"\r\n[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.InputParameters.AspireManifestPath}'[/].[/]");
+            Logger.WriteLine();
         }
 
         return Task.FromResult(true);
