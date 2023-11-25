@@ -5,28 +5,26 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
     private readonly StringBuilder _stdOutBuffer = new();
     private readonly StringBuilder _stdErrBuffer = new();
 
-    private string? _activeContextName;
-
-    public async Task<bool> SelectKubernetesContextForDeployment()
+    public async Task<string?> SelectKubernetesContextForDeployment()
     {
         var contexts = await GatherContexts();
 
         if (contexts.Count == 0)
         {
             console.MarkupLine("[red]No Kubernetes contexts found in kubeconfig[/]");
-            return false;
+            return null;
         }
 
-        _activeContextName = SelectKubernetesContextToUse(contexts!);
+        var activeContextName = SelectKubernetesContextToUse(contexts!);
 
-        return await SetActiveContext();
+        var successfullySet = await SetActiveContext(activeContextName);
+
+        return successfullySet ? activeContextName : null;
     }
 
-    public string GetActiveContextName() => _activeContextName ?? string.Empty;
-
-    public async Task<bool> ApplyManifests(string outputFolder)
+    public async Task<bool> ApplyManifests(string context, string outputFolder)
     {
-        if (!EnsureActiveContextIsSet())
+        if (!EnsureActiveContextIsSet(context))
         {
             return false;
         }
@@ -54,7 +52,7 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
             {
                 case StartedCommandEvent _:
                     console.WriteLine();
-                    console.MarkupLine($"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {arguments}[/] against kubernetes context [blue]{_activeContextName}.[/][/]");
+                    console.MarkupLine($"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {arguments}[/] against kubernetes context [blue]{context}.[/][/]");
                     break;
                 case StandardOutputCommandEvent stdOut:
                     console.WriteLine(stdOut.Text);
@@ -66,7 +64,7 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
                     if (exited.ExitCode != 0)
                     {
                         console.MarkupLine($"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]");
-                        return false;
+                        throw new ActionCausesExitException(exited.ExitCode);
                     }
                     break;
             }
@@ -78,9 +76,9 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
         return true;
     }
 
-    public async Task<bool> RemoveManifests(string outputFolder)
+    public async Task<bool> RemoveManifests(string context, string outputFolder)
     {
-        if (!EnsureActiveContextIsSet())
+        if (!EnsureActiveContextIsSet(context))
         {
             return false;
         }
@@ -108,7 +106,7 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
             {
                 case StartedCommandEvent _:
                     console.WriteLine();
-                    console.MarkupLine($"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {arguments}[/] against kubernetes context [blue]{_activeContextName}.[/][/]");
+                    console.MarkupLine($"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {arguments}[/] against kubernetes context [blue]{context}.[/][/]");
                     break;
                 case StandardOutputCommandEvent stdOut:
                     console.WriteLine(stdOut.Text);
@@ -120,7 +118,7 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
                     if (exited.ExitCode != 0)
                     {
                         console.MarkupLine($"[red]Failed to remove manifests in [blue]'{fullOutputPath}'[/][/]");
-                        return false;
+                        throw new ActionCausesExitException(exited.ExitCode);
                     }
                     break;
             }
@@ -161,9 +159,9 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
         return contexts;
     }
 
-    private async Task<bool> SetActiveContext()
+    private async Task<bool> SetActiveContext(string context)
     {
-        if (!EnsureActiveContextIsSet())
+        if (!EnsureActiveContextIsSet(context))
         {
             return false;
         }
@@ -172,7 +170,7 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
 
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(KubeCtlLiterals.KubeCtlConfigArgument, string.Empty, quoteValue: false)
-            .AppendArgument(KubeCtlLiterals.KubeCtlUseContextArgument, _activeContextName, quoteValue: false);
+            .AppendArgument(KubeCtlLiterals.KubeCtlUseContextArgument, context, quoteValue: false);
 
         var arguments = argumentsBuilder.RenderArguments();
 
@@ -184,17 +182,17 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
 
         if (commandResult.ExitCode != 0)
         {
-            console.MarkupLine($"[red]Failed to set Active Kubernetes Context to [blue]'{_activeContextName}'[/][/]");
+            console.MarkupLine($"[red]Failed to set Active Kubernetes Context to [blue]'{context}'[/][/]");
             return false;
         }
 
-        console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Successfully set the Active Kubernetes Context to [blue]'{_activeContextName}'[/]");
+        console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Successfully set the Active Kubernetes Context to [blue]'{context}'[/]");
         return true;
     }
 
-    private bool EnsureActiveContextIsSet()
+    private bool EnsureActiveContextIsSet(string context)
     {
-        if (string.IsNullOrEmpty(_activeContextName))
+        if (string.IsNullOrEmpty(context))
         {
             console.MarkupLine("[red]Active context has not been set.[/]");
             return false;

@@ -93,7 +93,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             throw new ActionCausesExitException(1013);
         }
 
-        return Task.CompletedTask;
+        throw new ActionCausesExitException(9999);
     }
 
     private Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder)
@@ -109,7 +109,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             return ExecuteCommand(argumentsBuilder, HandleBuildErrors);
         }
 
-        return Task.CompletedTask;
+        throw new ActionCausesExitException(9999);
     }
 
     private async Task HandleNoDockerRegistryAccess(ArgumentsBuilder argumentsBuilder)

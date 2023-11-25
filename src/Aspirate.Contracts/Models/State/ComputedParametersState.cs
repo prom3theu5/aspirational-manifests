@@ -2,6 +2,7 @@ namespace Aspirate.Contracts.Models.State;
 
 public class ComputedParametersState
 {
+    public string? ActiveKubernetesContext { get; set; }
     public string? AspireManifestPath { get; private set; }
     public string? KustomizeManifestPath { get; private set; }
     public List<string> AspireComponentsToProcess { get; private set; } = [];
@@ -17,6 +18,8 @@ public class ComputedParametersState
         LoadedAspireManifestResources
             .Where(x => x.Value is not UnsupportedResource && AspireComponentsToProcess.Contains(x.Key))
             .ToList();
+
+    public bool ActiveKubernetesContextIsSet => !string.IsNullOrEmpty(ActiveKubernetesContext);
 
     public void SetAspireManifestPath(string path) => AspireManifestPath = path;
 
