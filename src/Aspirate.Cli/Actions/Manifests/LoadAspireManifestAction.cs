@@ -2,7 +2,7 @@ namespace Aspirate.Cli.Actions.Manifests;
 
 public class LoadAspireManifestAction(
     IManifestFileParserService manifestFileParserService,
-    IServiceProvider serviceProvider) : BaseAction(serviceProvider)
+    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveSupport(serviceProvider)
 {
     public const string ActionKey = "LoadAspireManifestAction";
 
@@ -17,8 +17,15 @@ public class LoadAspireManifestAction(
         return Task.FromResult(true);
     }
 
-    private List<string> SelectManifestItemsToProcess() =>
-        Logger.Prompt(
+    private List<string> SelectManifestItemsToProcess()
+    {
+        if (CurrentState.NonInteractive)
+        {
+            Logger.MarkupLine("\r\n[blue]Non-Interactive Mode: Processing all components in the loaded file.[/]\r\n");
+            return CurrentState.LoadedAspireManifestResources.Keys.ToList();
+        }
+
+        return Logger.Prompt(
             new MultiSelectionPrompt<string>()
                 .Title("Select [green]components[/] to process from the loaded file")
                 .PageSize(10)
@@ -28,4 +35,13 @@ public class LoadAspireManifestAction(
                     "[grey](Press [blue]<space>[/] to toggle a component, " +
                     "[green]<enter>[/] to accept)[/]")
                 .AddChoiceGroup("All Components", CurrentState.LoadedAspireManifestResources.Keys.ToList()));
+    }
+
+    public override void ValidateNonInteractiveState()
+    {
+        if (string.IsNullOrEmpty(CurrentState.ProjectManifest))
+        {
+            NonInteractiveValidationFailed("No Aspire Manifest file was supplied.");
+        }
+    }
 }

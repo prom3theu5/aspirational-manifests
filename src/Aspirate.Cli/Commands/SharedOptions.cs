@@ -30,6 +30,13 @@ public static class SharedOptions
         IsRequired = false,
     };
 
+    public static Option<bool> SkipBuild => new(new[] { "--skip-build" })
+    {
+        Description = "Skips build and Push of containers",
+        Arity = ArgumentArity.ZeroOrOne,
+        IsRequired = false,
+    };
+
     public static Option<bool> NonInteractive => new(new[] { "--non-interactive" })
     {
         Description = "Disables interactive mode for the command",

@@ -2,6 +2,9 @@ namespace Aspirate.Cli.Commands.Generate;
 
 public sealed class GenerateOptions : ICommandOptions
 {
-    public string ProjectPath { get; init; } = AspirateLiterals.DefaultAspireProjectPath;
-    public string OutputPath { get; init; } = AspirateLiterals.DefaultOutputPath;
+    public string ProjectPath { get; set; } = AspirateLiterals.DefaultAspireProjectPath;
+    public string OutputPath { get; set; } = AspirateLiterals.DefaultOutputPath;
+
+    public bool SkipBuild { get; set; } = false;
+    public bool NonInteractive { get; set; } = false;
 }

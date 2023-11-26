@@ -55,7 +55,7 @@ public class ProjectProcessor(
         return Task.FromResult(true);
     }
 
-    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource)
+    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, bool nonInteractive)
     {
         var project = resource.Value as AspireProject;
 
@@ -64,7 +64,7 @@ public class ProjectProcessor(
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
-        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails);
+        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, nonInteractive);
 
         _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }

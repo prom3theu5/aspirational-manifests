@@ -5,7 +5,10 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
     private readonly StringBuilder _stdOutBuffer = new();
     private readonly StringBuilder _stdErrBuffer = new();
 
-    public async Task<bool> BuildAndPushContainerForProject(Project project, MsBuildContainerProperties containerDetails)
+    public async Task<bool> BuildAndPushContainerForProject(
+        Project project,
+        MsBuildContainerProperties containerDetails,
+        bool nonInteractive)
     {
         _stdErrBuffer.Clear();
         _stdOutBuffer.Clear();
@@ -17,12 +20,15 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         await AddProjectPublishArguments(argumentsBuilder, fullProjectPath);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
-        await ExecuteCommand(argumentsBuilder, onFailed: HandleBuildErrors);
+        await ExecuteCommand(argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors);
 
         return true;
     }
 
-    private async Task ExecuteCommand(ArgumentsBuilder argumentsBuilder, Func<ArgumentsBuilder, string, Task>? onFailed = default)
+    private async Task ExecuteCommand(
+        ArgumentsBuilder argumentsBuilder,
+        bool nonInteractive,
+        Func<ArgumentsBuilder, bool, string, Task>? onFailed = default)
     {
         var arguments = argumentsBuilder.RenderArguments();
 
@@ -51,6 +57,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
                     {
                         await onFailed?.Invoke(
                             argumentsBuilder,
+                            nonInteractive,
                             _stdErrBuffer.Append(_stdOutBuffer).ToString());
                     }
                     break;
@@ -75,16 +82,16 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         return commandResult.ExitCode != 0;
     }
 
-    private Task HandleBuildErrors(ArgumentsBuilder argumentsBuilder, string errors)
+    private Task HandleBuildErrors(ArgumentsBuilder argumentsBuilder, bool nonInteractive, string errors)
     {
         if (errors.Contains(DotNetSdkLiterals.DuplicateFileOutputError, StringComparison.OrdinalIgnoreCase))
         {
-            return HandleDuplicateFilesInOutput(argumentsBuilder);
+            return HandleDuplicateFilesInOutput(argumentsBuilder, nonInteractive);
         }
 
         if (errors.Contains(DotNetSdkLiterals.NoContainerRegistryAccess, StringComparison.OrdinalIgnoreCase))
         {
-            return HandleNoDockerRegistryAccess(argumentsBuilder);
+            return HandleNoDockerRegistryAccess(argumentsBuilder, nonInteractive);
         }
 
         if (errors.Contains(DotNetSdkLiterals.UnknownContainerRegistryAddress, StringComparison.OrdinalIgnoreCase))
@@ -96,9 +103,9 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         throw new ActionCausesExitException(9999);
     }
 
-    private Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder)
+    private Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder, bool nonInteractive)
     {
-        var shouldRetry = AskIfShouldRetryHandlingDuplicateFiles();
+        var shouldRetry = AskIfShouldRetryHandlingDuplicateFiles(nonInteractive);
         if (shouldRetry)
         {
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.ErrorOnDuplicatePublishOutputFilesArgument, "false");
@@ -106,15 +113,21 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             _stdErrBuffer.Clear();
             _stdOutBuffer.Clear();
 
-            return ExecuteCommand(argumentsBuilder, HandleBuildErrors);
+            return ExecuteCommand(argumentsBuilder, nonInteractive, HandleBuildErrors);
         }
 
         throw new ActionCausesExitException(9999);
     }
 
-    private async Task HandleNoDockerRegistryAccess(ArgumentsBuilder argumentsBuilder)
+    private async Task HandleNoDockerRegistryAccess(ArgumentsBuilder argumentsBuilder, bool nonInteractive)
     {
-        var shouldLogin = AskIfShouldLoginToDocker();
+        if (nonInteractive)
+        {
+            console.MarkupLine($"\r\n[red bold]{DotNetSdkLiterals.NoContainerRegistryAccess}: No access to container registry. Cannot attempt login in non interactive mode.[/]");
+            throw new ActionCausesExitException(1000);
+        }
+
+        var shouldLogin = AskIfShouldLoginToDocker(nonInteractive);
         if (shouldLogin)
         {
             var credentials = GatherDockerCredentials();
@@ -125,16 +138,33 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             {
                 await ExecuteCommand(
                     argumentsBuilder,
+                    nonInteractive,
                     onFailed: HandleBuildErrors);
             }
         }
     }
 
-    private bool AskIfShouldRetryHandlingDuplicateFiles() =>
-        console.Confirm("\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
+    private bool AskIfShouldRetryHandlingDuplicateFiles(bool nonInteractive)
+    {
+        if (nonInteractive)
+        {
+            return true;
+        }
 
-    private bool AskIfShouldLoginToDocker() =>
-        console.Confirm("\r\nWe could not access the container registry during build. Do you want to login to the registry and retry?\r\n");
+        return console.Confirm(
+            "\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
+    }
+
+    private bool AskIfShouldLoginToDocker(bool nonInteractive)
+    {
+        if (nonInteractive)
+        {
+            return false;
+        }
+
+        return console.Confirm(
+            "\r\nWe could not access the container registry during build. Do you want to login to the registry and retry?\r\n");
+    }
 
     private Dictionary<string, string?> GatherDockerCredentials()
     {
