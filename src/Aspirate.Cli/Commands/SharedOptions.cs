@@ -30,6 +30,13 @@ public static class SharedOptions
         IsRequired = false,
     };
 
+    public static Option<string> AspireManifest => new(new[] { "-m", "--aspire-manifest" })
+    {
+        Description = "The aspire manifest file to use",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
     public static Option<bool> SkipBuild => new(new[] { "--skip-build" })
     {
         Description = "Skips build and Push of containers",

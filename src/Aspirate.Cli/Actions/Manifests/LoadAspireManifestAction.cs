@@ -8,7 +8,7 @@ public class LoadAspireManifestAction(
 
     public override Task<bool> ExecuteAsync()
     {
-        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(CurrentState.ProjectManifest);
+        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(CurrentState.AspireManifest);
         CurrentState.LoadedAspireManifestResources = aspireManifest;
 
         var componentsToProcess = SelectManifestItemsToProcess();
@@ -39,7 +39,7 @@ public class LoadAspireManifestAction(
 
     public override void ValidateNonInteractiveState()
     {
-        if (string.IsNullOrEmpty(CurrentState.ProjectManifest))
+        if (string.IsNullOrEmpty(CurrentState.AspireManifest))
         {
             NonInteractiveValidationFailed("No Aspire Manifest file was supplied.");
         }

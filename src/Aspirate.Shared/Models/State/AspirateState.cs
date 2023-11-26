@@ -3,7 +3,7 @@ namespace Aspirate.Shared.Models.State;
 public class AspirateState
 {
     public string? ProjectPath { get; set; }
-    public string? ProjectManifest { get; set; }
+    public string? AspireManifest { get; set; }
     public string? InputPath { get; set; }
     public string? OutputPath { get; set; }
     public string? ContainerRegistry { get; set; }
