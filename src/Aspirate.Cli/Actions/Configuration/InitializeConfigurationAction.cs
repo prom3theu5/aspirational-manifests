@@ -9,11 +9,6 @@ public class InitializeConfigurationAction(
 
     public override Task<bool> ExecuteAsync()
     {
-        if (CurrentState.NonInteractive)
-        {
-            ValidateNonInteractiveState();
-        }
-
         configurationService.HandleExistingConfiguration(CurrentState.ProjectPath, CurrentState.NonInteractive);
 
         var aspirateSettings = PerformConfigurationBootstrapping();
@@ -171,30 +166,26 @@ public class InitializeConfigurationAction(
         }
     }
 
-    protected override void ValidateNonInteractiveState()
+    public override void ValidateNonInteractiveState()
     {
         if (string.IsNullOrEmpty(CurrentState.ProjectPath))
         {
-            Logger.MarkupLine("\r\n[red](!)[/] Project path must be supplied when running in non-interactive mode.");
-            throw new ActionCausesExitException(9999);
+            NonInteractiveValidationFailed("Project path must be supplied when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.ContainerRegistry))
         {
-            Logger.MarkupLine("\r\n[red](!)[/] Container registry must be supplied when running in non-interactive mode.");
-            throw new ActionCausesExitException(9999);
+            NonInteractiveValidationFailed("Container Registry must be supplied when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.ContainerImageTag))
         {
-            Logger.MarkupLine("\r\n[red](!)[/] Container image tag must be supplied when running in non-interactive mode.");
-            throw new ActionCausesExitException(9999);
+            NonInteractiveValidationFailed("Container image tag must be supplied when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.TemplatePath))
         {
-            Logger.MarkupLine("\r\n[red](!)[/] Template path must be supplied when running in non-interactive mode.");
-            throw new ActionCausesExitException(9999);
+            NonInteractiveValidationFailed("Template path must be supplied when running in non-interactive mode.");
         }
     }
 }

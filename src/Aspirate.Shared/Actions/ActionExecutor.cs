@@ -1,8 +1,9 @@
 namespace Aspirate.Shared.Actions;
 
-public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvider)
+public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvider, AspirateState state)
 {
-    public static ActionExecutor CreateInstance(IServiceProvider serviceProvider) => new(serviceProvider.GetRequiredService<IAnsiConsole>(), serviceProvider);
+    public static ActionExecutor CreateInstance(IServiceProvider serviceProvider) =>
+        new(serviceProvider.GetRequiredService<IAnsiConsole>(), serviceProvider, serviceProvider.GetRequiredService<AspirateState>());
 
     private readonly Queue<ExecutionAction> _actionQueue = new();
 
@@ -16,6 +17,11 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
 
     public async Task<int> ExecuteCommandsAsync()
     {
+        if (state.NonInteractive)
+        {
+            console.MarkupLine("[blue]Non-interactive mode enabled.[/]");
+        }
+
         while (_actionQueue.Count > 0)
         {
             var executionAction = _actionQueue.Dequeue();
@@ -23,6 +29,11 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
 
             try
             {
+                if (state.NonInteractive && action is BaseActionWithNonInteractiveSupport nonInteractiveAction)
+                {
+                    nonInteractiveAction.ValidateNonInteractiveState();
+                }
+
                 var successfullyCompleted = await action.ExecuteAsync();
 
                 if (successfullyCompleted)
