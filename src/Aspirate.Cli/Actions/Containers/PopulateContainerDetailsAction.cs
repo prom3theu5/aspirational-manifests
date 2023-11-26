@@ -16,9 +16,9 @@ public sealed class PopulateContainerDetailsAction(
 
         Logger.MarkupLine("\r\n[bold]Gathering container details for each project in selected components[/]\r\n");
 
-        foreach (var resource in CurrentState.ComputedParameters.SelectedProjectComponents)
+        foreach (var resource in CurrentState.SelectedProjectComponents)
         {
-            await projectProcessor.PopulateContainerDetailsCacheForProject(resource, CurrentState.InputParameters.LoadedAspirateSettings);
+            await projectProcessor.PopulateContainerDetailsCacheForProject(resource, CurrentState.ContainerRegistry, CurrentState.ContainerImageTag);
         }
 
         Logger.MarkupLine("\r\n[bold]Gathering Tasks Completed - Cache Populated.[/]");
@@ -28,7 +28,7 @@ public sealed class PopulateContainerDetailsAction(
 
     private bool NoSelectedProjectComponents()
     {
-        if (CurrentState.ComputedParameters.SelectedProjectComponents.Count != 0)
+        if (CurrentState.SelectedProjectComponents.Count != 0)
         {
             return false;
         }

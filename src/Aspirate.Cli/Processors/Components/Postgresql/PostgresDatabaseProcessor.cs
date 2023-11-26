@@ -13,7 +13,7 @@ public class PostgresDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole cons
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<PostgresDatabase>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null) =>
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string? templatePath = null) =>
         // Do nothing for databases, they are there for configuration.
         Task.FromResult(true);
 }

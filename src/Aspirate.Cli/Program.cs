@@ -1,7 +1,8 @@
 AspirateCli.WelcomeMessage();
 
-return new CommandLineBuilder(new AspirateCli())
+return await new CommandLineBuilder(new AspirateCli())
     .UseDefaults()
     .UseDependencyInjection(services => services.RegisterAspirateEssential())
     .Build()
-    .Invoke(args);
+    .InvokeAsync(args);
+

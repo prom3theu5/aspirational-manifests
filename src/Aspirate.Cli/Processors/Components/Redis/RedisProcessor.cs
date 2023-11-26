@@ -1,4 +1,4 @@
-using AspireRedis = Aspirate.Contracts.Models.AspireManifests.Components.V0.Redis;
+using AspireRedis = Aspirate.Shared.Models.AspireManifests.Components.V0.Redis;
 
 namespace Aspirate.Cli.Processors.Components.Redis;
 
@@ -19,7 +19,7 @@ public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console) : Base
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireRedis>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string? templatePath)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -27,8 +27,8 @@ public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console) : Base
 
         var data = new RedisTemplateData(_manifests);
 
-        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RedisType}.yml", TemplateLiterals.RedisType, data, aspirateSettings);
-        CreateComponentKustomizeManifest(resourceOutputPath, data, aspirateSettings);
+        CreateCustomManifest(resourceOutputPath, $"{TemplateLiterals.RedisType}.yml", TemplateLiterals.RedisType, data, templatePath);
+        CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
 
         LogCompletion(resourceOutputPath);
 

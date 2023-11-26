@@ -1,3 +1,5 @@
+using Aspirate.Shared.Services;
+
 namespace Aspirate.Tests.ServiceTests;
 
 [UsesVerify]
@@ -25,7 +27,7 @@ public class ContainerDetailsServiceTests
         var containerDetailsService = new ContainerDetailsService(projectPropertyService, testConsole);
 
         // Act
-        var containerDetails = await containerDetailsService.GetContainerDetails("test-service", new());
+        var containerDetails = await containerDetailsService.GetContainerDetails("test-service", new(), null, null);
 
         // Assert
         await Verify(containerDetails)

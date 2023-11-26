@@ -15,15 +15,15 @@ public sealed class RemoveManifestsFromClusterAction(IKubeCtlService kubeCtlServ
             return true;
         }
 
-        CurrentState.ComputedParameters.ActiveKubernetesContext = await kubeCtlService.SelectKubernetesContextForDeployment();
+        CurrentState.ActiveKubernetesContext = await kubeCtlService.SelectKubernetesContextForDeployment();
 
-        if (!CurrentState.ComputedParameters.ActiveKubernetesContextIsSet)
+        if (!CurrentState.ActiveKubernetesContextIsSet)
         {
             return false;
         }
 
-        await kubeCtlService.RemoveManifests(CurrentState.ComputedParameters.ActiveKubernetesContext, CurrentState.ComputedParameters.KustomizeManifestPath);
-        Logger.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.ComputedParameters.ActiveKubernetesContext}'[/]");
+        await kubeCtlService.RemoveManifests(CurrentState.ActiveKubernetesContext, CurrentState.InputPath);
+        Logger.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.ActiveKubernetesContext}'[/]");
 
         return true;
     }

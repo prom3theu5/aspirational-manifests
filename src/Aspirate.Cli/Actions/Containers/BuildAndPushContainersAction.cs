@@ -16,7 +16,7 @@ public sealed class BuildAndPushContainersAction(
 
         Logger.MarkupLine("\r\n[bold]Building all project resources, and pushing containers:[/]\r\n");
 
-        foreach (var resource in CurrentState.ComputedParameters.SelectedProjectComponents)
+        foreach (var resource in CurrentState.SelectedProjectComponents)
         {
             await projectProcessor.BuildAndPushProjectContainer(resource);
         }
@@ -28,7 +28,7 @@ public sealed class BuildAndPushContainersAction(
 
     private bool NoSelectedProjectComponents()
     {
-        if (CurrentState.ComputedParameters.SelectedProjectComponents.Count != 0)
+        if (CurrentState.SelectedProjectComponents.Count != 0)
         {
             return false;
         }
