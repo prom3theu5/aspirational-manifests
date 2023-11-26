@@ -6,5 +6,7 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
     {
        AddOption(SharedOptions.AspireProjectPath);
        AddOption(SharedOptions.OutputPath);
+       AddOption(SharedOptions.NonInteractive);
+       AddOption(SharedOptions.SkipBuild);
     }
 }
