@@ -18,20 +18,20 @@ public sealed class GenerateKustomizeManifestAction(
 
          Logger.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
 
-         foreach (var resource in CurrentState.ComputedParameters.AllSelectedSupportedComponents)
+         foreach (var resource in CurrentState.AllSelectedSupportedComponents)
          {
              await ProcessIndividualResourceManifests(resource);
          }
 
          var finalHandler = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
-         finalHandler.CreateFinalManifest(CurrentState.ComputedParameters.FinalResources, CurrentState.ComputedParameters.KustomizeManifestPath, CurrentState.InputParameters.LoadedAspirateSettings);
+         finalHandler.CreateFinalManifest(CurrentState.FinalResources, CurrentState.OutputPath, CurrentState.TemplatePath);
 
          return true;
     }
 
     private bool NoSupportedComponentsExitAction()
     {
-        if (CurrentState.ComputedParameters.AllSelectedSupportedComponents.Count != 0)
+        if (CurrentState.AllSelectedSupportedComponents.Count != 0)
         {
             return false;
         }
@@ -57,11 +57,11 @@ public sealed class GenerateKustomizeManifestAction(
             return;
         }
 
-        var success = await handler.CreateManifests(resource, CurrentState.ComputedParameters.KustomizeManifestPath, CurrentState.InputParameters.LoadedAspirateSettings);
+        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.TemplatePath);
 
         if (success && !IsDatabase(resource.Value))
         {
-            CurrentState.ComputedParameters.AppendToFinalResources(resource.Key, resource.Value);
+            CurrentState.AppendToFinalResources(resource.Key, resource.Value);
         }
     }
 }

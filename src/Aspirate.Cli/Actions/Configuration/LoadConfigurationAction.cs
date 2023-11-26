@@ -8,12 +8,14 @@ public class LoadConfigurationAction(
 
     public override Task<bool> ExecuteAsync()
     {
-        var aspirateSettings = configurationService.LoadConfigurationFile(CurrentState.InputParameters.AspireManifestPath);
+        var aspirateSettings = configurationService.LoadConfigurationFile(CurrentState.ProjectPath);
 
         if (aspirateSettings is not null)
         {
-            CurrentState.InputParameters.LoadedAspirateSettings = aspirateSettings;
-            Logger.MarkupLine($"\r\n[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.InputParameters.AspireManifestPath}'[/].[/]");
+            CurrentState.TemplatePath = aspirateSettings.TemplatePath ?? null;
+            CurrentState.ContainerRegistry = aspirateSettings.ContainerSettings?.Registry ?? null;
+            CurrentState.ContainerImageTag = aspirateSettings.ContainerSettings?.Tag ?? null;
+            Logger.MarkupLine($"\r\n[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.ProjectPath}'[/].[/]");
             Logger.WriteLine();
         }
 

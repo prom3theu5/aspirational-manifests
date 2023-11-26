@@ -6,7 +6,8 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
     public async Task<MsBuildContainerProperties> GetContainerDetails(
         string resourceName,
         Project project,
-        AspirateSettings? aspirateSettings = null)
+        string? containerRegistry,
+        string? containerImageTag)
     {
         var containerPropertiesJson = await propertyService.GetProjectPropertiesAsync(
             project.Path,
@@ -18,7 +19,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         var msBuildProperties = JsonSerializer.Deserialize<MsBuildProperties<MsBuildContainerProperties>>(containerPropertiesJson ?? "{}");
 
         // Exit app if container registry is empty. We need it.
-        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, project, aspirateSettings);
+        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, project, containerRegistry);
 
         // Fallback to service name if image name is not provided from anywhere. (imageName is deprecated using repository like it says to).
         if (string.IsNullOrEmpty(msBuildProperties.Properties.ContainerRepository) && string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImageName))
@@ -27,7 +28,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         // Fallback to latest tag if tag not specified.
-        HandleTag(msBuildProperties, aspirateSettings);
+        HandleTag(msBuildProperties, containerImageTag);
 
         msBuildProperties.Properties.FullContainerImage = GetFullImage(msBuildProperties.Properties);
 
@@ -74,7 +75,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
     private void EnsureContainerRegistryIsNotEmpty(
         MsBuildContainerProperties details,
         Project project,
-        AspirateSettings? aspirateSettings)
+        string? containerRegistry)
     {
         if (!string.IsNullOrEmpty(details.ContainerRegistry))
         {
@@ -82,9 +83,9 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         // Use our custom fall-back value if it exists
-        if (!string.IsNullOrEmpty(aspirateSettings?.ContainerSettings?.Registry))
+        if (!string.IsNullOrEmpty(containerRegistry))
         {
-            details.ContainerRegistry = aspirateSettings.ContainerSettings.Registry;
+            details.ContainerRegistry = containerRegistry;
             return;
         }
 
@@ -94,7 +95,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
 
     private static void HandleTag(
         MsBuildProperties<MsBuildContainerProperties> msBuildProperties,
-        AspirateSettings? aspirateSettings)
+        string containerImageTag)
     {
         if (!string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImageTag))
         {
@@ -102,9 +103,9 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         // Use our custom fall-back value if it exists
-        if (!string.IsNullOrEmpty(aspirateSettings?.ContainerSettings?.Tag))
+        if (!string.IsNullOrEmpty(containerImageTag))
         {
-            msBuildProperties.Properties.ContainerImageTag = aspirateSettings.ContainerSettings.Tag;
+            msBuildProperties.Properties.ContainerImageTag = containerImageTag;
             return;
         }
 

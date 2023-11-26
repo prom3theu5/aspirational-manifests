@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Aspirate.Contracts\Aspirate.Contracts.csproj" />
+    <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,8 +41,6 @@
     <PackageReference Include="CliWrap" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" />
-    <PackageReference Include="System.CommandLine" />
-    <PackageReference Include="System.CommandLine.NamingConventionBinder" />
   </ItemGroup>
 
   <ItemGroup>

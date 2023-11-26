@@ -15,15 +15,15 @@ public sealed class ApplyManifestsToClusterAction(IKubeCtlService kubeCtlService
             return true;
         }
 
-        CurrentState.ComputedParameters.ActiveKubernetesContext = await kubeCtlService.SelectKubernetesContextForDeployment();
+        CurrentState.ActiveKubernetesContext = await kubeCtlService.SelectKubernetesContextForDeployment();
 
-        if (!CurrentState.ComputedParameters.ActiveKubernetesContextIsSet)
+        if (!CurrentState.ActiveKubernetesContextIsSet)
         {
             return false;
         }
 
-        await kubeCtlService.ApplyManifests(CurrentState.ComputedParameters.ActiveKubernetesContext, CurrentState.ComputedParameters.KustomizeManifestPath);
-        Logger.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.ComputedParameters.ActiveKubernetesContext}'[/]");
+        await kubeCtlService.ApplyManifests(CurrentState.ActiveKubernetesContext, CurrentState.InputPath);
+        Logger.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.ActiveKubernetesContext}'[/]");
 
         return true;
     }

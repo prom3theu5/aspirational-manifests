@@ -8,11 +8,11 @@ public class LoadAspireManifestAction(
 
     public override Task<bool> ExecuteAsync()
     {
-        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(CurrentState.ComputedParameters.AspireManifestPath);
-        CurrentState.ComputedParameters.SetLoadedManifestState(aspireManifest);
+        var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(CurrentState.ProjectManifest);
+        CurrentState.LoadedAspireManifestResources = aspireManifest;
 
         var componentsToProcess = SelectManifestItemsToProcess();
-        CurrentState.ComputedParameters.SetAspireComponentsToProcess(componentsToProcess);
+        CurrentState.AspireComponentsToProcess = componentsToProcess;
 
         return Task.FromResult(true);
     }
@@ -27,5 +27,5 @@ public class LoadAspireManifestAction(
                 .InstructionsText(
                     "[grey](Press [blue]<space>[/] to toggle a component, " +
                     "[green]<enter>[/] to accept)[/]")
-                .AddChoiceGroup("All Components", CurrentState.ComputedParameters.LoadedAspireManifestResources.Keys.ToList()));
+                .AddChoiceGroup("All Components", CurrentState.LoadedAspireManifestResources.Keys.ToList()));
 }

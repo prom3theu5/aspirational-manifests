@@ -2,5 +2,5 @@ namespace Aspirate.Cli.Commands.Apply;
 
 public sealed class ApplyOptions : ICommandOptions
 {
-    public string OutputPath { get; init; } = AspirateLiterals.DefaultOutputPath;
+    public string InputPath { get; init; } = AspirateLiterals.DefaultOutputPath;
 }

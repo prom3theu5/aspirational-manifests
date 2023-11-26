@@ -13,12 +13,12 @@ public class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console) : Base
     public override Resource Deserialize(ref Utf8JsonReader reader) =>
         throw new NotImplementedException();
 
-    public void CreateFinalManifest(Dictionary<string, Resource> resources, string outputPath, AspirateSettings? aspirateSettings = null)
+    public void CreateFinalManifest(Dictionary<string, Resource> resources, string outputPath, string? templatePath = null)
     {
         var manifests = resources.Select(x => x.Key).ToList();
 
         var templateData = new FinalTemplateData(manifests);
 
-        CreateComponentKustomizeManifest(outputPath, templateData, aspirateSettings);
+        CreateComponentKustomizeManifest(outputPath, templateData, templatePath);
     }
 }

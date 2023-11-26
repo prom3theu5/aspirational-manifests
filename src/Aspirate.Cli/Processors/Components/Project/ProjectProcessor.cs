@@ -1,4 +1,4 @@
-using AspireProject = Aspirate.Contracts.Models.AspireManifests.Components.V0.Project;
+using AspireProject = Aspirate.Shared.Models.AspireManifests.Components.V0.Project;
 
 namespace Aspirate.Cli.Processors.Components.Project;
 
@@ -27,7 +27,7 @@ public class ProjectProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireProject>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, AspirateSettings? aspirateSettings = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string? templatePath = null)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -46,9 +46,9 @@ public class ProjectProcessor(
             project.Env,
             _manifests);
 
-        CreateDeployment(resourceOutputPath, data, aspirateSettings);
-        CreateService(resourceOutputPath, data, aspirateSettings);
-        CreateComponentKustomizeManifest(resourceOutputPath, data, aspirateSettings);
+        CreateDeployment(resourceOutputPath, data, templatePath);
+        CreateService(resourceOutputPath, data, templatePath);
+        CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
 
         LogCompletion(resourceOutputPath);
 
@@ -71,11 +71,12 @@ public class ProjectProcessor(
 
     public async Task PopulateContainerDetailsCacheForProject(
         KeyValuePair<string, Resource> resource,
-        AspirateSettings? aspirateSettings)
+        string containerRegistry,
+        string containerImageTag)
     {
         var project = resource.Value as AspireProject;
 
-        var details = await containerDetailsService.GetContainerDetails(resource.Key, project, aspirateSettings);
+        var details = await containerDetailsService.GetContainerDetails(resource.Key, project, containerRegistry, containerImageTag);
 
         var success = _containerDetailsCache.TryAdd(resource.Key, details);
 

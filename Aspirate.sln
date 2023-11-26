@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{52460A37-4C1
 		dotnet-tools.json = dotnet-tools.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Contracts", "src\Aspirate.Contracts\Aspirate.Contracts.csproj", "{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Shared", "src\Aspirate.Shared\Aspirate.Shared.csproj", "{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A093C5FC-06FF-4DD3-B0D6-55CEF555A55E}"
 EndProject
