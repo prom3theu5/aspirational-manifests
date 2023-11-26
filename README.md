@@ -5,8 +5,6 @@
 
 <https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
 
----
-
 # Table of Contents
 1. [To Install as a global tool](#to-install-as-a-global-tool)
 2. [ContainerRegistry](#containerregistry)
@@ -25,8 +23,6 @@ dotnet tool install -g aspirate --prerelease
 ```
 
 > NOTE: While Aspirate is in development the package will be versioned as a preview and the `--prelease` option will get the latest preview.
-
----
 
 ## ContainerRegistry
 
@@ -47,8 +43,6 @@ aspirate init
 
 from within your AppHost directory - and it'll ask you which settings you'd like to override.
 
----
-
 ## Producing Manifests
 
 Navigate to your Aspire project's AppHost directory, and run:
@@ -60,8 +54,6 @@ This command (by-default) will also build selected projects, and push the contai
 Builds can be skipped by passing the `--skip-build` flag.
 
 Your manifests will be in the AppHost/aspirate-output directory by default.
-
----
 
 ## Build
 
@@ -75,8 +67,6 @@ The command will first create the manifest file, however this can be overridden 
 aspirate build
 ```
 
----
-
 ## Apply Manifests
 
 To apply the manifests to your cluster, run:
@@ -86,8 +76,6 @@ aspirate apply
 ```
 
 Aspirate will first ask you which context they would like you to operate on, and will confirm first that you wish to act.
-
----
 
 ## Remove Manifests
 
@@ -99,8 +87,6 @@ aspirate destroy
 
 Aspirate will first ask you which context they would like you to operate on, and will confirm first that you wish to act.
 
----
-
 ## Non-Interactive Invocation
 All commands can be invoked non-interactively by passing the `--non-interactive` flag.
 
@@ -108,16 +94,12 @@ This will cause the tool to use the default context and not prompt for confirmat
 
 When using this flag, all configuration arguments must be passed on the command line.
 
----
-
 ## Uninstall tool
 Aspirate can be uninstalled as a global tool by running:
 
 ```bash
 dotnet tool uninstall -g aspirate
 ```
-
----
 
 ## Configuring the Windows Terminal For Unicode and Emoji Support
 
