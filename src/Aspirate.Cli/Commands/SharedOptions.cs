@@ -23,6 +23,13 @@ public static class SharedOptions
         IsRequired = false,
     };
 
+    public static Option<string> KubernetesContext => new(new[] { "-k", "--kube-context" })
+    {
+        Description = "The name of the kubernetes context to use",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
     public static Option<bool> NonInteractive => new(new[] { "--non-interactive" })
     {
         Description = "Disables interactive mode for the command",

@@ -9,12 +9,12 @@ public class AspirateState
     public string? ContainerRegistry { get; set; }
     public string? ContainerImageTag { get; set; }
     public string? TemplatePath { get; set; }
-    public string? ActiveKubernetesContext { get; set; }
+    public string? KubeContext { get; set; }
     public bool NonInteractive { get; set; }
     public List<string> AspireComponentsToProcess { get; set; } = [];
     public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = [];
     public Dictionary<string, Resource> FinalResources { get; } = [];
-    public bool ActiveKubernetesContextIsSet => !string.IsNullOrEmpty(ActiveKubernetesContext);
+    public bool ActiveKubernetesContextIsSet => !string.IsNullOrEmpty(KubeContext);
     public List<KeyValuePair<string, Resource>> SelectedProjectComponents =>
         LoadedAspireManifestResources
             .Where(x => x.Value is Project && AspireComponentsToProcess.Contains(x.Key))
