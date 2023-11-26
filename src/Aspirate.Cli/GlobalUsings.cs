@@ -18,6 +18,7 @@ global using Aspirate.Cli.Actions.Configuration;
 global using Aspirate.Cli.Actions.Containers;
 global using Aspirate.Cli.Actions.Manifests;
 global using Aspirate.Cli.Commands.Apply;
+global using Aspirate.Cli.Commands.Build;
 global using Aspirate.Cli.Commands.Destroy;
 global using Aspirate.Cli.Commands.Generate;
 global using Aspirate.Cli.Commands.Init;

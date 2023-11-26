@@ -12,6 +12,12 @@
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
+    "build": {
+      "commandName": "Project",
+      "commandLineArgs": "build",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
     "apply": {
       "commandName": "Project",
       "commandLineArgs": "apply",

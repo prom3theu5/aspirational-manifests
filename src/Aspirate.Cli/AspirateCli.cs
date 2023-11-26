@@ -14,6 +14,7 @@ internal class AspirateCli : RootCommand
     {
         AddCommand(new InitCommand());
         AddCommand(new GenerateCommand());
+        AddCommand(new BuildCommand());
         AddCommand(new ApplyCommand());
         AddCommand(new DestroyCommand());
     }
