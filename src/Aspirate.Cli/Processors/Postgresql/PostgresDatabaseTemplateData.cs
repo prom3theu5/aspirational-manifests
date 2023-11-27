@@ -1,4 +1,4 @@
-namespace Aspirate.Cli.Processors.Components.Postgresql;
+namespace Aspirate.Cli.Processors.Postgresql;
 
 public sealed class PostgresDatabaseTemplateData(
     string name,

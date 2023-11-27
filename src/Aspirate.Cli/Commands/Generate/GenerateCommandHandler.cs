@@ -9,6 +9,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(LoadAspireManifestAction.ActionKey)
             .QueueAction(PopulateContainerDetailsAction.ActionKey)
             .QueueAction(BuildAndPushContainersAction.ActionKey)
-            .QueueAction(GenerateKustomizeManifestAction.ActionKey)
+            .QueueAction(GenerateKustomizeManifestsAction.ActionKey)
+            .QueueAction(GenerateFinalKustomizeManifestAction.ActionKey)
             .ExecuteCommandsAsync();
 }

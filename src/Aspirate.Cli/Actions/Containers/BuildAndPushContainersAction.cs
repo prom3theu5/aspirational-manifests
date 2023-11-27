@@ -1,7 +1,9 @@
+using Aspirate.Cli.Processors.Project;
+
 namespace Aspirate.Cli.Actions.Containers;
 
 public sealed class BuildAndPushContainersAction(
-    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveSupport(serviceProvider)
+    IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
     public const string ActionKey = "BuildAndPushContainersAction";
 
@@ -41,9 +43,5 @@ public sealed class BuildAndPushContainersAction(
 
         Logger.MarkupLine("\r\n[bold]No project components selected. Skipping build and publish action.[/]");
         return true;
-    }
-
-    public override void ValidateNonInteractiveState()
-    {
     }
 }

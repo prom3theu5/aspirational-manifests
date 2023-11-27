@@ -1,5 +1,3 @@
-using Aspirate.Shared.Literals;
-
 namespace Aspirate.Shared.Processors;
 
 public static class BaseProcessorLogExtensions

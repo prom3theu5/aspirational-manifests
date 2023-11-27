@@ -1,4 +1,4 @@
-namespace Aspirate.Cli.Processors.Components.Project;
+namespace Aspirate.Cli.Processors.Project;
 
 public class ProjectTemplateData(
     string name,

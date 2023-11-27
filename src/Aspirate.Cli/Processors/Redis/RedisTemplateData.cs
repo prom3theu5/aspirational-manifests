@@ -1,4 +1,4 @@
-namespace Aspirate.Cli.Processors.Components.Redis;
+namespace Aspirate.Cli.Processors.Redis;
 
 public sealed class RedisTemplateData(IReadOnlyCollection<string> manifests)
     : BaseTemplateData(null, null, manifests, false);

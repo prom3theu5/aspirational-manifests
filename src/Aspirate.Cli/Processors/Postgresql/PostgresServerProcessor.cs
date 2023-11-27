@@ -1,4 +1,4 @@
-namespace Aspirate.Cli.Processors.Components.Postgresql;
+namespace Aspirate.Cli.Processors.Postgresql;
 
 /// <summary>
 /// Handles producing the Postgres component as Kustomize manifest.

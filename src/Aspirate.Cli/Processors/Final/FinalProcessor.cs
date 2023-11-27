@@ -1,4 +1,4 @@
-namespace Aspirate.Cli.Processors.Components.Final;
+namespace Aspirate.Cli.Processors.Final;
 
 /// <summary>
 /// A project component for version 0 of Aspire.
@@ -20,5 +20,7 @@ public class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console) : Base
         var templateData = new FinalTemplateData(manifests);
 
         CreateComponentKustomizeManifest(outputPath, templateData, templatePath);
+
+        _console.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/kustomization.yml[/]");
     }
 }

@@ -1,6 +1,6 @@
 namespace Aspirate.Shared.Actions;
 
-public abstract class BaseActionWithNonInteractiveSupport(IServiceProvider serviceProvider) : BaseAction(serviceProvider)
+public abstract class BaseActionWithNonInteractiveValidation(IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
     public abstract void ValidateNonInteractiveState();
 

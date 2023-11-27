@@ -2,7 +2,7 @@ namespace Aspirate.Cli.Actions.Manifests;
 
 public class LoadAspireManifestAction(
     IManifestFileParserService manifestFileParserService,
-    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveSupport(serviceProvider)
+    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public const string ActionKey = "LoadAspireManifestAction";
 

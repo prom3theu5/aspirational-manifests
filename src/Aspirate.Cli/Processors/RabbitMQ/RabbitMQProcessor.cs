@@ -1,6 +1,6 @@
 using AspireRabbit = Aspirate.Shared.Models.AspireManifests.Components.V0.RabbitMq;
 
-namespace Aspirate.Cli.Processors.Components.RabbitMQ;
+namespace Aspirate.Cli.Processors.RabbitMQ;
 
 /// <summary>
 /// Handles producing the RabbitMq component as Kustomize manifest.
