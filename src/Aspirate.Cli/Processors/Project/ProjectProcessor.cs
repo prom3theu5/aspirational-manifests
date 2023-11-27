@@ -1,6 +1,6 @@
 using AspireProject = Aspirate.Shared.Models.AspireManifests.Components.V0.Project;
 
-namespace Aspirate.Cli.Processors.Components.Project;
+namespace Aspirate.Cli.Processors.Project;
 
 /// <summary>
 /// A project component for version 0 of Aspire.

@@ -29,7 +29,7 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
 
             try
             {
-                if (state.NonInteractive && action is BaseActionWithNonInteractiveSupport nonInteractiveAction)
+                if (state.NonInteractive && action is BaseActionWithNonInteractiveValidation nonInteractiveAction)
                 {
                     nonInteractiveAction.ValidateNonInteractiveState();
                 }

@@ -12,6 +12,7 @@ public class AspirateState
     public string? KubeContext { get; set; }
     public bool NonInteractive { get; set; }
     public bool SkipBuild { get; set; }
+    public bool SkipFinalKustomizeGeneration { get; set; }
     public List<string> AspireComponentsToProcess { get; set; } = [];
     public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = [];
     public Dictionary<string, Resource> FinalResources { get; } = [];
@@ -24,6 +25,12 @@ public class AspirateState
         LoadedAspireManifestResources
             .Where(x => x.Value is not UnsupportedResource && AspireComponentsToProcess.Contains(x.Key))
             .ToList();
+
+    public bool HasSelectedSupportedComponents => !AllSelectedSupportedComponents.All(x => IsDatabase(x.Value));
+
     public void AppendToFinalResources(string key, Resource resource) =>
         FinalResources.Add(key, resource);
+
+    public bool IsDatabase(Resource resource) =>
+        resource is PostgresDatabase;
 }

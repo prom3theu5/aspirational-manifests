@@ -3,7 +3,7 @@ namespace Aspirate.Cli.Actions.Configuration;
 public class InitializeConfigurationAction(
     IFileSystem fileSystem,
     IAspirateConfigurationService configurationService,
-    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveSupport(serviceProvider)
+    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public const string ActionKey = "InitializeConfigurationAction";
 

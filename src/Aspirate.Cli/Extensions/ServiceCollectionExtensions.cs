@@ -1,3 +1,8 @@
+using Aspirate.Cli.Processors.Postgresql;
+using Aspirate.Cli.Processors.Project;
+using Aspirate.Cli.Processors.RabbitMQ;
+using Aspirate.Cli.Processors.Redis;
+
 namespace Aspirate.Cli.Extensions;
 
 internal static class ServiceCollectionExtensions
@@ -46,7 +51,8 @@ internal static class ServiceCollectionExtensions
             .AddKeyedSingleton<IAction, BuildAndPushContainersAction>(BuildAndPushContainersAction.ActionKey)
             .AddKeyedSingleton<IAction, PopulateContainerDetailsAction>(PopulateContainerDetailsAction.ActionKey)
             .AddKeyedSingleton<IAction, GenerateAspireManifestAction>(GenerateAspireManifestAction.ActionKey)
-            .AddKeyedSingleton<IAction, GenerateKustomizeManifestAction>(GenerateKustomizeManifestAction.ActionKey)
+            .AddKeyedSingleton<IAction, GenerateKustomizeManifestsAction>(GenerateKustomizeManifestsAction.ActionKey)
+            .AddKeyedSingleton<IAction, GenerateFinalKustomizeManifestAction>(GenerateFinalKustomizeManifestAction.ActionKey)
             .AddKeyedSingleton<IAction, LoadAspireManifestAction>(LoadAspireManifestAction.ActionKey)
             .AddKeyedSingleton<IAction, ApplyManifestsToClusterAction>(ApplyManifestsToClusterAction.ActionKey)
             .AddKeyedSingleton<IAction, RemoveManifestsFromClusterAction>(RemoveManifestsFromClusterAction.ActionKey);

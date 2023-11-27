@@ -1,6 +1,6 @@
 using AspireRedis = Aspirate.Shared.Models.AspireManifests.Components.V0.Redis;
 
-namespace Aspirate.Cli.Processors.Components.Redis;
+namespace Aspirate.Cli.Processors.Redis;
 
 /// <summary>
 /// Handles producing the Redis component as Kustomize manifest.

@@ -8,4 +8,5 @@ public sealed class GenerateOptions : ICommandOptions
 
     public bool SkipBuild { get; set; } = false;
     public bool NonInteractive { get; set; } = false;
+    public bool SkipFinalKustomizeGeneration { get; set; } = false;
 }

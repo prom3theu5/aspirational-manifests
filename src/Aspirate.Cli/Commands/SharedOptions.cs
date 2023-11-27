@@ -23,6 +23,28 @@ public static class SharedOptions
         IsRequired = false,
     };
 
+
+    public static Option<string> TemplatePath => new(new[] {"-tp", "--template-path" })
+    {
+        Description = "The Custom Template path to use.",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
+    public static Option<string> ContainerRegistry => new(new[] {"-cr", "--container-registry" })
+    {
+        Description = "The Container Registry to use as the fall-back value for all containers.",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
+    public static Option<string> ContainerImageTag => new(new[] {"-ct", "--container-image-tag" })
+    {
+        Description = "The Container Image Tag to use as the fall-back value for all containers.",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
     public static Option<string> KubernetesContext => new(new[] { "-k", "--kube-context" })
     {
         Description = "The name of the kubernetes context to use",
@@ -40,6 +62,13 @@ public static class SharedOptions
     public static Option<bool> SkipBuild => new(new[] { "--skip-build" })
     {
         Description = "Skips build and Push of containers",
+        Arity = ArgumentArity.ZeroOrOne,
+        IsRequired = false,
+    };
+
+    public static Option<bool> SkipFinalKustomizeGeneration => new(new[] { "-sf", "--skip-final", "--skip-final-kustomize-generation" })
+    {
+        Description = "Skips The final generation of the kustomize manifest, which is the parent top level file",
         Arity = ArgumentArity.ZeroOrOne,
         IsRequired = false,
     };

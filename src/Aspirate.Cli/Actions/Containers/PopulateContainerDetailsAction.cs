@@ -1,3 +1,5 @@
+using Aspirate.Cli.Processors.Project;
+
 namespace Aspirate.Cli.Actions.Containers;
 
 public sealed class PopulateContainerDetailsAction(

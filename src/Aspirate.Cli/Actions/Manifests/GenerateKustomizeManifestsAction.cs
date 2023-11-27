@@ -1,13 +1,10 @@
 namespace Aspirate.Cli.Actions.Manifests;
 
-public sealed class GenerateKustomizeManifestAction(
+public sealed class GenerateKustomizeManifestsAction(
     IAspireManifestCompositionService manifestCompositionService,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
-    public const string ActionKey = "GenerateKustomizeManifestAction";
-
-    private static bool IsDatabase(Resource resource) =>
-        resource is PostgresDatabase;
+    public const string ActionKey = "GenerateKustomizeManifestsAction";
 
     public override async Task<bool> ExecuteAsync()
     {
@@ -23,22 +20,18 @@ public sealed class GenerateKustomizeManifestAction(
              await ProcessIndividualResourceManifests(resource);
          }
 
-         var finalHandler = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
-         finalHandler.CreateFinalManifest(CurrentState.FinalResources, CurrentState.OutputPath, CurrentState.TemplatePath);
-
          return true;
     }
 
     private bool NoSupportedComponentsExitAction()
     {
-        if (CurrentState.AllSelectedSupportedComponents.Count != 0)
+        if (CurrentState.HasSelectedSupportedComponents)
         {
             return false;
         }
 
         Logger.MarkupLine("\r\n[bold]No supported components selected. Skipping generation of kustomize manifests.[/]");
         return true;
-
     }
 
     private async Task ProcessIndividualResourceManifests(KeyValuePair<string, Resource> resource)
@@ -59,7 +52,7 @@ public sealed class GenerateKustomizeManifestAction(
 
         var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.TemplatePath);
 
-        if (success && !IsDatabase(resource.Value))
+        if (success && !CurrentState.IsDatabase(resource.Value))
         {
             CurrentState.AppendToFinalResources(resource.Key, resource.Value);
         }
