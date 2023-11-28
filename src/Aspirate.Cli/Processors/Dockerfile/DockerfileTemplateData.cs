@@ -9,6 +9,7 @@ public class DockerfileTemplateData(
     : BaseTemplateData(name, env, manifests)
 {
     public string ContainerImage { get; set; } = containerImage;
+    public bool IsDockerfile { get; set; } = true;
     public List<Ports> Ports { get; set; } = ports;
-    public bool HasCustomPorts => Ports.Any();
+    public bool HasPorts => Ports.Any();
 }

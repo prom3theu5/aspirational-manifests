@@ -1,3 +1,5 @@
+using CliWrap.Buffered;
+
 namespace Aspirate.Cli.Services;
 
 public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiConsole console, IProjectPropertyService projectPropertyService) : IContainerCompositionService
@@ -10,9 +12,6 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         MsBuildContainerProperties containerDetails,
         bool nonInteractive)
     {
-        _stdErrBuffer.Clear();
-        _stdOutBuffer.Clear();
-
         var fullProjectPath = filesystem.NormalizePath(project.Path);
 
         var argumentsBuilder = ArgumentsBuilder.Create();
@@ -27,18 +26,16 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
 
     public async Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string registry, bool nonInteractive)
     {
-        _stdErrBuffer.Clear();
-        _stdOutBuffer.Clear();
-
         var fullDockerfilePath = filesystem.GetFullPath(dockerfile.Path);
 
         var tag = $"{registry}/{imageName}:latest";
 
         var argumentsBuilder = ArgumentsBuilder
             .Create()
+            .AppendArgument(DockerLiterals.BuildCommand, string.Empty, quoteValue: false)
             .AppendArgument(DockerLiterals.TagArgument, tag)
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
-            .AppendArgument(dockerfile.Context, string.Empty);
+            .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
 
         await ExecuteCommand(builder, argumentsBuilder, nonInteractive);
 
@@ -57,43 +54,29 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         bool nonInteractive,
         Func<string, ArgumentsBuilder, bool, string, Task>? onFailed = default)
     {
-        var arguments = argumentsBuilder.RenderArguments();
-
-        var executeCommand = CliWrap.Cli.Wrap(command)
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(_stdErrBuffer));
-
-        await foreach(var cmdEvent in executeCommand.ListenAsync())
-        {
-            switch (cmdEvent)
-            {
-                case StartedCommandEvent _:
-                    console.WriteLine();
-                    console.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
-                    break;
-                case StandardOutputCommandEvent stdOut:
-                    console.WriteLine(stdOut.Text);
-                    break;
-                case StandardErrorCommandEvent stdErr:
-                    console.MarkupLine($"[red]{stdErr.Text}[/]");
-                    break;
-                case ExitedCommandEvent exited:
-                    if (exited.ExitCode != 0)
-                    {
-                        await onFailed?.Invoke(
-                            command,
-                            argumentsBuilder,
-                            nonInteractive,
-                            _stdErrBuffer.Append(_stdOutBuffer).ToString());
-                    }
-                    break;
-            }
-        }
-
         _stdErrBuffer.Clear();
         _stdOutBuffer.Clear();
+
+        var arguments = argumentsBuilder.RenderArguments();
+
+        console.WriteLine();
+        console.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
+
+        var result = await CliWrap.Cli.Wrap(command)
+            .WithArguments(arguments)
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(WriteInfo))
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(WriteError))
+            .ExecuteBufferedAsync();
+
+        if (result.ExitCode != 0)
+        {
+            await onFailed?.Invoke(
+                           command,
+                           argumentsBuilder,
+                           nonInteractive,
+                           _stdErrBuffer.Append(_stdOutBuffer).ToString());
+        }
     }
 
     private static async Task<bool> ExecuteCommandNoOutput(string command, IReadOnlyDictionary<string, string?> environmentVariables)
@@ -138,10 +121,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         {
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.ErrorOnDuplicatePublishOutputFilesArgument, "false");
 
-            _stdErrBuffer.Clear();
-            _stdOutBuffer.Clear();
-
-            return ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, HandleBuildErrors);
+           return ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, HandleBuildErrors);
         }
 
         throw new ActionCausesExitException(9999);
@@ -258,5 +238,17 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         }
 
         argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageTagArgument, containerDetails.ContainerImageTag);
+    }
+
+    private void WriteError(string message)
+    {
+        console.MarkupLine("[red]{0}[/]", message.EscapeMarkup());
+        _stdErrBuffer.AppendLine(message);
+    }
+
+    private void WriteInfo(string message)
+    {
+        console.WriteLine(message);
+        _stdOutBuffer.AppendLine(message);
     }
 }

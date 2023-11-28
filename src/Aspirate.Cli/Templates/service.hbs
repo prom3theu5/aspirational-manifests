@@ -1,3 +1,4 @@
+{{#if isProject}}
 ---
 apiVersion: v1
 kind: Service
@@ -7,15 +8,28 @@ spec:
   type: {{serviceType}}
   selector:
     app: {{name}}
-  ports:
-  {{#if hasCustomPorts}}
-  {{#each ports}}
-  - name: {{name}}
-    port: {{port}}
-    targetPort: {{port}}
-  {{/each}}
-  {{else}}
-  - name: http
-    port: 8080
-    targetPort: 8080
-  {{/if}}
+    ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+{{/if}}
+
+{{#if isDockerfile}}
+{{#if hasPorts}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{name}}
+spec:
+  type: {{serviceType}}
+  selector:
+    app: {{name}}
+    ports:
+{{#each ports}}
+    - name: {{name}}
+      port: {{port}}
+      targetPort: {{port}}
+{{/each}}
+{{/if}}
+{{/if}}

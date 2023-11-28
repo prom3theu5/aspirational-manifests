@@ -6,4 +6,6 @@ public sealed class BuildOptions : BaseCommandOptions
     public string? AspireManifest { get; set; }
 
     public string? ContainerBuilder { get; set; } = "docker";
+    public string? ContainerRegistry { get; set; }
+    public string? ContainerImageTag { get; set; }
 }

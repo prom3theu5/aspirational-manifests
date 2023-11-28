@@ -8,4 +8,5 @@ public class ProjectTemplateData(
     : BaseTemplateData(name, env, manifests)
 {
     public string ContainerImage { get; set; } = containerImage;
+    public bool IsProject { get; set; } = true;
 }
