@@ -21,34 +21,39 @@ public class DockerfileProcessor(
         $"{TemplateLiterals.ServiceType}.yml",
     ];
 
+    private readonly Dictionary<string, string> _containerImageCache = [];
+
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireDockerfile>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string? templatePath = null)
     {
-        // var resourceOutputPath = Path.Combine(outputPath, resource.Key);
-        //
-        // EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
-        //
-        // var project = resource.Value as AspireDockerfile;
-        //
-        // if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
-        // {
-        //     throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
-        // }
-        //
-        // var data = new DockerfileTemplateData(
-        //     resource.Key,
-        //     containerDetails.FullContainerImage,
-        //     project.Env,
-        //     _manifests);
-        //
-        // CreateDeployment(resourceOutputPath, data, templatePath);
-        // CreateService(resourceOutputPath, data, templatePath);
-        // CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
-        //
-        // LogCompletion(resourceOutputPath);
+        var resourceOutputPath = Path.Combine(outputPath, resource.Key);
+
+        EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
+
+        var dockerFile = resource.Value as AspireDockerfile;
+
+        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = int.Parse(b.Value.ContainerPort) }).ToList() ?? [];
+
+        if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
+        {
+            throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
+        }
+
+        var data = new DockerfileTemplateData(
+            resource.Key,
+            containerImage,
+            dockerFile.Env,
+            containerPorts,
+            _manifests);
+
+        CreateDeployment(resourceOutputPath, data, templatePath);
+        CreateService(resourceOutputPath, data, templatePath);
+        CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
+
+        LogCompletion(resourceOutputPath);
 
         return Task.FromResult(true);
     }
@@ -58,6 +63,8 @@ public class DockerfileProcessor(
         var dockerfile = resource.Value as AspireDockerfile;
 
         await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, nonInteractive);
+
+        _containerImageCache.Add(resource.Key, $"{registry}/{imageName}:latest");
 
         _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for Dockerfile [blue]{resource.Key}[/]");
     }
