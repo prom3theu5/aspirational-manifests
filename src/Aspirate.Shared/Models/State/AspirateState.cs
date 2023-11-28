@@ -8,6 +8,7 @@ public class AspirateState
     public string? OutputPath { get; set; }
     public string? ContainerRegistry { get; set; }
     public string? ContainerImageTag { get; set; }
+    public string? ContainerBuilder { get; set; }
     public string? TemplatePath { get; set; }
     public string? KubeContext { get; set; }
     public bool NonInteractive { get; set; }
@@ -20,6 +21,10 @@ public class AspirateState
     public List<KeyValuePair<string, Resource>> SelectedProjectComponents =>
         LoadedAspireManifestResources
             .Where(x => x.Value is Project && AspireComponentsToProcess.Contains(x.Key))
+            .ToList();
+    public List<KeyValuePair<string, Resource>> SelectedDockerfileComponents =>
+        LoadedAspireManifestResources
+            .Where(x => x.Value is Dockerfile && AspireComponentsToProcess.Contains(x.Key))
             .ToList();
     public List<KeyValuePair<string, Resource>> AllSelectedSupportedComponents =>
         LoadedAspireManifestResources

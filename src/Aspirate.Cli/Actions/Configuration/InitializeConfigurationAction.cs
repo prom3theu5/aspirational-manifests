@@ -5,8 +5,6 @@ public class InitializeConfigurationAction(
     IAspirateConfigurationService configurationService,
     IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
-    public const string ActionKey = "InitializeConfigurationAction";
-
     public override Task<bool> ExecuteAsync()
     {
         configurationService.HandleExistingConfiguration(CurrentState.ProjectPath, CurrentState.NonInteractive);

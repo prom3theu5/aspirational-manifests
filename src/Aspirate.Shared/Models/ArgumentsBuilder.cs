@@ -6,6 +6,13 @@ public class ArgumentsBuilder
 
     public static ArgumentsBuilder Create() => new();
 
+    public ArgumentsBuilder Clear()
+    {
+        _arguments.Clear();
+
+        return this;
+    }
+
 
     public ArgumentsBuilder AppendArgument(string argument, string newValue, bool allowDuplicates = false, bool quoteValue = true)
     {

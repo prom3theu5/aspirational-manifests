@@ -6,9 +6,21 @@
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
+    "init-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "init --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
     "generate": {
       "commandName": "Project",
       "commandLineArgs": "generate",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "generate-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "generate --non-interactive",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
@@ -18,15 +30,33 @@
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
+    "build-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "build --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
     "apply": {
       "commandName": "Project",
       "commandLineArgs": "apply",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
+    "apply-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "apply --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
     "destroy": {
       "commandName": "Project",
       "commandLineArgs": "destroy",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "destroy-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "destroy --non-interactive",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     }

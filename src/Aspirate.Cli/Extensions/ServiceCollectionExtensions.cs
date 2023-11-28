@@ -1,8 +1,3 @@
-using Aspirate.Cli.Processors.Postgresql;
-using Aspirate.Cli.Processors.Project;
-using Aspirate.Cli.Processors.RabbitMQ;
-using Aspirate.Cli.Processors.Redis;
-
 namespace Aspirate.Cli.Extensions;
 
 internal static class ServiceCollectionExtensions
@@ -46,23 +41,31 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection AddActions(this IServiceCollection services) =>
         services
-            .AddKeyedSingleton<IAction, InitializeConfigurationAction>(InitializeConfigurationAction.ActionKey)
-            .AddKeyedSingleton<IAction, LoadConfigurationAction>(LoadConfigurationAction.ActionKey)
-            .AddKeyedSingleton<IAction, BuildAndPushContainersAction>(BuildAndPushContainersAction.ActionKey)
-            .AddKeyedSingleton<IAction, PopulateContainerDetailsAction>(PopulateContainerDetailsAction.ActionKey)
-            .AddKeyedSingleton<IAction, GenerateAspireManifestAction>(GenerateAspireManifestAction.ActionKey)
-            .AddKeyedSingleton<IAction, GenerateKustomizeManifestsAction>(GenerateKustomizeManifestsAction.ActionKey)
-            .AddKeyedSingleton<IAction, GenerateFinalKustomizeManifestAction>(GenerateFinalKustomizeManifestAction.ActionKey)
-            .AddKeyedSingleton<IAction, LoadAspireManifestAction>(LoadAspireManifestAction.ActionKey)
-            .AddKeyedSingleton<IAction, ApplyManifestsToClusterAction>(ApplyManifestsToClusterAction.ActionKey)
-            .AddKeyedSingleton<IAction, RemoveManifestsFromClusterAction>(RemoveManifestsFromClusterAction.ActionKey);
+            .RegisterAction<InitializeConfigurationAction>()
+            .RegisterAction<LoadConfigurationAction>()
+            .RegisterAction<BuildAndPushContainersFromProjectsAction>()
+            .RegisterAction<BuildAndPushContainersFromDockerfilesAction>()
+            .RegisterAction<PopulateContainerDetailsForProjectsAction>()
+            .RegisterAction<GenerateAspireManifestAction>()
+            .RegisterAction<GenerateKustomizeManifestsAction>()
+            .RegisterAction<GenerateFinalKustomizeManifestAction>()
+            .RegisterAction<LoadAspireManifestAction>()
+            .RegisterAction<ApplyManifestsToClusterAction>()
+            .RegisterAction<RemoveManifestsFromClusterAction>();
 
     private static void AddProcessors(this IServiceCollection services) =>
         services
-            .AddKeyedSingleton<IProcessor, PostgresServerProcessor>(AspireLiterals.PostgresServer)
-            .AddKeyedSingleton<IProcessor, PostgresDatabaseProcessor>(AspireLiterals.PostgresDatabase)
-            .AddKeyedSingleton<IProcessor, ProjectProcessor>(AspireLiterals.Project)
-            .AddKeyedSingleton<IProcessor, RedisProcessor>(AspireLiterals.Redis)
-            .AddKeyedSingleton<IProcessor, RabbitMqProcessor>(AspireLiterals.RabbitMq)
-            .AddKeyedSingleton<IProcessor, FinalProcessor>(AspireLiterals.Final);
+            .RegisterProcessor<PostgresServerProcessor>(AspireLiterals.PostgresServer)
+            .RegisterProcessor<PostgresDatabaseProcessor>(AspireLiterals.PostgresDatabase)
+            .RegisterProcessor<ProjectProcessor>(AspireLiterals.Project)
+            .RegisterProcessor<DockerfileProcessor>(AspireLiterals.Dockerfile)
+            .RegisterProcessor<RedisProcessor>(AspireLiterals.Redis)
+            .RegisterProcessor<RabbitMqProcessor>(AspireLiterals.RabbitMq)
+            .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
+
+    private static IServiceCollection RegisterAction<TImplementation>(this IServiceCollection services) where TImplementation : class, IAction =>
+        services.AddKeyedSingleton<IAction, TImplementation>(typeof(TImplementation).Name);
+
+    private static IServiceCollection RegisterProcessor<TImplementation>(this IServiceCollection services, string key) where TImplementation : class, IProcessor =>
+        services.AddKeyedSingleton<IProcessor, TImplementation>(key);
 }

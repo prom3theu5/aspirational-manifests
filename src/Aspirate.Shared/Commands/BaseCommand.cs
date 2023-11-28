@@ -5,8 +5,11 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
     where TOptionsHandler : class, ICommandOptionsHandler<TOptions>
 {
     protected BaseCommand(string name, string description)
-        : base(name, description) =>
-        this.Handler = CommandHandler.Create<TOptions, IServiceProvider>(HandleOptions);
+        : base(name, description)
+    {
+        Handler = CommandHandler.Create<TOptions, IServiceProvider>(HandleOptions);
+        AddOption(NonInteractive);
+    }
 
     private static Task<int> HandleOptions(TOptions options, IServiceProvider serviceProvider)
     {
@@ -16,4 +19,11 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
         return handler.HandleAsync(options);
     }
+
+    private static Option<bool> NonInteractive => new(new[] { "--non-interactive" })
+    {
+        Description = "Disables interactive mode for the command",
+        Arity = ArgumentArity.ZeroOrOne,
+        IsRequired = false,
+    };
 }

@@ -23,4 +23,10 @@ public class Binding
     /// </summary>
     [JsonPropertyName("transport")]
     public string? Transport { get; set; }
+
+    /// <summary>
+    /// The Container Port for the binding.
+    /// </summary>
+    [JsonPropertyName("containerPort")]
+    public string? ContainerPort { get; set; }
 }

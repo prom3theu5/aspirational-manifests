@@ -4,10 +4,11 @@ public sealed class BuildCommandHandler(IServiceProvider serviceProvider) : Base
 {
     public override Task<int> HandleAsync(BuildOptions options) =>
         ActionExecutor
-            .QueueAction(LoadConfigurationAction.ActionKey)
-            .QueueAction(GenerateAspireManifestAction.ActionKey)
-            .QueueAction(LoadAspireManifestAction.ActionKey)
-            .QueueAction(PopulateContainerDetailsAction.ActionKey)
-            .QueueAction(BuildAndPushContainersAction.ActionKey)
+            .QueueAction(nameof(LoadConfigurationAction))
+            .QueueAction(nameof(GenerateAspireManifestAction))
+            .QueueAction(nameof(LoadAspireManifestAction))
+            .QueueAction(nameof(PopulateContainerDetailsForProjectsAction))
+            .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
+            .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))
             .ExecuteCommandsAsync();
 }

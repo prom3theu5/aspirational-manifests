@@ -3,8 +3,6 @@ namespace Aspirate.Cli.Actions.Manifests;
 public sealed class RemoveManifestsFromClusterAction(IKubeCtlService kubeCtlService, IServiceProvider serviceProvider) :
     BaseActionWithNonInteractiveValidation(serviceProvider)
 {
-    public const string ActionKey = "RemoveManifestsFromClusterAction";
-
     public override async Task<bool> ExecuteAsync()
     {
         if (!CurrentState.NonInteractive)

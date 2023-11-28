@@ -1,14 +1,16 @@
-using Aspirate.Cli.Processors.Project;
-
 namespace Aspirate.Cli.Actions.Containers;
 
-public sealed class PopulateContainerDetailsAction(
+public sealed class BuildAndPushContainersFromProjectsAction(
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
-    public const string ActionKey = "PopulateContainerDetailsAction";
-
     public override async Task<bool> ExecuteAsync()
     {
+        if (CurrentState.SkipBuild)
+        {
+            Logger.MarkupLine("\r\n[bold]Skipping build and push action as requested.[/]");
+            return true;
+        }
+
         if (NoSelectedProjectComponents())
         {
             return true;
@@ -16,14 +18,14 @@ public sealed class PopulateContainerDetailsAction(
 
         var projectProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Project) as ProjectProcessor;
 
-        Logger.MarkupLine("\r\n[bold]Gathering container details for each project in selected components[/]\r\n");
+        Logger.MarkupLine("\r\n[bold]Building all project resources, and pushing containers:[/]\r\n");
 
         foreach (var resource in CurrentState.SelectedProjectComponents)
         {
-            await projectProcessor.PopulateContainerDetailsCacheForProject(resource, CurrentState.ContainerRegistry, CurrentState.ContainerImageTag);
+            await projectProcessor.BuildAndPushProjectContainer(resource, CurrentState.NonInteractive);
         }
 
-        Logger.MarkupLine("\r\n[bold]Gathering Tasks Completed - Cache Populated.[/]");
+        Logger.MarkupLine("\r\n[bold]Building and push completed for all selected project components.[/]");
 
         return true;
     }
@@ -35,8 +37,7 @@ public sealed class PopulateContainerDetailsAction(
             return false;
         }
 
-        Logger.MarkupLine("\r\n[bold]No project components selected. Skipping execution of container detail gathering.[/]");
+        Logger.MarkupLine("\r\n[bold]No project components selected. Skipping build and publish action.[/]");
         return true;
-
     }
 }

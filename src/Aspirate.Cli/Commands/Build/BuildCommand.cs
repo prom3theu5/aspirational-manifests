@@ -6,6 +6,6 @@ public sealed class BuildCommand : BaseCommand<BuildOptions, BuildCommandHandler
     {
        AddOption(SharedOptions.AspireProjectPath);
        AddOption(SharedOptions.AspireManifest);
-       AddOption(SharedOptions.NonInteractive);
+       AddOption(SharedOptions.ContainerBuilder);
     }
 }

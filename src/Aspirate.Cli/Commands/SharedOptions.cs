@@ -23,7 +23,6 @@ public static class SharedOptions
         IsRequired = false,
     };
 
-
     public static Option<string> TemplatePath => new(new[] {"-tp", "--template-path" })
     {
         Description = "The Custom Template path to use.",
@@ -41,6 +40,13 @@ public static class SharedOptions
     public static Option<string> ContainerImageTag => new(new[] {"-ct", "--container-image-tag" })
     {
         Description = "The Container Image Tag to use as the fall-back value for all containers.",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
+    public static Option<string> ContainerBuilder => new(new[] { "--container-builder" })
+    {
+        Description = "The Container Builder: can be 'docker' or 'podman'. The default is 'docker'.",
         Arity = ArgumentArity.ExactlyOne,
         IsRequired = false,
     };
@@ -69,13 +75,6 @@ public static class SharedOptions
     public static Option<bool> SkipFinalKustomizeGeneration => new(new[] { "-sf", "--skip-final", "--skip-final-kustomize-generation" })
     {
         Description = "Skips The final generation of the kustomize manifest, which is the parent top level file",
-        Arity = ArgumentArity.ZeroOrOne,
-        IsRequired = false,
-    };
-
-    public static Option<bool> NonInteractive => new(new[] { "--non-interactive" })
-    {
-        Description = "Disables interactive mode for the command",
         Arity = ArgumentArity.ZeroOrOne,
         IsRequired = false,
     };
