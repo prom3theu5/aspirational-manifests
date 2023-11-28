@@ -23,7 +23,13 @@ spec:
         image: {{containerImage}}
         imagePullPolicy: Always
         ports:
+        {{#if hasCustomPorts}}
+        {{#each ports}}
+        - containerPort: {{port}}
+        {{/each}}
+        {{else}}
         - containerPort: 8080
+        {{/if}}
         envFrom:
         - configMapRef:
             name: {{name}}-env

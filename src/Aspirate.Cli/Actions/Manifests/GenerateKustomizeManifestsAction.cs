@@ -4,8 +4,6 @@ public sealed class GenerateKustomizeManifestsAction(
     IAspireManifestCompositionService manifestCompositionService,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
-    public const string ActionKey = "GenerateKustomizeManifestsAction";
-
     public override async Task<bool> ExecuteAsync()
     {
          if (NoSupportedComponentsExitAction())

@@ -4,8 +4,6 @@ public sealed class GenerateFinalKustomizeManifestAction(
     IAspireManifestCompositionService manifestCompositionService,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
-    public const string ActionKey = "GenerateFinalKustomizeManifestAction";
-
     public override Task<bool> ExecuteAsync()
     {
         if (CurrentState.SkipFinalKustomizeGeneration)

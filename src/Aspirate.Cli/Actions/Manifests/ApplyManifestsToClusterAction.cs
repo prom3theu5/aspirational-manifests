@@ -2,8 +2,6 @@ namespace Aspirate.Cli.Actions.Manifests;
 
 public sealed class ApplyManifestsToClusterAction(IKubeCtlService kubeCtlService, IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
-    public const string ActionKey = "ApplyManifestsToClusterAction";
-
     public override async Task<bool> ExecuteAsync()
     {
         if (!CurrentState.NonInteractive)

@@ -4,8 +4,6 @@ public class LoadAspireManifestAction(
     IManifestFileParserService manifestFileParserService,
     IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
-    public const string ActionKey = "LoadAspireManifestAction";
-
     public override Task<bool> ExecuteAsync()
     {
         var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(CurrentState.AspireManifest);

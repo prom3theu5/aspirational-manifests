@@ -8,6 +8,5 @@ public sealed class InitCommand : BaseCommand<InitOptions, InitCommandHandler>
         AddOption(SharedOptions.ContainerRegistry);
         AddOption(SharedOptions.ContainerImageTag);
         AddOption(SharedOptions.TemplatePath);
-        AddOption(SharedOptions.NonInteractive);
     }
 }

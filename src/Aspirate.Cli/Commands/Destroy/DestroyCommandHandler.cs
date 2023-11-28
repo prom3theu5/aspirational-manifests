@@ -4,6 +4,6 @@ public sealed class DestroyCommandHandler(IServiceProvider serviceProvider) : Ba
 {
     public override Task<int> HandleAsync(DestroyOptions options) =>
         ActionExecutor
-            .QueueAction(RemoveManifestsFromClusterAction.ActionKey)
+            .QueueAction(nameof(RemoveManifestsFromClusterAction))
             .ExecuteCommandsAsync();
 }

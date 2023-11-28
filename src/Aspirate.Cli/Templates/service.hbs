@@ -8,6 +8,14 @@ spec:
   selector:
     app: {{name}}
   ports:
+  {{#if hasCustomPorts}}
+  {{#each ports}}
+  - name: {{name}}
+    port: {{port}}
+    targetPort: {{port}}
+  {{/each}}
+  {{else}}
   - name: http
     port: 8080
     targetPort: 8080
+  {{/if}}

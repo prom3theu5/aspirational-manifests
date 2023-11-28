@@ -4,8 +4,6 @@ public sealed class GenerateAspireManifestAction(
     IAspireManifestCompositionService manifestCompositionService,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
-    public const string ActionKey = "GenerateAspireManifestAction";
-
     public override async Task<bool> ExecuteAsync()
     {
         if (!string.IsNullOrEmpty(CurrentState.AspireManifest))

@@ -20,19 +20,46 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         await AddProjectPublishArguments(argumentsBuilder, fullProjectPath);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
-        await ExecuteCommand(argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors);
+        await ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors);
+
+        return true;
+    }
+
+    public async Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string registry, bool nonInteractive)
+    {
+        _stdErrBuffer.Clear();
+        _stdOutBuffer.Clear();
+
+        var fullDockerfilePath = filesystem.GetFullPath(dockerfile.Path);
+
+        var tag = $"{registry}/{imageName}:latest";
+
+        var argumentsBuilder = ArgumentsBuilder
+            .Create()
+            .AppendArgument(DockerLiterals.TagArgument, tag)
+            .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
+            .AppendArgument(dockerfile.Context, string.Empty);
+
+        await ExecuteCommand(builder, argumentsBuilder, nonInteractive);
+
+        argumentsBuilder.Clear()
+            .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
+            .AppendArgument(tag, string.Empty, quoteValue: false);
+
+        await ExecuteCommand(builder, argumentsBuilder, nonInteractive);
 
         return true;
     }
 
     private async Task ExecuteCommand(
+        string command,
         ArgumentsBuilder argumentsBuilder,
         bool nonInteractive,
-        Func<ArgumentsBuilder, bool, string, Task>? onFailed = default)
+        Func<string, ArgumentsBuilder, bool, string, Task>? onFailed = default)
     {
         var arguments = argumentsBuilder.RenderArguments();
 
-        var executeCommand = CliWrap.Cli.Wrap(DotNetSdkLiterals.DotNetCommand)
+        var executeCommand = CliWrap.Cli.Wrap(command)
             .WithArguments(arguments)
             .WithValidation(CommandResultValidation.None)
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
@@ -44,7 +71,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             {
                 case StartedCommandEvent _:
                     console.WriteLine();
-                    console.MarkupLine($"[cyan]Executing: {DotNetSdkLiterals.DotNetCommand} {arguments}[/]");
+                    console.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
                     break;
                 case StandardOutputCommandEvent stdOut:
                     console.WriteLine(stdOut.Text);
@@ -56,6 +83,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
                     if (exited.ExitCode != 0)
                     {
                         await onFailed?.Invoke(
+                            command,
                             argumentsBuilder,
                             nonInteractive,
                             _stdErrBuffer.Append(_stdOutBuffer).ToString());
@@ -82,7 +110,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         return commandResult.ExitCode != 0;
     }
 
-    private Task HandleBuildErrors(ArgumentsBuilder argumentsBuilder, bool nonInteractive, string errors)
+    private Task HandleBuildErrors(string command, ArgumentsBuilder argumentsBuilder, bool nonInteractive, string errors)
     {
         if (errors.Contains(DotNetSdkLiterals.DuplicateFileOutputError, StringComparison.OrdinalIgnoreCase))
         {
@@ -113,7 +141,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             _stdErrBuffer.Clear();
             _stdOutBuffer.Clear();
 
-            return ExecuteCommand(argumentsBuilder, nonInteractive, HandleBuildErrors);
+            return ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, HandleBuildErrors);
         }
 
         throw new ActionCausesExitException(9999);
@@ -137,6 +165,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             if (loginResult)
             {
                 await ExecuteCommand(
+                    DotNetSdkLiterals.DotNetCommand,
                     argumentsBuilder,
                     nonInteractive,
                     onFailed: HandleBuildErrors);

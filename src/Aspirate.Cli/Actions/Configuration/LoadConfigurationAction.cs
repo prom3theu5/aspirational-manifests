@@ -4,8 +4,6 @@ public class LoadConfigurationAction(
     IAspirateConfigurationService configurationService,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
-    public const string ActionKey = "LoadConfigurationAction";
-
     public override Task<bool> ExecuteAsync()
     {
         var aspirateSettings = configurationService.LoadConfigurationFile(CurrentState.ProjectPath);

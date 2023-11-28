@@ -6,6 +6,5 @@ public sealed class DestroyCommand : BaseCommand<DestroyOptions, DestroyCommandH
     {
         AddOption(SharedOptions.ManifestDirectoryPath);
         AddOption(SharedOptions.KubernetesContext);
-        AddOption(SharedOptions.NonInteractive);
     }
 }

@@ -4,6 +4,6 @@ public class InitCommandHandler(IServiceProvider serviceProvider) : BaseCommandO
 {
     public override Task<int> HandleAsync(InitOptions options) =>
         ActionExecutor
-            .QueueAction(InitializeConfigurationAction.ActionKey)
+            .QueueAction(nameof(InitializeConfigurationAction))
             .ExecuteCommandsAsync();
 }

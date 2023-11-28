@@ -7,8 +7,8 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(SharedOptions.AspireProjectPath);
        AddOption(SharedOptions.AspireManifest);
        AddOption(SharedOptions.OutputPath);
-       AddOption(SharedOptions.NonInteractive);
        AddOption(SharedOptions.SkipBuild);
        AddOption(SharedOptions.SkipFinalKustomizeGeneration);
+       AddOption(SharedOptions.ContainerBuilder);
     }
 }
