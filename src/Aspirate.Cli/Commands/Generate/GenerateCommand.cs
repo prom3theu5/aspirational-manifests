@@ -10,5 +10,7 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(SharedOptions.SkipBuild);
        AddOption(SharedOptions.SkipFinalKustomizeGeneration);
        AddOption(SharedOptions.ContainerBuilder);
+       AddOption(SharedOptions.ContainerImageTag);
+       AddOption(SharedOptions.ContainerRegistry);
     }
 }

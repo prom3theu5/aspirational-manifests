@@ -7,5 +7,7 @@ public sealed class BuildCommand : BaseCommand<BuildOptions, BuildCommandHandler
        AddOption(SharedOptions.AspireProjectPath);
        AddOption(SharedOptions.AspireManifest);
        AddOption(SharedOptions.ContainerBuilder);
+       AddOption(SharedOptions.ContainerImageTag);
+       AddOption(SharedOptions.ContainerRegistry);
     }
 }

@@ -22,12 +22,16 @@ spec:
       - name: {{name}}
         image: {{containerImage}}
         imagePullPolicy: Always
+        {{#if isDockerfile}}
+        {{#if hasPorts}}
         ports:
-        {{#if hasCustomPorts}}
         {{#each ports}}
         - containerPort: {{port}}
         {{/each}}
-        {{else}}
+        {{/if}}
+        {{/if}}
+        {{#if isProject}}
+        ports:
         - containerPort: 8080
         {{/if}}
         envFrom:
