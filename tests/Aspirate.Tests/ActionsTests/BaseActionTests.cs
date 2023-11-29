@@ -13,7 +13,9 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         string? containerRegistry = DefaultContainerRegistry,
         string? containerImageTag = DefaultContainerImageTag,
         string? templatePath = DefaultTemplatePath,
-        string? aspireManifest = null)
+        string? aspireManifest = null,
+        string? inputPath = null,
+        string? kubeContext = null)
     {
         var state = new AspirateState
         {
@@ -21,6 +23,8 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
             ContainerRegistry = containerRegistry,
             ContainerImageTag = containerImageTag,
             TemplatePath = templatePath,
+            InputPath = inputPath,
+            KubeContext = kubeContext,
         };
 
         if (!string.IsNullOrEmpty(projectPath))
