@@ -11,6 +11,7 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="NSubstitute" />
         <PackageReference Include="Spectre.Console.Testing" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
         <PackageReference Include="Verify.Xunit" />
         <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" />
@@ -20,6 +21,19 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Aspirate.Cli\Aspirate.Cli.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="TestData\**" />
+      <None Include="TestData\TestApp.csproj">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Include="TestData\Program.cs">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Include="TestData\manifest.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

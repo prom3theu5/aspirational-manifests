@@ -1,0 +1,34 @@
+{
+    "resources": {
+      "postgres": {
+        "type": "postgres.server.v0"
+      },
+      "catalogdb": {
+        "type": "postgres.database.v0",
+        "parent": "postgres"
+      },
+      "basketcache": {
+        "type": "redis.v0"
+      },
+      "catalogservice": {
+        "type": "project.v0",
+        "path": "./TestApp.csproj",
+        "env": {
+          "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+          "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true"
+        },
+        "bindings": {
+          "http": {
+            "scheme": "http",
+            "protocol": "tcp",
+            "transport": "http"
+          },
+          "https": {
+            "scheme": "https",
+            "protocol": "tcp",
+            "transport": "http"
+          }
+        }
+      }
+    }
+  }

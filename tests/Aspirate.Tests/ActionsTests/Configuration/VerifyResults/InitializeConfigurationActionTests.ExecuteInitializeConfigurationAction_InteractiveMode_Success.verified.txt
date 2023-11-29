@@ -1,0 +1,6 @@
+﻿{
+  ContainerSettings: {
+    Registry: localhost:5001,
+    Tag: tests
+  }
+}

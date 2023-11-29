@@ -1,5 +1,6 @@
 namespace Aspirate.Shared.Commands;
 
+[ExcludeFromCodeCoverage]
 public abstract class BaseCommandOptionsHandler<TOptions> : ICommandOptionsHandler<TOptions> where TOptions : class, ICommandOptions
 {
     protected BaseCommandOptionsHandler(IServiceProvider serviceProvider)

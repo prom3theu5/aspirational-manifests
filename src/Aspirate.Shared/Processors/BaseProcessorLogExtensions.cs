@@ -1,5 +1,6 @@
 namespace Aspirate.Shared.Processors;
 
+[ExcludeFromCodeCoverage]
 public static class BaseProcessorLogExtensions
 {
     public static void LogCreateManifestNotOverridden(this IAnsiConsole console, string processor) =>

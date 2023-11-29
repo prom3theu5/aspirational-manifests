@@ -1,5 +1,3 @@
-using Aspirate.Shared.Services;
-
 namespace Aspirate.Tests.ServiceTests;
 
 [UsesVerify]

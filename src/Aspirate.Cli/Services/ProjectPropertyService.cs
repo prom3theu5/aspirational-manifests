@@ -26,7 +26,7 @@ public sealed class ProjectPropertyService(IFileSystem filesystem, IShellExecuti
             argumentsBuilder,
             workingDirectory: workingDirectory,
             propertyKeySeparator: ':',
-            showOutput: false);
+            showOutput: true);
 
 
         return result.Success ? result.Output : null;
