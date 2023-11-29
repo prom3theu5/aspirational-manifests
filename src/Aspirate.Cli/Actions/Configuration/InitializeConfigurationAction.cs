@@ -77,6 +77,11 @@ public class InitializeConfigurationAction(
 
     private void HandleTemplateDirectory(AspirateSettings aspirateConfiguration)
     {
+        if (CurrentState.NonInteractive && string.IsNullOrEmpty(CurrentState.TemplatePath))
+        {
+            return;
+        }
+
         if (!string.IsNullOrEmpty(CurrentState.TemplatePath))
         {
             aspirateConfiguration.TemplatePath = CurrentState.TemplatePath;
@@ -179,11 +184,6 @@ public class InitializeConfigurationAction(
         if (string.IsNullOrEmpty(CurrentState.ContainerImageTag))
         {
             NonInteractiveValidationFailed("Container image tag must be supplied when running in non-interactive mode.");
-        }
-
-        if (string.IsNullOrEmpty(CurrentState.TemplatePath))
-        {
-            NonInteractiveValidationFailed("Template path must be supplied when running in non-interactive mode.");
         }
     }
 }

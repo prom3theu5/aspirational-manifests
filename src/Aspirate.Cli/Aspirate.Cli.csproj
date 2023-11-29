@@ -34,6 +34,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Aspirate.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 

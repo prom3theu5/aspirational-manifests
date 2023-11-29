@@ -2,7 +2,7 @@ namespace Aspirate.Cli.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-    public static void RegisterAspirateEssential(this IServiceCollection services) =>
+    internal static void RegisterAspirateEssential(this IServiceCollection services) =>
         services
             .AddSpectreConsole()
             .AddAspirateState()

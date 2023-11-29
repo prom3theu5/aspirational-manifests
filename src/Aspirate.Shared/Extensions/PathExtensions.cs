@@ -4,6 +4,11 @@ public static class PathExtensions
 {
     public static string NormalizePath(this IFileSystem fileSystem, string pathToTarget)
     {
+        if (string.IsNullOrEmpty(pathToTarget))
+        {
+            return fileSystem.Directory.GetCurrentDirectory();
+        }
+
         if (!pathToTarget.StartsWith('.'))
         {
             return pathToTarget;
