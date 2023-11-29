@@ -1,16 +1,15 @@
-using CliWrap.Buffered;
-
 namespace Aspirate.Cli.Services;
 
-public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiConsole console, IProjectPropertyService projectPropertyService) : IContainerCompositionService
+public sealed class ContainerCompositionService(
+    IFileSystem filesystem,
+    IAnsiConsole console,
+    IProjectPropertyService projectPropertyService,
+    IShellExecutionService shellExecutionService) : IContainerCompositionService
 {
-    private readonly StringBuilder _stdOutBuffer = new();
-    private readonly StringBuilder _stdErrBuffer = new();
-
     public async Task<bool> BuildAndPushContainerForProject(
         Project project,
         MsBuildContainerProperties containerDetails,
-        bool nonInteractive)
+        bool nonInteractive = false)
     {
         var fullProjectPath = filesystem.NormalizePath(project.Path);
 
@@ -19,7 +18,7 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         await AddProjectPublishArguments(argumentsBuilder, fullProjectPath);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
-        await ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors);
+        await shellExecutionService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors );
 
         return true;
     }
@@ -37,60 +36,15 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
             .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
 
-        await ExecuteCommand(builder, argumentsBuilder, nonInteractive);
+        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive);
 
         argumentsBuilder.Clear()
             .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
             .AppendArgument(tag, string.Empty, quoteValue: false);
 
-        await ExecuteCommand(builder, argumentsBuilder, nonInteractive);
+        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive);
 
         return true;
-    }
-
-    private async Task ExecuteCommand(
-        string command,
-        ArgumentsBuilder argumentsBuilder,
-        bool nonInteractive,
-        Func<string, ArgumentsBuilder, bool, string, Task>? onFailed = default)
-    {
-        _stdErrBuffer.Clear();
-        _stdOutBuffer.Clear();
-
-        var arguments = argumentsBuilder.RenderArguments();
-
-        console.WriteLine();
-        console.MarkupLine($"[cyan]Executing: {command} {arguments}[/]");
-
-        var result = await CliWrap.Cli.Wrap(command)
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(WriteInfo))
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(WriteError))
-            .ExecuteBufferedAsync();
-
-        if (result.ExitCode != 0)
-        {
-            await onFailed?.Invoke(
-                           command,
-                           argumentsBuilder,
-                           nonInteractive,
-                           _stdErrBuffer.Append(_stdOutBuffer).ToString());
-        }
-    }
-
-    private static async Task<bool> ExecuteCommandNoOutput(string command, IReadOnlyDictionary<string, string?> environmentVariables)
-    {
-        var executionCommand = CliWrap.Cli.Wrap(command)
-            .WithEnvironmentVariables(environmentVariables);
-
-        var commandResult = await executionCommand
-            .WithValidation(CommandResultValidation.ZeroExitCode)
-            .WithStandardErrorPipe(PipeTarget.Null)
-            .WithStandardOutputPipe(PipeTarget.Null)
-            .ExecuteAsync();
-
-        return commandResult.ExitCode != 0;
     }
 
     private Task HandleBuildErrors(string command, ArgumentsBuilder argumentsBuilder, bool nonInteractive, string errors)
@@ -114,14 +68,14 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         throw new ActionCausesExitException(9999);
     }
 
-    private Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder, bool nonInteractive)
+    private Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder, bool nonInteractive = false)
     {
         var shouldRetry = AskIfShouldRetryHandlingDuplicateFiles(nonInteractive);
         if (shouldRetry)
         {
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.ErrorOnDuplicatePublishOutputFilesArgument, "false");
 
-           return ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, HandleBuildErrors);
+           return shellExecutionService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, HandleBuildErrors);
         }
 
         throw new ActionCausesExitException(9999);
@@ -140,11 +94,11 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         {
             var credentials = GatherDockerCredentials();
 
-            var loginResult = await ExecuteCommandNoOutput(ContainerBuilderLiterals.DockerLoginCommand, credentials);
+            var loginResult = await shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(ContainerBuilderLiterals.DockerLoginCommand, credentials);
 
             if (loginResult)
             {
-                await ExecuteCommand(
+                await shellExecutionService.ExecuteCommand(
                     DotNetSdkLiterals.DotNetCommand,
                     argumentsBuilder,
                     nonInteractive,
@@ -238,17 +192,5 @@ public sealed class ContainerCompositionService(IFileSystem filesystem, IAnsiCon
         }
 
         argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageTagArgument, containerDetails.ContainerImageTag);
-    }
-
-    private void WriteError(string message)
-    {
-        console.MarkupLine("[red]{0}[/]", message.EscapeMarkup());
-        _stdErrBuffer.AppendLine(message);
-    }
-
-    private void WriteInfo(string message)
-    {
-        console.WriteLine(message);
-        _stdOutBuffer.AppendLine(message);
     }
 }

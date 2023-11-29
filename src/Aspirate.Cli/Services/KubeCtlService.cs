@@ -1,10 +1,7 @@
 namespace Aspirate.Cli.Services;
 
-public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKubeCtlService
+public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShellExecutionService shellExecutionService) : IKubeCtlService
 {
-    private readonly StringBuilder _stdOutBuffer = new();
-    private readonly StringBuilder _stdErrBuffer = new();
-
     public async Task<string?> SelectKubernetesContextForDeployment()
     {
         var contexts = await GatherContexts();
@@ -31,47 +28,14 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
 
         var fullOutputPath = filesystem.GetFullPath(outputFolder);
 
-        _stdErrBuffer.Clear();
-        _stdOutBuffer.Clear();
-
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(KubeCtlLiterals.KubeCtlApplyArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlKustomizeManifestsArgument, fullOutputPath, quoteValue: false);
 
-        var arguments = argumentsBuilder.RenderArguments();
-
-        var executeCommand = CliWrap.Cli.Wrap(KubeCtlLiterals.KubeCtlCommand)
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(_stdErrBuffer));
-
-        await foreach(var cmdEvent in executeCommand.ListenAsync())
-        {
-            switch (cmdEvent)
-            {
-                case StartedCommandEvent _:
-                    console.WriteLine();
-                    console.MarkupLine($"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {arguments}[/] against kubernetes context [blue]{context}.[/][/]");
-                    break;
-                case StandardOutputCommandEvent stdOut:
-                    console.WriteLine(stdOut.Text);
-                    break;
-                case StandardErrorCommandEvent stdErr:
-                    console.MarkupLine($"[red]{stdErr.Text}[/]");
-                    break;
-                case ExitedCommandEvent exited:
-                    if (exited.ExitCode != 0)
-                    {
-                        console.MarkupLine($"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]");
-                        throw new ActionCausesExitException(exited.ExitCode);
-                    }
-                    break;
-            }
-        }
-
-        _stdErrBuffer.Clear();
-        _stdOutBuffer.Clear();
+        _ = await shellExecutionService.ExecuteCommand(
+            KubeCtlLiterals.KubeCtlCommand, argumentsBuilder,
+            preCommandMessage: $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
+            failureCommandMessage: $"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]");
 
         return true;
     }
@@ -85,78 +49,32 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
 
         var fullOutputPath = filesystem.GetFullPath(outputFolder);
 
-        _stdErrBuffer.Clear();
-        _stdOutBuffer.Clear();
-
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(KubeCtlLiterals.KubeCtlDeleteArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlKustomizeManifestsArgument, fullOutputPath, quoteValue: false);
 
-        var arguments = argumentsBuilder.RenderArguments();
-
-        var executeCommand = CliWrap.Cli.Wrap(KubeCtlLiterals.KubeCtlCommand)
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(_stdErrBuffer));
-
-        await foreach(var cmdEvent in executeCommand.ListenAsync())
-        {
-            switch (cmdEvent)
-            {
-                case StartedCommandEvent _:
-                    console.WriteLine();
-                    console.MarkupLine($"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {arguments}[/] against kubernetes context [blue]{context}.[/][/]");
-                    break;
-                case StandardOutputCommandEvent stdOut:
-                    console.WriteLine(stdOut.Text);
-                    break;
-                case StandardErrorCommandEvent stdErr:
-                    console.MarkupLine($"[red]{stdErr.Text}[/]");
-                    break;
-                case ExitedCommandEvent exited:
-                    if (exited.ExitCode != 0)
-                    {
-                        console.MarkupLine($"[red]Failed to remove manifests in [blue]'{fullOutputPath}'[/][/]");
-                        throw new ActionCausesExitException(exited.ExitCode);
-                    }
-                    break;
-            }
-        }
-
-        _stdErrBuffer.Clear();
-        _stdOutBuffer.Clear();
+        _ = await shellExecutionService.ExecuteCommand(
+            KubeCtlLiterals.KubeCtlCommand, argumentsBuilder,
+            preCommandMessage: $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
+            failureCommandMessage: $"[red]Failed to remove manifests in [blue]'{fullOutputPath}'[/][/]");
 
         return true;
     }
 
     private async Task<IReadOnlyCollection<string?>> GatherContexts()
     {
-        _stdOutBuffer.Clear();
-
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(KubeCtlLiterals.KubeCtlConfigArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlViewArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlOutputArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlOutputJsonArgument, string.Empty, quoteValue: false);
 
-        var arguments = argumentsBuilder.RenderArguments();
+        var contextOutput = await shellExecutionService.ExecuteCommand(
+            KubeCtlLiterals.KubeCtlCommand,
+            argumentsBuilder,
+            failureCommandMessage: "[red]Failed to gather Kubernetes contexts from kubeconfig[/]");
 
-        var commandResult = await CliWrap.Cli.Wrap(KubeCtlLiterals.KubeCtlCommand)
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
-            .ExecuteAsync();
-
-        if (commandResult.ExitCode != 0)
-        {
-            console.MarkupLine("[red]Failed to gather Kubernetes contexts from kubeconfig[/]");
-        }
-
-        var contexts = ParseResponseAsContextList(_stdOutBuffer.ToString());
-        _stdOutBuffer.Clear();
-
-        return contexts;
+        return ParseResponseAsContextList(contextOutput.Output);
     }
 
     private async Task<bool> SetActiveContext(string context)
@@ -166,28 +84,17 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console) : IKub
             return false;
         }
 
-        _stdOutBuffer.Clear();
-
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(KubeCtlLiterals.KubeCtlConfigArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlUseContextArgument, context, quoteValue: false);
 
-        var arguments = argumentsBuilder.RenderArguments();
+        var result = await shellExecutionService.ExecuteCommand(
+            KubeCtlLiterals.KubeCtlCommand,
+            argumentsBuilder,
+            failureCommandMessage: $"[red]Failed to set Active Kubernetes Context to [blue]'{context}'[/][/]",
+            successCommandMessage: $"[green]({EmojiLiterals.CheckMark}) Done:[/] Successfully set the Active Kubernetes Context to [blue]'{context}'[/]");
 
-        var commandResult = await CliWrap.Cli.Wrap(KubeCtlLiterals.KubeCtlCommand)
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
-            .ExecuteAsync();
-
-        if (commandResult.ExitCode != 0)
-        {
-            console.MarkupLine($"[red]Failed to set Active Kubernetes Context to [blue]'{context}'[/][/]");
-            return false;
-        }
-
-        console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Successfully set the Active Kubernetes Context to [blue]'{context}'[/]");
-        return true;
+        return result.Success;
     }
 
     private bool EnsureActiveContextIsSet(string context)

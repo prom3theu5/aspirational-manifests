@@ -1,9 +1,7 @@
 namespace Aspirate.Cli.Services;
 
-public sealed class ProjectPropertyService(IFileSystem filesystem) : IProjectPropertyService
+public sealed class ProjectPropertyService(IFileSystem filesystem, IShellExecutionService shellExecutionService) : IProjectPropertyService
 {
-    private readonly StringBuilder _stdOutBuffer = new();
-
     public async Task<string?> GetProjectPropertiesAsync(string projectPath, params string[] propertyNames)
     {
         var fullProjectPath = filesystem.NormalizePath(projectPath);
@@ -15,8 +13,6 @@ public sealed class ProjectPropertyService(IFileSystem filesystem) : IProjectPro
 
     private async Task<string?> ExecuteDotnetMsBuildGetPropertyCommand(string workingDirectory, params string[] propertyNames)
     {
-        _stdOutBuffer.Clear();
-
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(DotNetSdkLiterals.MsBuildArgument, string.Empty, quoteValue: false);
 
@@ -25,16 +21,14 @@ public sealed class ProjectPropertyService(IFileSystem filesystem) : IProjectPro
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.GetPropertyArgument, propertyName, true);
         }
 
-        var arguments = argumentsBuilder.RenderArguments(propertyKeySeparator: ':');
+        var result = await shellExecutionService.ExecuteCommand(
+            DotNetSdkLiterals.DotNetCommand,
+            argumentsBuilder,
+            workingDirectory: workingDirectory,
+            propertyKeySeparator: ':',
+            showOutput: false);
 
-        var executionCommand = CliWrap.Cli.Wrap(DotNetSdkLiterals.DotNetCommand)
-            .WithArguments(arguments);
 
-        var commandResult = await executionCommand.WithWorkingDirectory(workingDirectory)
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(_stdOutBuffer))
-            .WithValidation(CommandResultValidation.None)
-            .ExecuteAsync();
-
-        return commandResult.ExitCode != 0 ? null : _stdOutBuffer.ToString();
+        return result.Success ? result.Output : null;
     }
 }
