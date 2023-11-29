@@ -1,5 +1,6 @@
 namespace Aspirate.Shared.Processors;
 
+[ExcludeFromCodeCoverage]
 public abstract class BaseTemplateData(
     string? name,
     Dictionary<string, string>? env,

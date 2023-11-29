@@ -20,5 +20,6 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
 global using NSubstitute;
 global using NSubstitute.ClearExtensions;
+global using NSubstitute.ExceptionExtensions;
 global using Spectre.Console;
 global using Spectre.Console.Testing;
