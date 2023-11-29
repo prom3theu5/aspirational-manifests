@@ -9,6 +9,7 @@ global using Aspirate.Shared.Actions;
 global using Aspirate.Shared.Exceptions;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Literals;
+global using Aspirate.Shared.Models;
 global using Aspirate.Shared.Models.Aspirate;
 global using Aspirate.Shared.Models.AspireManifests;
 global using Aspirate.Shared.Models.AspireManifests.Components;

@@ -46,5 +46,6 @@ global using Aspirate.Shared.Models.State;
 global using Aspirate.Shared.Processors;
 global using Aspirate.Shared.Services;
 global using CliWrap;
+global using CliWrap.Buffered;
 global using CliWrap.EventStream;
 global using Spectre.Console;
