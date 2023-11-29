@@ -38,6 +38,5 @@ public sealed class PopulateContainerDetailsForProjectsAction(
 
         Logger.MarkupLine("\r\n[bold]No project components selected. Skipping execution of container detail gathering for them.[/]");
         return true;
-
     }
 }
