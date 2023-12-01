@@ -35,7 +35,8 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
         _ = await shellExecutionService.ExecuteCommand(
             KubeCtlLiterals.KubeCtlCommand, argumentsBuilder,
             preCommandMessage: $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
-            failureCommandMessage: $"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]");
+            failureCommandMessage: $"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]",
+            showOutput: true);
 
         return true;
     }
@@ -56,7 +57,8 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
         _ = await shellExecutionService.ExecuteCommand(
             KubeCtlLiterals.KubeCtlCommand, argumentsBuilder,
             preCommandMessage: $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
-            failureCommandMessage: $"[red]Failed to remove manifests in [blue]'{fullOutputPath}'[/][/]");
+            failureCommandMessage: $"[red]Failed to remove manifests in [blue]'{fullOutputPath}'[/][/]",
+            showOutput: true);
 
         return true;
     }

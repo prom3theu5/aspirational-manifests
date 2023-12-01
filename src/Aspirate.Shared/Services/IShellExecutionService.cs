@@ -4,7 +4,7 @@ public interface IShellExecutionService
 {
     Task<ShellCommandResult> ExecuteCommand(string command, ArgumentsBuilder argumentsBuilder, bool nonInteractive = false,
         Func<string, ArgumentsBuilder, bool, string, Task>? onFailed = default,
-        bool? showOutput = true,
+        bool? showOutput = false,
         string? workingDirectory = null,
         char? propertyKeySeparator = null,
         string? preCommandMessage = null,

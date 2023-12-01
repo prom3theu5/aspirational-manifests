@@ -12,4 +12,6 @@ public class DockerfileTemplateData(
     public bool IsDockerfile { get; set; } = true;
     public List<Ports> Ports { get; set; } = ports;
     public bool HasPorts => Ports.Any();
+
+    public string ServiceType { get; set; } = "ClusterIP";
 }

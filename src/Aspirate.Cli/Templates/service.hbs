@@ -8,10 +8,10 @@ spec:
   type: {{serviceType}}
   selector:
     app: {{name}}
-    ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
 {{/if}}
 
 {{#if isDockerfile}}
@@ -25,11 +25,11 @@ spec:
   type: {{serviceType}}
   selector:
     app: {{name}}
-    ports:
+  ports:
 {{#each ports}}
-    - name: {{name}}
-      port: {{port}}
-      targetPort: {{port}}
+  - name: {{name}}
+    port: {{port}}
+    targetPort: {{port}}
 {{/each}}
 {{/if}}
 {{/if}}
