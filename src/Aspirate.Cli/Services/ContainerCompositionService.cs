@@ -18,7 +18,7 @@ public sealed class ContainerCompositionService(
         await AddProjectPublishArguments(argumentsBuilder, fullProjectPath);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
-        await shellExecutionService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors );
+        await shellExecutionService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors, showOutput: true);
 
         return true;
     }
@@ -36,13 +36,13 @@ public sealed class ContainerCompositionService(
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
             .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
 
-        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive);
+        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive, showOutput: true);
 
         argumentsBuilder.Clear()
             .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
             .AppendArgument(tag, string.Empty, quoteValue: false);
 
-        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive);
+        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive, showOutput: true);
 
         return true;
     }

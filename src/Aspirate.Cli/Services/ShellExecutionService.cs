@@ -10,7 +10,7 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
         ArgumentsBuilder argumentsBuilder,
         bool nonInteractive = false,
         Func<string, ArgumentsBuilder, bool, string, Task>? onFailed = default,
-        bool? showOutput = true,
+        bool? showOutput = false,
         string? workingDirectory = null,
         char? propertyKeySeparator = null,
         string? preCommandMessage = null,

@@ -9,4 +9,5 @@ public class ProjectTemplateData(
 {
     public string ContainerImage { get; set; } = containerImage;
     public bool IsProject { get; set; } = true;
+    public string ServiceType { get; set; } = "ClusterIP";
 }
