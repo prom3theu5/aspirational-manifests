@@ -18,7 +18,14 @@ public sealed class ContainerCompositionService(
         await AddProjectPublishArguments(argumentsBuilder, fullProjectPath);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
-        await shellExecutionService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, onFailed: HandleBuildErrors, showOutput: true);
+        await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = DotNetSdkLiterals.DotNetCommand,
+            ArgumentsBuilder = argumentsBuilder,
+            NonInteractive = nonInteractive,
+            OnFailed = HandleBuildErrors,
+            ShowOutput = true,
+        });
 
         return true;
     }
@@ -36,13 +43,25 @@ public sealed class ContainerCompositionService(
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
             .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
 
-        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive, showOutput: true);
+        await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = builder,
+            ArgumentsBuilder = argumentsBuilder,
+            NonInteractive = nonInteractive,
+            ShowOutput = true,
+        });
 
         argumentsBuilder.Clear()
             .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
             .AppendArgument(tag, string.Empty, quoteValue: false);
 
-        await shellExecutionService.ExecuteCommand(builder, argumentsBuilder, nonInteractive, showOutput: true);
+        await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = builder,
+            ArgumentsBuilder = argumentsBuilder,
+            NonInteractive = nonInteractive,
+            ShowOutput = true,
+        });
 
         return true;
     }
@@ -75,7 +94,13 @@ public sealed class ContainerCompositionService(
         {
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.ErrorOnDuplicatePublishOutputFilesArgument, "false");
 
-           return shellExecutionService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder, nonInteractive, HandleBuildErrors);
+            return shellExecutionService.ExecuteCommand(new()
+            {
+                Command = DotNetSdkLiterals.DotNetCommand,
+                ArgumentsBuilder = argumentsBuilder,
+                NonInteractive = nonInteractive,
+                OnFailed = HandleBuildErrors,
+            });
         }
 
         throw new ActionCausesExitException(9999);
@@ -98,11 +123,13 @@ public sealed class ContainerCompositionService(
 
             if (loginResult)
             {
-                await shellExecutionService.ExecuteCommand(
-                    DotNetSdkLiterals.DotNetCommand,
-                    argumentsBuilder,
-                    nonInteractive,
-                    onFailed: HandleBuildErrors);
+                await shellExecutionService.ExecuteCommand(new()
+                {
+                    Command = DotNetSdkLiterals.DotNetCommand,
+                    ArgumentsBuilder = argumentsBuilder,
+                    NonInteractive = nonInteractive,
+                    OnFailed = HandleBuildErrors,
+                });
             }
         }
     }

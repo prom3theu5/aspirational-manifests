@@ -21,7 +21,11 @@ public class AspireManifestCompositionService(IFileSystem fileSystem, IAnsiConso
             fileSystem.File.Delete(outputFile);
         }
 
-        var newManifestFile = await shellExecutionService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, argumentsBuilder);
+        var newManifestFile = await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = DotNetSdkLiterals.DotNetCommand,
+            ArgumentsBuilder =  argumentsBuilder,
+        });
 
         return (newManifestFile.Success, outputFile);
     }

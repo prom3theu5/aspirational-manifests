@@ -1,6 +1,3 @@
-using Aspirate.Cli.Processors.Project;
-using Aspirate.Shared.Processors;
-
 namespace Aspirate.Tests.ActionsTests.Containers;
 
 public class PopulateContainerDetailsForProjectsActionTests : BaseActionTests<PopulateContainerDetailsForProjectsAction>
@@ -33,7 +30,7 @@ public class PopulateContainerDetailsForProjectsActionTests : BaseActionTests<Po
 
         mockExecutorService.ClearSubstitute();
 
-        mockExecutorService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, Arg.Any<ArgumentsBuilder>())
+        mockExecutorService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
             .ReturnsForAnyArgs(new ShellCommandResult(true, PropertiesResponse, string.Empty, 0));
 
         var populateContainerDetailsForProjectsAction = GetSystemUnderTest(serviceProvider);

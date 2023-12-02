@@ -21,12 +21,13 @@ public sealed class ProjectPropertyService(IFileSystem filesystem, IShellExecuti
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.GetPropertyArgument, propertyName, true);
         }
 
-        var result = await shellExecutionService.ExecuteCommand(
-            DotNetSdkLiterals.DotNetCommand,
-            argumentsBuilder,
-            workingDirectory: workingDirectory,
-            propertyKeySeparator: ':');
-
+        var result = await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = DotNetSdkLiterals.DotNetCommand,
+            ArgumentsBuilder = argumentsBuilder,
+            WorkingDirectory = workingDirectory,
+            PropertyKeySeparator = ':',
+        });
 
         return result.Success ? result.Output : null;
     }

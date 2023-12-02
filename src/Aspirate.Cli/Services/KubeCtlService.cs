@@ -32,11 +32,17 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
             .AppendArgument(KubeCtlLiterals.KubeCtlApplyArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlKustomizeManifestsArgument, fullOutputPath, quoteValue: false);
 
-        _ = await shellExecutionService.ExecuteCommand(
-            KubeCtlLiterals.KubeCtlCommand, argumentsBuilder,
-            preCommandMessage: $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
-            failureCommandMessage: $"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]",
-            showOutput: true);
+        var executionOptions = new ShellCommandOptions
+        {
+            Command = KubeCtlLiterals.KubeCtlCommand,
+            ArgumentsBuilder = argumentsBuilder,
+            PreCommandMessage =
+                $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
+            FailureCommandMessage = $"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]",
+            ShowOutput = true,
+        };
+
+        _ = await shellExecutionService.ExecuteCommand(executionOptions);
 
         return true;
     }
@@ -54,11 +60,16 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
             .AppendArgument(KubeCtlLiterals.KubeCtlDeleteArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlKustomizeManifestsArgument, fullOutputPath, quoteValue: false);
 
-        _ = await shellExecutionService.ExecuteCommand(
-            KubeCtlLiterals.KubeCtlCommand, argumentsBuilder,
-            preCommandMessage: $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
-            failureCommandMessage: $"[red]Failed to remove manifests in [blue]'{fullOutputPath}'[/][/]",
-            showOutput: true);
+        var executionOptions = new ShellCommandOptions
+        {
+            Command = KubeCtlLiterals.KubeCtlCommand,
+            ArgumentsBuilder = argumentsBuilder,
+            PreCommandMessage = $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
+            FailureCommandMessage = $"[red]Failed to remove manifests in [blue]'{fullOutputPath}'[/][/]",
+            ShowOutput = true,
+        };
+
+        _ = await shellExecutionService.ExecuteCommand(executionOptions);
 
         return true;
     }
@@ -71,10 +82,14 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
             .AppendArgument(KubeCtlLiterals.KubeCtlOutputArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlOutputJsonArgument, string.Empty, quoteValue: false);
 
-        var contextOutput = await shellExecutionService.ExecuteCommand(
-            KubeCtlLiterals.KubeCtlCommand,
-            argumentsBuilder,
-            failureCommandMessage: "[red]Failed to gather Kubernetes contexts from kubeconfig[/]");
+        var executionOptions = new ShellCommandOptions
+        {
+            Command = KubeCtlLiterals.KubeCtlCommand,
+            ArgumentsBuilder = argumentsBuilder,
+            FailureCommandMessage = "[red]Failed to gather Kubernetes contexts from kubeconfig[/]",
+        };
+
+        var contextOutput = await shellExecutionService.ExecuteCommand(executionOptions);
 
         return ParseResponseAsContextList(contextOutput.Output);
     }
@@ -90,11 +105,15 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
             .AppendArgument(KubeCtlLiterals.KubeCtlConfigArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlUseContextArgument, context, quoteValue: false);
 
-        var result = await shellExecutionService.ExecuteCommand(
-            KubeCtlLiterals.KubeCtlCommand,
-            argumentsBuilder,
-            failureCommandMessage: $"[red]Failed to set Active Kubernetes Context to [blue]'{context}'[/][/]",
-            successCommandMessage: $"[green]({EmojiLiterals.CheckMark}) Done:[/] Successfully set the Active Kubernetes Context to [blue]'{context}'[/]");
+        var executionOptions = new ShellCommandOptions
+        {
+            Command = KubeCtlLiterals.KubeCtlCommand,
+            ArgumentsBuilder = argumentsBuilder,
+            FailureCommandMessage = $"[red]Failed to set Active Kubernetes Context to [blue]'{context}'[/][/]",
+            SuccessCommandMessage = $"[green]({EmojiLiterals.CheckMark}) Done:[/] Successfully set the Active Kubernetes Context to [blue]'{context}'[/]",
+        };
+
+        var result = await shellExecutionService.ExecuteCommand(executionOptions);
 
         return result.Success;
     }

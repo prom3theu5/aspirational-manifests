@@ -1,0 +1,7 @@
+﻿{
+  TemplatePath: SomeTemplatePath,
+  ContainerSettings: {
+    Registry: SomeRegistry,
+    Tag: SomeTag
+  }
+}

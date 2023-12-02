@@ -6,35 +6,25 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
     private readonly StringBuilder _stdErrBuffer = new();
     private bool _showOutput;
 
-    public async Task<ShellCommandResult> ExecuteCommand(string command,
-        ArgumentsBuilder argumentsBuilder,
-        bool nonInteractive = false,
-        Func<string, ArgumentsBuilder, bool, string, Task>? onFailed = default,
-        bool? showOutput = false,
-        string? workingDirectory = null,
-        char? propertyKeySeparator = null,
-        string? preCommandMessage = null,
-        string? successCommandMessage = null,
-        string? failureCommandMessage = null,
-        bool exitWithExitCode = false)
+    public async Task<ShellCommandResult> ExecuteCommand(ShellCommandOptions options)
     {
-        _showOutput = showOutput ?? true;
+        _showOutput = options.ShowOutput;
         _stdErrBuffer.Clear();
         _stdOutBuffer.Clear();
 
-        var arguments = argumentsBuilder.RenderArguments(propertyKeySeparator: propertyKeySeparator ?? ' ');
+        var arguments = options.ArgumentsBuilder.RenderArguments(propertyKeySeparator: options.PropertyKeySeparator);
 
-        if (showOutput == true)
+        if (options.ShowOutput)
         {
             console.WriteLine();
-            console.MarkupLine(string.IsNullOrEmpty(preCommandMessage) ? $"[cyan]Executing: {command} {arguments}[/]" : preCommandMessage);
+            console.MarkupLine(string.IsNullOrEmpty(options.PreCommandMessage) ? $"[cyan]Executing: {options.Command} {arguments}[/]" : options.PreCommandMessage);
         }
 
-        var executionDirectory = string.IsNullOrEmpty(workingDirectory)
+        var executionDirectory = string.IsNullOrEmpty(options.WorkingDirectory)
             ? fileSystem.Directory.GetCurrentDirectory()
-            : workingDirectory;
+            : options.WorkingDirectory;
 
-        var result = await CliWrap.Cli.Wrap(command)
+        var result = await CliWrap.Cli.Wrap(options.Command)
             .WithWorkingDirectory(executionDirectory)
             .WithArguments(arguments)
             .WithValidation(CommandResultValidation.None)
@@ -44,14 +34,14 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
 
         if (result.ExitCode != 0)
         {
-            await HandleExitCode(command, argumentsBuilder, nonInteractive, onFailed, failureCommandMessage, result, exitWithExitCode);
+            await HandleExitCode(options.Command, options.ArgumentsBuilder, options.NonInteractive, options.OnFailed, options.FailureCommandMessage, result, options.ExitWithExitCode);
         }
 
         if (result.ExitCode == 0)
         {
-            if (!string.IsNullOrEmpty(successCommandMessage))
+            if (!string.IsNullOrEmpty(options.SuccessCommandMessage))
             {
-                console.MarkupLine(successCommandMessage);
+                console.MarkupLine(options.SuccessCommandMessage);
             }
         }
 
