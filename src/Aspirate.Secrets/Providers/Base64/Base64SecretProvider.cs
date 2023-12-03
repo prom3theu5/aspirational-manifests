@@ -2,7 +2,7 @@ namespace Aspirate.Secrets.Providers.Base64;
 
 public sealed class Base64SecretProvider(IFileSystem fileSystem) : BaseSecretProvider<Base64SecretState>(fileSystem)
 {
-    public override string Type => AspirateSecretLiterals.Base64SecretsManager;
+    public override ProviderType Type => ProviderType.Base64;
 
     public override Base64SecretState? State { get; protected set; }
 

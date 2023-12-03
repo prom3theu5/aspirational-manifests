@@ -1,7 +1,7 @@
 namespace Aspirate.Secrets.Services;
 public interface ISecretProvider
 {
-    string Type { get; }
+    ProviderType Type { get; }
 
     IEncrypter? Encrypter { get; }
 

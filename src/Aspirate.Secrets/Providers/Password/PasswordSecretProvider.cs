@@ -10,7 +10,7 @@ public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider
 
     public override PasswordSecretState? State { get; protected set; }
 
-    public override string Type => AspirateSecretLiterals.PasswordSecretsManager;
+    public override ProviderType Type => ProviderType.Password;
 
     public override IEncrypter? Encrypter => _encrypter;
 

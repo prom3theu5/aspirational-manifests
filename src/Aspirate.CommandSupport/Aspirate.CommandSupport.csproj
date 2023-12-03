@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Aspirate.Secrets\Aspirate.Secrets.csproj" />
       <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
     </ItemGroup>
 

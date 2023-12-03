@@ -8,7 +8,7 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    public abstract string Type { get; }
+    public abstract ProviderType Type { get; }
 
     public abstract TState? State { get; protected set; }
 

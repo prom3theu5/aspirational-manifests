@@ -2,12 +2,15 @@ namespace Aspirate.Secrets.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterAspirateSecretProviders(this IServiceCollection services) =>
-        services
-            .RegisterSecretProviders<Base64SecretProvider>(AspirateSecretLiterals.Base64SecretsManager)
-            .RegisterSecretProviders<PasswordSecretProvider>(AspirateSecretLiterals.PasswordSecretsManager);
+    public static IServiceCollection RegisterAspirateSecretProvider(this IServiceCollection services, ProviderType providerType) =>
+        providerType switch
+        {
+            ProviderType.Base64 => services.RegisterSecretProvider<Base64SecretProvider>(),
+            ProviderType.Password => services.RegisterSecretProvider<PasswordSecretProvider>(),
+            _ => throw new ArgumentOutOfRangeException(nameof(providerType), providerType, null)
+        };
 
-    private static IServiceCollection RegisterSecretProviders<TImplementation>(this IServiceCollection services, string key)
+    private static IServiceCollection RegisterSecretProvider<TImplementation>(this IServiceCollection services)
         where TImplementation : class, ISecretProvider =>
-            services.AddKeyedSingleton<ISecretProvider, TImplementation>(key);
+            services.AddSingleton<ISecretProvider, TImplementation>();
 }
