@@ -100,6 +100,7 @@ public sealed class ContainerCompositionService(
                 ArgumentsBuilder = argumentsBuilder,
                 NonInteractive = nonInteractive,
                 OnFailed = HandleBuildErrors,
+                ShowOutput = true,
             });
         }
 
