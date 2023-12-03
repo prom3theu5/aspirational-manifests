@@ -1,6 +1,6 @@
 namespace Aspirate.Commands.Commands.Init;
 
-public sealed class InitOptions : BaseCommandOptions
+public sealed class InitOptions : BaseCommandOptions, IInitOptions
 {
     public string ProjectPath { get; set; } = AspirateLiterals.DefaultAspireProjectPath;
     public string? ContainerRegistry { get; set; }

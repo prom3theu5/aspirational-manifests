@@ -24,6 +24,5 @@ global using Aspirate.Processors.Redis;
 global using Aspirate.Services;
 global using Aspirate.Services.Interfaces;
 global using Aspirate.Shared.Literals;
-global using Aspirate.Shared.Models.State;
 global using Aspirate.Shared.Processors;
 global using Spectre.Console;

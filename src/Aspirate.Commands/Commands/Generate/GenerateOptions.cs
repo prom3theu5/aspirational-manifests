@@ -1,6 +1,6 @@
 namespace Aspirate.Commands.Commands.Generate;
 
-public sealed class GenerateOptions : BaseCommandOptions
+public sealed class GenerateOptions : BaseCommandOptions, IGenerateOptions
 {
     public string ProjectPath { get; set; } = AspirateLiterals.DefaultAspireProjectPath;
     public string? AspireManifest { get; set; }

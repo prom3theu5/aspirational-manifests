@@ -1,7 +1,7 @@
 namespace Aspirate.Commands.Commands.Apply;
 
-public sealed class ApplyOptions : BaseCommandOptions
+public sealed class ApplyOptions : BaseCommandOptions, IApplyOptions
 {
-    public string InputPath { get; init; } = AspirateLiterals.DefaultOutputPath;
+    public string InputPath { get; set; } = AspirateLiterals.DefaultOutputPath;
     public string? KubeContext { get; set; }
 }

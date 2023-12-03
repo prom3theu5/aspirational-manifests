@@ -16,7 +16,6 @@ global using Aspirate.Shared.Models.Aspirate;
 global using Aspirate.Shared.Models.AspireManifests.Components;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0;
 global using Aspirate.Shared.Models.MsBuild;
-global using Aspirate.Shared.Models.State;
 global using FluentAssertions;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;

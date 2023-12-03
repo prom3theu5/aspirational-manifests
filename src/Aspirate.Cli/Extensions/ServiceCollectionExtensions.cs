@@ -1,3 +1,4 @@
+using Aspirate.Commands;
 using Aspirate.Services.Implementations;
 
 namespace Aspirate.Cli.Extensions;
