@@ -22,6 +22,7 @@ global using Aspirate.Secrets.Extensions;
 global using Aspirate.Secrets.Providers;
 global using Aspirate.Secrets.Providers.Base64;
 global using Aspirate.Secrets.Providers.Password;
+global using Aspirate.Secrets.Services;
 global using Aspirate.Services.Interfaces;
 global using Aspirate.Shared.Exceptions;
 global using Aspirate.Shared.Extensions;
