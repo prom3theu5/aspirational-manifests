@@ -1,11 +1,14 @@
 namespace Aspirate.Secrets.Providers.Password;
 
-public class PasswordSecretProvider : BaseSecretProvider
+public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider<PasswordSecretState>(fileSystem)
 {
     private const int TagSizeInBytes = 16;
-    private string? _passphrase;
+    private string? _password;
+    private string? _salt;
     private IEncrypter? _encrypter;
     private IDecrypter? _decrypter;
+
+    public override PasswordSecretState? State { get; protected set; }
 
     public override string Type => AspirateSecretLiterals.PasswordSecretsManager;
 
@@ -13,15 +16,28 @@ public class PasswordSecretProvider : BaseSecretProvider
 
     public override IDecrypter? Decrypter => _decrypter;
 
-    public void SetPassphrase(string passphrase)
+    public void SetPassword(string password)
     {
-        _passphrase = passphrase;
+        _password = password;
+
+        if (string.IsNullOrEmpty(_salt))
+        {
+            CreateNewSalt();
+        }
 
         // Derive a key from the passphrase using Pbkdf2 with SHA256, 1 million iterations.
-        using var pbkdf2 = new Rfc2898DeriveBytes(_passphrase, salt: new byte[16], iterations: 1000000, HashAlgorithmName.SHA256);
+        var saltBytes = Convert.FromBase64String(_salt);
+        using var pbkdf2 = new Rfc2898DeriveBytes(_password, salt: saltBytes, iterations: 1000000, HashAlgorithmName.SHA256);
         var key = pbkdf2.GetBytes(32); // AES-256-GCM needs a 32-byte key
 
         _encrypter = new AesGcmEncrypter(key, TagSizeInBytes);
         _decrypter = new AesGcmDecrypter(key, TagSizeInBytes);
+    }
+
+    private void CreateNewSalt()
+    {
+        var newSaltBytes = new byte[16];
+        RandomNumberGenerator.Fill(newSaltBytes);
+        _salt = Convert.ToBase64String(newSaltBytes);
     }
 }
