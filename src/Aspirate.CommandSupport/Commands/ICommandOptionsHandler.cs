@@ -1,4 +1,4 @@
-namespace Aspirate.Shared.Commands;
+namespace Aspirate.CommandSupport.Commands;
 
 public interface ICommandOptionsHandler<in TOptions>
 {

@@ -1,4 +1,4 @@
-namespace Aspirate.Shared.Actions;
+namespace Aspirate.CommandSupport.Actions;
 
 public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvider, AspirateState state)
 {

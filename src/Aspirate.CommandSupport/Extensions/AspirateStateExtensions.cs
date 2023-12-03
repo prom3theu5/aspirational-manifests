@@ -1,6 +1,4 @@
-using Aspirate.Shared.Commands;
-
-namespace Aspirate.Shared.Extensions;
+namespace Aspirate.CommandSupport.Extensions;
 
 public static class AspirateStateExtensions
 {

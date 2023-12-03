@@ -1,4 +1,4 @@
-namespace Aspirate.Shared.Commands;
+namespace Aspirate.CommandSupport.Commands;
 
 [ExcludeFromCodeCoverage]
 public abstract class BaseCommandOptions : ICommandOptions

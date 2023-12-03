@@ -1,0 +1,12 @@
+global using System.CommandLine;
+global using System.CommandLine.NamingConventionBinder;
+global using System.Diagnostics.CodeAnalysis;
+global using System.Reflection;
+global using Aspirate.CommandSupport.Actions;
+global using Aspirate.CommandSupport.Commands;
+global using Aspirate.CommandSupport.Extensions;
+global using Aspirate.Shared.Exceptions;
+global using Aspirate.Shared.Literals;
+global using Aspirate.Shared.Models.State;
+global using Microsoft.Extensions.DependencyInjection;
+global using Spectre.Console;

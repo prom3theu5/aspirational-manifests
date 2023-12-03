@@ -30,6 +30,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Aspirate.CommandSupport\Aspirate.CommandSupport.csproj" />
+    <ProjectReference Include="..\Aspirate.Secrets\Aspirate.Secrets.csproj" />
     <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
   </ItemGroup>
 
@@ -43,7 +45,6 @@
 
   <ItemGroup>
     <PackageReference Include="CliWrap" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" />
   </ItemGroup>
 

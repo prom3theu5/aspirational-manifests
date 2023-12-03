@@ -1,21 +1,14 @@
-global using System.CommandLine;
-global using System.CommandLine.NamingConventionBinder;
 global using System.Diagnostics.CodeAnalysis;
 global using System.IO.Abstractions;
-global using System.Reflection;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
-global using Aspirate.Shared.Actions;
-global using Aspirate.Shared.Exceptions;
+
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Literals;
-global using Aspirate.Shared.Models;
 global using Aspirate.Shared.Models.Aspirate;
 global using Aspirate.Shared.Models.AspireManifests;
 global using Aspirate.Shared.Models.AspireManifests.Components;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0;
 global using Aspirate.Shared.Models.MsBuild;
-global using Aspirate.Shared.Models.State;
 global using HandlebarsDotNet;
-global using Microsoft.Extensions.DependencyInjection;
 global using Spectre.Console;
