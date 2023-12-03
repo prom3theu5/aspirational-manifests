@@ -7,6 +7,8 @@ global using Aspirate.Cli.Actions.Containers;
 global using Aspirate.Cli.Actions.Manifests;
 global using Aspirate.Cli.Extensions;
 global using Aspirate.Cli.Services;
+global using Aspirate.Secrets.Providers.Base64;
+global using Aspirate.Secrets.Providers.Password;
 global using Aspirate.Shared.Actions;
 global using Aspirate.Shared.Exceptions;
 global using Aspirate.Shared.Extensions;

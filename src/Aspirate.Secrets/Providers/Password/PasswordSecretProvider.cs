@@ -4,9 +4,9 @@ public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider
 {
     private const int TagSizeInBytes = 16;
     private string? _password;
-    private string? _salt;
     private IEncrypter? _encrypter;
     private IDecrypter? _decrypter;
+    private byte[]? _salt;
 
     public override PasswordSecretState? State { get; protected set; }
 
@@ -20,24 +20,46 @@ public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider
     {
         _password = password;
 
-        if (string.IsNullOrEmpty(_salt))
+        if (_salt is null)
         {
             CreateNewSalt();
         }
 
         // Derive a key from the passphrase using Pbkdf2 with SHA256, 1 million iterations.
-        var saltBytes = Convert.FromBase64String(_salt);
-        using var pbkdf2 = new Rfc2898DeriveBytes(_password, salt: saltBytes, iterations: 1000000, HashAlgorithmName.SHA256);
+        using var pbkdf2 = new Rfc2898DeriveBytes(_password, salt: _salt, iterations: 1000000, HashAlgorithmName.SHA256);
         var key = pbkdf2.GetBytes(32); // AES-256-GCM needs a 32-byte key
 
-        _encrypter = new AesGcmEncrypter(key, TagSizeInBytes);
-        _decrypter = new AesGcmDecrypter(key, TagSizeInBytes);
+        var crypter = new AesGcmCrypter(key, _salt, TagSizeInBytes);
+
+        _encrypter = crypter;
+        _decrypter = crypter;
+    }
+
+    public override void ProcessAfterStateRestoration()
+    {
+        if (!string.IsNullOrEmpty(_password))
+        {
+            _password = null;
+            _decrypter = null;
+            _encrypter = null;
+        }
+
+        State ??= new();
+
+        if (!string.IsNullOrEmpty(State.Salt))
+        {
+            _salt = Convert.FromBase64String(State.Salt);
+        }
     }
 
     private void CreateNewSalt()
     {
-        var newSaltBytes = new byte[16];
-        RandomNumberGenerator.Fill(newSaltBytes);
-        _salt = Convert.ToBase64String(newSaltBytes);
+        // in .net 8 - this is 96 bit (12 bytes) max it seems
+        // maybe because NIST recommends 96 bit IV for GCM to promote interoperability, efficiency, and simplicity of design on
+        // page 15 of https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf ??
+        _salt = new byte[12];
+        RandomNumberGenerator.Fill(_salt);
+        State ??= new();
+        State.Salt = Convert.ToBase64String(_salt);
     }
 }

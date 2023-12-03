@@ -2,7 +2,7 @@ namespace Aspirate.Secrets;
 
 public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecretProvider where TState : BaseSecretState, new()
 {
-    private readonly JsonSerializerOptions _serializerOptions = new()
+    protected readonly JsonSerializerOptions _serializerOptions = new()
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -29,8 +29,17 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
     public void RemoveSecret(string key) =>
         State?.Secrets.Remove(key);
 
-    public virtual void RestoreState(string state) =>
+    public virtual void RestoreState(string state)
+    {
         State = JsonSerializer.Deserialize<TState>(state, _serializerOptions);
+        ProcessAfterStateRestoration();
+    }
+
+    public virtual void TransformStateForStorage() =>
+        State.Version++;
+
+    public virtual void ProcessAfterStateRestoration()
+    {}
 
     public void SaveState(string? path = null)
     {
@@ -39,7 +48,7 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
             return;
         }
 
-        State.Version++;
+        TransformStateForStorage();
 
         path ??= fileSystem.Directory.GetCurrentDirectory();
 
