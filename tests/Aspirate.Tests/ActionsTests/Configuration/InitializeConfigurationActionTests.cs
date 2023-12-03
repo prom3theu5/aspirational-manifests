@@ -1,3 +1,5 @@
+using Aspirate.Commands.Actions.Configuration;
+
 namespace Aspirate.Tests.ActionsTests.Configuration;
 
 [UsesVerify]
