@@ -1,6 +1,13 @@
 namespace Aspirate.Commands;
 
-public class AspirateState : IApplyOptions, IDestroyOptions, IInitOptions, IGenerateOptions, IBuildOptions
+public class AspirateState :
+    IApplyOptions,
+    IDestroyOptions,
+    IInitOptions,
+    IGenerateOptions,
+    IBuildOptions,
+    IPasswordSecretState,
+    IBase64SecretState
 {
     [JsonPropertyName("projectPath")]
     public string ProjectPath { get; set; } = null!;
@@ -40,6 +47,15 @@ public class AspirateState : IApplyOptions, IDestroyOptions, IInitOptions, IGene
 
     [JsonPropertyName("skipFinalKustomizeGeneration")]
     public bool SkipFinalKustomizeGeneration { get; set; }
+
+    [JsonPropertyName("salt")]
+    public string? Salt { get; set; }
+
+    [JsonPropertyName("secrets")]
+    public Dictionary<string, string> Secrets { get; set; } = [];
+
+    [JsonPropertyName("secretsVersion")]
+    public int? Version { get; set; }
 
     [JsonIgnore]
     public List<string> AspireComponentsToProcess { get; set; } = [];
