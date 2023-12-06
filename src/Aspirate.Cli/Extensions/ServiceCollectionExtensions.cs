@@ -1,3 +1,6 @@
+using Aspirate.Commands;
+using Aspirate.Services.Implementations;
+
 namespace Aspirate.Cli.Extensions;
 
 internal static class ServiceCollectionExtensions
@@ -47,6 +50,7 @@ internal static class ServiceCollectionExtensions
         services
             .RegisterAction<InitializeConfigurationAction>()
             .RegisterAction<LoadConfigurationAction>()
+            .RegisterAction<AskImagePullPolicyAction>()
             .RegisterAction<BuildAndPushContainersFromProjectsAction>()
             .RegisterAction<BuildAndPushContainersFromDockerfilesAction>()
             .RegisterAction<PopulateContainerDetailsForProjectsAction>()

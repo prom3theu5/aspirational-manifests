@@ -66,6 +66,11 @@ public class ContainerDetailsServiceTests
                 new TestContainerProperties(
                     "NoRepositoryOrTagShouldBeImageLatest", CreateContainerProperties("test-registry", null, "test-image")),
             },
+            new object[]
+            {
+                new TestContainerProperties(
+                    "NoRegistryOrRepositoryOrTagShouldBeImageLatest", CreateContainerProperties(null, null, "test-image")),
+            },
         };
 
     private static MsBuildProperties<MsBuildContainerProperties> CreateContainerProperties(string? registry = null,

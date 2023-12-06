@@ -1,3 +1,9 @@
+using Aspirate.Commands.Commands.Apply;
+using Aspirate.Commands.Commands.Build;
+using Aspirate.Commands.Commands.Destroy;
+using Aspirate.Commands.Commands.Generate;
+using Aspirate.Commands.Commands.Init;
+
 namespace Aspirate.Cli;
 
 internal class AspirateCli : RootCommand

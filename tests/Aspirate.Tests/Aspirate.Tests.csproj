@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Aspirate.Cli\Aspirate.Cli.csproj" />
+      <ProjectReference Include="..\..\src\Aspirate.Secrets\Aspirate.Secrets.csproj" />
     </ItemGroup>
 
     <ItemGroup>

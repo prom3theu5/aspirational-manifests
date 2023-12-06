@@ -28,14 +28,16 @@ public class GenerateAspireManifestActionTests : BaseActionTests<GenerateAspireM
 
         var mockExecutorService = serviceProvider.GetRequiredService<IShellExecutionService>();
         mockExecutorService.ClearSubstitute();
-        mockExecutorService.ExecuteCommand(DotNetSdkLiterals.DotNetCommand, Arg.Any<ArgumentsBuilder>())
+        mockExecutorService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
             .Returns(new ShellCommandResult(true, string.Empty, string.Empty, 0));
 
         // Act
         var result = await generateAspireManifestAction.ExecuteAsync();
 
         // Assert
-        await mockExecutorService.Received(1).ExecuteCommand(DotNetSdkLiterals.DotNetCommand, Arg.Any<ArgumentsBuilder>());
+        await mockExecutorService.Received(1).ExecuteCommand(
+            Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null));
+
         result.Should().BeTrue();
     }
 }

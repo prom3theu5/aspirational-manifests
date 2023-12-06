@@ -40,7 +40,7 @@ public class RemoveManifestsToClusterActionTests : BaseActionTests<RemoveManifes
 
         mockExecutorService.ClearSubstitute();
 
-        mockExecutorService.ExecuteCommand(KubeCtlLiterals.KubeCtlCommand, Arg.Any<ArgumentsBuilder>())
+        mockExecutorService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
             .ReturnsForAnyArgs(new ShellCommandResult(true, ContextsResponse, string.Empty, 0));
 
         var generateAspireManifestAction = GetSystemUnderTest(serviceProvider);
@@ -93,7 +93,7 @@ public class RemoveManifestsToClusterActionTests : BaseActionTests<RemoveManifes
 
         mockExecutorService.ClearSubstitute();
 
-        mockExecutorService.ExecuteCommand(KubeCtlLiterals.KubeCtlCommand, Arg.Any<ArgumentsBuilder>())
+        mockExecutorService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
             .ReturnsForAnyArgs(new ShellCommandResult(true, ContextsResponse, string.Empty, 0));
 
         var generateAspireManifestAction = GetSystemUnderTest(serviceProvider);
