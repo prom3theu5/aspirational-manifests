@@ -1,20 +1,20 @@
 namespace Aspirate.Services.Implementations;
 
-public sealed class ProjectPropertyService(IFileSystem filesystem, IShellExecutionService shellExecutionService) : IProjectPropertyService
+public sealed class ProjectPropertyService(IFileSystem filesystem, IShellExecutionService shellExecutionService, IAnsiConsole console) : IProjectPropertyService
 {
     public async Task<string?> GetProjectPropertiesAsync(string projectPath, params string[] propertyNames)
     {
         var fullProjectPath = filesystem.NormalizePath(projectPath);
-        var projectDirectory = filesystem.Path.GetDirectoryName(fullProjectPath);
-        var propertyValues = await ExecuteDotnetMsBuildGetPropertyCommand(projectDirectory, propertyNames);
+        var propertyValues = await ExecuteDotnetMsBuildGetPropertyCommand(fullProjectPath, propertyNames);
 
         return propertyValues ?? null;
     }
 
-    private async Task<string?> ExecuteDotnetMsBuildGetPropertyCommand(string workingDirectory, params string[] propertyNames)
+    private async Task<string?> ExecuteDotnetMsBuildGetPropertyCommand(string projectPath, params string[] propertyNames)
     {
         var argumentsBuilder = ArgumentsBuilder.Create()
-            .AppendArgument(DotNetSdkLiterals.MsBuildArgument, string.Empty, quoteValue: false);
+            .AppendArgument(DotNetSdkLiterals.MsBuildArgument, string.Empty, quoteValue: false)
+            .AppendArgument($"\"{projectPath}\"", string.Empty, quoteValue: false);
 
         foreach (var propertyName in propertyNames)
         {
@@ -25,9 +25,14 @@ public sealed class ProjectPropertyService(IFileSystem filesystem, IShellExecuti
         {
             Command = DotNetSdkLiterals.DotNetCommand,
             ArgumentsBuilder = argumentsBuilder,
-            WorkingDirectory = workingDirectory,
             PropertyKeySeparator = ':',
         });
+
+        if (!result.Success)
+        {
+            console.MarkupLine($"[red]Failed to get project properties for '{projectPath}'.[/]");
+            throw new ActionCausesExitException(result.ExitCode);
+        }
 
         return result.Success ? result.Output : null;
     }

@@ -1,5 +1,3 @@
-using Aspirate.Services.Implementations;
-
 namespace Aspirate.Tests.ServiceTests;
 
 public class ContainerCompositionServiceTest

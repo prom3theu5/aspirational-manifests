@@ -39,7 +39,7 @@ public abstract class BaseProcessor<TTemplateData> : IProcessor where TTemplateD
     public abstract Resource? Deserialize(ref Utf8JsonReader reader);
 
     /// <inheritdoc />
-    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string? templatePath = null)
+    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
     {
         _console.LogCreateManifestNotOverridden(GetType().Name);
 

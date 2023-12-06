@@ -55,29 +55,44 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
 
     private static void HandleImage(MsBuildContainerProperties containerDetails)
     {
-        if (!string.IsNullOrEmpty(containerDetails.ContainerImageName))
+        if (HasImageName(containerDetails))
         {
-            _imageBuilder.Append($"/{containerDetails.ContainerImageName}");
+            _imageBuilder.Append($"{containerDetails.ContainerImageName}");
         }
     }
 
     private static void HandleRepository(MsBuildContainerProperties containerDetails)
     {
-        if (!string.IsNullOrEmpty(containerDetails.ContainerRepository))
+        if (HasRepository(containerDetails))
         {
-            _imageBuilder.Append($"/{containerDetails.ContainerRepository}");
+            _imageBuilder.Append($"{containerDetails.ContainerRepository}");
+        }
+
+        if (HasImageName(containerDetails))
+        {
+            _imageBuilder.Append('/');
         }
     }
 
-    private static void HandleRegistry(MsBuildContainerProperties containerDetails) =>
-        _imageBuilder.Append($"{containerDetails.ContainerRegistry}");
+    private static void HandleRegistry(MsBuildContainerProperties containerDetails)
+    {
+        if (HasRegistry(containerDetails))
+        {
+            _imageBuilder.Append($"{containerDetails.ContainerRegistry}");
+        }
+
+        if (HasRepository(containerDetails))
+        {
+            _imageBuilder.Append('/');
+        }
+    }
 
     private void EnsureContainerRegistryIsNotEmpty(
         MsBuildContainerProperties details,
         Project project,
         string? containerRegistry)
     {
-        if (!string.IsNullOrEmpty(details.ContainerRegistry))
+        if (HasRegistry(details))
         {
             return;
         }
@@ -88,9 +103,9 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
             details.ContainerRegistry = containerRegistry;
             return;
         }
-
-        console.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
-        throw new ActionCausesExitException(1);
+        //
+        // console.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
+        // throw new ActionCausesExitException(1);
     }
 
     private static void HandleTag(
@@ -111,4 +126,9 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
 
         msBuildProperties.Properties.ContainerImageTag = "latest";
     }
+
+
+    private static bool HasImageName(MsBuildContainerProperties? containerDetails) => !string.IsNullOrEmpty(containerDetails?.ContainerImageName);
+    private static bool HasRepository(MsBuildContainerProperties? containerDetails) => !string.IsNullOrEmpty(containerDetails?.ContainerRepository);
+    private static bool HasRegistry(MsBuildContainerProperties? containerDetails) => !string.IsNullOrEmpty(containerDetails?.ContainerRegistry);
 }

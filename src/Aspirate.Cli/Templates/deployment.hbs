@@ -21,7 +21,7 @@ spec:
       containers:
       - name: {{name}}
         image: {{containerImage}}
-        imagePullPolicy: Always
+        imagePullPolicy: {{imagePullPolicy}}
         {{#if isDockerfile}}
         {{#if hasPorts}}
         ports:

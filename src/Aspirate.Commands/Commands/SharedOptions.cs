@@ -51,6 +51,13 @@ public static class SharedOptions
         IsRequired = false,
     };
 
+    public static Option<string> ImagePullPolicy => new(new[] {"--image-pull-policy" })
+    {
+        Description = "The Image pull policy to use when generating manifests.",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
     public static Option<string> KubernetesContext => new(new[] { "-k", "--kube-context" })
     {
         Description = "The name of the kubernetes context to use",

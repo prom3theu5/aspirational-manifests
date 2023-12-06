@@ -10,6 +10,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(PopulateContainerDetailsForProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))
+            .QueueAction(nameof(AskImagePullPolicyAction))
             .QueueAction(nameof(GenerateKustomizeManifestsAction))
             .QueueAction(nameof(GenerateFinalKustomizeManifestAction))
             .ExecuteCommandsAsync();

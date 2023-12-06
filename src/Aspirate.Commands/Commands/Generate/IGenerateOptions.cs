@@ -18,6 +18,8 @@ public interface IGenerateOptions
 
     string? ContainerImageTag { get; set; }
 
+    string? ImagePullPolicy { get; set; }
+
     bool NonInteractive { get; set; }
 
     ProviderType SecretProvider { get; set; }

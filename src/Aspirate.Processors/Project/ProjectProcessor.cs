@@ -25,7 +25,7 @@ public class ProjectProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireProject>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string? templatePath = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -42,7 +42,8 @@ public class ProjectProcessor(
             resource.Key,
             containerDetails.FullContainerImage,
             project.Env,
-            _manifests);
+            _manifests,
+            imagePullPolicy);
 
         CreateDeployment(resourceOutputPath, data, templatePath);
         CreateService(resourceOutputPath, data, templatePath);

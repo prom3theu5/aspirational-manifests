@@ -19,7 +19,7 @@ public class RabbitMqProcessor(IFileSystem fileSystem, IAnsiConsole console) : B
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireRabbit>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string? templatePath = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 

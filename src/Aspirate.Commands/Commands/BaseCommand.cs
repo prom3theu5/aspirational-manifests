@@ -15,7 +15,8 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
     private static Task<int> ConstructCommand(TOptions options, IServiceCollection services)
     {
-        services.RegisterAspirateSecretProvider(options.SecretProvider);
+        // todo: Implement Secrets.
+        // services.RegisterAspirateSecretProvider(options.SecretProvider);
 
         var handler = ActivatorUtilities.CreateInstance<TOptionsHandler>(services.BuildServiceProvider());
 
@@ -36,5 +37,6 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         Description = "Sets the secret provider. Default is 'Password'",
         Arity = ArgumentArity.ExactlyOne,
         IsRequired = false,
+        IsHidden = true,
     };
 }

@@ -27,6 +27,9 @@ public class AspirateState :
     [JsonPropertyName("containerImageTag")]
     public string? ContainerImageTag { get; set; }
 
+    [JsonPropertyName("imagePullPolicy")]
+    public string? ImagePullPolicy { get; set; }
+
     [JsonPropertyName("containerBuilder")]
     public string? ContainerBuilder { get; set; }
 

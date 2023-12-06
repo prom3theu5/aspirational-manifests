@@ -1,5 +1,3 @@
-using Aspirate.Services.Implementations;
-
 namespace Aspirate.Tests.ServiceTests;
 
 public class ProjectPropertyServiceTest
@@ -11,10 +9,10 @@ public class ProjectPropertyServiceTest
         var fileSystem = Substitute.For<IFileSystem>();
         var shellExecutionService = Substitute.For<IShellExecutionService>();
 
-        var service = new ProjectPropertyService(fileSystem, shellExecutionService);
+        var service = new ProjectPropertyService(fileSystem, shellExecutionService, new TestConsole());
 
         var projectPath = "testPath";
-        var propertyNames = new string[] { "Property1", "Property2" };
+        var propertyNames = new[] { "Property1", "Property2" };
 
         shellExecutionService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
             .Returns(Task.FromResult(new ShellCommandResult(true, "test", string.Empty, 0)));

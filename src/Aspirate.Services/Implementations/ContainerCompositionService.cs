@@ -207,7 +207,10 @@ public sealed class ContainerCompositionService(
 
     private static void AddContainerDetailsToArguments(ArgumentsBuilder argumentsBuilder, MsBuildContainerProperties containerDetails)
     {
-        argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerRegistryArgument, containerDetails.ContainerRegistry);
+        if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
+        {
+            argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerRegistryArgument, containerDetails.ContainerRegistry);
+        }
 
         if (!string.IsNullOrEmpty(containerDetails.ContainerRepository))
         {

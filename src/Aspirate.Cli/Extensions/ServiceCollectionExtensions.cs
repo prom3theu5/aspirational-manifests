@@ -50,6 +50,7 @@ internal static class ServiceCollectionExtensions
         services
             .RegisterAction<InitializeConfigurationAction>()
             .RegisterAction<LoadConfigurationAction>()
+            .RegisterAction<AskImagePullPolicyAction>()
             .RegisterAction<BuildAndPushContainersFromProjectsAction>()
             .RegisterAction<BuildAndPushContainersFromDockerfilesAction>()
             .RegisterAction<PopulateContainerDetailsForProjectsAction>()

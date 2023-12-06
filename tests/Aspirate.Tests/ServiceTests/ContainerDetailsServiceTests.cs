@@ -1,5 +1,3 @@
-using Aspirate.Services.Implementations;
-
 namespace Aspirate.Tests.ServiceTests;
 
 [UsesVerify]
@@ -67,6 +65,11 @@ public class ContainerDetailsServiceTests
             {
                 new TestContainerProperties(
                     "NoRepositoryOrTagShouldBeImageLatest", CreateContainerProperties("test-registry", null, "test-image")),
+            },
+            new object[]
+            {
+                new TestContainerProperties(
+                    "NoRegistryOrRepositoryOrTagShouldBeImageLatest", CreateContainerProperties(null, null, "test-image")),
             },
         };
 

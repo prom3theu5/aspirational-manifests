@@ -2,7 +2,6 @@ namespace Aspirate.Commands.Actions.Configuration;
 
 public class LoadConfigurationAction(
     IAspirateConfigurationService configurationService,
-    ISecretProvider secretProvider,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
     public override Task<bool> ExecuteAsync()

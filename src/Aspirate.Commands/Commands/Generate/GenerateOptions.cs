@@ -11,4 +11,6 @@ public sealed class GenerateOptions : BaseCommandOptions, IGenerateOptions
     public string? ContainerBuilder { get; set; } = "docker";
     public string? ContainerRegistry { get; set; }
     public string? ContainerImageTag { get; set; }
+
+    public string? ImagePullPolicy { get; set; }
 }
