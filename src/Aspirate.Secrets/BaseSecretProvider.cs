@@ -73,6 +73,14 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
         ProcessAfterStateRestoration();
     }
 
+    public bool SecretStateExists(string? path = null)
+    {
+        path ??= fileSystem.Directory.GetCurrentDirectory();
+        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
+
+        return fileSystem.File.Exists(inputFile);
+    }
+
     public string? GetSecret(string resourceName, string key)
     {
         if (State?.Secrets == null || Decrypter == null)

@@ -23,6 +23,23 @@ public class PasswordSecretProviderTests
     }
 
     [Fact]
+    public void SecretState_ShouldExist()
+    {
+        var provider = new PasswordSecretProvider(_fileSystem);
+        var state = GetState();
+        WriteStateFile(state);
+        provider.SecretStateExists().Should().BeTrue();
+    }
+
+    [Fact]
+    public void SecretState_ShouldNotExist()
+    {
+        _fileSystem.File.Delete(_fileSystem.Path.Combine("/", AspirateSecretLiterals.SecretsStateFile));
+        var provider = new PasswordSecretProvider(_fileSystem);
+        provider.SecretStateExists().Should().BeFalse();
+    }
+
+    [Fact]
     public void RestoreState_ShouldSetState()
     {
         var provider = new PasswordSecretProvider(_fileSystem);
