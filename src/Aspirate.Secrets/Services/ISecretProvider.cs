@@ -7,9 +7,11 @@ public interface ISecretProvider
 
     IDecrypter? Decrypter { get; }
 
-    void AddSecret(string key, string value);
-    void RemoveSecret(string key);
-    void RestoreState(string state);
+    void AddResource(string resourceName);
+    void RemoveResource(string resourceName);
+    void AddSecret(string resourceName, string key, string value);
+    void RemoveSecret(string resourceName, string key);
     void SaveState(string? path = null);
-    string? GetSecret(string key);
+    void LoadState(string? path = null);
+    string? GetSecret(string resourceName, string key);
 }

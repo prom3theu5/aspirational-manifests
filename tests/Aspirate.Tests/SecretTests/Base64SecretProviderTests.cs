@@ -1,8 +1,12 @@
+using Aspirate.Secrets;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+
 namespace Aspirate.Tests.SecretTests;
 
 public class Base64SecretProviderTests
 {
     private const string TestKey = "testKey";
+    private const string TestResource = "testresource";
     private const string DecryptedTestValue = "testValue";
     private const string EncryptedTestValue = "dGVzdFZhbHVl";
     private readonly IFileSystem _fileSystem = new MockFileSystem();
@@ -12,7 +16,8 @@ public class Base64SecretProviderTests
     {
         var provider = new Base64SecretProvider(_fileSystem);
         var state = GetState();
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
         provider.State.Should().NotBeNull();
     }
 
@@ -21,7 +26,8 @@ public class Base64SecretProviderTests
     {
         var provider = new Base64SecretProvider(_fileSystem);
         var state = GetState(1);
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
 
         provider.SaveState();
 
@@ -33,11 +39,13 @@ public class Base64SecretProviderTests
     {
         var provider = new Base64SecretProvider(_fileSystem);
         var state = GetState();
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
 
-        provider.AddSecret(TestKey, DecryptedTestValue);
+        provider.AddResource(TestResource);
+        provider.AddSecret(TestResource, TestKey, DecryptedTestValue);
 
-        provider.State.Secrets.Keys.Should().Contain(TestKey);
+        provider.State.Secrets[TestResource].Keys.Should().Contain(TestKey);
     }
 
     [Fact]
@@ -48,14 +56,19 @@ public class Base64SecretProviderTests
         var state = GetState(
             secrets: new()
             {
-                [TestKey] = EncryptedTestValue,
+                [TestResource] = new()
+                {
+                    [TestKey] = EncryptedTestValue,
+                },
             });
 
-        provider.RestoreState(state);
+        WriteStateFile(state);
 
-        provider.RemoveSecret(TestKey);
+        provider.LoadState("/");
 
-        provider.State.Secrets.Keys.Should().NotContain(TestKey);
+        provider.RemoveSecret(TestResource, TestKey);
+
+        provider.State.Secrets[TestResource].Keys.Should().NotContain(TestKey);
     }
 
     [Fact]
@@ -66,23 +79,35 @@ public class Base64SecretProviderTests
         var state = GetState(
             secrets: new()
             {
-                [TestKey] = EncryptedTestValue,
+                [TestResource] = new()
+                {
+                    [TestKey] = EncryptedTestValue,
+                },
             });
 
-        provider.RestoreState(state);
+        WriteStateFile(state);
 
-        var secret = provider.GetSecret(TestKey);
+        provider.LoadState("/");
+
+        var secret = provider.GetSecret(TestResource, TestKey);
 
         secret.Should().Be(DecryptedTestValue);
     }
 
-    private static string GetState(int? version = null, Dictionary<string, string>? secrets = null)
+    private static string GetState(int? version = null, Dictionary<string, Dictionary<string, string>>? secrets = null)
     {
         var state = new Base64SecretState
         {
-            Version = version ?? 0, Secrets = secrets ?? new Dictionary<string, string>(),
+            Version = version ?? 0,
+            Secrets = secrets ?? [],
         };
 
         return JsonSerializer.Serialize(state);
+    }
+
+    private void WriteStateFile(string state)
+    {
+        var outputFile = _fileSystem.Path.Combine("/", AspirateSecretLiterals.SecretsStateFile);
+        _fileSystem.File.WriteAllText(outputFile, state);
     }
 }

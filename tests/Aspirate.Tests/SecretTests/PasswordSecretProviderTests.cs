@@ -1,3 +1,5 @@
+using Aspirate.Secrets;
+
 namespace Aspirate.Tests.SecretTests;
 
 public class PasswordSecretProviderTests
@@ -5,10 +7,10 @@ public class PasswordSecretProviderTests
     private const string TestPassword = "testPassword";
     private const string Base64Salt = "dxaPu37gk4KtgYBy";
     private const string TestKey = "testKey";
+    private const string TestResource = "testresource";
     private const string DecryptedTestValue = "testValue";
     private const string EncryptedTestValue = "dxaPu37gk4KtgYByS0Fyt9hQ/dvbURmdavzyWNs8xEgBdduW9Q==";
     private readonly IFileSystem _fileSystem = new MockFileSystem();
-
 
     [Fact]
     public void SetPassword_ShouldInitializeEncrypterAndDecrypter()
@@ -25,7 +27,8 @@ public class PasswordSecretProviderTests
     {
         var provider = new PasswordSecretProvider(_fileSystem);
         var state = GetState();
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
         provider.State.Should().NotBeNull();
         provider.State.Salt.Should().BeNull();
     }
@@ -35,7 +38,8 @@ public class PasswordSecretProviderTests
     {
         var provider = new PasswordSecretProvider(_fileSystem);
         var state = GetState(Base64Salt, 1);
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
 
         provider.SaveState();
 
@@ -47,12 +51,14 @@ public class PasswordSecretProviderTests
     {
         var provider = new PasswordSecretProvider(_fileSystem);
         var state = GetState(Base64Salt);
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
         provider.SetPassword(TestPassword);
 
-        provider.AddSecret(TestKey, DecryptedTestValue);
+        provider.AddResource(TestResource);
+        provider.AddSecret(TestResource, TestKey, DecryptedTestValue);
 
-        provider.State.Secrets.Keys.Should().Contain(TestKey);
+        provider.State.Secrets[TestResource].Keys.Should().Contain(TestKey);
     }
 
     [Fact]
@@ -63,16 +69,20 @@ public class PasswordSecretProviderTests
         var state = GetState(
             Base64Salt, secrets: new()
             {
-                [TestKey] = EncryptedTestValue,
+               [TestResource] = new()
+               {
+                   [TestKey] = EncryptedTestValue,
+               },
             });
 
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
 
         provider.SetPassword(TestPassword);
 
-        provider.RemoveSecret(TestKey);
+        provider.RemoveSecret(TestResource, TestKey);
 
-        provider.State.Secrets.Keys.Should().NotContain(TestKey);
+        provider.State.Secrets[TestResource].Keys.Should().NotContain(TestKey);
     }
 
     [Fact]
@@ -83,19 +93,23 @@ public class PasswordSecretProviderTests
         var state = GetState(
             Base64Salt, secrets: new()
             {
-                [TestKey] = EncryptedTestValue,
+                [TestResource] = new()
+                {
+                    [TestKey] = EncryptedTestValue,
+                },
             });
 
-        provider.RestoreState(state);
+        WriteStateFile(state);
+        provider.LoadState("/");
 
         provider.SetPassword(TestPassword);
 
-        var secret = provider.GetSecret(TestKey);
+        var secret = provider.GetSecret(TestResource, TestKey);
 
         secret.Should().Be(DecryptedTestValue);
     }
 
-    private static string GetState(string? salt = null, int? version = null, Dictionary<string, string>? secrets = null)
+    private static string GetState(string? salt = null, int? version = null, Dictionary<string, Dictionary<string, string>>? secrets = null)
     {
         var state = new PasswordSecretState
         {
@@ -105,5 +119,11 @@ public class PasswordSecretProviderTests
         };
 
         return JsonSerializer.Serialize(state);
+    }
+
+    private void WriteStateFile(string state)
+    {
+        var outputFile = _fileSystem.Path.Combine("/", AspirateSecretLiterals.SecretsStateFile);
+        _fileSystem.File.WriteAllText(outputFile, state);
     }
 }

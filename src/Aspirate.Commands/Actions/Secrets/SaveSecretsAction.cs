@@ -1,8 +1,8 @@
 namespace Aspirate.Commands.Actions.Secrets;
 
-public class SaveInputsAction(
+public class SaveSecretsAction(
     IAnsiConsole console,
-    IPasswordGenerator passwordGenerator,
+    ISecretProvider secretProvider,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
     public override Task<bool> ExecuteAsync()
