@@ -1,26 +1,40 @@
-namespace Aspirate.Tests.Secrets;
+namespace Aspirate.Tests.SecretTests;
 
-public class Base64SecretProviderTests
+public class PasswordSecretProviderTests
 {
+    private const string TestPassword = "testPassword";
+    private const string Base64Salt = "dxaPu37gk4KtgYBy";
     private const string TestKey = "testKey";
     private const string DecryptedTestValue = "testValue";
-    private const string EncryptedTestValue = "dGVzdFZhbHVl";
+    private const string EncryptedTestValue = "dxaPu37gk4KtgYByS0Fyt9hQ/dvbURmdavzyWNs8xEgBdduW9Q==";
     private readonly IFileSystem _fileSystem = new MockFileSystem();
+
+
+    [Fact]
+    public void SetPassword_ShouldInitializeEncrypterAndDecrypter()
+    {
+        var provider = new PasswordSecretProvider(_fileSystem);
+        provider.SetPassword(TestPassword);
+
+        provider.Encrypter.Should().NotBeNull();
+        provider.Decrypter.Should().NotBeNull();
+    }
 
     [Fact]
     public void RestoreState_ShouldSetState()
     {
-        var provider = new Base64SecretProvider(_fileSystem);
+        var provider = new PasswordSecretProvider(_fileSystem);
         var state = GetState();
         provider.RestoreState(state);
         provider.State.Should().NotBeNull();
+        provider.State.Salt.Should().BeNull();
     }
 
     [Fact]
     public void SaveState_ShouldIncreaseVersion()
     {
-        var provider = new Base64SecretProvider(_fileSystem);
-        var state = GetState(1);
+        var provider = new PasswordSecretProvider(_fileSystem);
+        var state = GetState(Base64Salt, 1);
         provider.RestoreState(state);
 
         provider.SaveState();
@@ -31,9 +45,10 @@ public class Base64SecretProviderTests
     [Fact]
     public void AddSecret_ShouldAddEncryptedSecretToState()
     {
-        var provider = new Base64SecretProvider(_fileSystem);
-        var state = GetState();
+        var provider = new PasswordSecretProvider(_fileSystem);
+        var state = GetState(Base64Salt);
         provider.RestoreState(state);
+        provider.SetPassword(TestPassword);
 
         provider.AddSecret(TestKey, DecryptedTestValue);
 
@@ -43,15 +58,17 @@ public class Base64SecretProviderTests
     [Fact]
     public void RemoveSecret_ShouldRemoveSecretFromState()
     {
-        var provider = new Base64SecretProvider(_fileSystem);
+        var provider = new PasswordSecretProvider(_fileSystem);
 
         var state = GetState(
-            secrets: new()
+            Base64Salt, secrets: new()
             {
                 [TestKey] = EncryptedTestValue,
             });
 
         provider.RestoreState(state);
+
+        provider.SetPassword(TestPassword);
 
         provider.RemoveSecret(TestKey);
 
@@ -61,26 +78,30 @@ public class Base64SecretProviderTests
     [Fact]
     public void GetSecret_ShouldReturnDecryptedSecret()
     {
-        var provider = new Base64SecretProvider(_fileSystem);
+        var provider = new PasswordSecretProvider(_fileSystem);
 
         var state = GetState(
-            secrets: new()
+            Base64Salt, secrets: new()
             {
                 [TestKey] = EncryptedTestValue,
             });
 
         provider.RestoreState(state);
 
+        provider.SetPassword(TestPassword);
+
         var secret = provider.GetSecret(TestKey);
 
         secret.Should().Be(DecryptedTestValue);
     }
 
-    private static string GetState(int? version = null, Dictionary<string, string>? secrets = null)
+    private static string GetState(string? salt = null, int? version = null, Dictionary<string, string>? secrets = null)
     {
-        var state = new Base64SecretState
+        var state = new PasswordSecretState
         {
-            Version = version ?? 0, Secrets = secrets ?? new Dictionary<string, string>(),
+            Salt = salt,
+            Version = version ?? 0,
+            Secrets = secrets ?? [],
         };
 
         return JsonSerializer.Serialize(state);

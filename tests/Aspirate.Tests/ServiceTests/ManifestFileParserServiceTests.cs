@@ -1,3 +1,5 @@
+using Aspirate.Commands;
+
 namespace Aspirate.Tests.ServiceTests;
 
 [UsesVerify]
@@ -112,7 +114,7 @@ public class ManifestFileParserServiceTest
     }
 
     [Fact]
-    public void LoadAndParseAspireManifest_ParsesManifestFileCorrectly()
+    public async Task LoadAndParseAspireManifest_ParsesManifestFileCorrectly()
     {
         // Arrange
         var fileSystem = new MockFileSystem();
@@ -123,10 +125,18 @@ public class ManifestFileParserServiceTest
         var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
 
         // Act
-        var result = service.LoadAndParseAspireManifest(manifestFile);
+        var state = serviceProvider.GetRequiredService<AspirateState>();
+        state.LoadedAspireManifestResources = service.LoadAndParseAspireManifest(manifestFile);
+
+        var postgresContainer = state.LoadedAspireManifestResources["postgrescontainer"] as Container;
+        postgresContainer.Inputs["password"].Value = "secret_password"; // inputs captured from user input
+
+        var postLoadAction = new SubstituteValuesAspireManifestAction(serviceProvider);
+        await postLoadAction.ExecuteAsync();
+        var result = state.LoadedAspireManifestResources;
 
         // Assert
-        result.Should().HaveCount(5);
+        result.Should().HaveCount(6);
         result["postgres"].Should().BeOfType<PostgresServer>();
         result["catalogdb"].Should().BeOfType<PostgresDatabase>();
         result["basketcache"].Should().BeOfType<Redis>();
@@ -141,6 +151,11 @@ public class ManifestFileParserServiceTest
         result["anotherservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
         result["anotherservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
         result["anotherservice"].Env["services__catalogservice"].Should().Be("http://catalogservice:8080");
+        result["anotherservice"].Env["ConnectionStrings__basketcache"].Should().Be("redis");
+        result["anotherservice"].Env["ConnectionStrings__postgrescontainer"].Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password;");
+
+        postgresContainer = result["postgrescontainer"] as Container;
+        postgresContainer.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password;");
     }
 
     private static IServiceProvider CreateServiceProvider(IFileSystem? fileSystem = null, IAnsiConsole? console = null)

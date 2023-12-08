@@ -23,7 +23,7 @@ public class LoadAspireManifestActionTests : BaseActionTests<LoadAspireManifestA
         // Assert
         result.Should().BeTrue();
         state.SelectedProjectComponents.Should().HaveCount(2);
-        state.LoadedAspireManifestResources.Keys.Count.Should().Be(5);
+        state.LoadedAspireManifestResources.Keys.Count.Should().Be(6);
     }
 
     [Fact]
@@ -41,6 +41,6 @@ public class LoadAspireManifestActionTests : BaseActionTests<LoadAspireManifestA
         // Assert
         result.Should().BeTrue();
         state.SelectedProjectComponents.Should().HaveCount(2);
-        state.LoadedAspireManifestResources.Keys.Count.Should().Be(5);
+        state.LoadedAspireManifestResources.Keys.Count.Should().Be(6);
     }
 }

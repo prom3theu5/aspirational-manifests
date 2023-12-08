@@ -1,4 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests.Components.V0;
 using AspireDockerfile = Aspirate.Shared.Models.AspireManifests.Components.V0.Dockerfile;
 
 namespace Aspirate.Processors.Dockerfile;
@@ -36,7 +35,7 @@ public class DockerfileProcessor(
 
         var dockerFile = resource.Value as AspireDockerfile;
 
-        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = int.Parse(b.Value.ContainerPort) }).ToList() ?? [];
+        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
 
         if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
         {

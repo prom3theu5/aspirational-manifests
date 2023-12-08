@@ -1,6 +1,6 @@
-namespace Aspirate.Processors.Dockerfile;
+namespace Aspirate.Processors.Container;
 
-public class DockerfileTemplateData(
+public class ContainerTemplateData(
     string name,
     string containerImage,
     Dictionary<string, string> env,
@@ -9,7 +9,6 @@ public class DockerfileTemplateData(
     : BaseTemplateData(name, env, manifests)
 {
     public string ContainerImage { get; set; } = containerImage;
-    public bool IsDockerfile { get; set; } = true;
     public List<Ports> Ports { get; set; } = ports;
     public bool HasPorts => Ports.Any();
 

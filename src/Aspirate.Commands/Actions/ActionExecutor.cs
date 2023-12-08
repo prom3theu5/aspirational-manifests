@@ -1,12 +1,31 @@
 namespace Aspirate.Commands.Actions;
 
+/// <summary>
+/// Represents a class responsible for executing a queue of actions.
+/// </summary>
 public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvider, AspirateState state)
 {
+    /// <summary>
+    /// Creates an instance of ActionExecutor using the provided IServiceProvider.
+    /// </summary>
+    /// <param name="serviceProvider">The IServiceProvider used to retrieve required services.</param>
+    /// <returns>An instance of ActionExecutor.</returns>
     public static ActionExecutor CreateInstance(IServiceProvider serviceProvider) =>
         new(serviceProvider.GetRequiredService<IAnsiConsole>(), serviceProvider, serviceProvider.GetRequiredService<AspirateState>());
 
+    /// <summary>
+    /// Represents a queue of <see cref="ExecutionAction"/> objects for delayed execution.
+    /// </summary>
     private readonly Queue<ExecutionAction> _actionQueue = new();
 
+    /// <summary>
+    /// Queues an action to be executed.
+    /// </summary>
+    /// <param name="actionKey">The key of the action to be executed.</param>
+    /// <param name="onFailure">An optional action to be executed if the queued action fails.</param>
+    /// <returns>
+    /// The <see cref="ActionExecutor"/> instance to allow method chaining.
+    /// </returns>
     public ActionExecutor QueueAction(string actionKey, Func<Task>? onFailure = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(actionKey, nameof(actionKey));
@@ -15,6 +34,15 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
         return this;
     }
 
+    /// <summary>
+    /// Executes a queue of actions asynchronously.
+    /// </summary>
+    /// <returns>
+    /// An integer value representing the execution result:
+    /// - 0 if all actions were successfully executed.
+    /// - 1 if any action failed to execute.
+    /// - The exit code if an action caused the program to exit.
+    /// </returns>
     public async Task<int> ExecuteCommandsAsync()
     {
         if (state.NonInteractive)
@@ -64,6 +92,9 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
     private static Task HandleActionFailure(Func<Task>? onFailure = null) =>
         onFailure != null ? onFailure() : Task.CompletedTask;
 
+    /// <summary>
+    /// Represents an action to be executed with optional failure handling. </summary>
+    /// /
     private record ExecutionAction(string ActionKey, Func<Task>? OnFailure = null);
 }
 

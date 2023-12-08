@@ -1,5 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests.Components.V0;
-
 namespace Aspirate.Processors.Postgresql;
 
 /// <summary>
@@ -7,7 +5,6 @@ namespace Aspirate.Processors.Postgresql;
 /// </summary>
 public class PostgresDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole console) : BaseProcessor<PostgresDatabaseTemplateData>(fileSystem, console)
 {
-
     /// <inheritdoc />
     public override string ResourceType => AspireLiterals.PostgresDatabase;
 
