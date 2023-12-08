@@ -1,5 +1,3 @@
-using Aspirate.Secrets;
-
 namespace Aspirate.Tests.SecretTests;
 
 public class PasswordSecretProviderTests

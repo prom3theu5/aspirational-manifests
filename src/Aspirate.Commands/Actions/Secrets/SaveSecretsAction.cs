@@ -43,41 +43,19 @@ public class SaveSecretsAction(
 
         console.MarkupLine($"Saving secrets for provider [blue]{secretProvider.Type}[/]");
 
-        var componentsWithInputs = CurrentState.AllSelectedSupportedComponents.Where(x => x.Value is IResourceWithInput).ToArray();
-
-        foreach (var component in componentsWithInputs)
+        foreach (var component in CurrentState.AllSelectedSupportedComponents.Where(component => !secretProvider.ResourceExists(component.Key)))
         {
             secretProvider.AddResource(component.Key);
         }
 
-        foreach (var component in componentsWithInputs)
+        foreach (var component in CurrentState.AllSelectedSupportedComponents)
         {
-            var componentWithInput = component.Value as IResourceWithInput;
-
-            foreach (var input in componentWithInput.Inputs)
+            if (component.Value.Env is null)
             {
-                var secretExists = secretProvider.GetSecret(component.Key, input.Key) is not null;
-
-                if (secretExists)
-                {
-                    console.MarkupLine($"[yellow]Secret for {component.Key} {input.Key} already exists[/]");
-
-                    if (AskIfShouldUseExisting())
-                    {
-                        continue;
-                    }
-
-                    if (!AskIfShouldOverwrite())
-                    {
-                        console.MarkupLine("[red]Aborting due to inability to modify secret.[/]");
-                        throw new ActionCausesExitException(1);
-                    }
-
-                    secretProvider.RemoveSecret(component.Key, input.Key);
-                }
-
-                secretProvider.AddSecret(component.Key, input.Key, input.Value.Value);
+                continue;
             }
+
+            ProtectConnectionStrings(component);
         }
 
         secretProvider.SaveState(CurrentState.OutputPath);
@@ -85,6 +63,29 @@ public class SaveSecretsAction(
         console.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved to [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
 
         return Task.FromResult(true);
+    }
+
+    private void UpsertSecret(KeyValuePair<string, Resource> component, KeyValuePair<string, string> input)
+    {
+        if (secretProvider.SecretExists(component.Key, input.Key))
+        {
+            console.MarkupLine($"[yellow]Secret for {component.Key} {input.Key} already exists[/]");
+
+            if (AskIfShouldUseExisting())
+            {
+                return;
+            }
+
+            if (!AskIfShouldOverwrite())
+            {
+                console.MarkupLine("[red]Aborting due to inability to modify secret.[/]");
+                throw new ActionCausesExitException(1);
+            }
+
+            secretProvider.RemoveSecret(component.Key, input.Key);
+        }
+
+        secretProvider.AddSecret(component.Key, input.Key, input.Value);
     }
 
     private void HandleInitialisation()
@@ -143,6 +144,21 @@ public class SaveSecretsAction(
         }
 
         return false;
+    }
+
+    private void ProtectConnectionStrings(KeyValuePair<string, Resource> component)
+    {
+        var connectionStrings = component.Value.Env?.Where(x => x.Key.StartsWith("ConnectionString", StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (connectionStrings.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var input in connectionStrings)
+        {
+            UpsertSecret(component, input);
+        }
     }
 
     private bool AskIfShouldOverwrite(bool plural = false, bool defaultValue = true) =>

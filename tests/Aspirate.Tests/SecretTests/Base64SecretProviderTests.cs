@@ -1,4 +1,3 @@
-using Aspirate.Secrets;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Aspirate.Tests.SecretTests;

@@ -88,6 +88,34 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         return state;
     }
 
+    protected AspirateState CreateAspirateStateWithConnectionStrings()
+    {
+        var postgres = CreatePostgresContainerResourceManualInput("postgrescontainer");
+        var postgresTwo = CreatePostgresContainerResourceManualInput("postgrescontainer2");
+
+        var resources = new Dictionary<string, Resource>
+        {
+            { "postgrescontainer", postgres },
+            { "postgrescontainer2", postgresTwo },
+        };
+
+        resources["postgrescontainer"].Env = new()
+        {
+            ["ConnectionString_Test"] = "some_secret_value",
+        };
+
+        resources["postgrescontainer2"].Env = new()
+        {
+            ["ConnectionString_Test"] = "some_secret_value",
+        };
+
+        var state = CreateAspirateState(nonInteractive: false);
+        state.LoadedAspireManifestResources = resources;
+        state.AspireComponentsToProcess = resources.Keys.ToList();
+
+        return state;
+    }
+
     private static Container CreatePostgresContainerResourceManualInput(string resourceName, bool generatedInput = false, bool passwordsSet = false)
     {
         var postgres = new Container

@@ -8,7 +8,9 @@ public interface ISecretProvider
     IDecrypter? Decrypter { get; }
 
     void AddResource(string resourceName);
+    bool ResourceExists(string resourceName);
     void RemoveResource(string resourceName);
+    bool SecretExists(string resourceName, string key);
     void AddSecret(string resourceName, string key, string value);
     void RemoveSecret(string resourceName, string key);
     void SaveState(string? path = null);

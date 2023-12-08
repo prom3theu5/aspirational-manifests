@@ -30,6 +30,9 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
     public void RemoveSecret(string resourceName, string key) =>
         State?.Secrets[resourceName].Remove(key);
 
+    public bool ResourceExists(string resourceName) => State?.Secrets.TryGetValue(resourceName, out _) == true;
+    public bool SecretExists(string resourceName, string key) => State?.Secrets[resourceName].TryGetValue(key, out _) == true;
+
     public void RemoveResource(string resourceName) =>
         State?.Secrets.Remove(resourceName);
 
