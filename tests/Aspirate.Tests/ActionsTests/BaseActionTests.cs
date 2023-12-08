@@ -1,5 +1,3 @@
-using Aspirate.Commands;
-
 namespace Aspirate.Tests.ActionsTests;
 
 public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest : class, IAction

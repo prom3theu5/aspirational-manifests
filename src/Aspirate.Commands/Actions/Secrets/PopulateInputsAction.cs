@@ -1,18 +1,12 @@
 namespace Aspirate.Commands.Actions.Secrets;
 
-public class PromptForNonGeneratedSecretsAction(
+public class PopulateInputsAction(
     IAnsiConsole console,
     IPasswordGenerator passwordGenerator,
-    IServiceProvider serviceProvider) : BaseAction(serviceProvider)
+    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public override Task<bool> ExecuteAsync()
     {
-        if (CurrentState.NonInteractive)
-        {
-            // Values cannot be prompted for in non-interactive mode.
-            return Task.FromResult(true);
-        }
-
         var componentsWithInputs = CurrentState.AllSelectedSupportedComponents.Where(x => x.Value is IResourceWithInput).ToArray();
 
         if (componentsWithInputs.Length == 0)
@@ -20,21 +14,45 @@ public class PromptForNonGeneratedSecretsAction(
             return Task.FromResult(true);
         }
 
+        ApplyGeneratedValues(componentsWithInputs);
+
+        if (CurrentState.NonInteractive)
+        {
+            return Task.FromResult(true);
+        }
+
+        ApplyManualValues(componentsWithInputs);
+
+        return Task.FromResult(true);
+    }
+
+    private void ApplyManualValues(KeyValuePair<string, Resource>[] componentsWithInputs)
+    {
         console.MarkupLine("You will now be prompted to enter values for any [green]secrets[/] that are [blue]not generated[/] automatically.");
-        console.MarkupLine("All [blue]automatically generated[/] [green]secrets[/] will be created accordingly.");
+
+        foreach (var component in componentsWithInputs)
+        {
+            var componentWithInput = component.Value as IResourceWithInput;
+
+            var manualInputs = componentWithInput.Inputs?.Where(x => x.Value.Default?.Generate is null);
+
+            AssignManualValues(ref manualInputs, componentWithInput);
+        }
+    }
+
+    private void ApplyGeneratedValues(KeyValuePair<string, Resource>[] componentsWithInputs)
+    {
+        console.WriteLine();
+        console.MarkupLine("Applying values for all [blue]automatically generated[/] [green]secrets[/].");
 
         foreach (var component in componentsWithInputs)
         {
             var componentWithInput = component.Value as IResourceWithInput;
 
             var generatedInputs = componentWithInput.Inputs?.Where(x => x.Value.Default?.Generate is not null);
-            var manualInputs = componentWithInput.Inputs?.Where(x => x.Value.Default?.Generate is null);
 
-            AssignManualValues(ref manualInputs, componentWithInput);
             AssignGeneratedValues(ref generatedInputs, componentWithInput);
         }
-
-        return Task.FromResult(true);
     }
 
     private void AssignManualValues(ref IEnumerable<KeyValuePair<string, Input>>? manualInputs,
@@ -97,6 +115,21 @@ public class PromptForNonGeneratedSecretsAction(
             input.Value.Value = passwordGenerator.Generate(minimumLength);
 
             console.MarkupLine($"Successfully [green]generated[/] a value for [blue]{componentWithInput.Name}'s[/] Input Value [blue]'{input.Key}'[/]");
+        }
+    }
+
+    public override void ValidateNonInteractiveState()
+    {
+        var componentsWithInputs = CurrentState.AllSelectedSupportedComponents.Where(x => x.Value is IResourceWithInput).ToArray();
+
+        var manualInputs = componentsWithInputs
+            .Select(x => (IResourceWithInput) x.Value)
+            .SelectMany(x => x.Inputs)
+            .Where(x => x.Value.Default?.Generate is null);
+
+        if (manualInputs.Any())
+        {
+            NonInteractiveValidationFailed("Cannot obtain non-generated values for inputs in non-interactive mode. Inputs are required according to the manifest.");
         }
     }
 }

@@ -1,5 +1,3 @@
-using Aspirate.Commands;
-
 namespace Aspirate.Tests.ServiceTests;
 
 [UsesVerify]

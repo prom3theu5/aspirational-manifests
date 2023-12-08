@@ -7,7 +7,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
-            .QueueAction(nameof(PromptForNonGeneratedSecretsAction))
+            .QueueAction(nameof(PopulateInputsAction))
             .QueueAction(nameof(SubstituteValuesAspireManifestAction))
             .QueueAction(nameof(PopulateContainerDetailsForProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
