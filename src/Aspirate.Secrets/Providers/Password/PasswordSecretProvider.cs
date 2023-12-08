@@ -28,11 +28,20 @@ public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider
         // Derive a key from the passphrase using Pbkdf2 with SHA256, 1 million iterations.
         using var pbkdf2 = new Rfc2898DeriveBytes(_password, salt: _salt, iterations: 1000000, HashAlgorithmName.SHA256);
         var key = pbkdf2.GetBytes(32); // AES-256-GCM needs a 32-byte key
-
         var crypter = new AesGcmCrypter(key, _salt, TagSizeInBytes);
 
         _encrypter = crypter;
         _decrypter = crypter;
+
+        SetPasswordHash();
+    }
+
+    public bool CheckPassword(string password)
+    {
+        using var pbkdf2ToCheck = new Rfc2898DeriveBytes(password, salt: _salt, iterations: 1000000, HashAlgorithmName.SHA256);
+        var passwordToCheckHash = Convert.ToBase64String(pbkdf2ToCheck.GetBytes(32));
+
+        return passwordToCheckHash == State.Hash;
     }
 
     public override void ProcessAfterStateRestoration()
@@ -61,5 +70,11 @@ public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider
         RandomNumberGenerator.Fill(_salt);
         State ??= new();
         State.Salt = Convert.ToBase64String(_salt);
+    }
+
+    private void SetPasswordHash()
+    {
+        using var pbkdf2 = new Rfc2898DeriveBytes(_password, salt: _salt, iterations: 1000000, HashAlgorithmName.SHA256);
+        State.Hash = Convert.ToBase64String(pbkdf2.GetBytes(32));
     }
 }

@@ -60,6 +60,8 @@ public class AspirateState :
     [JsonPropertyName("secretsVersion")]
     public int? Version { get; set; }
 
+    public string? Hash { get; set; }
+
     [JsonIgnore]
     public List<string> AspireComponentsToProcess { get; set; } = [];
 

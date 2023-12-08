@@ -23,7 +23,8 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
             return;
         }
 
-        State.Secrets[resourceName][key] = Encrypter?.EncryptValue(value);
+        var protectedValue = Encrypter?.EncryptValue(value);
+        State.Secrets[resourceName][key] = protectedValue;
     }
 
     public void RemoveSecret(string resourceName, string key) =>

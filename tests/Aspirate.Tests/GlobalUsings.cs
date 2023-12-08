@@ -11,6 +11,7 @@ global using Aspirate.Commands.Actions.Secrets;
 global using Aspirate.Processors.Container;
 global using Aspirate.Secrets.Providers.Base64;
 global using Aspirate.Secrets.Providers.Password;
+global using Aspirate.Secrets.Services;
 global using Aspirate.Services;
 global using Aspirate.Services.Implementations;
 global using Aspirate.Services.Interfaces;

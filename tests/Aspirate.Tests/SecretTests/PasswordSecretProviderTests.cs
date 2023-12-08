@@ -23,6 +23,24 @@ public class PasswordSecretProviderTests
     }
 
     [Fact]
+    public void SetPassword_ShouldSetHash()
+    {
+        var provider = new PasswordSecretProvider(_fileSystem);
+        provider.SetPassword(TestPassword);
+
+        provider.Encrypter.Should().NotBeNull();
+        provider.State.Hash.Should().NotBeNullOrEmpty();
+    }
+
+    [Fact]
+    public void CheckPassword_ShouldMatchHash()
+    {
+        var provider = new PasswordSecretProvider(_fileSystem);
+        provider.SetPassword(TestPassword);
+        provider.CheckPassword(TestPassword).Should().BeTrue();
+    }
+
+    [Fact]
     public void SecretState_ShouldExist()
     {
         var provider = new PasswordSecretProvider(_fileSystem);
