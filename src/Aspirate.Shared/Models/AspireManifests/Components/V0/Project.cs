@@ -4,7 +4,7 @@ namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
 /// A project within an aspire manifest.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class Project : Resource
+public class Project : Resource, IResourceWithBinding
 {
     /// <summary>
     /// The path to the project.

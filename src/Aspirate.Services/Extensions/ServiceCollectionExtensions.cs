@@ -13,10 +13,19 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAspirateServices(this IServiceCollection services) =>
         services
             .AddShellExecution()
+            .AddPasswordGenerator()
             .AddAspireManifestSupport()
             .AddAspirateConfigurationSupport()
             .AddContainerSupport()
             .AddKubeCtlSupport();
+
+    /// <summary>
+    /// Adds the password generator implementation to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to add the password generator to.</param>
+    /// <returns>The updated service collection.</returns>
+    private static IServiceCollection AddPasswordGenerator(this IServiceCollection services) =>
+        services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
 
     /// <summary>
     /// Adds Aspire manifest support to the <see cref="IServiceCollection"/> container. </summary>

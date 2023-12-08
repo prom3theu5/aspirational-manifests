@@ -6,6 +6,9 @@ namespace Aspirate.Shared.Models.AspireManifests;
 [ExcludeFromCodeCoverage]
 public abstract class Resource
 {
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
     /// <summary>
     /// The type of the resource.
     /// </summary>

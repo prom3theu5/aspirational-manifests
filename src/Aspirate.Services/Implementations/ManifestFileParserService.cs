@@ -54,6 +54,7 @@ public class ManifestFileParserService(
 
             if (resource != null)
             {
+                resource.Name = resourceName;
                 resources.Add(resourceName, resource);
             }
         }
