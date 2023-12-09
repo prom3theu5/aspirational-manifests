@@ -48,7 +48,7 @@ public class InitializeConfigurationAction(
             return;
         }
 
-        var containerRegistry = Logger.Prompt(new TextPrompt<string>("\tPlease enter the container registry to use as a fall-back value:").PromptStyle("blue"));
+        var containerRegistry = Logger.Prompt(new TextPrompt<string>("Please enter the container registry to use as a fall-back value:").PromptStyle("blue"));
         aspirateConfiguration.ContainerSettings.Registry = containerRegistry;
         Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback registry'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Registry}'[/].");
     }
@@ -70,7 +70,7 @@ public class InitializeConfigurationAction(
             return;
         }
 
-        var containerTag = Logger.Prompt(new TextPrompt<string>("\tPlease enter the container tag to use as a fall-back value:").PromptStyle("blue"));
+        var containerTag = Logger.Prompt(new TextPrompt<string>("Please enter the container tag to use as a fall-back value:").PromptStyle("blue"));
         aspirateConfiguration.ContainerSettings.Tag = containerTag;
         Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tag}'[/].");
     }
@@ -97,7 +97,7 @@ public class InitializeConfigurationAction(
             return;
         }
 
-        var templatePath = Logger.Prompt(new TextPrompt<string>("\tPlease enter the path to use as the template directory:").PromptStyle("blue"));
+        var templatePath = Logger.Prompt(new TextPrompt<string>("Please enter the path to use as the template directory:").PromptStyle("blue"));
         aspirateConfiguration.TemplatePath = fileSystem.GetFullPath(templatePath);
         Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'TemplatePath'[/] to [blue]'{aspirateConfiguration.TemplatePath}'[/].");
     }

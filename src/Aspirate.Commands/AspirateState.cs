@@ -55,10 +55,14 @@ public class AspirateState :
     public string? Salt { get; set; }
 
     [JsonPropertyName("secrets")]
-    public Dictionary<string, string> Secrets { get; set; } = [];
+    public Dictionary<string, Dictionary<string, string>> Secrets { get; set; } = [];
 
     [JsonPropertyName("secretsVersion")]
     public int? Version { get; set; }
+
+    public string? Hash { get; set; }
+
+    public string? SecretPassword { get; set; }
 
     [JsonIgnore]
     public List<string> AspireComponentsToProcess { get; set; } = [];

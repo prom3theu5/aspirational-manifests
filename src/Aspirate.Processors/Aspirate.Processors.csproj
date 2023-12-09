@@ -11,8 +11,4 @@
       <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
 </Project>

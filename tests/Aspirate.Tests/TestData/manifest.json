@@ -36,7 +36,9 @@
         "env": {
           "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
           "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
-          "services__catalogservice": "{catalogservice.bindings.http.url}"
+          "services__catalogservice": "{catalogservice.bindings.http.url}",
+          "ConnectionStrings__basketcache": "{basketcache.connectionString}",
+          "ConnectionStrings__postgrescontainer": "{postgrescontainer.connectionString}"
         },
         "bindings": {
           "http": {
@@ -48,6 +50,35 @@
             "scheme": "https",
             "protocol": "tcp",
             "transport": "http"
+          }
+        }
+      },
+      "postgrescontainer": {
+        "type": "container.v0",
+        "image": "postgres:latest",
+        "env": {
+          "POSTGRES_HOST_AUTH_METHOD": "scram-sha-256",
+          "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256 --auth-local=scram-sha-256",
+          "POSTGRES_PASSWORD": "{postgrescontainer.inputs.password}"
+        },
+        "bindings": {
+          "tcp": {
+            "scheme": "tcp",
+            "protocol": "tcp",
+            "transport": "tcp",
+            "containerPort": 5432
+          }
+        },
+        "connectionString": "Host={postgrescontainer.bindings.tcp.host};Port={postgrescontainer.bindings.tcp.port};Username=postgres;Password={postgrescontainer.inputs.password};",
+        "inputs": {
+          "password": {
+            "type": "string",
+            "secret": true,
+            "default": {
+              "generate": {
+                "minLength": 10
+              }
+            }
           }
         }
       }

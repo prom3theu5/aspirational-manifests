@@ -1,5 +1,3 @@
-using Aspirate.Commands;
-
 namespace Aspirate.Tests.ActionsTests;
 
 public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest : class, IAction
@@ -9,15 +7,15 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
     protected const string DefaultContainerImageTag = "test-tag";
     protected const string DefaultTemplatePath = "/templates";
 
-    protected static AspirateState CreateAspirateState(
-        bool nonInteractive = false,
+    protected static AspirateState CreateAspirateState(bool nonInteractive = false,
         string? projectPath = DefaultProjectPath,
         string? containerRegistry = DefaultContainerRegistry,
         string? containerImageTag = DefaultContainerImageTag,
         string? templatePath = DefaultTemplatePath,
         string? aspireManifest = null,
         string? inputPath = null,
-        string? kubeContext = null)
+        string? kubeContext = null,
+        string? password = null)
     {
         var state = new AspirateState
         {
@@ -27,6 +25,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
             TemplatePath = templatePath,
             InputPath = inputPath,
             KubeContext = kubeContext,
+            SecretPassword = password,
         };
 
         if (!string.IsNullOrEmpty(projectPath))
@@ -45,10 +44,12 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
     protected static IServiceProvider CreateServiceProvider(
         AspirateState state,
         TestConsole? testConsole = null,
-        IFileSystem? fileSystem = null)
+        IFileSystem? fileSystem = null,
+        ISecretProvider? secretProvider = null)
     {
         var console = testConsole ?? new TestConsole();
         fileSystem ??= Substitute.For<IFileSystem>();
+        secretProvider ??= new Base64SecretProvider(fileSystem);
 
         var services = new ServiceCollection();
         services.RegisterAspirateEssential();
@@ -59,11 +60,117 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         services.RemoveAll<AspirateState>();
 
         services.AddSingleton<IFileSystem>(fileSystem);
+        services.AddSingleton<ISecretProvider>(secretProvider);
         services.AddSingleton<IAnsiConsole>(console);
         services.AddSingleton(state);
         services.AddSingleton(Substitute.For<IShellExecutionService>());
 
         return services.BuildServiceProvider();
+    }
+
+    protected AspirateState CreateAspirateStateWithInputs(bool nonInteractive = false, bool generatedInputs = false, bool passwordsSet = false)
+    {
+        var postgres = CreatePostgresContainerResourceManualInput("postgrescontainer", generatedInputs, passwordsSet);
+        var postgresTwo = CreatePostgresContainerResourceManualInput("postgrescontainer2", generatedInputs, passwordsSet);
+
+        var resources = new Dictionary<string, Resource>
+        {
+            { "postgrescontainer", postgres },
+            { "postgrescontainer2", postgresTwo },
+        };
+
+        var state = CreateAspirateState(nonInteractive: nonInteractive);
+        state.LoadedAspireManifestResources = resources;
+        state.AspireComponentsToProcess = resources.Keys.ToList();
+
+        return state;
+    }
+
+    protected AspirateState CreateAspirateStateWithConnectionStrings(bool nonInteractive = false, string? password = null)
+    {
+        var postgres = CreatePostgresContainerResourceManualInput("postgrescontainer");
+        var postgresTwo = CreatePostgresContainerResourceManualInput("postgrescontainer2");
+
+        var resources = new Dictionary<string, Resource>
+        {
+            { "postgrescontainer", postgres },
+            { "postgrescontainer2", postgresTwo },
+        };
+
+        resources["postgrescontainer"].Env = new()
+        {
+            ["ConnectionString_Test"] = "some_secret_value",
+        };
+
+        resources["postgrescontainer2"].Env = new()
+        {
+            ["ConnectionString_Test"] = "some_secret_value",
+        };
+
+        var state = CreateAspirateState(nonInteractive: nonInteractive, password: password);
+        state.LoadedAspireManifestResources = resources;
+        state.AspireComponentsToProcess = resources.Keys.ToList();
+
+        return state;
+    }
+
+    private static Container CreatePostgresContainerResourceManualInput(string resourceName, bool generatedInput = false, bool passwordsSet = false)
+    {
+        var postgres = new Container
+        {
+            Name = resourceName,
+            Type = AspireLiterals.Container,
+            Image = "postgres:latest",
+            ConnectionString = $"Host={{{resourceName}.bindings.tcp.host}};Port={{{resourceName}.bindings.tcp.port}};Username=postgres;Password={{{resourceName}.inputs.password}}",
+            Bindings = new()
+            {
+                {
+                    "tcp", new()
+                    {
+                        Scheme = "tcp",
+                        Protocol = "tcp",
+                        Transport = "tcp",
+                        ContainerPort = 5432,
+                    }
+                },
+            },
+            Inputs = CreateInputs(generatedInput, passwordsSet),
+        };
+        return postgres;
+    }
+
+    private static Dictionary<string, Input> CreateInputs(bool generated = false, bool passwordsSet = false)
+    {
+        var inputs = new Dictionary<string, Input>();
+
+        if (generated)
+        {
+            inputs.Add("password", new()
+            {
+                Type = "string",
+                Default = new()
+                {
+                    Generate = new()
+                    {
+                        MinLength = 20,
+                    },
+                },
+            });
+        }
+        else
+        {
+            inputs.Add("password", new()
+            {
+                Type = "string",
+            });
+        }
+
+        if (passwordsSet)
+        {
+            inputs["password"].Value = "some-password";
+        }
+
+        return inputs;
     }
 
     protected TSystemUnderTest? GetSystemUnderTest(IServiceProvider serviceProvider) =>

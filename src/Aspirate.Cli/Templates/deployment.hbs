@@ -37,4 +37,8 @@ spec:
         envFrom:
         - configMapRef:
             name: {{name}}-env
+        {{#if hasAnySecrets}}
+        - secretRef:
+            name: {{name}}-secrets
+        {{/if}}
       terminationGracePeriodSeconds: 180

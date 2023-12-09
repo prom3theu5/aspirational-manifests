@@ -5,4 +5,4 @@ public sealed class PostgresDatabaseTemplateData(
     Dictionary<string, string> env,
     IReadOnlyCollection<string> manifests,
     bool isService)
-    : BaseTemplateData(name, env, manifests, isService);
+    : BaseTemplateData(null, null, null, manifests, false);

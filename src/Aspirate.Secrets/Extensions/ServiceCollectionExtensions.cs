@@ -2,6 +2,9 @@ namespace Aspirate.Secrets.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddSecretProtectionStrategies(this IServiceCollection services) =>
+        services.AddSingleton<ISecretProtectionStrategy, ConnectionStringProtector>();
+
     public static IServiceCollection RegisterAspirateSecretProvider(this IServiceCollection services, ProviderType providerType) =>
         providerType switch
         {

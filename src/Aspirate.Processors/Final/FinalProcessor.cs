@@ -21,6 +21,6 @@ public class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console) : Base
 
         CreateComponentKustomizeManifest(outputPath, templateData, templatePath);
 
-        _console.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/kustomization.yml[/]");
+        _console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/kustomization.yml[/]");
     }
 }

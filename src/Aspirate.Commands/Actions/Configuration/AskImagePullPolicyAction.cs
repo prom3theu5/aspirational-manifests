@@ -2,7 +2,6 @@ namespace Aspirate.Commands.Actions.Configuration;
 
 public class AskImagePullPolicyAction(
     IAspirateConfigurationService configurationService,
-    IAnsiConsole console,
     IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public override Task<bool> ExecuteAsync()
@@ -24,9 +23,9 @@ public class AskImagePullPolicyAction(
             "Never",
         };
 
-        console.WriteLine();
+        Logger.WriteLine();
 
-        var choice = console.Prompt(
+        var choice = Logger.Prompt(
             new SelectionPrompt<string>()
                 .Title("Select image pull policy for manifests")
                 .PageSize(10)

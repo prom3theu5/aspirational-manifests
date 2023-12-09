@@ -4,7 +4,7 @@ namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
 /// A Dockerfile within an aspire manifest.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class Dockerfile : Resource
+public class Dockerfile : Resource, IResourceWithBinding
 {
     /// <summary>
     /// The path to the dockerfile.

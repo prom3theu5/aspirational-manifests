@@ -15,8 +15,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
     private static Task<int> ConstructCommand(TOptions options, IServiceCollection services)
     {
-        // todo: Implement Secrets.
-        // services.RegisterAspirateSecretProvider(options.SecretProvider);
+        services.RegisterAspirateSecretProvider(options.SecretProvider);
 
         var handler = ActivatorUtilities.CreateInstance<TOptionsHandler>(services.BuildServiceProvider());
 

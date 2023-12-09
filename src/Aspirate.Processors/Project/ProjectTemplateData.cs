@@ -3,10 +3,11 @@ namespace Aspirate.Processors.Project;
 public class ProjectTemplateData(
     string name,
     string containerImage,
-    Dictionary<string, string> env,
+    Dictionary<string, string>? env,
+    Dictionary<string, string>? secrets,
     IReadOnlyCollection<string> manifests,
     string imagePullPolicy)
-    : BaseTemplateData(name, env, manifests)
+    : BaseTemplateData(name, env, secrets, manifests)
 {
     public string ContainerImage { get; set; } = containerImage;
     public bool IsProject { get; set; } = true;

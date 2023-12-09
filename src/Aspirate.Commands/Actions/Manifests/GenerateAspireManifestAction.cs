@@ -22,7 +22,7 @@ public sealed class GenerateAspireManifestAction(
         {
             CurrentState.AspireManifest = result.FullPath;
 
-            Logger.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Created Aspire Manifest At Path: [blue]{CurrentState.AspireManifest}[/]");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Created Aspire Manifest At Path: [blue]{CurrentState.AspireManifest}[/]");
 
             return true;
         }

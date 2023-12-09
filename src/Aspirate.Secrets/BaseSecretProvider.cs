@@ -1,3 +1,5 @@
+using Aspirate.Secrets.Literals;
+
 namespace Aspirate.Secrets;
 
 public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecretProvider where TState : BaseSecretState, new()
@@ -16,24 +18,28 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
 
     public abstract IDecrypter? Decrypter { get; }
 
-    public void AddSecret(string key, string value)
+    public void AddSecret(string resourceName, string key, string value)
     {
         if (State?.Secrets == null || Encrypter == null)
         {
             return;
         }
 
-        State.Secrets[key] = Encrypter?.EncryptValue(value);
+        var protectedValue = Encrypter?.EncryptValue(value);
+        State.Secrets[resourceName][key] = protectedValue;
     }
 
-    public void RemoveSecret(string key) =>
-        State?.Secrets.Remove(key);
+    public void RemoveSecret(string resourceName, string key) =>
+        State?.Secrets[resourceName].Remove(key);
 
-    public virtual void RestoreState(string state)
-    {
-        State = JsonSerializer.Deserialize<TState>(state, _serializerOptions);
-        ProcessAfterStateRestoration();
-    }
+    public bool ResourceExists(string resourceName) => State?.Secrets.TryGetValue(resourceName, out _) == true;
+    public bool SecretExists(string resourceName, string key) => State?.Secrets[resourceName].TryGetValue(key, out _) == true;
+
+    public void RemoveResource(string resourceName) =>
+        State?.Secrets.Remove(resourceName);
+
+    public void AddResource(string resourceName) =>
+        State?.Secrets.Add(resourceName, []);
 
     public virtual void TransformStateForStorage() =>
         State.Version++;
@@ -57,13 +63,54 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
         fileSystem.File.WriteAllText(outputFile, state);
     }
 
-    public string? GetSecret(string key)
+    public void LoadState(string? path = null)
+    {
+        path ??= fileSystem.Directory.GetCurrentDirectory();
+        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
+
+        if (!fileSystem.File.Exists(inputFile))
+        {
+            throw new FileNotFoundException($"State file not found: {inputFile}");
+        }
+
+        var stateJson = fileSystem.File.ReadAllText(inputFile);
+        State = JsonSerializer.Deserialize<TState>(stateJson, _serializerOptions);
+
+        ProcessAfterStateRestoration();
+    }
+
+    public void RemoveState(string? path = null)
+    {
+        path ??= fileSystem.Directory.GetCurrentDirectory();
+        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
+
+        if (!fileSystem.File.Exists(inputFile))
+        {
+            throw new FileNotFoundException($"State file not found: {inputFile}");
+        }
+
+        fileSystem.File.Delete(inputFile);
+
+        State = null;
+
+        ProcessAfterStateRestoration();
+    }
+
+    public bool SecretStateExists(string? path = null)
+    {
+        path ??= fileSystem.Directory.GetCurrentDirectory();
+        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
+
+        return fileSystem.File.Exists(inputFile);
+    }
+
+    public string? GetSecret(string resourceName, string key)
     {
         if (State?.Secrets == null || Decrypter == null)
         {
             return null;
         }
 
-        return State.Secrets.TryGetValue(key, out var encryptedValue) ? Decrypter.DecryptValue(encryptedValue) : null;
+        return State.Secrets[resourceName].TryGetValue(key, out var encryptedValue) ? Decrypter.DecryptValue(encryptedValue) : null;
     }
 }

@@ -1,5 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests.Components.V0;
-
 namespace Aspirate.Processors.Postgresql;
 
 /// <summary>

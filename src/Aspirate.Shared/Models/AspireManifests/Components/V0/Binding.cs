@@ -28,5 +28,5 @@ public class Binding
     /// The Container Port for the binding.
     /// </summary>
     [JsonPropertyName("containerPort")]
-    public string? ContainerPort { get; set; }
+    public int ContainerPort { get; set; }
 }

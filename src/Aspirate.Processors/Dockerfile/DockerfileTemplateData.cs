@@ -1,14 +1,13 @@
-using Aspirate.Shared.Models.AspireManifests.Components.V0;
-
 namespace Aspirate.Processors.Dockerfile;
 
 public class DockerfileTemplateData(
     string name,
     string containerImage,
-    Dictionary<string, string> env,
+    Dictionary<string, string>? env,
+    Dictionary<string, string>? secrets,
     List<Ports> ports,
     IReadOnlyCollection<string> manifests)
-    : BaseTemplateData(name, env, manifests)
+    : BaseTemplateData(name, env, secrets, manifests)
 {
     public string ContainerImage { get; set; } = containerImage;
     public bool IsDockerfile { get; set; } = true;
