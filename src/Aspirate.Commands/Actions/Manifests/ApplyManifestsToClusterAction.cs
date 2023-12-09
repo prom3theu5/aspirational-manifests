@@ -66,6 +66,11 @@ public sealed class ApplyManifestsToClusterAction(
 
     private async Task WriteSecretsOutToTempFiles(List<string> files)
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return;
+        }
+
         if (secretProvider is PasswordSecretProvider passwordSecretProvider)
         {
             Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Decrypting secrets from [blue]{CurrentState.InputPath}[/]");
@@ -92,6 +97,11 @@ public sealed class ApplyManifestsToClusterAction(
 
     private void CleanupSecretEnvFiles(IEnumerable<string> secretFiles)
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return;
+        }
+
         foreach (var secretFile in secretFiles.Where(secretFile => fileSystem.File.Exists(secretFile)))
         {
             fileSystem.File.Delete(secretFile);

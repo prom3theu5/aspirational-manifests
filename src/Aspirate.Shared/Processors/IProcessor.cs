@@ -24,5 +24,10 @@ public interface IProcessor
     /// <summary>
     /// Produces the output manifest file.
     /// </summary>
-    Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? aspirateSettings = null);
+    Task<bool> CreateManifests(
+        KeyValuePair<string, Resource> resource,
+        string outputPath,
+        string imagePullPolicy,
+        string? aspirateSettings = null,
+        bool? disableSecrets = false);
 }

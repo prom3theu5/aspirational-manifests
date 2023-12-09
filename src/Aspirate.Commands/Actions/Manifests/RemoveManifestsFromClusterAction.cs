@@ -56,6 +56,11 @@ public sealed class RemoveManifestsFromClusterAction(
 
     private void CreateEmptySecretFiles(List<string> files)
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return;
+        }
+
         if (secretProvider is PasswordSecretProvider passwordSecretProvider)
         {
             passwordSecretProvider.LoadState(CurrentState.InputPath);
@@ -87,6 +92,11 @@ public sealed class RemoveManifestsFromClusterAction(
 
     private void CleanupSecretEnvFiles(IEnumerable<string> secretFiles)
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return;
+        }
+
         foreach (var secretFile in secretFiles.Where(secretFile => fileSystem.File.Exists(secretFile)))
         {
             fileSystem.File.Delete(secretFile);

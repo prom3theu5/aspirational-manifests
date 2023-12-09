@@ -6,6 +6,11 @@ public class LoadSecretsAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return Task.FromResult(true);
+        }
+
         if (!secretProvider.SecretStateExists(CurrentState.InputPath))
         {
             return Task.FromResult(true);
@@ -52,6 +57,11 @@ public class LoadSecretsAction(
 
     public override void ValidateNonInteractiveState()
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return;
+        }
+
         if (!secretProvider.SecretStateExists(CurrentState.InputPath))
         {
             return;

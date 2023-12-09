@@ -6,6 +6,11 @@ public class PopulateInputsAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return Task.FromResult(true);
+        }
+
         var componentsWithInputs = CurrentState.AllSelectedSupportedComponents.Where(x => x.Value is IResourceWithInput).ToArray();
 
         if (componentsWithInputs.Length == 0)
@@ -121,6 +126,11 @@ public class PopulateInputsAction(
 
     public override void ValidateNonInteractiveState()
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return;
+        }
+
         var componentsWithInputs = CurrentState.AllSelectedSupportedComponents.Where(x => x.Value is IResourceWithInput).ToArray();
 
         var manualInputs = componentsWithInputs

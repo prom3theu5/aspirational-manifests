@@ -162,8 +162,11 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     /// <param name="outputPath">The path where the manifests will be created.</param>
     /// <param name="imagePullPolicy">The image pull policy for the resource.</param>
     /// <param name="templatePath">Optional. The path to the template used for creating the manifests.</param>
+    /// <param name="disableSecrets">Passing this will disable all secret generation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result is a boolean indicating if the manifests were created successfully.</returns>
-    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
+    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
+        string? templatePath = null,
+        bool? disableSecrets = false)
     {
         _console.LogCreateManifestNotOverridden(GetType().Name);
 

@@ -10,6 +10,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
     {
         AddOption(NonInteractive);
         AddOption(SecretProvider);
+        AddOption(DisableSecrets);
         Handler = CommandHandler.Create<TOptions, IServiceCollection>(ConstructCommand);
     }
 
@@ -37,5 +38,12 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         Arity = ArgumentArity.ExactlyOne,
         IsRequired = false,
         IsHidden = true,
+    };
+
+    private static Option<bool> DisableSecrets => new(new[] { "--disable-secrets" })
+    {
+        Description = "Disables Secret Support",
+        Arity = ArgumentArity.ZeroOrOne,
+        IsRequired = false,
     };
 }
