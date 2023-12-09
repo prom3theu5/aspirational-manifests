@@ -1,7 +1,6 @@
 namespace Aspirate.Commands.Actions.Secrets;
 
 public class PopulateInputsAction(
-    IAnsiConsole console,
     IPasswordGenerator passwordGenerator,
     IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
@@ -23,14 +22,14 @@ public class PopulateInputsAction(
 
         ApplyManualValues(componentsWithInputs);
 
-        console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
+        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
 
         return Task.FromResult(true);
     }
 
     private void ApplyManualValues(KeyValuePair<string, Resource>[] componentsWithInputs)
     {
-        console.MarkupLine("You will now be prompted to enter values for any [green]secrets[/] that are [blue]not generated[/] automatically.");
+        Logger.MarkupLine("You will now be prompted to enter values for any [green]secrets[/] that are [blue]not generated[/] automatically.");
 
         foreach (var component in componentsWithInputs)
         {
@@ -44,8 +43,8 @@ public class PopulateInputsAction(
 
     private void ApplyGeneratedValues(KeyValuePair<string, Resource>[] componentsWithInputs)
     {
-        console.WriteLine();
-        console.MarkupLine("Applying values for all [blue]automatically generated[/] [green]secrets[/].");
+        Logger.WriteLine();
+        Logger.MarkupLine("Applying values for all [blue]automatically generated[/] [green]secrets[/].");
 
         foreach (var component in componentsWithInputs)
         {
@@ -73,7 +72,7 @@ public class PopulateInputsAction(
 
     private void HandleSetInput(KeyValuePair<string, Input> input, IResourceWithInput componentWithInput)
     {
-        console.WriteLine();
+        Logger.WriteLine();
 
         var firstPrompt = new TextPrompt<string>($"\r\nEnter a value for resource [blue]{componentWithInput.Name}'s[/] Input Value [blue]'{input.Key}'[/]: ");
         var secondPrompt = new TextPrompt<string>("\r\nPlease repeat the value: ");
@@ -89,8 +88,8 @@ public class PopulateInputsAction(
             secondPrompt.PromptStyle("yellow");
         }
 
-        var firstInput = console.Prompt(firstPrompt);
-        var secondInput = console.Prompt(secondPrompt);
+        var firstInput = Logger.Prompt(firstPrompt);
+        var secondInput = Logger.Prompt(secondPrompt);
 
         if (firstInput.Equals(secondInput, StringComparison.Ordinal))
         {
@@ -98,7 +97,7 @@ public class PopulateInputsAction(
             return;
         }
 
-        console.MarkupLine("[red]The values do not match. Please try again.[/]");
+        Logger.MarkupLine("[red]The values do not match. Please try again.[/]");
         HandleSetInput(input, componentWithInput);
     }
 
@@ -112,11 +111,11 @@ public class PopulateInputsAction(
 
         foreach (var input in generatedInputs)
         {
-            console.WriteLine();
+            Logger.WriteLine();
             var minimumLength = input.Value.Default?.Generate?.MinLength ?? 16;
             input.Value.Value = passwordGenerator.Generate(minimumLength);
 
-            console.MarkupLine($"Successfully [green]generated[/] a value for [blue]{componentWithInput.Name}'s[/] Input Value [blue]'{input.Key}'[/]");
+            Logger.MarkupLine($"Successfully [green]generated[/] a value for [blue]{componentWithInput.Name}'s[/] Input Value [blue]'{input.Key}'[/]");
         }
     }
 

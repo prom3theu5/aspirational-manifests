@@ -42,6 +42,7 @@ public class SaveSecretsAction(
             var secretsAction = console.Prompt(
                 new SelectionPrompt<string>()
                     .Title("Select the action for the existing secrets...")
+                    .HighlightStyle("blue")
                     .PageSize(3)
                     .AddChoices(UseExisting, Augment, Overwrite));
 

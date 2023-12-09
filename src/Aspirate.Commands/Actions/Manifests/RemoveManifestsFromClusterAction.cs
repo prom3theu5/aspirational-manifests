@@ -1,36 +1,75 @@
 namespace Aspirate.Commands.Actions.Manifests;
 
-public sealed class RemoveManifestsFromClusterAction(IKubeCtlService kubeCtlService, IServiceProvider serviceProvider) :
+public sealed class RemoveManifestsFromClusterAction(
+    IKubeCtlService kubeCtlService,
+    IServiceProvider serviceProvider,
+    IFileSystem fileSystem,
+    ISecretProvider secretProvider) :
     BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public override async Task<bool> ExecuteAsync()
     {
-        if (!CurrentState.NonInteractive)
+        var secretFiles = new List<string>();
+
+        try
         {
-
-            Logger.WriteLine();
-            var shouldDeploy = Logger.Confirm(
-                "[bold]Would you like to remove the deployed manifests from a kubernetes cluster defined in your kubeconfig file?[/]");
-
-            if (!shouldDeploy)
+            if (!CurrentState.NonInteractive)
             {
-                Logger.MarkupLine("[yellow]Cancelled![/]");
 
-                return true;
+                Logger.WriteLine();
+                var shouldDeploy = Logger.Confirm(
+                    "[bold]Would you like to remove the deployed manifests from a kubernetes cluster defined in your kubeconfig file?[/]");
+
+                if (!shouldDeploy)
+                {
+                    Logger.MarkupLine("[yellow]Cancelled![/]");
+
+                    return true;
+                }
+
+                CurrentState.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
+
+                if (!CurrentState.ActiveKubernetesContextIsSet)
+                {
+                    return false;
+                }
             }
 
-            CurrentState.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
+            CreateEmptySecretFiles(secretFiles);
+            await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
+            Logger.MarkupLine(
+                $"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
 
-            if (!CurrentState.ActiveKubernetesContextIsSet)
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.MarkupLine("[red](!)[/] Failed to remove manifests from cluster.");
+            Logger.MarkupLine($"[red](!)[/] Error: {e.Message}");
+            return false;
+        }
+        finally
+        {
+            CleanupSecretEnvFiles(secretFiles);
+        }
+    }
+
+    private void CreateEmptySecretFiles(List<string> files)
+    {
+        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+        {
+            passwordSecretProvider.LoadState(CurrentState.InputPath);
+
+            foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x=>x.Value.Keys.Count > 0))
             {
-                return false;
+                var secretFile = fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
+
+                files.Add(secretFile);
+
+                var stream = fileSystem.File.Create(secretFile);
+                stream.Close();
             }
         }
-
-        await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
-
-        return true;
     }
 
     public override void ValidateNonInteractiveState()
@@ -43,6 +82,14 @@ public sealed class RemoveManifestsFromClusterAction(IKubeCtlService kubeCtlServ
         if (string.IsNullOrEmpty(CurrentState.InputPath))
         {
             NonInteractiveValidationFailed("Cannot remove manifests from a cluster without specifying the input path to use for manifests.");
+        }
+    }
+
+    private void CleanupSecretEnvFiles(IEnumerable<string> secretFiles)
+    {
+        foreach (var secretFile in secretFiles.Where(secretFile => fileSystem.File.Exists(secretFile)))
+        {
+            fileSystem.File.Delete(secretFile);
         }
     }
 }

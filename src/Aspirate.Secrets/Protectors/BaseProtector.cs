@@ -22,6 +22,7 @@ public abstract class BaseProtector(ISecretProvider secretProvider, IAnsiConsole
             var secretAction = console.Prompt(
                 new SelectionPrompt<string>()
                     .Title("Select the action for the secret...")
+                    .HighlightStyle("blue")
                     .PageSize(3)
                     .AddChoices(UseExisting, Replace));
 
