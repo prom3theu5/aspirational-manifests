@@ -35,5 +35,5 @@ public interface IContainerCompositionService
     /// It then pushes the created image to the specified registry.
     /// The nonInteractive parameter can be set to true to suppress any interactive prompts during the build process.
     /// </remarks>
-    Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string registry, bool nonInteractive);
+    Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string? registry, bool nonInteractive);
 }

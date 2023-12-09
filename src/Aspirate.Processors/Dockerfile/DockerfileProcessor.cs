@@ -22,6 +22,8 @@ public class DockerfileProcessor(
         $"{TemplateLiterals.ServiceType}.yml",
     ];
 
+    private readonly StringBuilder _tagBuilder = new();
+
     private readonly Dictionary<string, string> _containerImageCache = [];
 
     /// <inheritdoc />
@@ -45,8 +47,8 @@ public class DockerfileProcessor(
         }
 
         var data = disableSecrets is false
-            ? HandleWithSecrets(resource, containerImage, containerPorts)
-            : HandleDisabledSecrets(resource, containerImage, containerPorts);
+            ? HandleWithSecrets(resource, containerImage, containerPorts, imagePullPolicy)
+            : HandleDisabledSecrets(resource, containerImage, containerPorts, imagePullPolicy);
 
         CreateDeployment(resourceOutputPath, data, templatePath);
         CreateService(resourceOutputPath, data, templatePath);
@@ -57,7 +59,8 @@ public class DockerfileProcessor(
         return Task.FromResult(true);
     }
 
-    private DockerfileTemplateData HandleWithSecrets(KeyValuePair<string, Resource> resource, string containerImage, List<Ports> containerPorts)
+    private DockerfileTemplateData HandleWithSecrets(KeyValuePair<string, Resource> resource, string containerImage,
+        List<Ports> containerPorts, string imagePullPolicy)
     {
         var envVars = GetFilteredEnvironmentalVariables(resource.Value);
         var secrets = GetSecretEnvironmentalVariables(resource.Value);
@@ -70,24 +73,37 @@ public class DockerfileProcessor(
             envVars,
             secrets,
             containerPorts,
-            _manifests);
+            _manifests,
+            imagePullPolicy);
     }
 
-    private DockerfileTemplateData HandleDisabledSecrets(KeyValuePair<string, Resource> resource, string containerImage, List<Ports> containerPorts) =>
+    private DockerfileTemplateData HandleDisabledSecrets(KeyValuePair<string, Resource> resource, string containerImage,
+        List<Ports> containerPorts, string imagePullPolicy) =>
         new(resource.Key,
             containerImage,
             resource.Value.Env,
             null,
             containerPorts,
-            _manifests);
+            _manifests,
+            imagePullPolicy);
 
     public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, string builder, string imageName, string registry, bool nonInteractive)
     {
+        _tagBuilder.Clear();
+
+        if (!string.IsNullOrEmpty(registry))
+        {
+            _tagBuilder.Append($"{registry}/");
+        }
+
+        _tagBuilder.Append(imageName);
+        _tagBuilder.Append(":latest");
+
         var dockerfile = resource.Value as AspireDockerfile;
 
         await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, nonInteractive);
 
-        _containerImageCache.Add(resource.Key, $"{registry}/{imageName}:latest");
+        _containerImageCache.Add(resource.Key, _tagBuilder.ToString());
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for Dockerfile [blue]{resource.Key}[/]");
     }
