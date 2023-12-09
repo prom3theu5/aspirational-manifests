@@ -37,7 +37,8 @@ public static class ServiceCollectionExtensions
             .RegisterAction<RemoveManifestsFromClusterAction>()
             .RegisterAction<SubstituteValuesAspireManifestAction>()
             .RegisterAction<PopulateInputsAction>()
-            .RegisterAction<SaveSecretsAction>();
+            .RegisterAction<SaveSecretsAction>()
+            .RegisterAction<LoadSecretsAction>();
 
     /// <summary>
     /// Registers an implementation of <see cref="IAction"/> with the specified <typeparamref name="TImplementation"/> type.

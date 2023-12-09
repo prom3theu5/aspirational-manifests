@@ -7,15 +7,15 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
     protected const string DefaultContainerImageTag = "test-tag";
     protected const string DefaultTemplatePath = "/templates";
 
-    protected static AspirateState CreateAspirateState(
-        bool nonInteractive = false,
+    protected static AspirateState CreateAspirateState(bool nonInteractive = false,
         string? projectPath = DefaultProjectPath,
         string? containerRegistry = DefaultContainerRegistry,
         string? containerImageTag = DefaultContainerImageTag,
         string? templatePath = DefaultTemplatePath,
         string? aspireManifest = null,
         string? inputPath = null,
-        string? kubeContext = null)
+        string? kubeContext = null,
+        string? password = null)
     {
         var state = new AspirateState
         {
@@ -25,6 +25,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
             TemplatePath = templatePath,
             InputPath = inputPath,
             KubeContext = kubeContext,
+            SecretPassword = password,
         };
 
         if (!string.IsNullOrEmpty(projectPath))
@@ -88,7 +89,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         return state;
     }
 
-    protected AspirateState CreateAspirateStateWithConnectionStrings()
+    protected AspirateState CreateAspirateStateWithConnectionStrings(bool nonInteractive = false, string? password = null)
     {
         var postgres = CreatePostgresContainerResourceManualInput("postgrescontainer");
         var postgresTwo = CreatePostgresContainerResourceManualInput("postgrescontainer2");
@@ -109,7 +110,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
             ["ConnectionString_Test"] = "some_secret_value",
         };
 
-        var state = CreateAspirateState(nonInteractive: false);
+        var state = CreateAspirateState(nonInteractive: nonInteractive, password: password);
         state.LoadedAspireManifestResources = resources;
         state.AspireComponentsToProcess = resources.Keys.ToList();
 

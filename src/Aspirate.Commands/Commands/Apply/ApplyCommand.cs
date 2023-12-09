@@ -6,5 +6,6 @@ public sealed class ApplyCommand : BaseCommand<ApplyOptions, ApplyCommandHandler
     {
         AddOption(SharedOptions.ManifestDirectoryPath);
         AddOption(SharedOptions.KubernetesContext);
+        AddOption(SharedOptions.SecretPassword);
     }
 }

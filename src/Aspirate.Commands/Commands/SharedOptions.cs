@@ -30,6 +30,13 @@ public static class SharedOptions
         IsRequired = false,
     };
 
+    public static Option<string> SecretPassword => new(new[] { "--secret-password" })
+    {
+        Description = "The Secret Password to use.",
+        Arity = ArgumentArity.ExactlyOne,
+        IsRequired = false,
+    };
+
     public static Option<string> ContainerRegistry => new(new[] {"-cr", "--container-registry" })
     {
         Description = "The Container Registry to use as the fall-back value for all containers.",

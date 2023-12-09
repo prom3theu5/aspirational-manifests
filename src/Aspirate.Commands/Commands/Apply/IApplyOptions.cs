@@ -9,4 +9,5 @@ public interface IApplyOptions
     bool NonInteractive { get; set; }
 
     ProviderType SecretProvider { get; set; }
+    string? SecretPassword { get; set; }
 }

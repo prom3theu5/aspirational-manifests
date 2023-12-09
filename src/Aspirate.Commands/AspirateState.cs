@@ -62,6 +62,8 @@ public class AspirateState :
 
     public string? Hash { get; set; }
 
+    public string? SecretPassword { get; set; }
+
     [JsonIgnore]
     public List<string> AspireComponentsToProcess { get; set; } = [];
 
