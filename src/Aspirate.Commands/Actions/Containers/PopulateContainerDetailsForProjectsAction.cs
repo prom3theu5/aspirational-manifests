@@ -19,7 +19,7 @@ public sealed class PopulateContainerDetailsForProjectsAction(
 
     private async Task HandleProjects()
     {
-        var projectProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Project) as ProjectProcessor;
+        var projectProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
 
         Logger.MarkupLine("\r\n[bold]Gathering container details for each project in selected components[/]\r\n");
 

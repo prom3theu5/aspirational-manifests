@@ -134,18 +134,27 @@ public class ManifestFileParserServiceTest
         var result = state.LoadedAspireManifestResources;
 
         // Assert
-        result.Should().HaveCount(8);
+        result.Should().HaveCount(10);
         result["postgres"].Should().BeOfType<PostgresServer>();
+
         result["sqlserver"].Should().BeOfType<SqlServer>();
         result["sqlserver"].Env["SaPassword"].Should().NotBeNull().And.NotBeEmpty();
         result["sqldb"].Should().BeOfType<SqlServerDatabase>();
+
+        result["mysqlserver"].Should().BeOfType<MySqlServer>();
+        result["mysqlserver"].Env["RootPassword"].Should().NotBeNull().And.NotBeEmpty();
+        result["mysqldb"].Should().BeOfType<MySqlDatabase>();
+
         result["catalogdb"].Should().BeOfType<PostgresDatabase>();
+
         result["basketcache"].Should().BeOfType<Redis>();
+
         result["catalogservice"].Should().BeOfType<Project>();
         result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
         result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
         result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
         result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
+
         result["anotherservice"].Should().BeOfType<Project>();
         result["anotherservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
         result["anotherservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");

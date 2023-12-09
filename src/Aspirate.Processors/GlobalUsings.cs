@@ -6,6 +6,7 @@ global using System.Text.RegularExpressions;
 global using Aspirate.Processors.Container;
 global using Aspirate.Processors.Dockerfile;
 global using Aspirate.Processors.Final;
+global using Aspirate.Processors.MySql;
 global using Aspirate.Processors.Postgresql;
 global using Aspirate.Processors.Project;
 global using Aspirate.Processors.RabbitMQ;

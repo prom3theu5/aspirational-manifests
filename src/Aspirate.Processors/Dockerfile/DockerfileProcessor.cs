@@ -14,7 +14,7 @@ public class DockerfileProcessor(
         : BaseProcessor<DockerfileTemplateData>(fileSystem, console)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireLiterals.Dockerfile;
+    public override string ResourceType => AspireComponentLiterals.Dockerfile;
 
     private readonly IReadOnlyCollection<string> _manifests =
     [

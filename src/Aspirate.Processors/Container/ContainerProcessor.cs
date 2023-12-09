@@ -14,7 +14,7 @@ public class ContainerProcessor(
         : BaseProcessor<ContainerTemplateData>(fileSystem, console)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireLiterals.Container;
+    public override string ResourceType => AspireComponentLiterals.Container;
 
     private readonly IReadOnlyCollection<string> _manifests =
     [

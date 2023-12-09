@@ -16,7 +16,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             return true;
         }
 
-        var dockerfileProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Dockerfile) as DockerfileProcessor;
+        var dockerfileProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireComponentLiterals.Dockerfile) as DockerfileProcessor;
 
         Logger.MarkupLine("\r\n[bold]Building all dockerfile resources, and pushing containers:[/]\r\n");
 

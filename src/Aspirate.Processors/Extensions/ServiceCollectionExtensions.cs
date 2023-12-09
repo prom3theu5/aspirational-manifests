@@ -11,15 +11,17 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The service collection to add the processors to.</param>
     public static void AddAspirateProcessors(this IServiceCollection services) =>
         services
-            .RegisterProcessor<PostgresServerProcessor>(AspireLiterals.PostgresServer)
-            .RegisterProcessor<PostgresDatabaseProcessor>(AspireLiterals.PostgresDatabase)
-            .RegisterProcessor<ProjectProcessor>(AspireLiterals.Project)
-            .RegisterProcessor<DockerfileProcessor>(AspireLiterals.Dockerfile)
-            .RegisterProcessor<RedisProcessor>(AspireLiterals.Redis)
-            .RegisterProcessor<RabbitMqProcessor>(AspireLiterals.RabbitMq)
-            .RegisterProcessor<ContainerProcessor>(AspireLiterals.Container)
-            .RegisterProcessor<SqlServerProcessor>(AspireLiterals.SqlServer)
-            .RegisterProcessor<SqlServerDatabaseProcessor>(AspireLiterals.SqlServerDatabase)
+            .RegisterProcessor<PostgresServerProcessor>(AspireComponentLiterals.PostgresServer)
+            .RegisterProcessor<PostgresDatabaseProcessor>(AspireComponentLiterals.PostgresDatabase)
+            .RegisterProcessor<ProjectProcessor>(AspireComponentLiterals.Project)
+            .RegisterProcessor<DockerfileProcessor>(AspireComponentLiterals.Dockerfile)
+            .RegisterProcessor<RedisProcessor>(AspireComponentLiterals.Redis)
+            .RegisterProcessor<RabbitMqProcessor>(AspireComponentLiterals.RabbitMq)
+            .RegisterProcessor<ContainerProcessor>(AspireComponentLiterals.Container)
+            .RegisterProcessor<SqlServerProcessor>(AspireComponentLiterals.SqlServer)
+            .RegisterProcessor<SqlServerDatabaseProcessor>(AspireComponentLiterals.SqlServerDatabase)
+            .RegisterProcessor<MySqlServerProcessor>(AspireComponentLiterals.MySqlServer)
+            .RegisterProcessor<MySqlDatabaseProcessor>(AspireComponentLiterals.MySqlDatabase)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
 
     /// <summary>

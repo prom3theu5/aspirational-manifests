@@ -6,6 +6,9 @@
       "sqlserver": {
         "type": "sqlserver.server.v1"
       },
+      "mysqlserver": {
+        "type": "mysql.server.v0"
+      },
       "catalogdb": {
         "type": "postgres.database.v0",
         "parent": "postgres"
@@ -13,6 +16,10 @@
       "sqldb": {
         "type": "sqlserver.database.v1",
         "parent": "sqlserver"
+      },
+      "mysqldb": {
+        "type": "mysql.database.v0",
+        "parent": "mysqlserver"
       },
       "basketcache": {
         "type": "redis.v0"
