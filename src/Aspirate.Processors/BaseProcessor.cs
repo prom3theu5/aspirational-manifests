@@ -40,6 +40,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         [AspireLiterals.PostgresDatabase] = (resourceName, resources) => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
         [AspireLiterals.Container] = (resourceName, resources) => ReplaceConnectionStringPlaceholders(resources[resourceName] as AspireContainer, resources),
         [AspireLiterals.RabbitMq] = (resourceName, resources) => "amqp://guest:guest@rabbitmq-service:5672",
+        [AspireLiterals.SqlServer] = (resourceName, resources) => $"Server=sqlserver-service,1433;User ID=sa;Password={resources[resourceName].Env["SaPassword"]};TrustServerCertificate=true;",
     };
 
     /// <summary>
@@ -57,7 +58,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     /// </summary>
     private readonly List<string> _protectedEnvVars =
     [
-        "ConnectionString",
+        ProtectableLiterals.ConnectionString,
     ];
 
     /// <summary>
@@ -69,6 +70,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         [TemplateLiterals.ServiceType] = $"{TemplateLiterals.ServiceType}.hbs",
         [TemplateLiterals.ComponentKustomizeType] = $"{TemplateLiterals.ComponentKustomizeType}.hbs",
         [TemplateLiterals.RedisType] = $"{TemplateLiterals.RedisType}.hbs",
+        [TemplateLiterals.SqlServerType] = $"{TemplateLiterals.SqlServerType}.hbs",
         [TemplateLiterals.RabbitMqType] = $"{TemplateLiterals.RabbitMqType}.hbs",
         [TemplateLiterals.PostgresServerType] = $"{TemplateLiterals.PostgresServerType}.hbs",
     };

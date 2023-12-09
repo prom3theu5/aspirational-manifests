@@ -10,6 +10,8 @@ public static class AspireLiterals
     public const string Container = "container.v0";
     public const string Redis = "redis.v0";
     public const string RabbitMq = "rabbitmq.server.v0";
+    public const string SqlServer = "sqlserver.server.v1";
+    public const string SqlServerDatabase = "sqlserver.database.v1";
     public const string Final = "final";
     public const string DefaultManifestFile = "manifest.json";
     public const string ManifestPublisherArgument = "manifest";

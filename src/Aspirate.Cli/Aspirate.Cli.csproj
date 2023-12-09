@@ -42,6 +42,9 @@
 
   <ItemGroup>
     <None Include="nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+    <None Update="Templates\sqlserver.hbs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

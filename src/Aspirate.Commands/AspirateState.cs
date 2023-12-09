@@ -1,3 +1,5 @@
+using Aspirate.Shared.Models.AspireManifests.Components.V1;
+
 namespace Aspirate.Commands;
 
 public class AspirateState :
@@ -104,5 +106,5 @@ public class AspirateState :
         FinalResources.Add(key, resource);
 
     public bool IsDatabase(Resource resource) =>
-        resource is PostgresDatabase;
+        resource is PostgresDatabase or SqlServerDatabase;
 }
