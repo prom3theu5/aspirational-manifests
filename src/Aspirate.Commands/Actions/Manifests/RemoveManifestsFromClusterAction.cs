@@ -61,9 +61,19 @@ public sealed class RemoveManifestsFromClusterAction(
             return;
         }
 
+        if (!secretProvider.SecretStateExists(CurrentState.InputPath))
+        {
+            return;
+        }
+
         if (secretProvider is PasswordSecretProvider passwordSecretProvider)
         {
             passwordSecretProvider.LoadState(CurrentState.InputPath);
+
+            if (passwordSecretProvider.State?.Secrets is null || passwordSecretProvider.State.Secrets.Count == 0)
+            {
+                return;
+            }
 
             foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x=>x.Value.Keys.Count > 0))
             {

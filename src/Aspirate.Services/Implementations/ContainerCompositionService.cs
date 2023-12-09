@@ -30,11 +30,20 @@ public sealed class ContainerCompositionService(
         return true;
     }
 
-    public async Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string registry, bool nonInteractive)
+    public async Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string? registry, bool nonInteractive)
     {
+        var tagBuilder = new StringBuilder();
         var fullDockerfilePath = filesystem.GetFullPath(dockerfile.Path);
 
-        var tag = $"{registry}/{imageName}:latest";
+        if (!string.IsNullOrEmpty(registry))
+        {
+            tagBuilder.Append($"{registry}/");
+        }
+
+        tagBuilder.Append(imageName);
+        tagBuilder.Append(":latest");
+
+        var tag = tagBuilder.ToString();
 
         var argumentsBuilder = ArgumentsBuilder
             .Create()
@@ -51,17 +60,19 @@ public sealed class ContainerCompositionService(
             ShowOutput = true,
         });
 
-        argumentsBuilder.Clear()
-            .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
-            .AppendArgument(tag, string.Empty, quoteValue: false);
-
-        await shellExecutionService.ExecuteCommand(new()
+        if (!string.IsNullOrEmpty(registry))
         {
-            Command = builder,
-            ArgumentsBuilder = argumentsBuilder,
-            NonInteractive = nonInteractive,
-            ShowOutput = true,
-        });
+
+            argumentsBuilder.Clear()
+                .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
+                .AppendArgument(tag, string.Empty, quoteValue: false);
+
+            await shellExecutionService.ExecuteCommand(
+                new()
+                {
+                    Command = builder, ArgumentsBuilder = argumentsBuilder, NonInteractive = nonInteractive, ShowOutput = true,
+                });
+        }
 
         return true;
     }
