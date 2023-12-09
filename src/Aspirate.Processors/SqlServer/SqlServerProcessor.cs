@@ -8,7 +8,7 @@ public sealed class SqlServerProcessor(IFileSystem fileSystem, IAnsiConsole cons
     ];
 
     /// <inheritdoc />
-    public override string ResourceType => AspireLiterals.SqlServer;
+    public override string ResourceType => AspireComponentLiterals.SqlServer;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader)

@@ -12,7 +12,7 @@ public class ProjectProcessor(
         : BaseProcessor<ProjectTemplateData>(fileSystem, console)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireLiterals.Project;
+    public override string ResourceType => AspireComponentLiterals.Project;
 
     private readonly IReadOnlyCollection<string> _manifests =
     [

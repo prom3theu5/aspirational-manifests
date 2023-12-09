@@ -8,7 +8,7 @@ namespace Aspirate.Processors.SqlServer;
 public class SqlServerDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole console) : BaseProcessor<SqlServerDatabaseTemplateData>(fileSystem, console)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireLiterals.SqlServerDatabase;
+    public override string ResourceType => AspireComponentLiterals.SqlServerDatabase;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>

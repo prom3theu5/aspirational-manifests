@@ -15,7 +15,7 @@ public class ContainerProcessorTests
 
         var resource = new Container
         {
-            Type = AspireLiterals.Container,
+            Type = AspireComponentLiterals.Container,
             ConnectionString = "Host={postgrescontainer.bindings.tcp.host};Port={postgrescontainer.bindings.tcp.port};Username=postgres;Password={postgrescontainer.inputs.password}",
             Inputs = new()
             {

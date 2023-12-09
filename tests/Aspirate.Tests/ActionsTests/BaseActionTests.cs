@@ -119,7 +119,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         var postgres = new Container
         {
             Name = resourceName,
-            Type = AspireLiterals.Container,
+            Type = AspireComponentLiterals.Container,
             Image = "postgres:latest",
             ConnectionString = $"Host={{{resourceName}.bindings.tcp.host}};Port={{{resourceName}.bindings.tcp.port}};Username=postgres;Password={{{resourceName}.inputs.password}}",
             Bindings = new()

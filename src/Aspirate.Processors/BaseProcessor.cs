@@ -36,11 +36,12 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     /// </returns>
     private readonly Dictionary<string, Func<string, Dictionary<string, Resource>, string>> _typeHandlers = new()
     {
-        [AspireLiterals.Redis] = (resourceName, resources) => "redis",
-        [AspireLiterals.PostgresDatabase] = (resourceName, resources) => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
-        [AspireLiterals.Container] = (resourceName, resources) => ReplaceConnectionStringPlaceholders(resources[resourceName] as AspireContainer, resources),
-        [AspireLiterals.RabbitMq] = (resourceName, resources) => "amqp://guest:guest@rabbitmq-service:5672",
-        [AspireLiterals.SqlServer] = (resourceName, resources) => $"Server=sqlserver-service,1433;User ID=sa;Password={resources[resourceName].Env["SaPassword"]};TrustServerCertificate=true;",
+        [AspireComponentLiterals.Redis] = (_, _) => "redis",
+        [AspireComponentLiterals.PostgresDatabase] = (resourceName, _) => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
+        [AspireComponentLiterals.Container] = (resourceName, resources) => ReplaceConnectionStringPlaceholders(resources[resourceName] as AspireContainer, resources),
+        [AspireComponentLiterals.RabbitMq] = (_, _) => "amqp://guest:guest@rabbitmq-service:5672",
+        [AspireComponentLiterals.SqlServer] = (resourceName, resources) => $"Server=sqlserver-service,1433;User ID=sa;Password={resources[resourceName].Env["SaPassword"]};TrustServerCertificate=true;",
+        [AspireComponentLiterals.MySqlServer] = (resourceName, resources) => $"Server=mysql-service;Port=3306;User ID=root;Password={resources[resourceName].Env["RootPassword"]};",
     };
 
     /// <summary>
@@ -71,6 +72,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         [TemplateLiterals.ComponentKustomizeType] = $"{TemplateLiterals.ComponentKustomizeType}.hbs",
         [TemplateLiterals.RedisType] = $"{TemplateLiterals.RedisType}.hbs",
         [TemplateLiterals.SqlServerType] = $"{TemplateLiterals.SqlServerType}.hbs",
+        [TemplateLiterals.MysqlServerType] = $"{TemplateLiterals.MysqlServerType}.hbs",
         [TemplateLiterals.RabbitMqType] = $"{TemplateLiterals.RabbitMqType}.hbs",
         [TemplateLiterals.PostgresServerType] = $"{TemplateLiterals.PostgresServerType}.hbs",
     };

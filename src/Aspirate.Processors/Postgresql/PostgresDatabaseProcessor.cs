@@ -6,7 +6,7 @@ namespace Aspirate.Processors.Postgresql;
 public class PostgresDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole console) : BaseProcessor<PostgresDatabaseTemplateData>(fileSystem, console)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireLiterals.PostgresDatabase;
+    public override string ResourceType => AspireComponentLiterals.PostgresDatabase;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
