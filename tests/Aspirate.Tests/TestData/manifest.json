@@ -3,9 +3,16 @@
       "postgres": {
         "type": "postgres.server.v0"
       },
+      "sqlserver": {
+        "type": "sqlserver.server.v1"
+      },
       "catalogdb": {
         "type": "postgres.database.v0",
         "parent": "postgres"
+      },
+      "sqldb": {
+        "type": "sqlserver.database.v1",
+        "parent": "sqlserver"
       },
       "basketcache": {
         "type": "redis.v0"

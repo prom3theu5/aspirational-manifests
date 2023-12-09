@@ -18,6 +18,8 @@ public static class ServiceCollectionExtensions
             .RegisterProcessor<RedisProcessor>(AspireLiterals.Redis)
             .RegisterProcessor<RabbitMqProcessor>(AspireLiterals.RabbitMq)
             .RegisterProcessor<ContainerProcessor>(AspireLiterals.Container)
+            .RegisterProcessor<SqlServerProcessor>(AspireLiterals.SqlServer)
+            .RegisterProcessor<SqlServerDatabaseProcessor>(AspireLiterals.SqlServerDatabase)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
 
     /// <summary>
