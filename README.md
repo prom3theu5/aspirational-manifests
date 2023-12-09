@@ -6,15 +6,21 @@
 <https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
 
 # Table of Contents
-1. [To Install as a global tool](#to-install-as-a-global-tool)
+1. [Installation as a global tool](#to-install-as-a-global-tool)
 2. [ContainerRegistry](#containerregistry)
-3. [Producing Manifests](#producing-manifests)
-4. [Build](#build)
-5. [Apply Manifests](#apply-manifests)
-6. [Remove Manifests](#remove-manifests)
-7. [Non-Interactive Invocation](#non-interactive-invocation)
-8. [Uninstall tool](#uninstall-tool)
-9. [Configuring the Windows Terminal For Unicode and Emoji Support](#configuring-the-windows-terminal-for-unicode-and-emoji-support)
+3. [Secrets Management](#secrets-management)
+    - [Managing Secrets](#managing-secrets)
+    - [Secrets File Contents](#secrets-file-contents)
+    - [Generating Secrets](#generating-secrets)
+    - [Applying Secrets](#applying-secrets)
+    - [Disabling Secret Management](#disabling-secret-management)
+4. [Producing Manifests](#producing-manifests)
+5. [Build](#build)
+6. [Apply Manifests](#apply-manifests)
+7. [Remove Manifests](#remove-manifests)
+8. [Non-Interactive Invocation](#non-interactive-invocation)
+9. [Uninstall tool](#uninstall-tool)
+10. [Configuring the Windows Terminal For Unicode and Emoji Support](#configuring-the-windows-terminal-for-unicode-and-emoji-support)
 
 ## To Install as a global tool
 
@@ -42,6 +48,33 @@ aspirate init
 ```
 
 from within your AppHost directory - and it'll ask you which settings you'd like to override.
+
+## Secrets Management
+
+Aspirate now includes built-in support for robust secret management, allowing you to easily encrypt sensitive data such as connection strings. This feature is designed to increase security and minimize vulnerabilities.
+
+### Managing Secrets
+
+During the `generate` and `apply` processes, you will be prompted to input a password.
+This password is used to encrypt your secrets in the secrets file, named `aspirate-secrets.json`, located in the `aspirate-output` directory.
+
+### Secrets File Contents
+
+The secrets file contains your encrypted secrets and is safe to commit to your Git repository.
+However, please handle this password with care. If it's lost, you'll be unable to access your encrypted secrets and you will need to use the `generate` command to create a new one.
+
+### Generating Secrets
+
+The `generate` command provides an interactive menu during the generation process that allows you to use existing secrets, overwrite them, or update them.
+
+### Applying Secrets
+
+The `apply` command will decrypt the secrets file and apply the secrets to the cluster, along with all the manifests.
+
+### Disabling Secret Management
+
+If secrets are not required, the `--disable-secrets` flag can be passed to all commands to disable secret functionality.
+However, once manifests are generated with secrets included, they cannot be disabled without regenerating the manifests.
 
 ## Producing Manifests
 
