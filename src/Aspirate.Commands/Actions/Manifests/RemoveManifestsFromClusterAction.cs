@@ -28,7 +28,7 @@ public sealed class RemoveManifestsFromClusterAction(IKubeCtlService kubeCtlServ
         }
 
         await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
-        Logger.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
+        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
 
         return true;
     }

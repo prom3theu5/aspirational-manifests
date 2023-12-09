@@ -8,6 +8,7 @@ namespace Aspirate.Processors.Dockerfile;
 public class DockerfileProcessor(
     IFileSystem fileSystem,
     IAnsiConsole console,
+    ISecretProvider secretProvider,
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService)
         : BaseProcessor<DockerfileTemplateData>(fileSystem, console)
@@ -42,10 +43,16 @@ public class DockerfileProcessor(
             throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
         }
 
+        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
+        var secrets = GetSecretEnvironmentalVariables(resource.Value);
+
+        SetSecretsFromSecretState(secrets, resource, secretProvider);
+
         var data = new DockerfileTemplateData(
             resource.Key,
             containerImage,
-            dockerFile.Env,
+            envVars,
+            secrets,
             containerPorts,
             _manifests);
 
@@ -66,7 +73,7 @@ public class DockerfileProcessor(
 
         _containerImageCache.Add(resource.Key, $"{registry}/{imageName}:latest");
 
-        _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for Dockerfile [blue]{resource.Key}[/]");
+        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for Dockerfile [blue]{resource.Key}[/]");
     }
 }
 

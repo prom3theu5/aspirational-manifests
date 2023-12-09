@@ -6,6 +6,7 @@ namespace Aspirate.Processors.Project;
 public class ProjectProcessor(
     IFileSystem fileSystem,
     IAnsiConsole console,
+    ISecretProvider secretProvider,
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService)
         : BaseProcessor<ProjectTemplateData>(fileSystem, console)
@@ -31,17 +32,21 @@ public class ProjectProcessor(
 
         EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var project = resource.Value as AspireProject;
-
         if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
         {
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
+        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
+        var secrets = GetSecretEnvironmentalVariables(resource.Value);
+
+        SetSecretsFromSecretState(secrets, resource, secretProvider);
+
         var data = new ProjectTemplateData(
             resource.Key,
             containerDetails.FullContainerImage,
-            project.Env,
+            envVars,
+            secrets,
             _manifests,
             imagePullPolicy);
 
@@ -65,7 +70,7 @@ public class ProjectProcessor(
 
         await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, nonInteractive);
 
-        _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
+        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }
 
     public async Task PopulateContainerDetailsCacheForProject(
@@ -84,7 +89,7 @@ public class ProjectProcessor(
             throw new InvalidOperationException($"Failed to add container details for project {resource.Key} to cache.");
         }
 
-        _console.MarkupLine($"\t[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
+        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
     }
 }
 

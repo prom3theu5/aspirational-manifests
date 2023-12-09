@@ -26,7 +26,7 @@ public sealed class ApplyManifestsToClusterAction(IKubeCtlService kubeCtlService
         }
 
         await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
-        Logger.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
+        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
 
         return true;
     }

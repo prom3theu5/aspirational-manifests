@@ -3,36 +3,60 @@ namespace Aspirate.Commands.Actions.Secrets;
 public class SaveSecretsAction(
     IAnsiConsole console,
     ISecretProvider secretProvider,
-    IServiceProvider serviceProvider) : BaseAction(serviceProvider)
+    IServiceProvider serviceProvider,
+    IEnumerable<ISecretProtectionStrategy> protectionStrategies) : BaseAction(serviceProvider)
 {
+    private const string UseExisting = "Use Existing";
+    private const string Augment = "Augment by adding / replacing values";
+    private const string Overwrite = "Overwrite / Create new Password";
+
+    private IReadOnlyCollection<ISecretProtectionStrategy> ProtectionStrategies { get; } = protectionStrategies.ToList();
+
     public override Task<bool> ExecuteAsync()
     {
+        if (!ProtectionStrategies.CheckForProtectableSecrets(CurrentState.AllSelectedSupportedComponents))
+        {
+            console.MarkupLine("No secrets to protect in any [blue]selected components[/]");
+
+            return Task.FromResult(true);
+        }
+
         if (secretProvider.SecretStateExists(CurrentState.OutputPath))
         {
-            console.MarkupLine($"[yellow]Secrets for provider {secretProvider.Type} already exist[/]");
+            console.MarkupLine("Aspirate Secrets [blue]already exist[/] for manifest.");
 
             secretProvider.LoadState(CurrentState.OutputPath);
 
             if (secretProvider is PasswordSecretProvider passwordSecretProvider)
             {
-                var correctPassword = CheckPassword(passwordSecretProvider);
+                var (correctPassword, password) = CheckPassword(passwordSecretProvider);
                 if (!correctPassword)
                 {
                     console.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
                     throw new ActionCausesExitException(1);
                 }
+
+                passwordSecretProvider.SetPassword(password!);
             }
 
-            if (AskIfShouldUseExisting(plural: true))
-            {
-                console.MarkupLine($"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/]");
-                return Task.FromResult(true);
-            }
+            var secretsAction = console.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Select the action for the existing secrets...")
+                    .PageSize(3)
+                    .AddChoices(UseExisting, Augment, Overwrite));
 
-            if (!AskIfShouldOverwrite(plural: true, defaultValue: false))
+            switch (secretsAction)
             {
-                console.MarkupLine("[red]Aborting due to inability to modify secrets.[/]");
-                throw new ActionCausesExitException(1);
+                case UseExisting:
+                    console.MarkupLine($"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/]");
+                    return Task.FromResult(true);
+                case Augment:
+                    console.MarkupLine($"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/] and augmenting with new values.");
+                    break;
+                case Overwrite:
+                    console.MarkupLine($"[yellow]Overwriting[/] secrets for provider [blue]{secretProvider.Type}[/]");
+                    secretProvider.RemoveState(CurrentState.OutputPath);
+                    break;
             }
         }
 
@@ -40,8 +64,6 @@ public class SaveSecretsAction(
         {
             HandleInitialisation();
         }
-
-        console.MarkupLine($"Saving secrets for provider [blue]{secretProvider.Type}[/]");
 
         foreach (var component in CurrentState.AllSelectedSupportedComponents.Where(component => !secretProvider.ResourceExists(component.Key)))
         {
@@ -55,38 +77,20 @@ public class SaveSecretsAction(
                 continue;
             }
 
-            ProtectConnectionStrings(component);
+            foreach (var strategy in ProtectionStrategies)
+            {
+                strategy.ProtectSecrets(component);
+            }
         }
 
         secretProvider.SaveState(CurrentState.OutputPath);
 
-        console.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved to [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
+        console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved to [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
 
         return Task.FromResult(true);
     }
 
-    private void UpsertSecret(KeyValuePair<string, Resource> component, KeyValuePair<string, string> input)
-    {
-        if (secretProvider.SecretExists(component.Key, input.Key))
-        {
-            console.MarkupLine($"[yellow]Secret for {component.Key} {input.Key} already exists[/]");
 
-            if (AskIfShouldUseExisting())
-            {
-                return;
-            }
-
-            if (!AskIfShouldOverwrite())
-            {
-                console.MarkupLine("[red]Aborting due to inability to modify secret.[/]");
-                throw new ActionCausesExitException(1);
-            }
-
-            secretProvider.RemoveSecret(component.Key, input.Key);
-        }
-
-        secretProvider.AddSecret(component.Key, input.Key, input.Value);
-    }
 
     private void HandleInitialisation()
     {
@@ -103,10 +107,13 @@ public class SaveSecretsAction(
 
     private bool CreatePassword(PasswordSecretProvider passwordSecretProvider)
     {
-        for (int i = 0; i < 3; i++)
+        console.MarkupLine("Secrets are to be protected by a [green]password[/]");
+
+        for (int i = 3; i > 0; i--)
         {
+            console.WriteLine();
             var firstEntry = console.Prompt(
-                new TextPrompt<string>("Secrets are to be protected by a [green]password[/]. Please enter it now: ")
+                new TextPrompt<string>("Please enter new Password: ")
                     .PromptStyle("red")
                     .Secret());
 
@@ -115,55 +122,37 @@ public class SaveSecretsAction(
                     .PromptStyle("red")
                     .Secret());
 
-            if (firstEntry == secondEntry)
+            if (firstEntry.Equals(secondEntry, StringComparison.Ordinal))
             {
                 passwordSecretProvider.SetPassword(firstEntry);
                 return true;
             }
 
-            console.MarkupLine($"[red]Passwords do not match[/]. Please try again. You have [yellow]{3 - i} attempt{(i > 1 ? "s" : "")}[/] remaining.");
+            console.MarkupLine($"[red]Passwords do not match[/]. Please try again. You have [yellow]{i - 1} attempt{(i > 1 ? "s" : "")}[/] remaining.");
         }
 
         return false;
     }
 
-    private bool CheckPassword(PasswordSecretProvider passwordSecretProvider)
+    private (bool Success, string? Password) CheckPassword(PasswordSecretProvider passwordSecretProvider)
     {
-        for (int i = 0; i < 3; i++)
+        console.MarkupLine("Existing Secrets are protected by a [green]password[/].");
+
+        for (int i = 3; i > 0; i--)
         {
+            console.WriteLine();
             var password = console.Prompt(
-                new TextPrompt<string>("Secrets are protected by a [green]password[/]. Please enter it now: ").PromptStyle("red")
+                new TextPrompt<string>("Please enter it now to confirm secret actions: ").PromptStyle("red")
                     .Secret());
 
             if (passwordSecretProvider.CheckPassword(password))
             {
-                return true;
+                return (true, password);
             }
 
-            console.MarkupLine($"[red]Incorrect password[/]. Please try again. You have [yellow]{3 - i} attempt{(i > 1 ? "s" : "")}[/] remaining.");
+            console.MarkupLine($"[red]Incorrect password[/]. Please try again. You have [yellow]{i - 1} attempt{(i > 1 ? "s" : "")}[/] remaining.");
         }
 
-        return false;
+        return (false, null);
     }
-
-    private void ProtectConnectionStrings(KeyValuePair<string, Resource> component)
-    {
-        var connectionStrings = component.Value.Env?.Where(x => x.Key.StartsWith("ConnectionString", StringComparison.OrdinalIgnoreCase)).ToList();
-
-        if (connectionStrings.Count == 0)
-        {
-            return;
-        }
-
-        foreach (var input in connectionStrings)
-        {
-            UpsertSecret(component, input);
-        }
-    }
-
-    private bool AskIfShouldOverwrite(bool plural = false, bool defaultValue = true) =>
-        console.Confirm($"Do you want to [red]overwrite[/] {(plural ? "them" : "it")}?", defaultValue: defaultValue);
-
-    private bool AskIfShouldUseExisting(bool plural = false) =>
-        console.Confirm($"Do you want to use the [blue]existing[/] secret{(plural ? "s" : "")}?");
 }

@@ -1,3 +1,5 @@
+using Aspirate.Secrets.Literals;
+
 namespace Aspirate.Secrets;
 
 public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecretProvider where TState : BaseSecretState, new()
@@ -73,6 +75,23 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
 
         var stateJson = fileSystem.File.ReadAllText(inputFile);
         State = JsonSerializer.Deserialize<TState>(stateJson, _serializerOptions);
+
+        ProcessAfterStateRestoration();
+    }
+
+    public void RemoveState(string? path = null)
+    {
+        path ??= fileSystem.Directory.GetCurrentDirectory();
+        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
+
+        if (!fileSystem.File.Exists(inputFile))
+        {
+            throw new FileNotFoundException($"State file not found: {inputFile}");
+        }
+
+        fileSystem.File.Delete(inputFile);
+
+        State = null;
 
         ProcessAfterStateRestoration();
     }

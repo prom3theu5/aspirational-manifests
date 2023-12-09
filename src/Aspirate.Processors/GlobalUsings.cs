@@ -9,6 +9,7 @@ global using Aspirate.Processors.Postgresql;
 global using Aspirate.Processors.Project;
 global using Aspirate.Processors.RabbitMQ;
 global using Aspirate.Processors.Redis;
+global using Aspirate.Secrets.Services;
 global using Aspirate.Services.Interfaces;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Literals;

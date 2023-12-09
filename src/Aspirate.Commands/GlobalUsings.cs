@@ -21,6 +21,7 @@ global using Aspirate.Processors.Final;
 global using Aspirate.Processors.Project;
 global using Aspirate.Secrets;
 global using Aspirate.Secrets.Extensions;
+global using Aspirate.Secrets.Literals;
 global using Aspirate.Secrets.Providers;
 global using Aspirate.Secrets.Providers.Base64;
 global using Aspirate.Secrets.Providers.Password;

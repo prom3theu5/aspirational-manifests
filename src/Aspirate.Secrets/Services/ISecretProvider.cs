@@ -15,6 +15,7 @@ public interface ISecretProvider
     void RemoveSecret(string resourceName, string key);
     void SaveState(string? path = null);
     void LoadState(string? path = null);
+    void RemoveState(string? path = null);
     bool SecretStateExists(string? path = null);
     string? GetSecret(string resourceName, string key);
 }

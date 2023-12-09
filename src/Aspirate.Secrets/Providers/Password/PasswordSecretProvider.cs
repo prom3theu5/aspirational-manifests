@@ -55,17 +55,11 @@ public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider
 
         State ??= new();
 
-        if (!string.IsNullOrEmpty(State.Salt))
-        {
-            _salt = Convert.FromBase64String(State.Salt);
-        }
+        _salt = !string.IsNullOrEmpty(State.Salt) ? Convert.FromBase64String(State.Salt) : null;
     }
 
     private void CreateNewSalt()
     {
-        // in .net 8 - this is 96 bit (12 bytes) max it seems
-        // maybe because NIST recommends 96 bit IV for GCM to promote interoperability, efficiency, and simplicity of design on
-        // page 15 of https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf ??
         _salt = new byte[12];
         RandomNumberGenerator.Fill(_salt);
         State ??= new();

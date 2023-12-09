@@ -49,6 +49,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
     {
         var console = testConsole ?? new TestConsole();
         fileSystem ??= Substitute.For<IFileSystem>();
+        secretProvider ??= new Base64SecretProvider(fileSystem);
 
         var services = new ServiceCollection();
         services.RegisterAspirateEssential();
@@ -59,14 +60,10 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         services.RemoveAll<AspirateState>();
 
         services.AddSingleton<IFileSystem>(fileSystem);
+        services.AddSingleton<ISecretProvider>(secretProvider);
         services.AddSingleton<IAnsiConsole>(console);
         services.AddSingleton(state);
         services.AddSingleton(Substitute.For<IShellExecutionService>());
-
-        if (secretProvider is not null)
-        {
-            services.AddSingleton<ISecretProvider>(secretProvider);
-        }
 
         return services.BuildServiceProvider();
     }

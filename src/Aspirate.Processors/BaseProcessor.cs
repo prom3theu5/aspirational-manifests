@@ -53,6 +53,14 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     };
 
     /// <summary>
+    /// List of environment variables that are considered protected and will be managed by secrets.
+    /// </summary>
+    private readonly List<string> _protectedEnvVars =
+    [
+        "ConnectionString",
+    ];
+
+    /// <summary>
     /// Mapping of template literals to corresponding template file names.
     /// </summary>
     private readonly Dictionary<string, string> _templateFileMapping = new()
@@ -83,6 +91,30 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     /// <param name="reader">The <see cref="Utf8JsonReader"/> containing the JSON data.</param>
     /// <returns>The deserialized <see cref="Resource"/> object, or null if the deserialization fails.</returns>
     public abstract Resource? Deserialize(ref Utf8JsonReader reader);
+
+    /// <summary>
+    /// Filters the environmental variables of a given resource and returns a dictionary of the filtered variables.
+    /// </summary>
+    /// <param name="resource">The resource whose environmental variables need to be filtered.</param>
+    /// <returns>A dictionary representing the filtered environmental variables.</returns>
+    protected Dictionary<string, string> GetFilteredEnvironmentalVariables(Resource resource)
+    {
+        var envVars = resource.Env;
+
+        return envVars == null ? [] : envVars.Where(e => !_protectedEnvVars.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
+    }
+
+    /// <summary>
+    /// Filters the environmental variables of a given resource and returns a dictionary of the secret variables.
+    /// </summary>
+    /// <param name="resource">The resource from which to retrieve the secret environmental variables.</param>
+    /// <returns>A dictionary representing the secret environmental variables.</returns>
+    protected Dictionary<string, string> GetSecretEnvironmentalVariables(Resource resource)
+    {
+        var envVars = resource.Env;
+
+        return envVars == null ? [] : envVars.Where(e => _protectedEnvVars.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
+    }
 
     /// <summary>
     /// Replaces placeholder values in the given resource.
@@ -286,6 +318,34 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
                 _ => throw new ArgumentException($"Unknown dictionary in placeholder {match.Value}."),
             };
         });
+
+    /// <summary>
+    /// Sets the secrets from the secret state for the specified resource using the provided secret provider.
+    /// </summary>
+    /// <param name="secrets">A dictionary containing the secrets.</param>
+    /// <param name="resource">A key-value pair representing the resource.</param>
+    /// <param name="secretProvider">An instance of the secret provider.</param>
+    protected void SetSecretsFromSecretState(Dictionary<string, string> secrets, KeyValuePair<string, Resource> resource, ISecretProvider secretProvider)
+    {
+        if (!secretProvider.ResourceExists(resource.Key))
+        {
+            return;
+        }
+
+        for (int i = 0; i < secrets.Count; i++)
+        {
+            var secret = secrets.ElementAt(i);
+
+            if (!secretProvider.SecretExists(resource.Key, secret.Key))
+            {
+                continue;
+            }
+
+            var encryptedSecret = secretProvider.GetSecret(resource.Key, secret.Key);
+
+            secrets[secret.Key] = encryptedSecret;
+        }
+    }
 
     /// <summary>
     /// Gets the regular expression pattern used to extract the connection string key from a connection string.

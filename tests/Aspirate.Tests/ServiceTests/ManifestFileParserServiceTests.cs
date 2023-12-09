@@ -166,6 +166,7 @@ public class ManifestFileParserServiceTest
         services.RemoveAll<IFileSystem>();
         services.AddSingleton<IAnsiConsole>(console);
         services.AddSingleton<IFileSystem>(fileSystem);
+        services.AddSingleton<ISecretProvider, Base64SecretProvider>();
 
         return services.BuildServiceProvider();
     }

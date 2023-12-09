@@ -26,7 +26,7 @@ public class LoadSecretsAction(
             }
         }
 
-        console.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State populated successfully from [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
+        console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State populated successfully from [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
 
         return Task.FromResult(true);
     }

@@ -8,6 +8,7 @@ namespace Aspirate.Processors.Container;
 public class ContainerProcessor(
     IFileSystem fileSystem,
     IAnsiConsole console,
+    ISecretProvider secretProvider,
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService)
         : BaseProcessor<ContainerTemplateData>(fileSystem, console)
@@ -48,10 +49,16 @@ public class ContainerProcessor(
 
         var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
 
+        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
+        var secrets = GetSecretEnvironmentalVariables(resource.Value);
+
+        SetSecretsFromSecretState(secrets, resource, secretProvider);
+
         var data = new ContainerTemplateData(
             resource.Key,
             container.Image,
-            container.Env,
+            envVars,
+            secrets,
             containerPorts,
             _manifests);
 

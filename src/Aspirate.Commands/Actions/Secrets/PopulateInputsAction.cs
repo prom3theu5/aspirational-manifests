@@ -23,7 +23,7 @@ public class PopulateInputsAction(
 
         ApplyManualValues(componentsWithInputs);
 
-        console.MarkupLine($"\r\n\t[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
+        console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
 
         return Task.FromResult(true);
     }

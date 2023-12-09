@@ -10,7 +10,8 @@ public class ContainerProcessorTests
         var console = new TestConsole();
         var containerCompositionService = Substitute.For<IContainerCompositionService>();
         var containerDetailsService = Substitute.For<IContainerDetailsService>();
-        var containerProcessor = new ContainerProcessor(fileSystem, console, containerCompositionService, containerDetailsService);
+        var secretProvider = Substitute.For<ISecretProvider>();
+        var containerProcessor = new ContainerProcessor(fileSystem, console, secretProvider,containerCompositionService, containerDetailsService);
 
         var resource = new Container
         {
