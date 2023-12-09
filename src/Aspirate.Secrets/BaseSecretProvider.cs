@@ -60,6 +60,12 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
 
         var state = JsonSerializer.Serialize(State, _serializerOptions);
         var outputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
+
+        if (!fileSystem.Directory.Exists(path))
+        {
+            fileSystem.Directory.CreateDirectory(path);
+        }
+
         fileSystem.File.WriteAllText(outputFile, state);
     }
 
