@@ -39,7 +39,8 @@ public class ContainerProcessor(
         container.ConnectionString = ReplaceConnectionStringPlaceholders(container, resources);
     }
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
+        string? templatePath = null, bool? disableSecrets = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -49,18 +50,10 @@ public class ContainerProcessor(
 
         var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
 
-        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
-        var secrets = GetSecretEnvironmentalVariables(resource.Value);
 
-        SetSecretsFromSecretState(secrets, resource, secretProvider);
-
-        var data = new ContainerTemplateData(
-            resource.Key,
-            container.Image,
-            envVars,
-            secrets,
-            containerPorts,
-            _manifests);
+        var data = disableSecrets is false
+            ? HandleWithSecrets(resource, container, containerPorts)
+            : HandleDisabledSecrets(resource, container, containerPorts);
 
         CreateDeployment(resourceOutputPath, data, templatePath);
         CreateService(resourceOutputPath, data, templatePath);
@@ -71,7 +64,29 @@ public class ContainerProcessor(
         return Task.FromResult(true);
     }
 
+    private ContainerTemplateData HandleWithSecrets(KeyValuePair<string, Resource> resource, AspireContainer container, List<Ports> containerPorts)
+    {
+        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
+        var secrets = GetSecretEnvironmentalVariables(resource.Value);
 
+        SetSecretsFromSecretState(secrets, resource, secretProvider);
+
+        return new(
+            resource.Key,
+            container.Image,
+            envVars,
+            secrets,
+            containerPorts,
+            _manifests);
+    }
+
+    private ContainerTemplateData HandleDisabledSecrets(KeyValuePair<string, Resource> resource, AspireContainer container, List<Ports> containerPorts) =>
+        new(resource.Key,
+            container.Image,
+            resource.Value.Env,
+            null,
+            containerPorts,
+            _manifests);
 }
 
 

@@ -14,6 +14,11 @@ public class SaveSecretsAction(
 
     public override Task<bool> ExecuteAsync()
     {
+        if (CurrentState.DisableSecrets)
+        {
+            return Task.FromResult(true);
+        }
+
         if (!ProtectionStrategies.CheckForProtectableSecrets(CurrentState.AllSelectedSupportedComponents))
         {
             console.MarkupLine("No secrets to protect in any [blue]selected components[/]");

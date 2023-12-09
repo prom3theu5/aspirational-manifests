@@ -17,7 +17,8 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<PostgresServer>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
+        string? templatePath = null, bool? disableSecrets = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 

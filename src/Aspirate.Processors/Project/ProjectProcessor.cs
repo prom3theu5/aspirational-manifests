@@ -26,7 +26,8 @@ public class ProjectProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireProject>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
+        string? templatePath = null, bool? disableSecrets = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -37,18 +38,9 @@ public class ProjectProcessor(
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
-        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
-        var secrets = GetSecretEnvironmentalVariables(resource.Value);
-
-        SetSecretsFromSecretState(secrets, resource, secretProvider);
-
-        var data = new ProjectTemplateData(
-            resource.Key,
-            containerDetails.FullContainerImage,
-            envVars,
-            secrets,
-            _manifests,
-            imagePullPolicy);
+        var data = disableSecrets is false
+            ? HandleWithSecrets(resource, containerDetails, imagePullPolicy)
+            : HandleDisabledSecrets(resource, containerDetails, imagePullPolicy);
 
         CreateDeployment(resourceOutputPath, data, templatePath);
         CreateService(resourceOutputPath, data, templatePath);
@@ -58,6 +50,31 @@ public class ProjectProcessor(
 
         return Task.FromResult(true);
     }
+
+    private ProjectTemplateData HandleWithSecrets(KeyValuePair<string, Resource> resource, MsBuildContainerProperties containerDetails, string imagePullPolicy)
+    {
+        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
+        var secrets = GetSecretEnvironmentalVariables(resource.Value);
+
+        SetSecretsFromSecretState(secrets, resource, secretProvider);
+
+        return new(
+            resource.Key,
+            containerDetails.FullContainerImage,
+            envVars,
+            secrets,
+            _manifests,
+            imagePullPolicy);
+    }
+
+    private ProjectTemplateData HandleDisabledSecrets(KeyValuePair<string, Resource> resource, MsBuildContainerProperties containerDetails, string imagePullPolicy) =>
+        new(
+            resource.Key,
+            containerDetails.FullContainerImage,
+            resource.Value.Env,
+            null,
+            _manifests,
+            imagePullPolicy);
 
     public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, bool nonInteractive)
     {

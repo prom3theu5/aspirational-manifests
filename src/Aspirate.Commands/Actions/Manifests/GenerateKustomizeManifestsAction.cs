@@ -48,7 +48,7 @@ public sealed class GenerateKustomizeManifestsAction(
             return;
         }
 
-        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath);
+        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath, CurrentState.DisableSecrets);
 
         if (success && !CurrentState.IsDatabase(resource.Value))
         {

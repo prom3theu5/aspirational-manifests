@@ -28,7 +28,8 @@ public class DockerfileProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<AspireDockerfile>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
+        string? templatePath = null, bool? disableSecrets = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -43,18 +44,9 @@ public class DockerfileProcessor(
             throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
         }
 
-        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
-        var secrets = GetSecretEnvironmentalVariables(resource.Value);
-
-        SetSecretsFromSecretState(secrets, resource, secretProvider);
-
-        var data = new DockerfileTemplateData(
-            resource.Key,
-            containerImage,
-            envVars,
-            secrets,
-            containerPorts,
-            _manifests);
+        var data = disableSecrets is false
+            ? HandleWithSecrets(resource, containerImage, containerPorts)
+            : HandleDisabledSecrets(resource, containerImage, containerPorts);
 
         CreateDeployment(resourceOutputPath, data, templatePath);
         CreateService(resourceOutputPath, data, templatePath);
@@ -64,6 +56,30 @@ public class DockerfileProcessor(
 
         return Task.FromResult(true);
     }
+
+    private DockerfileTemplateData HandleWithSecrets(KeyValuePair<string, Resource> resource, string containerImage, List<Ports> containerPorts)
+    {
+        var envVars = GetFilteredEnvironmentalVariables(resource.Value);
+        var secrets = GetSecretEnvironmentalVariables(resource.Value);
+
+        SetSecretsFromSecretState(secrets, resource, secretProvider);
+
+        return new(
+            resource.Key,
+            containerImage,
+            envVars,
+            secrets,
+            containerPorts,
+            _manifests);
+    }
+
+    private DockerfileTemplateData HandleDisabledSecrets(KeyValuePair<string, Resource> resource, string containerImage, List<Ports> containerPorts) =>
+        new(resource.Key,
+            containerImage,
+            resource.Value.Env,
+            null,
+            containerPorts,
+            _manifests);
 
     public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, string builder, string imageName, string registry, bool nonInteractive)
     {

@@ -42,6 +42,9 @@ public class AspirateState :
     [JsonPropertyName("nonInteractive")]
     public bool NonInteractive { get; set; }
 
+    [JsonPropertyName("disableSecrets")]
+    public bool DisableSecrets { get; set; }
+
     [JsonPropertyName("secretProvider")]
     public ProviderType SecretProvider { get; set; }
 
