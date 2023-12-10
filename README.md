@@ -5,6 +5,8 @@
 
 <https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
 
+Documentation: https://prom3theu5.github.io/aspirational-manifests/
+
 # Table of Contents
 1. [Installation as a global tool](#to-install-as-a-global-tool)
 2. [Producing Manifests](#producing-manifests)
