@@ -22,6 +22,8 @@ public static class ServiceCollectionExtensions
             .RegisterProcessor<SqlServerDatabaseProcessor>(AspireComponentLiterals.SqlServerDatabase)
             .RegisterProcessor<MySqlServerProcessor>(AspireComponentLiterals.MySqlServer)
             .RegisterProcessor<MySqlDatabaseProcessor>(AspireComponentLiterals.MySqlDatabase)
+            .RegisterProcessor<MongoDbServerProcessor>(AspireComponentLiterals.MongoDbServer)
+            .RegisterProcessor<MongoDbDatabaseProcessor>(AspireComponentLiterals.MongoDbDatabase)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
 
     /// <summary>

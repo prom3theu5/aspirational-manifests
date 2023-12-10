@@ -134,7 +134,7 @@ public class ManifestFileParserServiceTest
         var result = state.LoadedAspireManifestResources;
 
         // Assert
-        result.Should().HaveCount(10);
+        result.Should().HaveCount(12);
         result["postgres"].Should().BeOfType<PostgresServer>();
 
         result["sqlserver"].Should().BeOfType<SqlServer>();
@@ -144,6 +144,9 @@ public class ManifestFileParserServiceTest
         result["mysqlserver"].Should().BeOfType<MySqlServer>();
         result["mysqlserver"].Env["RootPassword"].Should().NotBeNull().And.NotBeEmpty();
         result["mysqldb"].Should().BeOfType<MySqlDatabase>();
+
+        result["mongodbserver"].Should().BeOfType<MongoDbServer>();
+        result["mongodbdb"].Should().BeOfType<MongoDbDatabase>();
 
         result["catalogdb"].Should().BeOfType<PostgresDatabase>();
 

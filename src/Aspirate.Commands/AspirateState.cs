@@ -105,6 +105,9 @@ public class AspirateState :
     public void AppendToFinalResources(string key, Resource resource) =>
         FinalResources.Add(key, resource);
 
-    public bool IsDatabase(Resource resource) =>
-        resource is PostgresDatabase or SqlServerDatabase;
+    public static bool IsDatabase(Resource resource) =>
+        resource is PostgresDatabase
+            or SqlServerDatabase
+            or MySqlDatabase
+            or MongoDbDatabase;
 }

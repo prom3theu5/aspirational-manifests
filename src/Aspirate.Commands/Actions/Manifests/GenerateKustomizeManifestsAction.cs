@@ -50,7 +50,7 @@ public sealed class GenerateKustomizeManifestsAction(
 
         var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath, CurrentState.DisableSecrets);
 
-        if (success && !CurrentState.IsDatabase(resource.Value))
+        if (success && !AspirateState.IsDatabase(resource.Value))
         {
             CurrentState.AppendToFinalResources(resource.Key, resource.Value);
         }

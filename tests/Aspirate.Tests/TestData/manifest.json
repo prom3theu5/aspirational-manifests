@@ -9,6 +9,9 @@
       "mysqlserver": {
         "type": "mysql.server.v0"
       },
+      "mongodbserver": {
+        "type": "mongodb.server.v0"
+      },
       "catalogdb": {
         "type": "postgres.database.v0",
         "parent": "postgres"
@@ -20,6 +23,10 @@
       "mysqldb": {
         "type": "mysql.database.v0",
         "parent": "mysqlserver"
+      },
+      "mongodbdb": {
+        "type": "mongodb.database.v0",
+        "parent": "mongodbserver"
       },
       "basketcache": {
         "type": "redis.v0"

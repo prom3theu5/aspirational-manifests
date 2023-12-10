@@ -21,4 +21,7 @@ public static class AspireComponentLiterals
 
     public const string MySqlServer = "mysql.server.v0";
     public const string MySqlDatabase = "mysql.database.v0";
+
+    public const string MongoDbServer = "mongodb.server.v0";
+    public const string MongoDbDatabase = "mongodb.database.v0";
 }
