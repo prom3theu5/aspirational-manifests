@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE vars SYSTEM "https://resources.jetbrains.com/writerside/1.0/vars.dtd">
+<vars>
+    <var name="product" value="Aspir8"/>
+    <var name="secrets-file" value="aspirate-secrets.json" />
+    <var name="output-dir" value="./aspirate-output" />
+    <var name="aspire-manifest" value="manifest.json" />
+</vars>
