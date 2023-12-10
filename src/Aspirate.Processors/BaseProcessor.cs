@@ -42,6 +42,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         [AspireComponentLiterals.RabbitMq] = (_, _) => "amqp://guest:guest@rabbitmq-service:5672",
         [AspireComponentLiterals.SqlServer] = (resourceName, resources) => $"Server=sqlserver-service,1433;User ID=sa;Password={resources[resourceName].Env["SaPassword"]};TrustServerCertificate=true;",
         [AspireComponentLiterals.MySqlServer] = (resourceName, resources) => $"Server=mysql-service;Port=3306;User ID=root;Password={resources[resourceName].Env["RootPassword"]};",
+        [AspireComponentLiterals.MongoDbServer] = (_, _) => "mongodb://mongo-service:27017",
     };
 
     /// <summary>
