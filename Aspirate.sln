@@ -41,6 +41,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "actions", "actions", "{5644
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\pull-requests.yml = .github\workflows\pull-requests.yml
 		.github\workflows\main.yml = .github\workflows\main.yml
+		.github\workflows\docs.yml = .github\workflows\docs.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Secrets", "src\Aspirate.Secrets\Aspirate.Secrets.csproj", "{5801EDCE-B1D1-474C-8F2B-BB2927372867}"
