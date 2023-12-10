@@ -7,17 +7,17 @@
 
 # Table of Contents
 1. [Installation as a global tool](#to-install-as-a-global-tool)
-2. [ContainerRegistry](#containerregistry)
-3. [Secrets Management](#secrets-management)
+2. [Producing Manifests](#producing-manifests)
+3. [Build](#build)
+4. [Secrets Management](#secrets-management)
     - [Managing Secrets](#managing-secrets)
     - [Secrets File Contents](#secrets-file-contents)
     - [Generating Secrets](#generating-secrets)
     - [Applying Secrets](#applying-secrets)
     - [Disabling Secret Management](#disabling-secret-management)
-4. [Producing Manifests](#producing-manifests)
-5. [Build](#build)
-6. [Apply Manifests](#apply-manifests)
-7. [Remove Manifests](#remove-manifests)
+5. [Apply Manifests](#apply-manifests)
+6. [Remove Manifests](#remove-manifests)
+7. [Init Command](#init)
 8. [Non-Interactive Invocation](#non-interactive-invocation)
 9. [Uninstall tool](#uninstall-tool)
 10. [Configuring the Windows Terminal For Unicode and Emoji Support](#configuring-the-windows-terminal-for-unicode-and-emoji-support)
@@ -30,24 +30,29 @@ dotnet tool install -g aspirate --prerelease
 
 > NOTE: While Aspirate is in development the package will be versioned as a preview and the `--prelease` option will get the latest preview.
 
-## ContainerRegistry
+## Producing Manifests
 
-You're csproj files (projects) that will be build as containers **MUST** contain ContainerRegistry as a minimum, or the sdk will raise a CONTAINERS1013 error.
-To get around this - you can either add it as required, or use the 'init' command.
-The init command allows you to bootstrap certain settings for an aspire project that Aspir8 will use.
-
-- ContainerRegistry: setting this means you do not need one in your csproj, and if it isn't found - all builds will use this.
-- ContainerTag - will override the container tag used if not in your csproj - if not specified in settings, will fall-back to latest.
-- TemplatePath - this customises the path used when loading templates that get transformed to manifests, you can take the templates folder from the source, and modify to your hearts content with all your custom changes, and as long as you don't remove the placeholders, aspirate will use those instead of its built in.
-  More on this and possible use cases (such as adding jobs to create databases etc) when we have docs....
-
-To use the init command, you simply run:
+Navigate to your Aspire project's AppHost directory, and run:
 
 ```bash
-aspirate init
+aspirate generate
 ```
+This command (by-default) will also build selected projects, and push the containers to the interpolated ContainerRegistry.
+Builds can be skipped by passing the `--skip-build` flag.
 
-from within your AppHost directory - and it'll ask you which settings you'd like to override.
+Your manifests will be in the AppHost/aspirate-output directory by default.
+
+## Build
+
+The Build command will build all projects defined in the aspire manifest file, and push the containers to the interpolated ContainerRegistry.
+
+The command is extremely useful for rebuilding and pushing containers to the registry using a simple menu to select the items you want to build.
+
+The command will first create the manifest file, however this can be overridden if you pass in the path to an existing manifest file using the `--aspire-manifest` or `-m` flag and supplying the path.
+
+```bash
+aspirate build
+```
 
 ## Secrets Management
 
@@ -76,30 +81,6 @@ The `apply` command will decrypt the secrets file and apply the secrets to the c
 If secrets are not required, the `--disable-secrets` flag can be passed to all commands to disable secret functionality.
 However, once manifests are generated with secrets included, they cannot be disabled without regenerating the manifests.
 
-## Producing Manifests
-
-Navigate to your Aspire project's AppHost directory, and run:
-
-```bash
-aspirate generate
-```
-This command (by-default) will also build selected projects, and push the containers to the interpolated ContainerRegistry.
-Builds can be skipped by passing the `--skip-build` flag.
-
-Your manifests will be in the AppHost/aspirate-output directory by default.
-
-## Build
-
-The Build command will build all projects defined in the aspire manifest file, and push the containers to the interpolated ContainerRegistry.
-
-The command is extremely useful for rebuilding and pushing containers to the registry using a simple menu to select the items you want to build.
-
-The command will first create the manifest file, however this can be overridden if you pass in the path to an existing manifest file using the `--aspire-manifest` or `-m` flag and supplying the path.
-
-```bash
-aspirate build
-```
-
 ## Apply Manifests
 
 To apply the manifests to your cluster, run:
@@ -120,8 +101,25 @@ aspirate destroy
 
 Aspirate will first ask you which context they would like you to operate on, and will confirm first that you wish to act.
 
+## Init
+The init command allows you to bootstrap certain settings for an aspire project that Aspir8 will use.
+
+- ContainerRegistry: setting this means you do not need one in your csproj, and if it isn't found - all builds will use this.
+- ContainerTag - will override the container tag used if not in your csproj - if not specified in settings, will fall-back to latest.
+- TemplatePath - this customises the path used when loading templates that get transformed to manifests, you can take the templates folder from the source, and modify to your hearts content with all your custom changes, and as long as you don't remove the placeholders, aspirate will use those instead of its built in.
+  More on this and possible use cases (such as adding jobs to create databases etc) when we have docs....
+
+To use the init command, you simply run:
+
+```bash
+aspirate init
+```
+
+from within your AppHost directory - and it'll ask you which settings you'd like to override.
+
 ## Non-Interactive Invocation
-All commands can be invoked non-interactively by passing the `--non-interactive` flag.
+All commands apart from generate can be invoked non-interactively by passing the `--non-interactive` flag.
+Generate can be used if secrets are disabled.
 
 This will cause the tool to use the default context and not prompt for confirmation.
 
