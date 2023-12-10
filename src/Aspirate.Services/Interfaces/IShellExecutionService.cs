@@ -21,6 +21,7 @@ public interface IShellExecutionService
     /// <param name="command">
     /// The command to execute.
     /// </param>
+    /// <param name="argumentsBuilder">The arguments builder instance.</param>
     /// <param name="environmentVariables">
     /// The dictionary of environment variables to set for the command.
     /// </param>
@@ -28,5 +29,6 @@ public interface IShellExecutionService
     /// A task that represents the asynchronous execution of the command.
     /// The task result is a boolean indicating whether the command was executed successfully or not.
     /// </returns>
-    Task<bool> ExecuteCommandWithEnvironmentNoOutput(string command, IReadOnlyDictionary<string, string?> environmentVariables);
+    Task<bool> ExecuteCommandWithEnvironmentNoOutput(string command, ArgumentsBuilder argumentsBuilder,
+        IReadOnlyDictionary<string, string?> environmentVariables);
 }

@@ -1,6 +1,6 @@
 namespace Aspirate.Shared.Literals;
 
-public class DockerLiterals
+public static class DockerLiterals
 {
     public const string BuildCommand = "build";
     public const string PushCommand = "push";

@@ -48,9 +48,12 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
         return new(result.ExitCode == 0, result.StandardOutput, result.StandardError, result.ExitCode);
     }
 
-    public async Task<bool> ExecuteCommandWithEnvironmentNoOutput(string command, IReadOnlyDictionary<string, string?> environmentVariables)
+    public async Task<bool> ExecuteCommandWithEnvironmentNoOutput(string command, ArgumentsBuilder argumentsBuilder, IReadOnlyDictionary<string, string?> environmentVariables)
     {
-        var executionCommand = CliWrap.Cli.Wrap(command)
+        var arguments = argumentsBuilder.RenderArguments();
+
+        var executionCommand = Cli.Wrap(command)
+            .WithArguments(arguments)
             .WithEnvironmentVariables(environmentVariables);
 
         var commandResult = await executionCommand
@@ -59,7 +62,7 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
             .WithStandardOutputPipe(PipeTarget.Null)
             .ExecuteAsync();
 
-        return commandResult.ExitCode != 0;
+        return commandResult.ExitCode == 0;
     }
 
     private Task HandleExitCode(string command,

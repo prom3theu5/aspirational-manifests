@@ -32,6 +32,8 @@ public sealed class ContainerCompositionService(
 
     public async Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string? registry, bool nonInteractive)
     {
+        await CheckIfBuilderIsRunning(builder);
+
         var tagBuilder = new StringBuilder();
         var fullDockerfilePath = filesystem.GetFullPath(dockerfile.Path);
 
@@ -45,36 +47,45 @@ public sealed class ContainerCompositionService(
 
         var tag = tagBuilder.ToString();
 
-        await BuildContainer(dockerfile, builder, nonInteractive, tag, fullDockerfilePath);
+        var result = await BuildContainer(dockerfile, builder, nonInteractive, tag, fullDockerfilePath);
 
-        await PushContainer(builder, registry, nonInteractive, tag);
+        CheckSuccess(result);
+
+        result = await PushContainer(builder, registry, nonInteractive, tag);
+
+        CheckSuccess(result);
 
         return true;
     }
 
-    private async Task PushContainer(string builder, string? registry, bool nonInteractive, string tag)
+    private async Task<ShellCommandResult> PushContainer(string builder, string? registry, bool nonInteractive, string tag)
     {
         if (!string.IsNullOrEmpty(registry))
         {
             var pushArgumentBuilder = ArgumentsBuilder
                 .Create()
                 .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
-                .AppendArgument(tag, string.Empty, quoteValue: false);
+                .AppendArgument(tag.ToLower(), string.Empty, quoteValue: false);
 
-            await shellExecutionService.ExecuteCommand(
+            return await shellExecutionService.ExecuteCommand(
                 new()
                 {
-                    Command = builder, ArgumentsBuilder = pushArgumentBuilder, NonInteractive = nonInteractive, ShowOutput = true,
+                    Command = builder,
+                    ArgumentsBuilder = pushArgumentBuilder,
+                    NonInteractive = nonInteractive,
+                    ShowOutput = true,
                 });
         }
+
+        return new ShellCommandResult(true, string.Empty, string.Empty, 0);
     }
 
-    private async Task BuildContainer(Dockerfile dockerfile, string builder, bool nonInteractive, string tag, string fullDockerfilePath)
+    private Task<ShellCommandResult> BuildContainer(Dockerfile dockerfile, string builder, bool nonInteractive, string tag, string fullDockerfilePath)
     {
         var buildArgumentBuilder = ArgumentsBuilder
             .Create()
             .AppendArgument(DockerLiterals.BuildCommand, string.Empty, quoteValue: false)
-            .AppendArgument(DockerLiterals.TagArgument, tag);
+            .AppendArgument(DockerLiterals.TagArgument, tag.ToLower());
 
 
         if (dockerfile.Env is not null)
@@ -86,7 +97,7 @@ public sealed class ContainerCompositionService(
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
             .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
 
-        await shellExecutionService.ExecuteCommand(new()
+        return shellExecutionService.ExecuteCommand(new()
         {
             Command = builder,
             ArgumentsBuilder = buildArgumentBuilder,
@@ -100,11 +111,6 @@ public sealed class ContainerCompositionService(
         if (errors.Contains(DotNetSdkLiterals.DuplicateFileOutputError, StringComparison.OrdinalIgnoreCase))
         {
             return HandleDuplicateFilesInOutput(argumentsBuilder, nonInteractive);
-        }
-
-        if (errors.Contains(DotNetSdkLiterals.NoContainerRegistryAccess, StringComparison.OrdinalIgnoreCase))
-        {
-            return HandleNoDockerRegistryAccess(argumentsBuilder, nonInteractive);
         }
 
         if (errors.Contains(DotNetSdkLiterals.UnknownContainerRegistryAddress, StringComparison.OrdinalIgnoreCase))
@@ -136,34 +142,6 @@ public sealed class ContainerCompositionService(
         throw new ActionCausesExitException(9999);
     }
 
-    private async Task HandleNoDockerRegistryAccess(ArgumentsBuilder argumentsBuilder, bool nonInteractive)
-    {
-        if (nonInteractive)
-        {
-            console.MarkupLine($"\r\n[red bold]{DotNetSdkLiterals.NoContainerRegistryAccess}: No access to container registry. Cannot attempt login in non interactive mode.[/]");
-            throw new ActionCausesExitException(1000);
-        }
-
-        var shouldLogin = AskIfShouldLoginToDocker(nonInteractive);
-        if (shouldLogin)
-        {
-            var credentials = GatherDockerCredentials();
-
-            var loginResult = await shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(ContainerBuilderLiterals.DockerLoginCommand, credentials);
-
-            if (loginResult)
-            {
-                await shellExecutionService.ExecuteCommand(new()
-                {
-                    Command = DotNetSdkLiterals.DotNetCommand,
-                    ArgumentsBuilder = argumentsBuilder,
-                    NonInteractive = nonInteractive,
-                    OnFailed = HandleBuildErrors,
-                });
-            }
-        }
-    }
-
     private bool AskIfShouldRetryHandlingDuplicateFiles(bool nonInteractive)
     {
         if (nonInteractive)
@@ -173,35 +151,6 @@ public sealed class ContainerCompositionService(
 
         return console.Confirm(
             "\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
-    }
-
-    private bool AskIfShouldLoginToDocker(bool nonInteractive)
-    {
-        if (nonInteractive)
-        {
-            return false;
-        }
-
-        return console.Confirm(
-            "\r\nWe could not access the container registry during build. Do you want to login to the registry and retry?\r\n");
-    }
-
-    private Dictionary<string, string?> GatherDockerCredentials()
-    {
-        console.WriteLine();
-        var registry = console.Ask<string>("What's the registry [green]address[/]?");
-        var username = console.Ask<string>("Enter [green]username[/]?");
-        var password = console.Prompt(
-            new TextPrompt<string>("Enter [green]password[/]?")
-                .PromptStyle("red")
-                .Secret());
-
-        return new()
-        {
-            { "DOCKER_HOST", registry },
-            { "DOCKER_USER", username },
-            { "DOCKER_PASS", password },
-        };
     }
 
     private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath)
@@ -259,6 +208,28 @@ public sealed class ContainerCompositionService(
         foreach (var (key, value) in dockerfileEnv)
         {
             argumentsBuilder.AppendArgument(DockerLiterals.BuildArgArgument, $"{key}=\"{value}\"", quoteValue: false, allowDuplicates: true);
+        }
+    }
+
+    private async Task CheckIfBuilderIsRunning(string builder)
+    {
+        var argumentsBuilder = ArgumentsBuilder
+            .Create()
+            .AppendArgument("info", string.Empty, quoteValue: false);
+
+        var builderIsRunning = await shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(builder, argumentsBuilder, new Dictionary<string, string?>());
+        if (!builderIsRunning)
+        {
+            console.MarkupLine($"\r\n[red bold]{builder} is not running.[/]");
+            throw new ActionCausesExitException(1);
+        }
+    }
+
+    private static void CheckSuccess(ShellCommandResult result)
+    {
+        if (result.ExitCode != 0)
+        {
+            throw new ActionCausesExitException(9999);
         }
     }
 }

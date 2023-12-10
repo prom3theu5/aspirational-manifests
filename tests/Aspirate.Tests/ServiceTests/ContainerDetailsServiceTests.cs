@@ -21,7 +21,6 @@ public class ContainerDetailsServiceTests
             .GetProjectPropertiesAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
             .ReturnsForAnyArgs(responseJson);
 
-
         var containerDetailsService = new ContainerDetailsService(projectPropertyService, testConsole);
 
         // Act
