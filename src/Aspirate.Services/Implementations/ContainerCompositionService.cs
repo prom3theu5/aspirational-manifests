@@ -45,36 +45,54 @@ public sealed class ContainerCompositionService(
 
         var tag = tagBuilder.ToString();
 
-        var argumentsBuilder = ArgumentsBuilder
-            .Create()
-            .AppendArgument(DockerLiterals.BuildCommand, string.Empty, quoteValue: false)
-            .AppendArgument(DockerLiterals.TagArgument, tag)
-            .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
-            .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
+        await BuildContainer(dockerfile, builder, nonInteractive, tag, fullDockerfilePath);
 
-        await shellExecutionService.ExecuteCommand(new()
-        {
-            Command = builder,
-            ArgumentsBuilder = argumentsBuilder,
-            NonInteractive = nonInteractive,
-            ShowOutput = true,
-        });
+        await PushContainer(builder, registry, nonInteractive, tag);
 
+        return true;
+    }
+
+    private async Task PushContainer(string builder, string? registry, bool nonInteractive, string tag)
+    {
         if (!string.IsNullOrEmpty(registry))
         {
-
-            argumentsBuilder.Clear()
+            var pushArgumentBuilder = ArgumentsBuilder
+                .Create()
                 .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
                 .AppendArgument(tag, string.Empty, quoteValue: false);
 
             await shellExecutionService.ExecuteCommand(
                 new()
                 {
-                    Command = builder, ArgumentsBuilder = argumentsBuilder, NonInteractive = nonInteractive, ShowOutput = true,
+                    Command = builder, ArgumentsBuilder = pushArgumentBuilder, NonInteractive = nonInteractive, ShowOutput = true,
                 });
         }
+    }
 
-        return true;
+    private async Task BuildContainer(Dockerfile dockerfile, string builder, bool nonInteractive, string tag, string fullDockerfilePath)
+    {
+        var buildArgumentBuilder = ArgumentsBuilder
+            .Create()
+            .AppendArgument(DockerLiterals.BuildCommand, string.Empty, quoteValue: false)
+            .AppendArgument(DockerLiterals.TagArgument, tag);
+
+
+        if (dockerfile.Env is not null)
+        {
+            AddDockerBuildArgs(buildArgumentBuilder, dockerfile.Env);
+        }
+
+        buildArgumentBuilder
+            .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
+            .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
+
+        await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = builder,
+            ArgumentsBuilder = buildArgumentBuilder,
+            NonInteractive = nonInteractive,
+            ShowOutput = true,
+        });
     }
 
     private Task HandleBuildErrors(string command, ArgumentsBuilder argumentsBuilder, bool nonInteractive, string errors)
@@ -234,5 +252,13 @@ public sealed class ContainerCompositionService(
         }
 
         argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageTagArgument, containerDetails.ContainerImageTag);
+    }
+
+    private static void AddDockerBuildArgs(ArgumentsBuilder argumentsBuilder, Dictionary<string, string> dockerfileEnv)
+    {
+        foreach (var (key, value) in dockerfileEnv)
+        {
+            argumentsBuilder.AppendArgument(DockerLiterals.BuildArgArgument, $"{key}=\"{value}\"", quoteValue: false, allowDuplicates: true);
+        }
     }
 }
