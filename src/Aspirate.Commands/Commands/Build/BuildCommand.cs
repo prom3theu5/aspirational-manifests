@@ -4,10 +4,10 @@ public sealed class BuildCommand : BaseCommand<BuildOptions, BuildCommandHandler
 {
     public BuildCommand() : base("build", "Builds and pushes containers")
     {
-       AddOption(SharedOptions.AspireProjectPath);
-       AddOption(SharedOptions.AspireManifest);
-       AddOption(SharedOptions.ContainerBuilder);
-       AddOption(SharedOptions.ContainerImageTag);
-       AddOption(SharedOptions.ContainerRegistry);
+       AddOption(ProjectPathOption.Instance);
+       AddOption(AspireManifestOption.Instance);
+       AddOption(ContainerBuilderOption.Instance);
+       AddOption(ContainerImageTagOption.Instance);
+       AddOption(ContainerRegistryOption.Instance);
     }
 }

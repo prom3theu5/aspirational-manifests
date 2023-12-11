@@ -4,7 +4,7 @@ public sealed class DestroyCommand : BaseCommand<DestroyOptions, DestroyCommandH
 {
     public DestroyCommand() : base("destroy", "Removes the manifests from your cluster..")
     {
-        AddOption(SharedOptions.ManifestDirectoryPath);
-        AddOption(SharedOptions.KubernetesContext);
+        AddOption(InputPathOption.Instance);
+        AddOption(KubernetesContextOption.Instance);
     }
 }

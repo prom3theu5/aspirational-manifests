@@ -3,8 +3,8 @@ namespace Aspirate.Commands.Commands;
 [ExcludeFromCodeCoverage]
 public abstract class BaseCommandOptions : ICommandOptions
 {
-    public bool NonInteractive { get; set; } = false;
-    public ProviderType SecretProvider { get; set; } = ProviderType.Password;
+    public bool NonInteractive { get; set; }
+    public ProviderType SecretProvider { get; set; }
 
-    public bool DisableSecrets { get; set; } = false;
+    public bool DisableSecrets { get; set; }
 }

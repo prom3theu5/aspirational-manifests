@@ -4,8 +4,8 @@ public sealed class ApplyCommand : BaseCommand<ApplyOptions, ApplyCommandHandler
 {
     public ApplyCommand() : base("apply", "Apply the generated kustomize manifest to the cluster.")
     {
-        AddOption(SharedOptions.ManifestDirectoryPath);
-        AddOption(SharedOptions.KubernetesContext);
-        AddOption(SharedOptions.SecretPassword);
+        AddOption(InputPathOption.Instance);
+        AddOption(KubernetesContextOption.Instance);
+        AddOption(SecretPasswordOption.Instance);
     }
 }

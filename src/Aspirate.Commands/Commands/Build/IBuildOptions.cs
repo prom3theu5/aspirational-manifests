@@ -2,7 +2,7 @@ namespace Aspirate.Commands.Commands.Build;
 
 public interface IBuildOptions
 {
-    string ProjectPath { get; set; }
+    string? ProjectPath { get; set; }
 
     string? AspireManifest { get; set; }
 

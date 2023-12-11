@@ -16,6 +16,7 @@ global using Aspirate.Commands.Commands.Destroy;
 global using Aspirate.Commands.Commands.Generate;
 global using Aspirate.Commands.Commands.Init;
 global using Aspirate.Commands.Extensions;
+global using Aspirate.Commands.Options;
 global using Aspirate.Processors.Dockerfile;
 global using Aspirate.Processors.Final;
 global using Aspirate.Processors.Project;

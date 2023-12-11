@@ -12,13 +12,13 @@ public class AspirateState :
     IBase64SecretState
 {
     [JsonPropertyName("projectPath")]
-    public string ProjectPath { get; set; } = null!;
+    public string? ProjectPath { get; set; }
 
     [JsonPropertyName("inputPath")]
-    public string InputPath { get; set; } = null!;
+    public string? InputPath { get; set; } = null!;
 
     [JsonPropertyName("outputPath")]
-    public string OutputPath { get; set; } = null!;
+    public string? OutputPath { get; set; } = null!;
 
     [JsonPropertyName("aspireManifest")]
     public string? AspireManifest { get; set; }
