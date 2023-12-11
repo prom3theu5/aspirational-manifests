@@ -1,13 +1,10 @@
 {
   "id": "aspirate",
-  "version": "0.1.0",
+  "version": "latest",
   "name": "Aspir8 Aspirate to Kubernetes",
   "documentationURL": "https://prom3theu5.github.io/aspirational-manifests/",
   "description": "Installs Aspir8.",
   "installsAfter": [
     "ghcr.io/devcontainers/features/dotnet"
-  ],
-  "versionAliases": {
-    "0.1.0": "latest"
-  }
+  ]
 }
