@@ -2,11 +2,11 @@ namespace Aspirate.Commands.Commands.Generate;
 
 public interface IGenerateOptions
 {
-    string ProjectPath { get; set; }
+    string? ProjectPath { get; set; }
 
     string? AspireManifest { get; set; }
 
-    string OutputPath { get; set; }
+    string? OutputPath { get; set; }
 
     bool SkipBuild { get; set; }
 

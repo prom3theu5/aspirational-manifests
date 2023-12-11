@@ -2,7 +2,7 @@ namespace Aspirate.Commands.Commands.Init;
 
 public interface IInitOptions
 {
-    string ProjectPath { get; set; }
+    string? ProjectPath { get; set; }
 
     string? ContainerRegistry { get; set; }
 
