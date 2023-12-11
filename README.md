@@ -23,6 +23,7 @@ Documentation: https://prom3theu5.github.io/aspirational-manifests/
 8. [Non-Interactive Invocation](#non-interactive-invocation)
 9. [Uninstall tool](#uninstall-tool)
 10. [Configuring the Windows Terminal For Unicode and Emoji Support](#configuring-the-windows-terminal-for-unicode-and-emoji-support)
+11. [DevContainer Support](#devcontainer-support)
 
 ## To Install as a global tool
 
@@ -158,3 +159,15 @@ For cmd.exe, the following steps are required to enable Unicode and Emoji suppor
 
 You will also need to ensure that your Console application is configured to use a font that supports Unicode and Emoji,
 such as Cascadia Code.
+
+## DevContainer Support
+
+Aspirate can be used in a devcontainer by installing the feature:
+
+```json
+features": {
+  "ghcr.io/prom3theu5/aspirational-manifests/aspirate:latest": {}
+}
+```
+
+An Example of a devcontainer can be found on the documentation page: [Here](https://prom3theu5.github.io/aspirational-manifests/installation-as-a-devcontainer-feature.html#example-dev-container-configuration)

@@ -8,6 +8,7 @@
 
     <toc-element topic="Getting-Started.md">
         <toc-element topic="Installing-as-a-Global-Tool.md"/>
+        <toc-element topic="Installation-as-a-DevContainer-Feature.md"/>
         <toc-element topic="Removing-Aspirate.md"/>
     </toc-element>
     <toc-element topic="Commands.md">
