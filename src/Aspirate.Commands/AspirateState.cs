@@ -20,6 +20,9 @@ public class AspirateState :
     [JsonPropertyName("outputPath")]
     public string? OutputPath { get; set; } = null!;
 
+    [JsonPropertyName("namespace")]
+    public string? Namespace { get; set; }
+
     [JsonPropertyName("aspireManifest")]
     public string? AspireManifest { get; set; }
 

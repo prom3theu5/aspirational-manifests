@@ -7,6 +7,7 @@ public interface IGenerateOptions
     string? AspireManifest { get; set; }
 
     string? OutputPath { get; set; }
+    string? Namespace { get; set; }
 
     bool SkipBuild { get; set; }
 

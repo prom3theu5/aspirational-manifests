@@ -13,4 +13,5 @@ public static class TemplateLiterals
     public const string PostgresServerType = "postgres-server";
     public const string MongoDbServerType = "mongo-server";
     public const string ComponentKustomizeType = "kustomization";
+    public const string NamespaceType = "namespace";
 }
