@@ -9,7 +9,7 @@ public class ProjectTemplateData(
     string imagePullPolicy)
     : BaseTemplateData(name, env, secrets, manifests)
 {
-    public string ContainerImage { get; set; } = containerImage;
+    public string ContainerImage { get; set; } = containerImage.ToLowerInvariant();
     public bool IsProject { get; set; } = true;
     public string ServiceType { get; set; } = "ClusterIP";
     public string ImagePullPolicy { get; set; } = imagePullPolicy;

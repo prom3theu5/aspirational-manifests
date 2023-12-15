@@ -1,3 +1,7 @@
+{{#if withNamespace}}
+namespace: {{namespace}}
+{{/if}}
+
 resources:
 {{#each manifests}}
 - {{this}}

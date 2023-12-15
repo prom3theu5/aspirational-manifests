@@ -76,6 +76,7 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         [TemplateLiterals.MysqlServerType] = $"{TemplateLiterals.MysqlServerType}.hbs",
         [TemplateLiterals.RabbitMqType] = $"{TemplateLiterals.RabbitMqType}.hbs",
         [TemplateLiterals.PostgresServerType] = $"{TemplateLiterals.PostgresServerType}.hbs",
+        [TemplateLiterals.NamespaceType] = $"{TemplateLiterals.NamespaceType}.hbs",
     };
 
     /// <summary>
@@ -240,6 +241,17 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
         var kustomizeOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ComponentKustomizeType}.yml");
 
         CreateFile(templateFile, kustomizeOutputPath, data, templatePath);
+    }
+
+    protected void CreateNamespace(
+        string outputPath,
+        TTemplateData data,
+        string? templatePath)
+    {
+        _templateFileMapping.TryGetValue(TemplateLiterals.NamespaceType, out var templateFile);
+        var namespaceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.NamespaceType}.yml");
+
+        CreateFile(templateFile, namespaceOutputPath, data, templatePath);
     }
 
     /// <summary>

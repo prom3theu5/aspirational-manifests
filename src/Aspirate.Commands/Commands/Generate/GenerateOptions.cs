@@ -6,6 +6,8 @@ public sealed class GenerateOptions : BaseCommandOptions, IGenerateOptions
     public string? AspireManifest { get; set; }
     public string? OutputPath { get; set; }
 
+    public string? Namespace { get; set; }
+
     public bool SkipBuild { get; set; }
     public bool SkipFinalKustomizeGeneration { get; set; }
     public string? ContainerBuilder { get; set; }

@@ -30,7 +30,7 @@ public sealed class GenerateFinalKustomizeManifestAction(
         }
 
         var finalHandler = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
-        finalHandler.CreateFinalManifest(CurrentState.FinalResources, CurrentState.OutputPath, CurrentState.TemplatePath);
+        finalHandler.CreateFinalManifest(CurrentState.FinalResources, CurrentState.OutputPath, CurrentState.TemplatePath, CurrentState.Namespace);
 
         return Task.FromResult(true);
     }
