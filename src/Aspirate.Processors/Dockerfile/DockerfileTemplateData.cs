@@ -10,7 +10,7 @@ public class DockerfileTemplateData(
     string imagePullPolicy)
     : BaseTemplateData(name, env, secrets, manifests)
 {
-    public string ContainerImage { get; set; } = containerImage;
+    public string ContainerImage { get; set; } = containerImage.ToLowerInvariant();
     public bool IsDockerfile { get; set; } = true;
     public string ImagePullPolicy { get; set; } = imagePullPolicy;
     public List<Ports> Ports { get; set; } = ports;

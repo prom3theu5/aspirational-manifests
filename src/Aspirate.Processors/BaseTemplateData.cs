@@ -8,7 +8,7 @@ public abstract class BaseTemplateData(
     IReadOnlyCollection<string>? manifests,
     bool isService = true)
 {
-    public string? Name { get; set; } = name;
+    public string? Name { get; set; } = name.ToLowerInvariant();
 
     public Dictionary<string, string>? Env { get; set; } = env;
     public Dictionary<string, string>? Secrets { get; set; } = secrets;
