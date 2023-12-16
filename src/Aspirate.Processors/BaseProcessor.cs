@@ -1,4 +1,7 @@
+using Aspirate.Shared.Models.AspireManifests.Components.V1;
+using Aspirate.Shared.Models.AspireManifests.Interfaces;
 using AspireContainer = Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
+using AspireSqlServer = Aspirate.Shared.Models.AspireManifests.Components.V1.SqlServer;
 
 namespace Aspirate.Processors;
 
@@ -37,11 +40,11 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     private readonly Dictionary<string, Func<string, Dictionary<string, Resource>, string>> _typeHandlers = new()
     {
         [AspireComponentLiterals.Redis] = (_, _) => "redis",
-        [AspireComponentLiterals.PostgresDatabase] = (resourceName, _) => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
+        [AspireComponentLiterals.PostgresDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<PostgresDatabase, PostgresServer>(resources, resourceName),
+        [AspireComponentLiterals.SqlServerDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<SqlServerDatabase, AspireSqlServer>(resources, resourceName),
+        [AspireComponentLiterals.MySqlDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<MySqlDatabase, MySqlServer>(resources, resourceName),
         [AspireComponentLiterals.Container] = (resourceName, resources) => ReplaceConnectionStringPlaceholders(resources[resourceName] as AspireContainer, resources),
         [AspireComponentLiterals.RabbitMq] = (_, _) => "amqp://guest:guest@rabbitmq-service:5672",
-        [AspireComponentLiterals.SqlServer] = (resourceName, resources) => $"Server=sqlserver-service,1433;User ID=sa;Password={resources[resourceName].Env["SaPassword"]};TrustServerCertificate=true;",
-        [AspireComponentLiterals.MySqlServer] = (resourceName, resources) => $"Server=mysql-service;Port=3306;User ID=root;Password={resources[resourceName].Env["RootPassword"]};",
         [AspireComponentLiterals.MongoDbServer] = (_, _) => "mongodb://mongo-service:27017",
     };
 
@@ -373,4 +376,42 @@ public abstract partial class BaseProcessor<TTemplateData> : IProcessor where TT
     /// <returns>A <see cref="Regex"/> object representing the regular expression pattern.</returns>
     [GeneratedRegex(@"\{([\w\.]+)\}")]
     private static partial Regex ConnectionStringRegex();
+
+    /// <summary>
+    /// Sets up the database connection string based on the provided resources and resource name. </summary>
+    /// <typeparam name="TDatabase">The type of database resource.</typeparam>
+    /// <typeparam name="TServer">The type of database server resource.</typeparam>
+    /// <param name="resources">A dictionary of resources.</param>
+    /// <param name="resourceName">The name of the resource.</param>
+    /// <returns>The database connection string.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// <para>Thrown when the resource indicated by <paramref name="resourceName"/> is not a database.</para>
+    /// <para>Thrown when the parent resource indicated by <paramref name="resourceName"/> is not a Database Server.</para>
+    /// <para>Thrown when the database server indicated by <typeparamref name="TServer"/> is not supported.</para>
+    /// </exception>
+    /// /
+    private static string SetupDatabaseConnectionString<TDatabase, TServer>(IReadOnlyDictionary<string, Resource> resources, string resourceName)
+        where TDatabase : IResourceWithParent
+        where TServer : Resource
+    {
+        if (resources[resourceName] is not TDatabase databaseResource)
+        {
+            throw new InvalidOperationException($"Resource {resourceName} is not a database.");
+        }
+
+        if (resources[databaseResource.Parent] is not TServer parentResource)
+        {
+            throw new InvalidOperationException($"Parent resource {databaseResource.Parent} is not a Database Server.");
+        }
+
+        return typeof(TServer) switch
+        {
+            var type when type == typeof(AspireSqlServer) => $"Server=sqlserver-service;User ID=sa;Password={FromBase64(parentResource.Env["SaPassword"])};TrustServerCertificate=true;",
+            var type when type == typeof(MySqlServer) => $"Server=mysql-service;Port=3306;User ID=root;Password={FromBase64(parentResource.Env["RootPassword"])};",
+            var type when type == typeof(PostgresServer) => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
+            _ => throw new InvalidOperationException($"Resource {databaseResource.Parent} is not a supported database server."),
+        };
+    }
+
+    private static string FromBase64(string base64String) => Encoding.UTF8.GetString(Convert.FromBase64String(base64String));
 }

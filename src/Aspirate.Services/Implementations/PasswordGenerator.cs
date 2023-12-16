@@ -2,7 +2,7 @@ namespace Aspirate.Services.Implementations;
 
 public class PasswordGenerator : IPasswordGenerator
 {
-    private const string Characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*_-=+";
+    private const string Characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!";
 
     public string Generate(int length = 24)
     {

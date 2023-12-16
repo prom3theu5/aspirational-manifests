@@ -2,7 +2,7 @@
 namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
 
 [ExcludeFromCodeCoverage]
-public class MongoDbDatabase : Resource
+public class MongoDbDatabase : Resource, IResourceWithParent
 {
     /// <summary>
     /// The parent server of the database.
