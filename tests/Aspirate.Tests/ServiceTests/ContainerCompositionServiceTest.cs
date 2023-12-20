@@ -35,12 +35,60 @@ public class ContainerCompositionServiceTest
         shellExecutionService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
             .Returns(Task.FromResult(new ShellCommandResult(true, "test", string.Empty, 0)));
 
+        shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(Arg.Any<string>(), Arg.Any<ArgumentsBuilder>(),Arg.Any<Dictionary<string, string?>>())
+            .Returns(Task.FromResult(true));
+
         // Act
-        var result = await service.BuildAndPushContainerForProject(project, containerDetails);
+        var result = await service.BuildAndPushContainerForProject(project, containerDetails, "docker");
 
         // Assert
         await shellExecutionService.Received(1).ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null));
         result.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("docker")]
+    [InlineData("podman")]
+    public async Task BuildAndPushContainerForProject_ShouldThrowWhenBuilderOffline(string builder)
+    {
+        // Arrange
+        var fileSystem = Substitute.For<IFileSystem>();
+        var console = Substitute.For<IAnsiConsole>();
+        var projectPropertyService = Substitute.For<IProjectPropertyService>();
+        var shellExecutionService = Substitute.For<IShellExecutionService>();
+
+        var service = new ContainerCompositionService(fileSystem, console, projectPropertyService, shellExecutionService);
+
+        var project = new Project
+        {
+            Path = "testPath"
+        };
+
+        var containerDetails = new MsBuildContainerProperties();
+
+        projectPropertyService.GetProjectPropertiesAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+            .Returns(
+                JsonSerializer.Serialize(
+                    new MsBuildProperties<MsBuildPublishingProperties>
+                    {
+                        Properties = new()
+                        {
+                            PublishSingleFile = "true",
+                            PublishTrimmed = "true",
+                        },
+                    }));
+
+        shellExecutionService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
+            .Returns(Task.FromResult(new ShellCommandResult(true, "test", string.Empty, 0)));
+
+        shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(Arg.Any<string>(), Arg.Any<ArgumentsBuilder>(),Arg.Any<Dictionary<string, string?>>())
+            .Returns(Task.FromResult(false));
+
+        // Act
+        var action = () => service.BuildAndPushContainerForProject(project, containerDetails, builder);
+
+        // Assert
+        await action.Should().ThrowAsync<ActionCausesExitException>();
     }
 
 

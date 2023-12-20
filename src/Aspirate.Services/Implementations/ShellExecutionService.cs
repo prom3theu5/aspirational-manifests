@@ -50,19 +50,26 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
 
     public async Task<bool> ExecuteCommandWithEnvironmentNoOutput(string command, ArgumentsBuilder argumentsBuilder, IReadOnlyDictionary<string, string?> environmentVariables)
     {
-        var arguments = argumentsBuilder.RenderArguments();
+        try
+        {
+            var arguments = argumentsBuilder.RenderArguments();
 
-        var executionCommand = Cli.Wrap(command)
-            .WithArguments(arguments)
-            .WithEnvironmentVariables(environmentVariables);
+            var executionCommand = Cli.Wrap(command)
+                .WithArguments(arguments)
+                .WithEnvironmentVariables(environmentVariables);
 
-        var commandResult = await executionCommand
-            .WithValidation(CommandResultValidation.ZeroExitCode)
-            .WithStandardErrorPipe(PipeTarget.Null)
-            .WithStandardOutputPipe(PipeTarget.Null)
-            .ExecuteAsync();
+            var commandResult = await executionCommand
+                .WithValidation(CommandResultValidation.ZeroExitCode)
+                .WithStandardErrorPipe(PipeTarget.Null)
+                .WithStandardOutputPipe(PipeTarget.Null)
+                .ExecuteAsync();
 
-        return commandResult.ExitCode == 0;
+            return commandResult.ExitCode == 0;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     private Task HandleExitCode(string command,

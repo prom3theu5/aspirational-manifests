@@ -194,7 +194,7 @@ public class ManifestFileParserServiceTest
         var result = state.LoadedAspireManifestResources;
 
         // Assert
-        result.Should().HaveCount(7);
+        result.Should().HaveCount(8);
         result["catalog"].Should().BeOfType<Container>();
         result["catalogdb"].Should().BeOfType<PostgresDatabase>();
         result["basketcache"].Should().BeOfType<Container>();
