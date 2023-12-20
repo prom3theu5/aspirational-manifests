@@ -1,3 +1,5 @@
+using Aspirate.Processors.Resources.Project;
+
 namespace Aspirate.Commands.Actions.Containers;
 
 public sealed class PopulateContainerDetailsForProjectsAction(
@@ -19,7 +21,7 @@ public sealed class PopulateContainerDetailsForProjectsAction(
 
     private async Task HandleProjects()
     {
-        var projectProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
+        var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
 
         Logger.MarkupLine("\r\n[bold]Gathering container details for each project in selected components[/]\r\n");
 

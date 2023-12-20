@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Resources\" />
+    </ItemGroup>
+
 </Project>

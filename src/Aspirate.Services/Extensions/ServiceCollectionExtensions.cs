@@ -36,7 +36,8 @@ public static class ServiceCollectionExtensions
         services
             .AddSingleton<IFileSystem, FileSystem>()
             .AddSingleton<IAspireManifestCompositionService, AspireManifestCompositionService>()
-            .AddSingleton<IManifestFileParserService, ManifestFileParserService>();
+            .AddSingleton<IManifestFileParserService, ManifestFileParserService>()
+            .AddSingleton<IManifestWriter, ManifestWriter>();
 
     /// <summary>
     /// Adds the AspirateConfigurationSupport to the specified service collection.

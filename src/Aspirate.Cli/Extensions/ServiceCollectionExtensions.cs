@@ -9,7 +9,8 @@ internal static class ServiceCollectionExtensions
             .AddAspirateState()
             .AddAspirateServices()
             .AddAspirateActions()
-            .AddAspirateProcessors();
+            .AddAspirateProcessors()
+            .AddAspiratePlaceholderSubstitutionStrategies();
 
     private static IServiceCollection AddSpectreConsole(this IServiceCollection services) =>
         services.AddSingleton(AnsiConsole.Console);

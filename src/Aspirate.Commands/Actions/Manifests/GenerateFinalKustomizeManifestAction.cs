@@ -1,3 +1,5 @@
+using Aspirate.Processors;
+
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateFinalKustomizeManifestAction(
@@ -29,7 +31,7 @@ public sealed class GenerateFinalKustomizeManifestAction(
             }
         }
 
-        var finalHandler = Services.GetRequiredKeyedService<IProcessor>(AspireLiterals.Final) as FinalProcessor;
+        var finalHandler = Services.GetRequiredKeyedService<IResourceProcessor>(AspireLiterals.Final) as FinalProcessor;
         finalHandler.CreateFinalManifest(CurrentState.FinalResources, CurrentState.OutputPath, CurrentState.TemplatePath, CurrentState.Namespace);
 
         return Task.FromResult(true);

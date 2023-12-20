@@ -1,3 +1,5 @@
+using Aspirate.Processors.Resources.Project;
+
 namespace Aspirate.Commands.Actions.Containers;
 
 public sealed class BuildAndPushContainersFromProjectsAction(
@@ -16,7 +18,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
             return true;
         }
 
-        var projectProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
+        var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
 
         Logger.MarkupLine("\r\n[bold]Building all project resources, and pushing containers:[/]\r\n");
 

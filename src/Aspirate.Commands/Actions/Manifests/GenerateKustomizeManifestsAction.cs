@@ -40,7 +40,7 @@ public sealed class GenerateKustomizeManifestsAction(
             return;
         }
 
-        var handler = Services.GetKeyedService<IProcessor>(resource.Value.Type);
+        var handler = Services.GetKeyedService<IResourceProcessor>(resource.Value.Type);
 
         if (handler is null)
         {

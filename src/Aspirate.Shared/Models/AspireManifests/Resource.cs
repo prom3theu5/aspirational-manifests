@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Aspirate.Shared.Models.AspireManifests;
 
 /// <summary>
