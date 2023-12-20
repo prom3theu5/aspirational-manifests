@@ -48,7 +48,7 @@ public class ManifestFileParserService(
             var rawBytes = Encoding.UTF8.GetBytes(resourceElement.GetRawText());
             var reader = new Utf8JsonReader(rawBytes);
 
-            var resource = serviceProvider.GetKeyedService<IProcessor>(type) is { } handler
+            var resource = serviceProvider.GetKeyedService<IResourceProcessor>(type) is { } handler
                 ? handler.Deserialize(ref reader)
                 : new UnsupportedResource();
 

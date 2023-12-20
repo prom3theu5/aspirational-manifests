@@ -11,10 +11,19 @@ public class SubstituteValuesAspireManifestAction(IServiceProvider serviceProvid
 
     private void ReplacePlaceholdersInParsedResources(Dictionary<string, Resource> resources)
     {
-        foreach (var resourceEntry in resources)
+        var containers = resources.Where(x => x.Value.Type == AspireComponentLiterals.Container);
+        var nonContainers = resources.Where(x => x.Value.Type != AspireComponentLiterals.Container);
+
+        ProcessPlaceholders(resources, containers);
+        ProcessPlaceholders(resources, nonContainers);
+    }
+
+    private void ProcessPlaceholders(Dictionary<string, Resource> resources, IEnumerable<KeyValuePair<string, Resource>> resourcesToProcess)
+    {
+        foreach (var resourceEntry in resourcesToProcess)
         {
-            var processor = Services.GetKeyedService<IProcessor>(resourceEntry.Value.Type);
-            processor?.ReplacePlaceholders(resourceEntry.Value, resources);
+            var resourceProcessor = Services.GetKeyedService<IResourceProcessor>(resourceEntry.Value.Type);
+            resourceProcessor?.ReplacePlaceholders(resourceEntry.Value, resources);
         }
     }
 }

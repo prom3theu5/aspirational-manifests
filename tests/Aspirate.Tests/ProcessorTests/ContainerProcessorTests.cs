@@ -1,3 +1,6 @@
+using Aspirate.Processors.PlaceholderSubstitutionStrategies;
+using Aspirate.Processors.Resources.Container;
+
 namespace Aspirate.Tests.ProcessorTests;
 
 public class ContainerProcessorTests
@@ -11,7 +14,9 @@ public class ContainerProcessorTests
         var containerCompositionService = Substitute.For<IContainerCompositionService>();
         var containerDetailsService = Substitute.For<IContainerDetailsService>();
         var secretProvider = Substitute.For<ISecretProvider>();
-        var containerProcessor = new ContainerProcessor(fileSystem, console, secretProvider,containerCompositionService, containerDetailsService);
+        var manifestWriter = Substitute.For<IManifestWriter>();
+        var strategies = new List<IPlaceholderSubstitutionStrategy> { new ResourceContainerConnectionStringSubstitutionStrategy() };
+        var containerProcessor = new ContainerProcessor(fileSystem, console, secretProvider, containerCompositionService, containerDetailsService, manifestWriter, strategies);
 
         var resource = new Container
         {

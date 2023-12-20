@@ -1,3 +1,5 @@
+using Aspirate.Processors.Resources.Dockerfile;
+
 namespace Aspirate.Commands.Actions.Containers;
 
 public sealed class BuildAndPushContainersFromDockerfilesAction(
@@ -5,19 +7,40 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        if (NoSelectedDockerfileComponents())
+        {
+            return true;
+        }
+
+        var dockerfileProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Dockerfile) as DockerfileProcessor;
+
+        CacheContainerDetails(dockerfileProcessor);
+
         if (CurrentState.SkipBuild)
         {
             Logger.MarkupLine("\r\n[bold]Skipping build and push action as requested.[/]");
             return true;
         }
 
-        if (NoSelectedDockerfileComponents())
+        await PerformBuildAndPushes(dockerfileProcessor);
+
+        return true;
+    }
+
+    private void CacheContainerDetails(DockerfileProcessor? dockerfileProcessor)
+    {
+        Logger.MarkupLine("\r\n[bold]Building all dockerfile resources, and pushing containers:[/]\r\n");
+
+        foreach (var resource in CurrentState.SelectedDockerfileComponents)
         {
-            return true;
+            dockerfileProcessor.PopulateContainerImageCacheWithImage(resource, resource.Key, CurrentState.ContainerRegistry);
         }
 
-        var dockerfileProcessor = Services.GetRequiredKeyedService<IProcessor>(AspireComponentLiterals.Dockerfile) as DockerfileProcessor;
+        Logger.MarkupLine("\r\n[bold]Building and push completed for all selected dockerfile components.[/]");
+    }
 
+    private async Task PerformBuildAndPushes(DockerfileProcessor? dockerfileProcessor)
+    {
         Logger.MarkupLine("\r\n[bold]Building all dockerfile resources, and pushing containers:[/]\r\n");
 
         foreach (var resource in CurrentState.SelectedDockerfileComponents)
@@ -26,8 +49,6 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         }
 
         Logger.MarkupLine("\r\n[bold]Building and push completed for all selected dockerfile components.[/]");
-
-        return true;
     }
 
     private bool NoSelectedDockerfileComponents()

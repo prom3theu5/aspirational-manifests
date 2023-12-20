@@ -16,5 +16,6 @@ global using Aspirate.Shared.Models.MsBuild;
 global using Aspirate.Shared.Processors;
 global using CliWrap;
 global using CliWrap.Buffered;
+global using HandlebarsDotNet;
 global using Microsoft.Extensions.DependencyInjection;
 global using Spectre.Console;

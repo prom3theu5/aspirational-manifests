@@ -1,5 +1,3 @@
-using Aspirate.Secrets.Literals;
-
 namespace Aspirate.Secrets;
 
 public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecretProvider where TState : BaseSecretState, new()
