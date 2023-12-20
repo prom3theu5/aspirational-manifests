@@ -9,9 +9,9 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
     private readonly Dictionary<string, Func<string, Dictionary<string, Resource>, string>> _connectionStringMapping = new()
     {
         [AspireComponentLiterals.Redis] = (_, _) => "redis",
-        [AspireComponentLiterals.PostgresDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<PostgresDatabase, PostgresServer>(resources, resourceName),
-        [AspireComponentLiterals.SqlServerDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<SqlServerDatabase, SqlServer>(resources, resourceName),
-        [AspireComponentLiterals.MySqlDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<MySqlDatabase, MySqlServer>(resources, resourceName),
+        [AspireComponentLiterals.PostgresDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<PostgresDatabase>(resources, resourceName),
+        [AspireComponentLiterals.SqlServerDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<SqlServerDatabase>(resources, resourceName),
+        [AspireComponentLiterals.MySqlDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<MySqlDatabase>(resources, resourceName),
         [AspireComponentLiterals.Container] = (resourceName, resources) => (resources[resourceName] as Container)?.ConnectionString,
         [AspireComponentLiterals.RabbitMq] = (_, _) => "amqp://guest:guest@rabbitmq-service:5672",
         [AspireComponentLiterals.MongoDbServer] = (_, _) => "mongodb://mongo-service:27017",
@@ -32,9 +32,8 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
         }
     }
 
-    private static string SetupDatabaseConnectionString<TDatabase, TServer>(IReadOnlyDictionary<string, Resource> resources, string resourceName)
+    private static string SetupDatabaseConnectionString<TDatabase>(IReadOnlyDictionary<string, Resource> resources, string resourceName)
         where TDatabase : IResourceWithParent
-        where TServer : Resource
     {
         if (resources[resourceName] is not TDatabase databaseResource)
         {
@@ -46,12 +45,35 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
             throw new InvalidOperationException($"Parent resource {databaseResource.Parent} is not a Database Server.");
         }
 
-        return typeof(TServer) switch
+        return GetConnectionString(resourceName, databaseResource, parentResource);
+    }
+
+    private static string GetConnectionString(string resourceName, IResourceWithParent databaseResource, Resource parentResource) =>
+        parentResource.GetType() switch
         {
-            var type when type == typeof(Shared.Models.AspireManifests.Components.V1.SqlServer) => $"Server=sqlserver-service;User ID=sa;Password={(parentResource.Env["SaPassword"]).FromBase64()};TrustServerCertificate=true;",
-            var type when type == typeof(MySqlServer) => $"Server=mysql-service;Port=3306;User ID=root;Password={(parentResource.Env["RootPassword"]).FromBase64()};",
-            var type when type == typeof(PostgresServer) => $"host=postgres-service;database={resourceName};username=postgres;password=postgres;",
-            _ => throw new InvalidOperationException($"Resource {databaseResource.Parent} is not a supported database server."),
+            { } t when t == typeof(SqlServer) => GetSqlServerConnectionString(parentResource),
+            { } t when t == typeof(MySqlServer) => GetMySqlServerConnectionString(parentResource),
+            { } t when t == typeof(PostgresServer) => GetPostgresServerConnectionString(resourceName, parentResource),
+            { } t when t == typeof(Container) => GetContainerConnectionString(resourceName, parentResource),
+            _ => throw new InvalidOperationException($"Resource {databaseResource.Parent} is not a supported database server.")
         };
+
+    private static string GetSqlServerConnectionString(Resource parentResource) =>
+        $"Server=sqlserver-service;User ID=sa;Password={(parentResource.Env["SaPassword"]).FromBase64()};TrustServerCertificate=true;";
+
+    private static string GetMySqlServerConnectionString(Resource parentResource) =>
+        $"Server=mysql-service;Port=3306;User ID=root;Password={(parentResource.Env["RootPassword"]).FromBase64()};";
+
+    private static string GetPostgresServerConnectionString(string resourceName, Resource parentResource) =>
+        $"host=postgres-service;database={resourceName};username=postgres;password={(parentResource.Env["POSTGRES_PASSWORD"]).FromBase64()};";
+
+    private static string GetContainerConnectionString(string resourceName, Resource parentResource)
+    {
+        if (parentResource is not Container containerResource)
+        {
+            throw new InvalidOperationException($"Resource {resourceName} is not a container.");
+        }
+
+        return containerResource.ConnectionString;
     }
 }

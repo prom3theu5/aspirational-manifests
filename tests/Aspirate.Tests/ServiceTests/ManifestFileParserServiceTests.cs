@@ -171,6 +171,47 @@ public class ManifestFileParserServiceTest
         postgresContainer.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password;");
     }
 
+     [Fact]
+    public async Task LoadAndParseAspirePreviewTwoManifest_ParsesManifestFileCorrectly()
+    {
+        // Arrange
+        var fileSystem = new MockFileSystem();
+        var manifestFile = "preview-2-manifest.json";
+        var testData = Path.Combine(AppContext.BaseDirectory, "TestData", manifestFile);
+        fileSystem.AddFile(manifestFile, new(File.ReadAllText(testData)));
+        var serviceProvider = CreateServiceProvider(fileSystem);
+        var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
+
+        // Act
+        var state = serviceProvider.GetRequiredService<AspirateState>();
+        state.LoadedAspireManifestResources = service.LoadAndParseAspireManifest(manifestFile);
+
+        var postgresContainer = state.LoadedAspireManifestResources["catalog"] as Container;
+        postgresContainer.Inputs["password"].Value = "secret_password"; // inputs captured from user input
+
+        var postLoadAction = new SubstituteValuesAspireManifestAction(serviceProvider);
+        await postLoadAction.ExecuteAsync();
+        var result = state.LoadedAspireManifestResources;
+
+        // Assert
+        result.Should().HaveCount(7);
+        result["catalog"].Should().BeOfType<Container>();
+        result["catalogdb"].Should().BeOfType<PostgresDatabase>();
+        result["basketcache"].Should().BeOfType<Container>();
+
+        result["catalogservice"].Should().BeOfType<Project>();
+        result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
+        result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
+        result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
+        result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
+        result["catalogservice"].Env["ConnectionStrings__catalogdb"].Should().Be("Host=catalog;Port=5432;Username=postgres;Password=secret_password;");
+
+        result["basketservice"].Env["ConnectionStrings__basketcache"].Should().Be("basketcache:6379");
+
+        postgresContainer = result["catalog"] as Container;
+        postgresContainer.ConnectionString.Should().Be("Host=catalog;Port=5432;Username=postgres;Password=secret_password;");
+    }
+
     private static IServiceProvider CreateServiceProvider(IFileSystem? fileSystem = null, IAnsiConsole? console = null)
     {
         console ??= new TestConsole();

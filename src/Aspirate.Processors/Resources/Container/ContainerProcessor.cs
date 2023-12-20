@@ -43,6 +43,7 @@ public class ContainerProcessor(
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
+            .SetIsContainer(true)
             .SetPorts(containerPorts)
             .SetManifests(_manifests)
             .Validate();

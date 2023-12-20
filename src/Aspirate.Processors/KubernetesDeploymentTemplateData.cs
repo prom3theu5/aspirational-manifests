@@ -10,6 +10,7 @@ public class KubernetesDeploymentTemplateData
     public IReadOnlyCollection<string>? Manifests {get; private set;}
     public bool? IsService { get; private set; } = true;
     public bool? IsProject {get; private set;}
+    public bool? IsContainer {get; private set;}
     public string? ContainerImage {get; private set;}
     public bool? IsDockerfile {get; private set;}
     public string? ImagePullPolicy {get; private set;}
@@ -67,6 +68,12 @@ public class KubernetesDeploymentTemplateData
     public KubernetesDeploymentTemplateData SetIsDockerfile(bool dockerfile)
     {
         IsDockerfile = dockerfile;
+        return this;
+    }
+
+    public KubernetesDeploymentTemplateData SetIsContainer(bool container)
+    {
+        IsContainer = container;
         return this;
     }
 

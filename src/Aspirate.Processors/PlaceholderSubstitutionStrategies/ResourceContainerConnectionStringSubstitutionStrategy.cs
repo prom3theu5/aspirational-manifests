@@ -35,8 +35,8 @@ public partial class ResourceContainerConnectionStringSubstitutionStrategy : IPl
                 ResourceBindingsSubstitutionStrategy.BindingPlaceholder when pathParts[3] == "port" && targetContainer.Bindings != null && targetContainer.Bindings.TryGetValue(pathParts[2], out var binding)
                     => binding.ContainerPort.ToString(),
 
-                ResourceInputsSubstitutionStrategy.InputsPlaceholder when targetContainer.Inputs != null && targetContainer.Inputs.TryGetValue(pathParts[2], out var input)
-                    => input.Value ?? string.Empty,
+                ResourceInputsSubstitutionStrategy.InputsPlaceholder when targetContainer.Inputs != null && targetContainer.Inputs.TryGetValue(pathParts[2], out var inputEntry)
+                    => inputEntry.Value ?? string.Empty,
 
                 _ => throw new ArgumentException($"Unknown dictionary in placeholder {match.Value}."),
             };

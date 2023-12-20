@@ -12,8 +12,7 @@ spec:
   - name: http
     port: 8080
     targetPort: 8080
-{{/if}}
-
+{{else}}
 {{#if isDockerfile}}
 {{#if hasPorts}}
 ---
@@ -31,5 +30,26 @@ spec:
     port: {{port}}
     targetPort: {{port}}
 {{/each}}
+{{/if}}
+{{else}}
+{{#if isContainer}}
+{{#if hasPorts}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{name}}
+spec:
+  type: {{serviceType}}
+  selector:
+    app: {{name}}
+  ports:
+  {{#each ports}}
+  - name: {{name}}
+    port: {{port}}
+    targetPort: {{port}}
+{{/each}}
+{{/if}}
+{{/if}}
 {{/if}}
 {{/if}}
