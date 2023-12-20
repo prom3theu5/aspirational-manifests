@@ -132,6 +132,25 @@
           "transport": "http"
         }
       }
+    },
+    "nodefrontend": {
+      "type": "dockerfile.v0",
+      "path": "../nodefrontend/Dockerfile",
+      "context": "../nodefrontend",
+      "env": {
+        "NODE_ENV": "development",
+        "services__catalogservice__0": "{catalogservice.bindings.http.url}",
+        "services__catalogservice__1": "{catalogservice.bindings.https.url}",
+        "PORT": "{nodefrontend.bindings.http.port}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http",
+          "containerPort": 3000
+        }
+      }
     }
   }
 }

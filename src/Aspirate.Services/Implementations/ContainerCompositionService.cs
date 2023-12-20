@@ -9,8 +9,11 @@ public sealed class ContainerCompositionService(
     public async Task<bool> BuildAndPushContainerForProject(
         Project project,
         MsBuildContainerProperties containerDetails,
+        string builder,
         bool nonInteractive = false)
     {
+        await CheckIfBuilderIsRunning(builder);
+
         var fullProjectPath = filesystem.NormalizePath(project.Path);
 
         var argumentsBuilder = ArgumentsBuilder.Create();

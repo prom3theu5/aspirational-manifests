@@ -24,7 +24,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
 
         foreach (var resource in CurrentState.SelectedProjectComponents)
         {
-            await projectProcessor.BuildAndPushProjectContainer(resource, CurrentState.NonInteractive);
+            await projectProcessor.BuildAndPushProjectContainer(resource, CurrentState.ContainerBuilder, CurrentState.NonInteractive);
         }
 
         Logger.MarkupLine("\r\n[bold]Building and push completed for all selected project components.[/]");

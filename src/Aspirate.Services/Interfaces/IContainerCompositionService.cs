@@ -10,12 +10,13 @@ public interface IContainerCompositionService
     /// </summary>
     /// <param name="project">The project to build and push the container for.</param>
     /// <param name="containerDetails">The container properties used to build and push the container.</param>
+    /// <param name="builder">docker or podman.</param>
     /// <param name="nonInteractive">Flag indicating whether the process should run in non-interactive mode.</param>
     /// <returns>
     /// A task representing the asynchronous operation. The task result will be true if the container build and push was successful,
     /// or false if there was an error during the process.
     /// </returns>
-    Task<bool> BuildAndPushContainerForProject(Project project, MsBuildContainerProperties containerDetails, bool nonInteractive);
+    Task<bool> BuildAndPushContainerForProject(Project project, MsBuildContainerProperties containerDetails, string builder, bool nonInteractive = false);
 
     /// <summary>
     /// Build and push a container for a Dockerfile.
