@@ -75,26 +75,33 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
         }
     }
 
-    public async Task<bool> IsCommandAvailable(string commandName)
+    public async Task<CommandAvailableResult> IsCommandAvailable(string commandName)
     {
         try
         {
-            var commandCheck = OperatingSystem.IsWindows()
-                ? "where"
-                : "which";
+            var commandCheck = OperatingSystem.IsWindows() ? "where" : "which";
+
+            StringBuilder output = new();
 
             var commandResult = await Cli.Wrap(commandCheck)
                 .WithArguments(commandName)
                 .WithValidation(CommandResultValidation.None)
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(new()))
-                .WithStandardOutputPipe(PipeTarget.ToStringBuilder(new()))
+                .WithStandardOutputPipe(PipeTarget.ToStringBuilder(output))
                 .ExecuteAsync();
 
-            return commandResult.ExitCode == 0;
+            if (commandResult.ExitCode != 0)
+            {
+                return CommandAvailableResult.NotAvailable;
+            }
+
+            var path = output.ToString().Trim();
+
+            return string.IsNullOrEmpty(path) ? CommandAvailableResult.NotAvailable : CommandAvailableResult.Available(path);
         }
         catch (Exception)
         {
-            return false;
+            return CommandAvailableResult.NotAvailable;
         }
     }
 
@@ -102,7 +109,7 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
         ArgumentsBuilder argumentsBuilder,
         bool nonInteractive,
         Func<string, ArgumentsBuilder, bool, string, Task>? onFailed,
-        string? failureCommandMessage, BufferedCommandResult result,
+        string? failureCommandMessage, CommandResult result,
         bool exitWithExitCode)
     {
         if (onFailed != null)

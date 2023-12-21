@@ -2,8 +2,20 @@ namespace Aspirate.Services.Implementations;
 
 public class DaprCliService(IShellExecutionService shellExecutionService, IAnsiConsole console) : IDaprCliService
 {
-    public Task<bool> IsDaprCliInstalledOnMachine() =>
-        shellExecutionService.IsCommandAvailable("dapr");
+    private string _daprPath = "dapr";
+
+    public async Task<bool> IsDaprCliInstalledOnMachine()
+    {
+        var result = await shellExecutionService.IsCommandAvailable("dapr");
+
+        if (!result.IsAvailable)
+        {
+            return false;
+        }
+
+        _daprPath = result.FullPath;
+        return true;
+    }
 
     public async Task<bool> IsDaprInstalledInCluster()
     {
@@ -12,7 +24,7 @@ public class DaprCliService(IShellExecutionService shellExecutionService, IAnsiC
             .AppendArgument("status", string.Empty, quoteValue: false)
             .AppendArgument("-k", string.Empty, quoteValue: false);
 
-        return await shellExecutionService.ExecuteCommandWithEnvironmentNoOutput("dapr", argumentsBuilder, new Dictionary<string, string?>());
+        return await shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(_daprPath, argumentsBuilder, new Dictionary<string, string?>());
     }
 
     public async Task<ShellCommandResult> InstallDaprInCluster()
@@ -24,7 +36,7 @@ public class DaprCliService(IShellExecutionService shellExecutionService, IAnsiC
 
         return await shellExecutionService.ExecuteCommand(new()
         {
-            Command = "dapr",
+            Command = _daprPath,
             ArgumentsBuilder = argumentsBuilder,
             ShowOutput = true,
         });
@@ -39,7 +51,7 @@ public class DaprCliService(IShellExecutionService shellExecutionService, IAnsiC
 
         return await shellExecutionService.ExecuteCommand(new()
         {
-            Command = "dapr",
+            Command = _daprPath,
             ArgumentsBuilder = argumentsBuilder,
             ShowOutput = true,
         });
