@@ -9,7 +9,7 @@ public partial class ResourceContainerConnectionStringSubstitutionStrategy : IPl
 
     public void Substitute(KeyValuePair<string, string> placeholder, Dictionary<string, Resource> resources, Resource resource)
     {
-        if (resource is not Container container)
+        if (resource is not ContainerResource container)
         {
             throw new ArgumentException($"Resource {resource.Name} is not a container.");
         }
@@ -22,7 +22,7 @@ public partial class ResourceContainerConnectionStringSubstitutionStrategy : IPl
             .Replace(input, match =>
         {
             string[] pathParts = match.Groups[1].Value.Split('.');
-            if (!resources.TryGetValue(pathParts[0], out var resource) || resource is not Container targetContainer)
+            if (!resources.TryGetValue(pathParts[0], out var resource) || resource is not ContainerResource targetContainer)
             {
                 throw new ArgumentException($"Resource {pathParts[0]} not found or is not a container.");
             }

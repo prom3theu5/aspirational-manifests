@@ -8,7 +8,7 @@ public interface IContainerCompositionService
     /// <summary>
     /// Builds and pushes a container for the specified project using the specified container details and interactive mode flag.
     /// </summary>
-    /// <param name="project">The project to build and push the container for.</param>
+    /// <param name="projectResource">The project to build and push the container for.</param>
     /// <param name="containerDetails">The container properties used to build and push the container.</param>
     /// <param name="builder">docker or podman.</param>
     /// <param name="nonInteractive">Flag indicating whether the process should run in non-interactive mode.</param>
@@ -16,12 +16,12 @@ public interface IContainerCompositionService
     /// A task representing the asynchronous operation. The task result will be true if the container build and push was successful,
     /// or false if there was an error during the process.
     /// </returns>
-    Task<bool> BuildAndPushContainerForProject(Project project, MsBuildContainerProperties containerDetails, string builder, bool nonInteractive = false);
+    Task<bool> BuildAndPushContainerForProject(ProjectResource projectResource, MsBuildContainerProperties containerDetails, string builder, bool nonInteractive = false);
 
     /// <summary>
     /// Build and push a container for a Dockerfile.
     /// </summary>
-    /// <param name="dockerfile">The Dockerfile to build the container from.</param>
+    /// <param name="dockerfileResource">The Dockerfile to build the container from.</param>
     /// <param name="builder">The builder to use.</param>
     /// <param name="imageName">The name of the image to create.</param>
     /// <param name="registry">The registry to push the image to.</param>
@@ -36,5 +36,5 @@ public interface IContainerCompositionService
     /// It then pushes the created image to the specified registry.
     /// The nonInteractive parameter can be set to true to suppress any interactive prompts during the build process.
     /// </remarks>
-    Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string? registry, bool nonInteractive);
+    Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, string builder, string imageName, string? registry, bool nonInteractive);
 }

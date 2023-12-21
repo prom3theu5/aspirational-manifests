@@ -4,6 +4,7 @@ public sealed class ApplyManifestsToClusterAction(
     IKubeCtlService kubeCtlService,
     ISecretProvider secretProvider,
     IFileSystem fileSystem,
+    IDaprCliService daprCliService,
     IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public override async Task<bool> ExecuteAsync()
@@ -33,6 +34,8 @@ public sealed class ApplyManifestsToClusterAction(
                 }
             }
 
+            await HandleDapr();
+
             await WriteSecretsOutToTempFiles(secretFiles);
             await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
             Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
@@ -48,6 +51,42 @@ public sealed class ApplyManifestsToClusterAction(
         finally
         {
             CleanupSecretEnvFiles(secretFiles);
+        }
+    }
+
+    private async Task HandleDapr()
+    {
+        if (!fileSystem.Directory.Exists(fileSystem.Path.Combine(CurrentState.InputPath, "dapr")))
+        {
+            return;
+        }
+
+        var daprCliInstalled = await daprCliService.IsDaprCliInstalledOnMachine();
+
+        if (!daprCliInstalled)
+        {
+            Logger.MarkupLine("[yellow]Dapr cli is required to perform dapr installation in your cluster.[/]");
+            Logger.MarkupLine("[yellow]Please install dapr cli following the guide here:[blue]https://docs.dapr.io/getting-started/install-dapr-cli/[/][/]");
+            Logger.MarkupLine("[yellow]Manifest deployment will continue, but dapr will not be installed by aspirate.[/]");
+            return;
+        }
+
+        var daprInstalled = await daprCliService.IsDaprInstalledInCluster();
+
+        if (!daprInstalled)
+        {
+            Logger.MarkupLine("Dapr is required for this workload as you have dapr components, but is not installed in the cluster.");
+            Logger.MarkupLine($"\r\nInstalling Dapr in cluster [blue]'{CurrentState.KubeContext}'[/]");
+            var result = await daprCliService.InstallDaprInCluster();
+
+            if (result.ExitCode != 0)
+            {
+                Logger.MarkupLine($"[red](!)[/] Failed to install Dapr in cluster [blue]'{CurrentState.KubeContext}'[/]");
+                Logger.MarkupLine($"[red](!)[/] Error: {result.Error}");
+                throw new ActionCausesExitException(9999);
+            }
+
+            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr installed in cluster [blue]'{CurrentState.KubeContext}'[/]");
         }
     }
 

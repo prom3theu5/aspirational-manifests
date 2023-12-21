@@ -1,19 +1,22 @@
 namespace Aspirate.Secrets.Protectors;
 
-public class PostgresPasswordProtector(ISecretProvider secretProvider, IAnsiConsole console): BaseProtector(secretProvider, console)
+public class PostgresPasswordProtector(ISecretProvider secretProvider, IAnsiConsole console) : BaseProtector(secretProvider, console)
 {
     public override bool HasSecrets(KeyValuePair<string, Resource> component) =>
-        component.Value.Env?.Any(x => x.Key.Equals(ProtectableLiterals.PostgresPassword, StringComparison.OrdinalIgnoreCase)) ?? false;
+        component.Value.Env?.Any(x => x.Key.Equals(ProtectorType.PostgresPassword.Value, StringComparison.OrdinalIgnoreCase)) ?? false;
 
     public override void ProtectSecrets(KeyValuePair<string, Resource> component)
     {
-        var postgresPasswordInput = component.Value.Env?.FirstOrDefault(x => x.Key.Equals(ProtectableLiterals.PostgresPassword, StringComparison.OrdinalIgnoreCase));
-
-        if (postgresPasswordInput is not { Key: ProtectableLiterals.PostgresPassword })
+        if (component.Value.Env is null)
         {
             return;
         }
 
-        UpsertSecret(component, postgresPasswordInput.GetValueOrDefault());
+        var postgresPasswordInput = component.Value.Env.FirstOrDefault(x => x.Key.Equals(ProtectorType.PostgresPassword.Value, StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrEmpty(postgresPasswordInput.Key) && postgresPasswordInput.Key.Equals(ProtectorType.PostgresPassword.Value, StringComparison.OrdinalIgnoreCase))
+        {
+            UpsertSecret(component, postgresPasswordInput);
+        }
     }
 }

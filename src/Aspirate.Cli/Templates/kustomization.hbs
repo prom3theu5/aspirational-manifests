@@ -1,7 +1,7 @@
 {{#if withNamespace}}
 namespace: {{namespace}}
-{{/if}}
 
+{{/if}}
 resources:
 {{#each manifests}}
 - {{this}}
@@ -20,8 +20,8 @@ configMapGenerator:
     {{#if isProject}}
     - ASPNETCORE_URLS=http://+:8080
     {{/if}}
-{{/if}}
 
+{{/if}}
 {{#if hasAnySecrets}}
 secretGenerator:
 - name: {{name}}-secrets

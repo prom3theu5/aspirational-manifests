@@ -24,6 +24,8 @@ public static class ServiceCollectionExtensions
             .RegisterProcessor<MySqlDatabaseProcessor>(AspireComponentLiterals.MySqlDatabase)
             .RegisterProcessor<MongoDbServerProcessor>(AspireComponentLiterals.MongoDbServer)
             .RegisterProcessor<MongoDbDatabaseProcessor>(AspireComponentLiterals.MongoDbDatabase)
+            .RegisterProcessor<DaprProcessor>(AspireComponentLiterals.DaprSystem)
+            .RegisterProcessor<DaprComponentProcessor>(AspireComponentLiterals.DaprComponent)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
 
     /// <summary>

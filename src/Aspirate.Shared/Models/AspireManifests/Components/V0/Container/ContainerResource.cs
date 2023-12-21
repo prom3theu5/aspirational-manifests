@@ -1,6 +1,6 @@
-﻿namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
+﻿namespace Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
 
-public class Container : Resource, IResourceWithInput, IResourceWithBinding, IResourceWithConnectionString
+public class ContainerResource : Resource, IResourceWithInput, IResourceWithBinding, IResourceWithConnectionString
 {
     [JsonPropertyName("image")]
     public required string Image { get; set; }

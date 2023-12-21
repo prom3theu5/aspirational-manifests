@@ -1,3 +1,5 @@
+using Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
+
 namespace Aspirate.Shared.Models.AspireManifests.Interfaces;
 
 public interface IResourceWithInput

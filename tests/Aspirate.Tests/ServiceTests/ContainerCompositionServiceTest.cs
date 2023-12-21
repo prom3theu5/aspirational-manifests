@@ -13,7 +13,7 @@ public class ContainerCompositionServiceTest
 
         var service = new ContainerCompositionService(fileSystem, console, projectPropertyService, shellExecutionService);
 
-        var project = new Project
+        var project = new ProjectResource
         {
             Path = "testPath"
         };
@@ -59,7 +59,7 @@ public class ContainerCompositionServiceTest
 
         var service = new ContainerCompositionService(fileSystem, console, projectPropertyService, shellExecutionService);
 
-        var project = new Project
+        var project = new ProjectResource
         {
             Path = "testPath"
         };
@@ -103,7 +103,7 @@ public class ContainerCompositionServiceTest
 
         var service = new ContainerCompositionService(fileSystem, console, projectPropertyService, shellExecutionService);
 
-        var dockerfile = new Dockerfile { Path = "testPath", Context = "testContext" };
+        var dockerfile = new DockerfileResource { Path = "testPath", Context = "testContext" };
         var builder = "testBuilder";
         var imageName = "testImageName";
         var registry = "testRegistry";
@@ -135,7 +135,7 @@ public class ContainerCompositionServiceTest
 
         var service = new ContainerCompositionService(fileSystem, console, projectPropertyService, shellExecutionService);
 
-        var dockerfile = new Dockerfile
+        var dockerfile = new DockerfileResource
         {
             Path = "./testDockerfile",
             Context = "testContext",
@@ -180,7 +180,7 @@ public class ContainerCompositionServiceTest
 
         var service = new ContainerCompositionService(fileSystem, console, projectPropertyService, shellExecutionService);
 
-        var dockerfile = new Dockerfile { Path = "testPath", Context = "testContext" };
+        var dockerfile = new DockerfileResource { Path = "testPath", Context = "testContext" };
         var imageName = "testImageName";
         var registry = "testRegistry";
 

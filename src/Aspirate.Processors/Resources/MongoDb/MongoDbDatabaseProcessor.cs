@@ -10,7 +10,7 @@ public class MongoDbDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole conso
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<MongoDbDatabase>(ref reader);
+        JsonSerializer.Deserialize<MongoDbDatabaseResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false) =>

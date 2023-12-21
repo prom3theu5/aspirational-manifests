@@ -24,7 +24,7 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
             ? fileSystem.Directory.GetCurrentDirectory()
             : options.WorkingDirectory;
 
-        var result = await CliWrap.Cli.Wrap(options.Command)
+        var result = await Cli.Wrap(options.Command)
             .WithWorkingDirectory(executionDirectory)
             .WithArguments(arguments)
             .WithValidation(CommandResultValidation.None)
@@ -50,6 +50,9 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
 
     public async Task<bool> ExecuteCommandWithEnvironmentNoOutput(string command, ArgumentsBuilder argumentsBuilder, IReadOnlyDictionary<string, string?> environmentVariables)
     {
+        var output = new StringBuilder();
+        var errors = new StringBuilder();
+
         try
         {
             var arguments = argumentsBuilder.RenderArguments();
@@ -60,8 +63,31 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
 
             var commandResult = await executionCommand
                 .WithValidation(CommandResultValidation.ZeroExitCode)
-                .WithStandardErrorPipe(PipeTarget.Null)
-                .WithStandardOutputPipe(PipeTarget.Null)
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(output))
+                .WithStandardOutputPipe(PipeTarget.ToStringBuilder(errors))
+                .ExecuteAsync();
+
+            return commandResult.ExitCode == 0;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> IsCommandAvailable(string commandName)
+    {
+        try
+        {
+            var commandCheck = OperatingSystem.IsWindows()
+                ? "where"
+                : "which";
+
+            var commandResult = await Cli.Wrap(commandCheck)
+                .WithArguments(commandName)
+                .WithValidation(CommandResultValidation.None)
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(new()))
+                .WithStandardOutputPipe(PipeTarget.ToStringBuilder(new()))
                 .ExecuteAsync();
 
             return commandResult.ExitCode == 0;

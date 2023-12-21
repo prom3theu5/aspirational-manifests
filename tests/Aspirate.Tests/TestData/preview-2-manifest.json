@@ -1,5 +1,11 @@
 {
   "resources": {
+    "statestore": {
+      "type": "dapr.component.v0",
+      "daprComponent": {
+        "type": "state"
+      }
+    },
     "catalog": {
       "type": "container.v0",
       "image": "postgres:latest",
@@ -150,6 +156,16 @@
           "transport": "http",
           "containerPort": 3000
         }
+      }
+    },
+    "catalogservice-dapr": {
+      "type": "dapr.v0",
+      "dapr": {
+        "application": "catalogservice",
+        "appId": "catalogservice",
+        "components": [
+          "statestore"
+        ]
       }
     }
   }

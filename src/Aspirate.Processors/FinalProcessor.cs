@@ -23,18 +23,38 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
             .SetNamespace(@namespace)
             .SetIsService(false);
 
-        if (!string.IsNullOrEmpty(@namespace))
-        {
-            _console.MarkupLine($"\r\n[bold]Generating namespace manifest with name [blue]'{@namespace}'[/][/]");
-            _manifestWriter.CreateNamespace(outputPath, templateDataBuilder, templatePath);
-            manifests.Add($"{TemplateLiterals.NamespaceType}.yml");
-            _console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/namespace.yml[/]");
-        }
+        HandleNamespace(outputPath, templatePath, @namespace, templateDataBuilder, manifests);
+
+        HandleDapr(outputPath, manifests);
 
         var templateData = templateDataBuilder.SetManifests(manifests);
 
         _manifestWriter.CreateComponentKustomizeManifest(outputPath, templateData, templatePath);
 
         _console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/kustomization.yml[/]");
+    }
+
+    private void HandleNamespace(string outputPath, string? templatePath, string @namespace, KubernetesDeploymentTemplateData templateDataBuilder, List<string> manifests)
+    {
+        if (string.IsNullOrEmpty(@namespace))
+        {
+            return;
+        }
+
+        _console.MarkupLine($"\r\n[bold]Generating namespace manifest with name [blue]'{@namespace}'[/][/]");
+        _manifestWriter.CreateNamespace(outputPath, templateDataBuilder, templatePath);
+        manifests.Add($"{TemplateLiterals.NamespaceType}.yml");
+        _console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/namespace.yml[/]");
+    }
+
+    private void HandleDapr(string outputPath, List<string> manifests)
+    {
+        if (!_fileSystem.Directory.Exists(Path.Combine(outputPath, "dapr")))
+        {
+            return;
+        }
+
+        var daprFiles = _fileSystem.Directory.GetFiles(Path.Combine(outputPath, "dapr"), "*.yml", SearchOption.AllDirectories);
+        manifests.AddRange(daprFiles.Select(daprFile => daprFile.Replace(outputPath, string.Empty).TrimStart(Path.DirectorySeparatorChar)));
     }
 }

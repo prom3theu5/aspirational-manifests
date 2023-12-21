@@ -1,8 +1,8 @@
 
-namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
+namespace Aspirate.Shared.Models.AspireManifests.Components.V0.MongoDb;
 
 [ExcludeFromCodeCoverage]
-public class MySqlDatabase : Resource, IResourceWithParent
+public class MongoDbDatabaseResource : Resource, IResourceWithParent
 {
     /// <summary>
     /// The parent server of the database.

@@ -14,7 +14,7 @@ public sealed class MongoDbServerProcessor(IFileSystem fileSystem, IAnsiConsole 
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<MongoDbServer>(ref reader);
+        JsonSerializer.Deserialize<MongoDbServerResource>(ref reader);
 
     public override Task<bool> CreateManifests(
         KeyValuePair<string, Resource> resource,

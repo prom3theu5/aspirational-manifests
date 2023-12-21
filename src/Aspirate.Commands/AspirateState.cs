@@ -1,5 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests.Components.V1;
-
 namespace Aspirate.Commands;
 
 public class AspirateState :
@@ -87,13 +85,13 @@ public class AspirateState :
     [JsonIgnore]
     public List<KeyValuePair<string, Resource>> SelectedProjectComponents =>
         LoadedAspireManifestResources
-            .Where(x => x.Value is Project && AspireComponentsToProcess.Contains(x.Key))
+            .Where(x => x.Value is ProjectResource && AspireComponentsToProcess.Contains(x.Key))
             .ToList();
 
     [JsonIgnore]
     public List<KeyValuePair<string, Resource>> SelectedDockerfileComponents =>
         LoadedAspireManifestResources
-            .Where(x => x.Value is Dockerfile && AspireComponentsToProcess.Contains(x.Key))
+            .Where(x => x.Value is DockerfileResource && AspireComponentsToProcess.Contains(x.Key))
             .ToList();
 
     [JsonIgnore]
@@ -102,15 +100,16 @@ public class AspirateState :
             .Where(x => x.Value is not UnsupportedResource && AspireComponentsToProcess.Contains(x.Key))
             .ToList();
 
-    [JsonIgnore]
-    public bool HasSelectedSupportedComponents => !AllSelectedSupportedComponents.All(x => IsDatabase(x.Value));
+   [JsonIgnore]
+    public bool HasSelectedSupportedComponents => !AllSelectedSupportedComponents.All(x => IsNotDeployable(x.Value));
 
     public void AppendToFinalResources(string key, Resource resource) =>
         FinalResources.Add(key, resource);
 
-    public static bool IsDatabase(Resource resource) =>
-        resource is PostgresDatabase
-            or SqlServerDatabase
-            or MySqlDatabase
-            or MongoDbDatabase;
+    public static bool IsNotDeployable(Resource resource) =>
+        resource is PostgresDatabaseResource
+            or SqlServerDatabaseResource
+            or MySqlDatabaseResource
+            or MongoDbDatabaseResource
+            or DaprResource;
 }

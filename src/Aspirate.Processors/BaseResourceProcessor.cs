@@ -8,7 +8,7 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// <summary>
     /// Represents the instance of a file system.
     /// </summary>
-    private readonly IFileSystem _fileSystem;
+    protected readonly IFileSystem _fileSystem;
 
     /// <summary>
     /// Represents a protected and read-only instance of the <see cref="IAnsiConsole"/> interface.
@@ -25,14 +25,8 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     protected readonly IManifestWriter _manifestWriter;
 
     /// <summary>
-    /// List of environment variables that are considered protected and will be managed by secrets.
+    /// The list of placeholder substitution strategies used for string formatting.
     /// </summary>
-    private readonly List<string> _protectedEnvVars =
-    [
-        ProtectableLiterals.ConnectionString,
-        ProtectableLiterals.PostgresPassword,
-    ];
-
     protected readonly List<IPlaceholderSubstitutionStrategy> _substitutionStrategies;
 
     /// <summary>
@@ -75,7 +69,7 @@ public abstract class BaseResourceProcessor : IResourceProcessor
 
         var envVars = resource.Env;
 
-        return envVars == null ? [] : envVars.Where(e => !_protectedEnvVars.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
+        return envVars == null ? [] : envVars.Where(e => !ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
 
     /// <summary>
@@ -93,7 +87,7 @@ public abstract class BaseResourceProcessor : IResourceProcessor
 
         var envVars = resource.Env;
 
-        return envVars == null ? [] : envVars.Where(e => _protectedEnvVars.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
+        return envVars == null ? [] : envVars.Where(e => ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
 
     /// <summary>

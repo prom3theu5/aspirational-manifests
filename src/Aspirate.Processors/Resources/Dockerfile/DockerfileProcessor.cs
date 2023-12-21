@@ -28,7 +28,7 @@ public class DockerfileProcessor(
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<Shared.Models.AspireManifests.Components.V0.Dockerfile>(ref reader);
+        JsonSerializer.Deserialize<DockerfileResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false)
@@ -37,7 +37,7 @@ public class DockerfileProcessor(
 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var dockerFile = resource.Value as Shared.Models.AspireManifests.Components.V0.Dockerfile;
+        var dockerFile = resource.Value as DockerfileResource;
 
         var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
 
@@ -51,6 +51,7 @@ public class DockerfileProcessor(
             .SetContainerImage(containerImage)
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
+            .SetAnnotations(resource.Value.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(containerPorts)
@@ -69,7 +70,7 @@ public class DockerfileProcessor(
 
     public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, string builder, string imageName, string registry, bool nonInteractive)
     {
-        var dockerfile = resource.Value as Shared.Models.AspireManifests.Components.V0.Dockerfile;
+        var dockerfile = resource.Value as DockerfileResource;
 
         await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, nonInteractive);
 

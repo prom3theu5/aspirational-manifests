@@ -24,16 +24,19 @@ public class ContainerProcessor(
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<Shared.Models.AspireManifests.Components.V0.Container>(ref reader);
+        JsonSerializer.Deserialize<ContainerResource>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
-        string? templatePath = null, bool? disableSecrets = false)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource,
+        string outputPath,
+        string imagePullPolicy,
+        string? templatePath = null,
+        bool? disableSecrets = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var container = resource.Value as Shared.Models.AspireManifests.Components.V0.Container;
+        var container = resource.Value as ContainerResource;
 
         var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
 
@@ -41,6 +44,7 @@ public class ContainerProcessor(
             .SetName(resource.Key)
             .SetContainerImage(container.Image)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
+            .SetAnnotations(resource.Value.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetIsContainer(true)

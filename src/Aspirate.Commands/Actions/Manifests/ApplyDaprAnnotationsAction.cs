@@ -1,0 +1,54 @@
+namespace Aspirate.Commands.Actions.Manifests;
+
+public class ApplyDaprAnnotationsAction(IServiceProvider serviceProvider, IAnsiConsole console) : BaseAction(serviceProvider)
+{
+    public override Task<bool> ExecuteAsync()
+    {
+        var daprSystemComponents = CurrentState.LoadedAspireManifestResources.Where(
+            x => x.Value.Type.Equals(AspireComponentLiterals.DaprSystem, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (daprSystemComponents.Count == 0)
+        {
+            console.WriteLine("No Dapr components selected, skipping Dapr annotations.");
+            return Task.FromResult(true);
+        }
+
+        foreach (var daprSystemComponent in daprSystemComponents)
+        {
+            var resource = daprSystemComponent.Value as DaprResource;
+
+            var serviceForSidecar = CurrentState.LoadedAspireManifestResources[resource.Metadata.Application];
+
+            ApplyDaprAnnotationsToTargetService(serviceForSidecar, resource);
+        }
+
+        return Task.FromResult(true);
+    }
+
+    private static void ApplyDaprAnnotationsToTargetService(Resource serviceForSidecar, DaprResource resource)
+    {
+        serviceForSidecar.Annotations ??= [];
+
+        serviceForSidecar.Annotations.Add("dapr.io/enabled", "true");
+        serviceForSidecar.Annotations.Add("dapr.io/config", "tracing");
+        serviceForSidecar.Annotations.Add("dapr.io/app-id", resource.Metadata.AppId);
+
+        HandleContainerPort(serviceForSidecar);
+    }
+
+    private static void HandleContainerPort(Resource serviceForSidecar)
+    {
+        if (serviceForSidecar is not ContainerResource container)
+        {
+            return;
+        }
+
+        if (!container.Bindings.TryGetValue("tcp", out var binding))
+        {
+            return;
+        }
+
+        container.Annotations.Add("dapr.io/app-port", binding.ContainerPort.ToString());
+    }
+}

@@ -15,7 +15,7 @@ public class SqlServerDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole con
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<SqlServerDatabase>(ref reader);
+        JsonSerializer.Deserialize<SqlServerDatabaseResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false) =>

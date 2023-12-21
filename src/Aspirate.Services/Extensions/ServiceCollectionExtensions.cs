@@ -17,7 +17,8 @@ public static class ServiceCollectionExtensions
             .AddAspireManifestSupport()
             .AddAspirateConfigurationSupport()
             .AddContainerSupport()
-            .AddKubeCtlSupport();
+            .AddKubeCtlSupport()
+            .AddDaprCliSupport();
 
     /// <summary>
     /// Adds the password generator implementation to the service collection.
@@ -56,6 +57,15 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddKubeCtlSupport(this IServiceCollection services) =>
         services
             .AddSingleton<IKubeCtlService, KubeCtlService>();
+
+    /// <summary>
+    /// Adds Dapr CLI support to the specified service collection.
+    /// </summary>
+    /// <param name="services">The service collection to add the Dapr CLI support to.</param>
+    /// <returns>The updated service collection with Dapr CLI support added.</returns>
+    private static IServiceCollection AddDaprCliSupport(this IServiceCollection services) =>
+        services
+            .AddSingleton<IDaprCliService, DaprCliService>();
 
     /// <summary>
     /// Adds the shell execution service to the service collection.

@@ -5,12 +5,12 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
 
     public async Task<MsBuildContainerProperties> GetContainerDetails(
         string resourceName,
-        Project project,
+        ProjectResource projectResource,
         string? containerRegistry,
         string? containerImageTag)
     {
         var containerPropertiesJson = await propertyService.GetProjectPropertiesAsync(
-            project.Path,
+            projectResource.Path,
             ContainerBuilderLiterals.ContainerRegistry,
             ContainerBuilderLiterals.ContainerRepository,
             ContainerBuilderLiterals.ContainerImageName,
@@ -19,7 +19,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         var msBuildProperties = JsonSerializer.Deserialize<MsBuildProperties<MsBuildContainerProperties>>(containerPropertiesJson ?? "{}");
 
         // Exit app if container registry is empty. We need it.
-        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, project, containerRegistry);
+        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, projectResource, containerRegistry);
 
         // Fallback to service name if image name is not provided from anywhere. (imageName is deprecated using repository like it says to).
         if (string.IsNullOrEmpty(msBuildProperties.Properties.ContainerRepository) && string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImageName))
@@ -89,7 +89,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
 
     private void EnsureContainerRegistryIsNotEmpty(
         MsBuildContainerProperties details,
-        Project project,
+        ProjectResource projectResource,
         string? containerRegistry)
     {
         if (HasRegistry(details))

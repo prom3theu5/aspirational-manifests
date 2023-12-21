@@ -1,5 +1,3 @@
-using AspireRedis = Aspirate.Shared.Models.AspireManifests.Components.V0.Redis;
-
 namespace Aspirate.Processors.Resources.Redis;
 
 /// <summary>
@@ -20,7 +18,7 @@ public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<AspireRedis>(ref reader);
+        JsonSerializer.Deserialize<RedisResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false)

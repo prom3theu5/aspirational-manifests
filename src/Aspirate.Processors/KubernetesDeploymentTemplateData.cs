@@ -7,6 +7,7 @@ public class KubernetesDeploymentTemplateData
     public string? Namespace {get; private set;}
     public Dictionary<string, string>? Env {get; private set;}
     public Dictionary<string, string>? Secrets {get; private set;}
+    public Dictionary<string, string>? Annotations {get; private set;}
     public IReadOnlyCollection<string>? Manifests {get; private set;}
     public bool? IsService { get; private set; } = true;
     public bool? IsProject {get; private set;}
@@ -38,6 +39,12 @@ public class KubernetesDeploymentTemplateData
     public KubernetesDeploymentTemplateData SetSecrets(Dictionary<string, string> secrets)
     {
         Secrets = secrets;
+        return this;
+    }
+
+    public KubernetesDeploymentTemplateData SetAnnotations(Dictionary<string, string> annotations)
+    {
+        Annotations = annotations;
         return this;
     }
 
@@ -126,6 +133,7 @@ public class KubernetesDeploymentTemplateData
 
     public bool HasPorts => Ports?.Any() == true;
     public bool HasAnySecrets => Secrets?.Any() == true;
+    public bool HasAnyAnnotations => Annotations?.Any() == true;
     public bool WithNamespace => !string.IsNullOrWhiteSpace(Namespace);
 
     public KubernetesDeploymentTemplateData Validate()
