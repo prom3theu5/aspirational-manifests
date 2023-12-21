@@ -38,5 +38,5 @@ public interface IShellExecutionService
     /// <param name="commandName">The name of the command to check availability for.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains
     /// true if the command is available, false otherwise.</returns>
-    Task<bool> IsCommandAvailable(string commandName);
+    Task<CommandAvailableResult> IsCommandAvailable(string commandName);
 }

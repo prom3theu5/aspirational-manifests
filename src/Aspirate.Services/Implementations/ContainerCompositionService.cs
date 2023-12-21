@@ -216,16 +216,52 @@ public sealed class ContainerCompositionService(
 
     private async Task CheckIfBuilderIsRunning(string builder)
     {
+        var builderAvailable = await shellExecutionService.IsCommandAvailable(builder);
+
+        if (builderAvailable is null || !builderAvailable.IsAvailable)
+        {
+            console.MarkupLine($"\r\n[red bold]{builder} is not available or found on your system.[/]");
+            throw new ActionCausesExitException(1);
+        }
+
         var argumentsBuilder = ArgumentsBuilder
             .Create()
-            .AppendArgument("info", string.Empty, quoteValue: false);
+            .AppendArgument("info", string.Empty, quoteValue: false)
+            .AppendArgument("--format", "json", quoteValue: false);
 
-        var builderIsRunning = await shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(builder, argumentsBuilder, new Dictionary<string, string?>());
-        if (!builderIsRunning)
+        var builderCheckResult = await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = builderAvailable.FullPath,
+            ArgumentsBuilder = argumentsBuilder,
+        });
+
+        if (builderCheckResult.ExitCode != 0)
         {
             console.MarkupLine($"\r\n[red bold]{builder} is not running.[/]");
             throw new ActionCausesExitException(1);
         }
+
+        ValidateBuilderOutput(builderCheckResult);
+    }
+
+    private void ValidateBuilderOutput(ShellCommandResult builderCheckResult)
+    {
+        var builderInfo = JsonDocument.Parse(builderCheckResult.Output);
+
+        if (!builderInfo.RootElement.TryGetProperty("ServerErrors", out var errorProperty))
+        {
+            return;
+        }
+
+        if (errorProperty.ValueKind == JsonValueKind.Array && errorProperty.GetArrayLength() == 0)
+        {
+            return;
+        }
+
+        string messages = string.Join(Environment.NewLine, errorProperty.EnumerateArray());
+        console.MarkupLine("[red][bold]The daemon server reported errors:[/][/]");
+        console.MarkupLine($"[red]{messages}[/]");
+        throw new ActionCausesExitException(1);
     }
 
     private static void CheckSuccess(ShellCommandResult result)
