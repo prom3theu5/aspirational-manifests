@@ -4,6 +4,7 @@ public sealed class RemoveManifestsFromClusterAction(
     IKubeCtlService kubeCtlService,
     IServiceProvider serviceProvider,
     IFileSystem fileSystem,
+    IDaprCliService daprCliService,
     ISecretProvider secretProvider) :
     BaseActionWithNonInteractiveValidation(serviceProvider)
 {
@@ -39,6 +40,8 @@ public sealed class RemoveManifestsFromClusterAction(
             await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
             Logger.MarkupLine(
                 $"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
+
+            await HandleDapr();
 
             return true;
         }
@@ -83,6 +86,53 @@ public sealed class RemoveManifestsFromClusterAction(
 
                 var stream = fileSystem.File.Create(secretFile);
                 stream.Close();
+            }
+        }
+    }
+
+    private async Task HandleDapr()
+    {
+        if (!fileSystem.Directory.Exists(fileSystem.Path.Combine(CurrentState.InputPath, "dapr")))
+        {
+            return;
+        }
+
+        var daprCliInstalled = await daprCliService.IsDaprCliInstalledOnMachine();
+
+        if (!daprCliInstalled)
+        {
+            Logger.MarkupLine("[yellow]Dapr cli is required to remove dapr installation from your cluster.[/]");
+            Logger.MarkupLine("[yellow]Please install dapr cli following the guide here:[blue]https://docs.dapr.io/getting-started/install-dapr-cli/[/][/]");
+            Logger.MarkupLine("[yellow]Manifest removal will continue, but dapr will not be removed by aspirate.[/]");
+            return;
+        }
+
+        var daprInstalled = await daprCliService.IsDaprInstalledInCluster();
+
+        if (daprInstalled)
+        {
+            Logger.MarkupLine("Dapr was required for the deployment workloads as you have dapr components.");
+            Logger.MarkupLine("Dapr is installed in your cluster.");
+
+            var shouldRemoveDapr = true;
+
+            if (!CurrentState.NonInteractive)
+            {
+                shouldRemoveDapr = Logger.Confirm("[bold]Would you like to remove Dapr from your cluster?[/]");
+            }
+
+            if (shouldRemoveDapr)
+            {
+                var result = await daprCliService.RemoveDaprFromCluster();
+
+                if (result.ExitCode != 0)
+                {
+                    Logger.MarkupLine($"[red](!)[/] Failed to remove Dapr from cluster [blue]'{CurrentState.KubeContext}'[/]");
+                    Logger.MarkupLine($"[red](!)[/] Error: {result.Error}");
+                    throw new ActionCausesExitException(9999);
+                }
+
+                Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
             }
         }
     }

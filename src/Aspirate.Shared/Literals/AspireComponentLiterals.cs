@@ -24,4 +24,7 @@ public static class AspireComponentLiterals
 
     public const string MongoDbServer = "mongodb.server.v0";
     public const string MongoDbDatabase = "mongodb.database.v0";
+
+    public const string DaprSystem = "dapr.v0";
+    public const string DaprComponent = "dapr.component.v0";
 }

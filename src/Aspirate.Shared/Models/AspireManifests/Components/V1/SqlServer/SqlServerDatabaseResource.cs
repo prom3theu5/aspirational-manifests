@@ -1,7 +1,7 @@
-namespace Aspirate.Shared.Models.AspireManifests.Components.V1;
+namespace Aspirate.Shared.Models.AspireManifests.Components.V1.SqlServer;
 
 [ExcludeFromCodeCoverage]
-public class SqlServerDatabase : Resource, IResourceWithParent
+public class SqlServerDatabaseResource : Resource, IResourceWithParent
 {
     /// <summary>
     /// The parent server of the database.

@@ -26,7 +26,7 @@ public sealed class ProjectProcessor(
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<AspireProject>(ref reader);
+        JsonSerializer.Deserialize<ProjectResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false)
@@ -45,6 +45,7 @@ public sealed class ProjectProcessor(
             .SetContainerImage(containerDetails.FullContainerImage)
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
+            .SetAnnotations(resource.Value.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetIsProject(true)
@@ -62,7 +63,7 @@ public sealed class ProjectProcessor(
 
     public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, string builder, bool nonInteractive)
     {
-        var project = resource.Value as AspireProject;
+        var project = resource.Value as ProjectResource;
 
         if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
         {
@@ -79,7 +80,7 @@ public sealed class ProjectProcessor(
         string containerRegistry,
         string containerImageTag)
     {
-        var project = resource.Value as AspireProject;
+        var project = resource.Value as ProjectResource;
 
         var details = await containerDetailsService.GetContainerDetails(resource.Key, project, containerRegistry, containerImageTag);
 

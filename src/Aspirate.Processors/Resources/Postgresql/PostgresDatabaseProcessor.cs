@@ -13,7 +13,7 @@ public class PostgresDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole cons
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<PostgresDatabase>(ref reader);
+        JsonSerializer.Deserialize<PostgresDatabaseResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false) =>

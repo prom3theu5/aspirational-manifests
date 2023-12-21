@@ -18,6 +18,21 @@ public interface IManifestWriter
     void CreateDeployment<TTemplateData>(string outputPath, TTemplateData data, string? templatePath);
 
     /// <summary>
+    /// Creates a Dapr manifest file based on the provided template data and saves it to the specified output path.
+    /// </summary>
+    /// <typeparam name="TTemplateData">The type of data used by the template.</typeparam>
+    /// <param name="outputPath">The path where the Dapr manifest file should be saved.</param>
+    /// <param name="data">The template data used to generate the Dapr manifest file.</param>
+    /// <param name="name">The name of the resource file to create.</param>
+    /// <param name="templatePath">The path to the template file used for generating the Dapr manifest. This parameter is optional and can be null.</param>
+    /// <remarks>
+    /// This method generates a Dapr manifest file using the provided data and saves it to the specified output path.
+    /// If a template path is provided, the method will use the template file for generating the manifest file.
+    /// If the template path is not provided, the method will generate the manifest file using default settings.
+    /// </remarks>
+    void CreateDaprManifest<TTemplateData>(string outputPath, TTemplateData data, string name, string? templatePath);
+
+    /// <summary>
     /// Creates a service based on the specified output path, template data, and optional template path.
     /// </summary>
     /// <param name="outputPath">The path to where the service should be created.</param>

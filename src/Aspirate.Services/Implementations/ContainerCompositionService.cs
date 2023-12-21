@@ -7,14 +7,14 @@ public sealed class ContainerCompositionService(
     IShellExecutionService shellExecutionService) : IContainerCompositionService
 {
     public async Task<bool> BuildAndPushContainerForProject(
-        Project project,
+        ProjectResource projectResource,
         MsBuildContainerProperties containerDetails,
         string builder,
         bool nonInteractive = false)
     {
         await CheckIfBuilderIsRunning(builder);
 
-        var fullProjectPath = filesystem.NormalizePath(project.Path);
+        var fullProjectPath = filesystem.NormalizePath(projectResource.Path);
 
         var argumentsBuilder = ArgumentsBuilder.Create();
 
@@ -33,12 +33,12 @@ public sealed class ContainerCompositionService(
         return true;
     }
 
-    public async Task<bool> BuildAndPushContainerForDockerfile(Dockerfile dockerfile, string builder, string imageName, string? registry, bool nonInteractive)
+    public async Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, string builder, string imageName, string? registry, bool nonInteractive)
     {
         await CheckIfBuilderIsRunning(builder);
 
         var tagBuilder = new StringBuilder();
-        var fullDockerfilePath = filesystem.GetFullPath(dockerfile.Path);
+        var fullDockerfilePath = filesystem.GetFullPath(dockerfileResource.Path);
 
         if (!string.IsNullOrEmpty(registry))
         {
@@ -50,7 +50,7 @@ public sealed class ContainerCompositionService(
 
         var tag = tagBuilder.ToString();
 
-        var result = await BuildContainer(dockerfile, builder, nonInteractive, tag, fullDockerfilePath);
+        var result = await BuildContainer(dockerfileResource, builder, nonInteractive, tag, fullDockerfilePath);
 
         CheckSuccess(result);
 
@@ -83,7 +83,7 @@ public sealed class ContainerCompositionService(
         return new ShellCommandResult(true, string.Empty, string.Empty, 0);
     }
 
-    private Task<ShellCommandResult> BuildContainer(Dockerfile dockerfile, string builder, bool nonInteractive, string tag, string fullDockerfilePath)
+    private Task<ShellCommandResult> BuildContainer(DockerfileResource dockerfileResource, string builder, bool nonInteractive, string tag, string fullDockerfilePath)
     {
         var buildArgumentBuilder = ArgumentsBuilder
             .Create()
@@ -91,14 +91,14 @@ public sealed class ContainerCompositionService(
             .AppendArgument(DockerLiterals.TagArgument, tag.ToLower());
 
 
-        if (dockerfile.Env is not null)
+        if (dockerfileResource.Env is not null)
         {
-            AddDockerBuildArgs(buildArgumentBuilder, dockerfile.Env);
+            AddDockerBuildArgs(buildArgumentBuilder, dockerfileResource.Env);
         }
 
         buildArgumentBuilder
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
-            .AppendArgument(dockerfile.Context, string.Empty, quoteValue: false);
+            .AppendArgument(dockerfileResource.Context, string.Empty, quoteValue: false);
 
         return shellExecutionService.ExecuteCommand(new()
         {

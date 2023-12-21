@@ -18,7 +18,7 @@ public class ContainerProcessorTests
         var strategies = new List<IPlaceholderSubstitutionStrategy> { new ResourceContainerConnectionStringSubstitutionStrategy() };
         var containerProcessor = new ContainerProcessor(fileSystem, console, secretProvider, containerCompositionService, containerDetailsService, manifestWriter, strategies);
 
-        var resource = new Container
+        var resource = new ContainerResource
         {
             Type = AspireComponentLiterals.Container,
             ConnectionString = "Host={postgrescontainer.bindings.tcp.host};Port={postgrescontainer.bindings.tcp.port};Username=postgres;Password={postgrescontainer.inputs.password}",

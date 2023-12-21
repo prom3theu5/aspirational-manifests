@@ -16,7 +16,7 @@ public sealed class SqlServerProcessor(IFileSystem fileSystem, IAnsiConsole cons
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader)
     {
-        var resource = JsonSerializer.Deserialize<Shared.Models.AspireManifests.Components.V1.SqlServer>(ref reader);
+        var resource = JsonSerializer.Deserialize<SqlServerResource>(ref reader);
         resource.Env = new()
         {
             ["SaPassword"] = passwordGenerator.Generate().ToBase64(),

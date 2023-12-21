@@ -1,5 +1,3 @@
-using AspireRabbit = Aspirate.Shared.Models.AspireManifests.Components.V0.RabbitMq;
-
 namespace Aspirate.Processors.Resources.RabbitMQ;
 
 /// <summary>
@@ -20,7 +18,7 @@ public class RabbitMqProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<AspireRabbit>(ref reader);
+        JsonSerializer.Deserialize<RabbitMqResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false)

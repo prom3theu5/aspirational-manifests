@@ -16,7 +16,7 @@ public sealed class MySqlServerProcessor(IFileSystem fileSystem, IAnsiConsole co
     /// <inheritdoc />
     public override Resource Deserialize(ref Utf8JsonReader reader)
     {
-        var resource = JsonSerializer.Deserialize<MySqlServer>(ref reader);
+        var resource = JsonSerializer.Deserialize<MySqlServerResource>(ref reader);
         resource.Env = new()
         {
             ["RootPassword"] = passwordGenerator.Generate().ToBase64(),

@@ -8,6 +8,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     private readonly Dictionary<string, string> _templateFileMapping = new()
     {
         [TemplateLiterals.DeploymentType] = $"{TemplateLiterals.DeploymentType}.hbs",
+        [TemplateLiterals.DaprComponentType] = $"{TemplateLiterals.DaprComponentType}.hbs",
         [TemplateLiterals.ServiceType] = $"{TemplateLiterals.ServiceType}.hbs",
         [TemplateLiterals.ComponentKustomizeType] = $"{TemplateLiterals.ComponentKustomizeType}.hbs",
         [TemplateLiterals.RedisType] = $"{TemplateLiterals.RedisType}.hbs",
@@ -41,6 +42,21 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DeploymentType}.yml");
 
         CreateFile(templateFile, deploymentOutputPath, data, templatePath);
+    }
+
+    public void CreateDaprManifest<TTemplateData>(string outputPath, TTemplateData data, string name, string? templatePath)
+    {
+        var daprOutputPath = Path.Combine(outputPath, "dapr");
+
+        if (!fileSystem.Directory.Exists(daprOutputPath))
+        {
+            fileSystem.Directory.CreateDirectory(daprOutputPath);
+        }
+
+        _templateFileMapping.TryGetValue(TemplateLiterals.DaprComponentType, out var templateFile);
+        var daprFileOutputPath = Path.Combine(daprOutputPath, $"{name}.yml");
+
+        CreateFile(templateFile, daprFileOutputPath, data, templatePath);
     }
 
     /// <inheritdoc />

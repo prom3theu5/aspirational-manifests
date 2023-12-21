@@ -108,7 +108,7 @@ public class ManifestFileParserServiceTest
         // Assert
         result.Should().HaveCount(1);
         result["resource1"].Should().NotBeOfType<UnsupportedResource>();
-        result["resource1"].Should().BeOfType<PostgresDatabase>();
+        result["resource1"].Should().BeOfType<PostgresDatabaseResource>();
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class ManifestFileParserServiceTest
         var state = serviceProvider.GetRequiredService<AspirateState>();
         state.LoadedAspireManifestResources = service.LoadAndParseAspireManifest(manifestFile);
 
-        var postgresContainer = state.LoadedAspireManifestResources["postgrescontainer"] as Container;
+        var postgresContainer = state.LoadedAspireManifestResources["postgrescontainer"] as ContainerResource;
         postgresContainer.Inputs["password"].Value = "secret_password"; // inputs captured from user input
 
         var postLoadAction = new SubstituteValuesAspireManifestAction(serviceProvider);
@@ -135,30 +135,30 @@ public class ManifestFileParserServiceTest
 
         // Assert
         result.Should().HaveCount(12);
-        result["postgres"].Should().BeOfType<PostgresServer>();
+        result["postgres"].Should().BeOfType<PostgresServerResource>();
 
-        result["sqlserver"].Should().BeOfType<SqlServer>();
+        result["sqlserver"].Should().BeOfType<SqlServerResource>();
         result["sqlserver"].Env["SaPassword"].Should().NotBeNull().And.NotBeEmpty();
-        result["sqldb"].Should().BeOfType<SqlServerDatabase>();
+        result["sqldb"].Should().BeOfType<SqlServerDatabaseResource>();
 
-        result["mysqlserver"].Should().BeOfType<MySqlServer>();
+        result["mysqlserver"].Should().BeOfType<MySqlServerResource>();
         result["mysqlserver"].Env["RootPassword"].Should().NotBeNull().And.NotBeEmpty();
-        result["mysqldb"].Should().BeOfType<MySqlDatabase>();
+        result["mysqldb"].Should().BeOfType<MySqlDatabaseResource>();
 
-        result["mongodbserver"].Should().BeOfType<MongoDbServer>();
-        result["mongodbdb"].Should().BeOfType<MongoDbDatabase>();
+        result["mongodbserver"].Should().BeOfType<MongoDbServerResource>();
+        result["mongodbdb"].Should().BeOfType<MongoDbDatabaseResource>();
 
-        result["catalogdb"].Should().BeOfType<PostgresDatabase>();
+        result["catalogdb"].Should().BeOfType<PostgresDatabaseResource>();
 
-        result["basketcache"].Should().BeOfType<Redis>();
+        result["basketcache"].Should().BeOfType<RedisResource>();
 
-        result["catalogservice"].Should().BeOfType<Project>();
+        result["catalogservice"].Should().BeOfType<ProjectResource>();
         result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
         result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
         result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
         result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
 
-        result["anotherservice"].Should().BeOfType<Project>();
+        result["anotherservice"].Should().BeOfType<ProjectResource>();
         result["anotherservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
         result["anotherservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
         result["anotherservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
@@ -167,7 +167,7 @@ public class ManifestFileParserServiceTest
         result["anotherservice"].Env["ConnectionStrings__basketcache"].Should().Be("redis");
         result["anotherservice"].Env["ConnectionStrings__postgrescontainer"].Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password;");
 
-        postgresContainer = result["postgrescontainer"] as Container;
+        postgresContainer = result["postgrescontainer"] as ContainerResource;
         postgresContainer.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password;");
     }
 
@@ -186,29 +186,39 @@ public class ManifestFileParserServiceTest
         var state = serviceProvider.GetRequiredService<AspirateState>();
         state.LoadedAspireManifestResources = service.LoadAndParseAspireManifest(manifestFile);
 
-        var postgresContainer = state.LoadedAspireManifestResources["catalog"] as Container;
+        var postgresContainer = state.LoadedAspireManifestResources["catalog"] as ContainerResource;
         postgresContainer.Inputs["password"].Value = "secret_password"; // inputs captured from user input
 
-        var postLoadAction = new SubstituteValuesAspireManifestAction(serviceProvider);
-        await postLoadAction.ExecuteAsync();
+        var substituteValuesAspireManifestAction = new SubstituteValuesAspireManifestAction(serviceProvider);
+        await substituteValuesAspireManifestAction.ExecuteAsync();
+
+        var applyDaprAnnotationsAction = new ApplyDaprAnnotationsAction(serviceProvider, new TestConsole());
+        await applyDaprAnnotationsAction.ExecuteAsync();
+
         var result = state.LoadedAspireManifestResources;
 
         // Assert
-        result.Should().HaveCount(8);
-        result["catalog"].Should().BeOfType<Container>();
-        result["catalogdb"].Should().BeOfType<PostgresDatabase>();
-        result["basketcache"].Should().BeOfType<Container>();
+        result.Should().HaveCount(10);
+        result["catalog"].Should().BeOfType<ContainerResource>();
+        result["catalogdb"].Should().BeOfType<PostgresDatabaseResource>();
+        result["basketcache"].Should().BeOfType<ContainerResource>();
+        result["catalogservice-dapr"].Should().BeOfType<DaprResource>();
 
-        result["catalogservice"].Should().BeOfType<Project>();
+        result["catalogservice"].Should().BeOfType<ProjectResource>();
         result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
         result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
         result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
         result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
         result["catalogservice"].Env["ConnectionStrings__catalogdb"].Should().Be("Host=catalog;Port=5432;Username=postgres;Password=secret_password;");
+        result["catalogservice"].Annotations.Should().NotBeEmpty();
+        result["catalogservice"].Annotations.Should().ContainKey("dapr.io/enabled");
+        result["catalogservice"].Annotations["dapr.io/enabled"].Should().Be("true");
+        result["catalogservice"].Annotations.Should().ContainKey("dapr.io/app-id");
+        result["catalogservice"].Annotations["dapr.io/app-id"].Should().Be("catalogservice");
 
         result["basketservice"].Env["ConnectionStrings__basketcache"].Should().Be("basketcache:6379");
 
-        postgresContainer = result["catalog"] as Container;
+        postgresContainer = result["catalog"] as ContainerResource;
         postgresContainer.ConnectionString.Should().Be("Host=catalog;Port=5432;Username=postgres;Password=secret_password;");
     }
 

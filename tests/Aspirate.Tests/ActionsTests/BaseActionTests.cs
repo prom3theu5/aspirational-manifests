@@ -114,9 +114,9 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         return state;
     }
 
-    private static Container CreatePostgresContainerResourceManualInput(string resourceName, bool generatedInput = false, bool passwordsSet = false)
+    private static ContainerResource CreatePostgresContainerResourceManualInput(string resourceName, bool generatedInput = false, bool passwordsSet = false)
     {
-        var postgres = new Container
+        var postgres = new ContainerResource
         {
             Name = resourceName,
             Type = AspireComponentLiterals.Container,

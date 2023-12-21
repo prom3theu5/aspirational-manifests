@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Aspirate.Shared.Models.AspireManifests;
 
 /// <summary>
@@ -22,4 +20,10 @@ public abstract class Resource
     /// </summary>
     [JsonPropertyName("env")]
     public Dictionary<string, string>? Env { get; set; }
+
+    /// <summary>
+    /// Annotations used for deployments.
+    /// </summary>
+    [JsonPropertyName("annotations")]
+    public Dictionary<string, string>? Annotations { get; set; }
 }

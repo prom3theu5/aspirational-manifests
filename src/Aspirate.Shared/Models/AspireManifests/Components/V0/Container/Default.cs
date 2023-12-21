@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
+﻿namespace Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
 
 [ExcludeFromCodeCoverage]
 public class Default
