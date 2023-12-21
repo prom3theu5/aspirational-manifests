@@ -235,12 +235,6 @@ public sealed class ContainerCompositionService(
             ArgumentsBuilder = argumentsBuilder,
         });
 
-        if (builderCheckResult.ExitCode != 0)
-        {
-            console.MarkupLine($"\r\n[red bold]{builder} is not running.[/]");
-            throw new ActionCausesExitException(1);
-        }
-
         ValidateBuilderOutput(builderCheckResult);
     }
 
