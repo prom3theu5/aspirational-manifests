@@ -3,7 +3,7 @@
         SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
 
 <instance-profile id="hi"
-                 name="Aspir8: Aspire to Kubernetes"
+                 name="Aspir8: Aspire to Deployments"
                  start-page="Getting-Started.md">
 
     <toc-element topic="Getting-Started.md">

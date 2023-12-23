@@ -9,6 +9,11 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             throw new ArgumentOutOfRangeException(nameof(options.OutputFormat), $"The output format '{options.OutputFormat}' is not supported.");
         }
 
+        if (outputFormat.Name == nameof(OutputFormat.DockerCompose))
+        {
+            CurrentState.DisableSecrets = true;
+        }
+
         return outputFormat.Name switch
         {
             nameof(OutputFormat.Kustomize) => GenerateKustomizeManifests(),

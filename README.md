@@ -1,7 +1,7 @@
 ![nuget-icon](https://github.com/prom3theu5/aspirational-manifests/assets/1518610/5f4402e9-6f2c-4ca4-b457-206fb8233155)
 # Aspirate (Aspir8)
 
-### Automate deployment of a .NET Aspire AppHost to a Kubernetes Cluster
+### Handle deployment yaml generation for a .NET Aspire AppHost
 
 <https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
 
@@ -44,6 +44,14 @@ This command (by-default) will also build selected projects, and push the contai
 Builds can be skipped by passing the `--skip-build` flag.
 
 Your manifests will be in the AppHost/aspirate-output directory by default.
+
+If you'd like - you can generate a slim docker-compose deployment instead of a kubernetes deployment.
+For this you can pass --output-format compose.
+Please note - this will disable secret support.
+
+```bash
+aspirate generate --output-format compose
+```
 
 ## Build
 
