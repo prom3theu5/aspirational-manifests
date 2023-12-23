@@ -55,7 +55,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             return;
         }
 
-        if (!AspirateState.IsNotDeployable(resource.Value))
+        if (AspirateState.IsNotDeployable(resource.Value))
         {
             return;
         }

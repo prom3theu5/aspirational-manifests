@@ -14,7 +14,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate",
+      "commandLineArgs": "generate --output-format compose --skip-build -m manifest.json",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
