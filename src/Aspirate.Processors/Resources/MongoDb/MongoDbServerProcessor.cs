@@ -38,4 +38,27 @@ public sealed class MongoDbServerProcessor(IFileSystem fileSystem, IAnsiConsole 
 
         return Task.FromResult(true);
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var servicePort = new Port
+        {
+            Target = 27017,
+            Published = 27017,
+        };
+
+        var environment = new Dictionary<string, string?>();
+
+        response.Service = Builder.MakeService("mongo-service")
+            .WithImage("mongo:latest")
+            .WithEnvironment(environment)
+            .WithContainerName("mongo-service")
+            .WithPortMappings(servicePort)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .Build();
+
+        return response;
+    }
 }

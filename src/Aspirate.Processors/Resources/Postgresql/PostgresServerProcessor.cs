@@ -39,4 +39,32 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
 
         return Task.FromResult(true);
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var servicePort = new Port
+        {
+            Target = 5432,
+            Published = 5432,
+        };
+
+        var environment = new Dictionary<string, string?>
+        {
+            ["POSTGRES_DB"] = "postgres",
+            ["POSTGRES_USER"] = "postgres",
+            ["POSTGRES_PASSWORD"] = "postgres",
+        };
+
+        response.Service = Builder.MakeService("postgres-service")
+            .WithImage("postgres:latest")
+            .WithEnvironment(environment)
+            .WithContainerName("postgres-service")
+            .WithPortMappings(servicePort)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .Build();
+
+        return response;
+    }
 }

@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
             .RegisterAction<GenerateAspireManifestAction>()
             .RegisterAction<GenerateKustomizeManifestsAction>()
             .RegisterAction<GenerateFinalKustomizeManifestAction>()
+            .RegisterAction<GenerateDockerComposeManifestAction>()
             .RegisterAction<LoadAspireManifestAction>()
             .RegisterAction<ApplyManifestsToClusterAction>()
             .RegisterAction<RemoveManifestsFromClusterAction>()

@@ -49,4 +49,30 @@ public sealed class MySqlServerProcessor(IFileSystem fileSystem, IAnsiConsole co
 
         return Task.FromResult(true);
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var servicePort = new Port
+        {
+            Target = 3306,
+            Published = 3306,
+        };
+
+        var environment = new Dictionary<string, string?>
+        {
+            ["MYSQL_ROOT_PASSWORD"] = resource.Value.Env["RootPassword"],
+        };
+
+        response.Service = Builder.MakeService("mysql-service")
+            .WithImage("mysql:latest")
+            .WithEnvironment(environment)
+            .WithContainerName("mysql-service")
+            .WithPortMappings(servicePort)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .Build();
+
+        return response;
+    }
 }

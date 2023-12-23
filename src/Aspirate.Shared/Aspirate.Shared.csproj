@@ -22,4 +22,8 @@
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Aspirate.DockerCompose\Aspirate.DockerCompose.csproj" />
+  </ItemGroup>
+
 </Project>

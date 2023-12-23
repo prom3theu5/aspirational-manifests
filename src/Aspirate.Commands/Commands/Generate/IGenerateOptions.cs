@@ -22,6 +22,7 @@ public interface IGenerateOptions
     string? ImagePullPolicy { get; set; }
 
     bool NonInteractive { get; set; }
+    string? OutputFormat { get; set; }
 
     ProviderType SecretProvider { get; set; }
 }

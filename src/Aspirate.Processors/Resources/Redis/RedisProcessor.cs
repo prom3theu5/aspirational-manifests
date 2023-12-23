@@ -39,4 +39,30 @@ public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         return Task.FromResult(true);
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var servicePort = new Port
+        {
+            Target = 6379,
+            Published = 6379,
+        };
+
+        var environment = new Dictionary<string, string?>
+        {
+            ["ALLOW_EMPTY_PASSWORD"] = "yes",
+        };
+
+        response.Service = Builder.MakeService("redis")
+            .WithImage("bitnami/redis:latest")
+            .WithEnvironment(environment)
+            .WithContainerName("redis")
+            .WithPortMappings(servicePort)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .Build();
+
+        return response;
+    }
 }

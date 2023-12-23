@@ -39,4 +39,37 @@ public class RabbitMqProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         return Task.FromResult(true);
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var servicePort = new Port
+        {
+            Target = 5672,
+            Published = 5672,
+        };
+
+        var managementPort = new Port
+        {
+            Target = 15672,
+            Published = 15672,
+        };
+
+        var environment = new Dictionary<string, string?>
+        {
+            ["RABBITMQ_DEFAULT_USER"] = "guest",
+            ["RABBITMQ_DEFAULT_PASS"] = "guest",
+        };
+
+        response.Service = Builder.MakeService("rabbitmq-service")
+            .WithImage("rabbitmq:3.8-management")
+            .WithEnvironment(environment)
+            .WithContainerName("rabbitmq-service")
+            .WithPortMappings(servicePort, managementPort)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .Build();
+
+        return response;
+    }
 }

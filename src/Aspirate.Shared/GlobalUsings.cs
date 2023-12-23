@@ -4,7 +4,7 @@ global using System.IO.Abstractions;
 global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
-
+global using Aspirate.DockerCompose.Models;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Literals;
 global using Aspirate.Shared.Models.Aspirate;

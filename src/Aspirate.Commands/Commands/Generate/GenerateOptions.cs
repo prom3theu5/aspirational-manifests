@@ -15,4 +15,6 @@ public sealed class GenerateOptions : BaseCommandOptions, IGenerateOptions
     public string? ContainerImageTag { get; set; }
 
     public string? ImagePullPolicy { get; set; }
+
+    public string? OutputFormat { get; set; }
 }
