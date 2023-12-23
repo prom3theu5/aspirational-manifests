@@ -49,4 +49,31 @@ public sealed class SqlServerProcessor(IFileSystem fileSystem, IAnsiConsole cons
 
         return Task.FromResult(true);
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var servicePort = new Port
+        {
+            Target = 1433,
+            Published = 1433,
+        };
+
+        var environment = new Dictionary<string, string?>
+        {
+            ["ACCEPT_EULA"] = "Y",
+            ["MSSQL_SA_PASSWORD"] = resource.Value.Env["SaPassword"],
+        };
+
+        response.Service = Builder.MakeService("sqlserver-service")
+            .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+            .WithEnvironment(environment)
+            .WithContainerName("sqlserver-service")
+            .WithPortMappings(servicePort)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .Build();
+
+        return response;
+    }
 }

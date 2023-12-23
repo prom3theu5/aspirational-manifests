@@ -2,6 +2,8 @@ namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateDockerComposeManifestAction(IServiceProvider serviceProvider, IFileSystem fileSystem) : BaseAction(serviceProvider)
 {
+    private int _servicePort = 8080;
+
     public override Task<bool> ExecuteAsync()
     {
         var outputFormat = OutputFormat.FromValue(CurrentState.OutputFormat);
@@ -68,14 +70,22 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             return;
         }
 
-        var service = handler.CreateComposeEntry(resource);
+        var response = handler.CreateComposeEntry(resource);
 
-        if (service is null)
+        if (response.IsProject)
         {
-            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its compose entry could not be created.[/]");
-            return;
+            response.Service.Ports =
+            [
+                new()
+                {
+                    Target = 8080,
+                    Published = _servicePort,
+                },
+            ];
+
+            _servicePort++;
         }
 
-        services.Add(service);
+        services.Add(response.Service);
     }
 }

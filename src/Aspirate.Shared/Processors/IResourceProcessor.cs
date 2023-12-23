@@ -36,5 +36,5 @@ public interface IResourceProcessor
     /// </summary>
     /// <param name="resource">The key-value pair containing the compose entry's identifier and resource.</param>
     /// <returns>The created compose entry as a <see cref="Service"/> object, or null if the operation fails.</returns>
-    Service? CreateComposeEntry(KeyValuePair<string, Resource> resource);
+    ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource);
 }

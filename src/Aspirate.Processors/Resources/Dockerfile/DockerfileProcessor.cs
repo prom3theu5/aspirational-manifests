@@ -93,6 +93,44 @@ public class DockerfileProcessor(
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var dockerFile = resource.Value as DockerfileResource;
+
+        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+
+        if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
+        {
+            throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
+        }
+
+        var environment = new Dictionary<string, string?>();
+
+        if (resource.Value.Env is not null)
+        {
+            foreach (var entry in resource.Value.Env)
+            {
+                environment.Add(entry.Key, entry.Value);
+            }
+        }
+
+        response.Service = Builder.MakeService(resource.Key)
+            .WithImage(containerImage.ToLowerInvariant())
+            .WithEnvironment(environment)
+            .WithContainerName(resource.Key)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithPortMappings(containerPorts.Select(x=> new Port
+            {
+                Target = x.Port,
+                Published = x.Port,
+            }).ToArray())
+            .Build();
+
+        return response;
+    }
 }
 
 

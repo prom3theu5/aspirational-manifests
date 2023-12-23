@@ -40,8 +40,10 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
         return Task.FromResult(true);
     }
 
-    public override Service CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
     {
+        var response = new ComposeService();
+
         var servicePort = new Port
         {
             Target = 5432,
@@ -55,11 +57,14 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
             ["POSTGRES_PASSWORD"] = "postgres",
         };
 
-        return Builder.MakeService(resource.Key)
+        response.Service = Builder.MakeService("postgres-service")
             .WithImage("postgres:latest")
             .WithEnvironment(environment)
-            .WithContainerName(resource.Key)
+            .WithContainerName("postgres-service")
             .WithPortMappings(servicePort)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
             .Build();
+
+        return response;
     }
 }

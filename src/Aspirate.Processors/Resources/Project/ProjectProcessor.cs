@@ -94,8 +94,10 @@ public sealed class ProjectProcessor(
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
     }
 
-    public override Service CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
     {
+        var response = new ComposeService();
+
         if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
         {
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
@@ -111,11 +113,16 @@ public sealed class ProjectProcessor(
             }
         }
 
-        return Builder.MakeService(resource.Key)
-            .WithImage(containerDetails.FullContainerImage)
+        response.Service = Builder.MakeService(resource.Key)
+            .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
             .WithEnvironment(environment)
             .WithContainerName(resource.Key)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
             .Build();
+
+        response.IsProject = true;
+
+        return response;
     }
 }
 

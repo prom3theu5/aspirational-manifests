@@ -70,6 +70,39 @@ public class ContainerProcessor(
 
         base.ReplacePlaceholders(resource, resources);
     }
+
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        var response = new ComposeService();
+
+        var container = resource.Value as ContainerResource;
+
+        var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+
+        var environment = new Dictionary<string, string?>();
+
+        if (resource.Value.Env is not null)
+        {
+            foreach (var entry in resource.Value.Env)
+            {
+                environment.Add(entry.Key, entry.Value);
+            }
+        }
+
+        response.Service = Builder.MakeService(resource.Key)
+            .WithImage(container.Image.ToLowerInvariant())
+            .WithEnvironment(environment)
+            .WithContainerName(resource.Key)
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithPortMappings(containerPorts.Select(x=> new Port
+            {
+                Target = x.Port,
+                Published = x.Port,
+            }).ToArray())
+            .Build();
+
+        return response;
+    }
 }
 
 
