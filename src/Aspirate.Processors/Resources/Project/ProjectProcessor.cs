@@ -93,6 +93,30 @@ public sealed class ProjectProcessor(
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
     }
+
+    public override Service CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
+        {
+            throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
+        }
+
+        var environment = new Dictionary<string, string?>();
+
+        if (resource.Value.Env is not null)
+        {
+            foreach (var entry in resource.Value.Env)
+            {
+                environment.Add(entry.Key, entry.Value);
+            }
+        }
+
+        return Builder.MakeService(resource.Key)
+            .WithImage(containerDetails.FullContainerImage)
+            .WithEnvironment(environment)
+            .WithContainerName(resource.Key)
+            .Build();
+    }
 }
 
 
