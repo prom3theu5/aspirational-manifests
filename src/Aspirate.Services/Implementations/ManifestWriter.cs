@@ -15,6 +15,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         [TemplateLiterals.SqlServerType] = $"{TemplateLiterals.SqlServerType}.hbs",
         [TemplateLiterals.MysqlServerType] = $"{TemplateLiterals.MysqlServerType}.hbs",
         [TemplateLiterals.RabbitMqType] = $"{TemplateLiterals.RabbitMqType}.hbs",
+        [TemplateLiterals.MongoDbServerType] = $"{TemplateLiterals.MongoDbServerType}.hbs",
         [TemplateLiterals.PostgresServerType] = $"{TemplateLiterals.PostgresServerType}.hbs",
         [TemplateLiterals.NamespaceType] = $"{TemplateLiterals.NamespaceType}.hbs",
     };
