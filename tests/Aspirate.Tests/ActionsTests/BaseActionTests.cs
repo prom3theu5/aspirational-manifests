@@ -6,6 +6,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
     protected const string DefaultContainerRegistry = "test-registry";
     protected const string DefaultContainerImageTag = "test-tag";
     protected const string DefaultTemplatePath = "/templates";
+    protected const string DefaultOutputFormat = "kustomize";
 
     protected static AspirateState CreateAspirateState(bool nonInteractive = false,
         string? projectPath = DefaultProjectPath,
@@ -15,7 +16,8 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         string? aspireManifest = null,
         string? inputPath = null,
         string? kubeContext = null,
-        string? password = null)
+        string? password = null,
+        string? outputFormat = DefaultOutputFormat)
     {
         var state = new AspirateState
         {
@@ -26,6 +28,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
             InputPath = inputPath,
             KubeContext = kubeContext,
             SecretPassword = password,
+            OutputFormat = outputFormat,
         };
 
         if (!string.IsNullOrEmpty(projectPath))

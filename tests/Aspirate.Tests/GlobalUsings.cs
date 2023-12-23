@@ -8,6 +8,7 @@ global using Aspirate.Commands.Actions;
 global using Aspirate.Commands.Actions.Containers;
 global using Aspirate.Commands.Actions.Manifests;
 global using Aspirate.Commands.Actions.Secrets;
+global using Aspirate.Commands.Enums;
 global using Aspirate.DockerCompose.Builders;
 global using Aspirate.DockerCompose.Extensions;
 global using Aspirate.DockerCompose.Models.Services.BuildArguments;

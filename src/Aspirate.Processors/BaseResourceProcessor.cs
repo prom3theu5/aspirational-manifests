@@ -109,6 +109,18 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     }
 
     /// <summary>
+    /// Creates a compose entry with the given resource.
+    /// </summary>
+    /// <param name="resource">The key-value pair representing the resource.</param>
+    /// <returns>The created compose entry service, or null if creation is not overridden.</returns>
+    public virtual Task<Service>? CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    {
+        LogCreateComposeNotOverridden(GetType().Name);
+
+        return null;
+    }
+
+    /// <summary>
     /// Logs the completion of a task with the given output path.
     /// </summary>
     /// <param name="outputPath">The path of the output file or directory.</param>
@@ -137,6 +149,9 @@ public abstract class BaseResourceProcessor : IResourceProcessor
 
     private void LogCreateManifestNotOverridden(string processor) =>
         _console.MarkupLine($"[bold yellow]Processor {processor} has not been configured. CreateManifest must be overridden.[/]");
+
+    private void LogCreateComposeNotOverridden(string processor) =>
+        _console.MarkupLine($"[bold yellow]Processor {processor} has not been configured. CreateComposeEntry must be overridden.[/]");
 
     private void LogCompletionMessage(string outputPath) => _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}[/]");
 }

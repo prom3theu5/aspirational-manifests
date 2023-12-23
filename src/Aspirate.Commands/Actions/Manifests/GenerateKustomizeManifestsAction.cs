@@ -6,19 +6,28 @@ public sealed class GenerateKustomizeManifestsAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
-         if (NoSupportedComponentsExitAction())
-         {
-             return true;
-         }
+        var outputFormat = OutputFormat.FromValue(CurrentState.OutputFormat);
 
-         Logger.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
+        if (outputFormat == OutputFormat.DockerCompose)
+        {
+            Logger.MarkupLine($"[red](!)[/] The output format '{CurrentState.OutputFormat}' is not supported for this action.");
+            Logger.MarkupLine("[red](!)[/] Please use the output format 'compose' instead.");
+            throw new ActionCausesExitException(1);
+        }
 
-         foreach (var resource in CurrentState.AllSelectedSupportedComponents)
-         {
-             await ProcessIndividualResourceManifests(resource);
-         }
+        if (NoSupportedComponentsExitAction())
+        {
+            return true;
+        }
 
-         return true;
+        Logger.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
+
+        foreach (var resource in CurrentState.AllSelectedSupportedComponents)
+        {
+            await ProcessIndividualResourceManifests(resource);
+        }
+
+        return true;
     }
 
     private bool NoSupportedComponentsExitAction()

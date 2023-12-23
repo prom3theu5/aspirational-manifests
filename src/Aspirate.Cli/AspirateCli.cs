@@ -10,7 +10,7 @@ internal class AspirateCli : RootCommand
         {
             AnsiConsole.WriteLine();
             AnsiConsole.Write(new FigletText("Aspir8").Color(Color.HotPink));
-            AnsiConsole.MarkupLine("[bold lime]Automate deployment of a .NET Aspire AppHost to a Kubernetes Cluster[/]");
+            AnsiConsole.MarkupLine("[bold lime]Handle deployments of a .NET Aspire AppHost[/]");
             AnsiConsole.WriteLine();
         }
     }

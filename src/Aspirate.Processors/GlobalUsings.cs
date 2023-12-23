@@ -3,6 +3,7 @@ global using System.IO.Abstractions;
 global using System.Text;
 global using System.Text.Json;
 global using System.Text.RegularExpressions;
+global using Aspirate.DockerCompose.Models;
 global using Aspirate.Processors.PlaceholderSubstitutionStrategies;
 global using Aspirate.Processors.Resources.Container;
 global using Aspirate.Processors.Resources.Dapr;
