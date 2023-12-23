@@ -61,7 +61,7 @@ public sealed class ApplyManifestsToClusterAction(
             return;
         }
 
-        var daprCliInstalled = await daprCliService.IsDaprCliInstalledOnMachine();
+        var daprCliInstalled = daprCliService.IsDaprCliInstalledOnMachine();
 
         if (!daprCliInstalled)
         {

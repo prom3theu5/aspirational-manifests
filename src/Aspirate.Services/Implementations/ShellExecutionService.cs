@@ -75,34 +75,36 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
         }
     }
 
-    public async Task<CommandAvailableResult> IsCommandAvailable(string commandName)
+    public CommandAvailableResult IsCommandAvailable(string commandName)
     {
         try
         {
-            var commandCheck = OperatingSystem.IsWindows() ? "where" : "which";
-
-            StringBuilder output = new();
-
-            var commandResult = await Cli.Wrap(commandCheck)
-                .WithArguments(commandName)
-                .WithValidation(CommandResultValidation.None)
-                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(new()))
-                .WithStandardOutputPipe(PipeTarget.ToStringBuilder(output))
-                .ExecuteAsync();
-
-            if (commandResult.ExitCode != 0)
+            var commandPath = FindFullPathFromPath(commandName);
+            if(string.IsNullOrEmpty(commandPath) || commandName.Equals(commandPath, StringComparison.Ordinal))
             {
                 return CommandAvailableResult.NotAvailable;
             }
 
-            var path = output.ToString().Trim();
-
-            return string.IsNullOrEmpty(path) ? CommandAvailableResult.NotAvailable : CommandAvailableResult.Available(path);
+            return string.IsNullOrEmpty(commandPath) ? CommandAvailableResult.NotAvailable : CommandAvailableResult.Available(commandPath);
         }
         catch (Exception)
         {
             return CommandAvailableResult.NotAvailable;
         }
+    }
+
+    private static string FindFullPathFromPath(string command)
+    {
+        foreach (string directory in (Environment.GetEnvironmentVariable("PATH") ?? string.Empty).Split(Path.PathSeparator))
+        {
+            string fullPath = Path.Combine(directory, command + (OperatingSystem.IsWindows() ? ".exe" : ""));
+            if (File.Exists(fullPath))
+            {
+                return fullPath;
+            }
+        }
+
+        return command;
     }
 
     private Task HandleExitCode(string command,
