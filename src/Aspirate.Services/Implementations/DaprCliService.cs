@@ -4,9 +4,9 @@ public class DaprCliService(IShellExecutionService shellExecutionService, IAnsiC
 {
     private string _daprPath = "dapr";
 
-    public async Task<bool> IsDaprCliInstalledOnMachine()
+    public bool IsDaprCliInstalledOnMachine()
     {
-        var result = await shellExecutionService.IsCommandAvailable("dapr");
+        var result = shellExecutionService.IsCommandAvailable("dapr");
 
         if (!result.IsAvailable)
         {

@@ -97,7 +97,7 @@ public sealed class RemoveManifestsFromClusterAction(
             return;
         }
 
-        var daprCliInstalled = await daprCliService.IsDaprCliInstalledOnMachine();
+        var daprCliInstalled = daprCliService.IsDaprCliInstalledOnMachine();
 
         if (!daprCliInstalled)
         {

@@ -216,7 +216,7 @@ public sealed class ContainerCompositionService(
 
     private async Task CheckIfBuilderIsRunning(string builder)
     {
-        var builderAvailable = await shellExecutionService.IsCommandAvailable(builder);
+        var builderAvailable = shellExecutionService.IsCommandAvailable(builder);
 
         if (builderAvailable is null || !builderAvailable.IsAvailable)
         {

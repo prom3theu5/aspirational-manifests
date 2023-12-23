@@ -40,7 +40,7 @@ public class ContainerCompositionServiceTest
             .Returns(Task.FromResult(new ShellCommandResult(true, response, string.Empty, 0)));
 
         shellExecutionService.IsCommandAvailable(Arg.Any<string>())
-            .Returns(Task.FromResult(CommandAvailableResult.Available(builder)));
+            .Returns(CommandAvailableResult.Available(builder));
 
         // Act
         var result = await service.BuildAndPushContainerForProject(project, containerDetails, builder);
@@ -122,13 +122,13 @@ public class ContainerCompositionServiceTest
             .Returns(Task.FromResult(true));
 
         shellExecutionService.IsCommandAvailable(Arg.Any<string>())
-            .Returns(Task.FromResult(CommandAvailableResult.Available(builder)));
+            .Returns(CommandAvailableResult.Available(builder));
 
         // Act
         var result = await service.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, true);
 
         // Assert
-        await shellExecutionService.Received(1).IsCommandAvailable(Arg.Any<string>());
+        shellExecutionService.Received(1).IsCommandAvailable(Arg.Any<string>());
         await shellExecutionService.Received(3).ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null));
         result.Should().BeTrue();
     }
@@ -167,7 +167,7 @@ public class ContainerCompositionServiceTest
             .Returns(Task.FromResult(true));
 
         shellExecutionService.IsCommandAvailable(Arg.Any<string>())
-            .Returns(Task.FromResult(CommandAvailableResult.Available(builder)));
+            .Returns(CommandAvailableResult.Available(builder));
 
         // Act
         await service.BuildAndPushContainerForDockerfile(dockerfile, builder, "testImageName", "testRegistry", true);
