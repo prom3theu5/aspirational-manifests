@@ -28,6 +28,7 @@ public sealed class MongoDbServerProcessor(IFileSystem fileSystem, IAnsiConsole 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
         var data = new KubernetesDeploymentTemplateData()
+            .SetName("mongo")
             .SetManifests(_manifests)
             .Validate();
 
