@@ -1,0 +1,4 @@
+﻿version: "3.8"
+services:
+  a-service:
+    image: "dotnetaspire/servicea"
