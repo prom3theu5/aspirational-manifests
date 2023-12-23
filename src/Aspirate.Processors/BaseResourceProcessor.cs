@@ -113,7 +113,7 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// </summary>
     /// <param name="resource">The key-value pair representing the resource.</param>
     /// <returns>The created compose entry service, or null if creation is not overridden.</returns>
-    public virtual Task<Service>? CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    public virtual Service? CreateComposeEntry(KeyValuePair<string, Resource> resource)
     {
         LogCreateComposeNotOverridden(GetType().Name);
 
