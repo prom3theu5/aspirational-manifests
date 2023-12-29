@@ -118,11 +118,20 @@ public sealed class ProjectProcessor(
             }
         }
 
+        var project = resource.Value as ProjectResource;
+
+        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+
         response.Service = Builder.MakeService(resource.Key)
             .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
             .WithEnvironment(environment)
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithPortMappings(ports.Select(x=> new Port
+            {
+                Target = x.Port,
+                Published = x.Port,
+            }).ToArray())
             .Build();
 
         response.IsProject = true;

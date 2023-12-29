@@ -2,7 +2,7 @@ namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateDockerComposeManifestAction(IServiceProvider serviceProvider, IFileSystem fileSystem) : BaseAction(serviceProvider)
 {
-    private int _servicePort = 8080;
+    private int _servicePort = 10000;
 
     public override Task<bool> ExecuteAsync()
     {
@@ -74,16 +74,11 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         if (response.IsProject)
         {
-            response.Service.Ports =
-            [
-                new()
-                {
-                    Target = 8080,
-                    Published = _servicePort,
-                },
-            ];
-
-            _servicePort++;
+            foreach (var port in response.Service.Ports)
+            {
+                port.Published = _servicePort;
+                _servicePort++;
+            }
         }
 
         services.Add(response.Service);
