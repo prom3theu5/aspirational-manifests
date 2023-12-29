@@ -17,6 +17,8 @@ public partial class ResourceContainerConnectionStringSubstitutionStrategy : IPl
         container.ConnectionString = ReplaceConnectionStringPlaceholders(resources, container.ConnectionString);
     }
 
+    public void Reset() { }
+
     private static string ReplaceConnectionStringPlaceholders(IReadOnlyDictionary<string, Resource> resources, string input) =>
         ConnectionStringRegex()
             .Replace(input, match =>

@@ -28,3 +28,4 @@ The command will first create the manifest file, however, this can be overridden
 | --non-interactive     |       | `ASPIRATE_NON_INTERACTIVE`         | Disables interactive mode for the command                                         |
 | --secret-provider     |       | `ASPIRATE_SECRET_PROVIDER`         | The secret provider to use. Defaults to `Password`. Can be `Password` or `Base64` |
 | --disable-secrets     |       | `ASPIRATE_DISABLE_SECRETS`         | Disables secrets management features.                                             |
+| --runtime-identifier  |       | `ASPIRATE_RUNTIME_IDENTIFIER`      | Sets the runtime identifier for project builds. Defaults to `linux-x64`.          |

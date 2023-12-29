@@ -11,6 +11,7 @@ public interface IBuildOptions
     string? ContainerRegistry { get; set; }
 
     string? ContainerImageTag { get; set; }
+    string? RuntimeIdentifier { get; set; }
 
     bool NonInteractive { get; set; }
 

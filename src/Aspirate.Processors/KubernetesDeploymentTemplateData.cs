@@ -11,12 +11,11 @@ public class KubernetesDeploymentTemplateData
     public IReadOnlyCollection<string>? Manifests {get; private set;}
     public bool? IsService { get; private set; } = true;
     public bool? IsProject {get; private set;}
-    public bool? IsContainer {get; private set;}
+    public bool? IncludeGeneratorOptions {get; private set;}
     public string? ContainerImage {get; private set;}
-    public bool? IsDockerfile {get; private set;}
     public string? ImagePullPolicy {get; private set;}
     public List<Ports>? Ports {get; private set;}
-    public string? ServiceType {get; private set;}
+    public string? ServiceType { get; private set; } = "ClusterIP";
 
     public KubernetesDeploymentTemplateData SetName(string name)
     {
@@ -72,18 +71,6 @@ public class KubernetesDeploymentTemplateData
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetIsDockerfile(bool dockerfile)
-    {
-        IsDockerfile = dockerfile;
-        return this;
-    }
-
-    public KubernetesDeploymentTemplateData SetIsContainer(bool container)
-    {
-        IsContainer = container;
-        return this;
-    }
-
     public KubernetesDeploymentTemplateData SetImagePullPolicy(string imagePullPolicy)
     {
         ImagePullPolicy = imagePullPolicy ?? "IfNotPresent";
@@ -99,6 +86,12 @@ public class KubernetesDeploymentTemplateData
     public KubernetesDeploymentTemplateData SetServiceType(string? serviceType)
     {
         ServiceType = serviceType ?? "ClusterIP";
+        return this;
+    }
+
+    public KubernetesDeploymentTemplateData SetIncludeGeneratorOptions(bool include)
+    {
+        IncludeGeneratorOptions = include;
         return this;
     }
 

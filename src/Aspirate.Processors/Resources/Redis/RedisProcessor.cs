@@ -29,6 +29,7 @@ public class RedisProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         var data = new KubernetesDeploymentTemplateData()
             .SetName("redis")
+            .SetIsService(false)
             .SetManifests(_manifests)
             .Validate();
 

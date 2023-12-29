@@ -17,4 +17,6 @@ public sealed class GenerateOptions : BaseCommandOptions, IGenerateOptions
     public string? ImagePullPolicy { get; set; }
 
     public string? OutputFormat { get; set; }
+
+    public string? RuntimeIdentifier { get; set; }
 }

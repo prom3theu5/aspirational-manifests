@@ -29,6 +29,7 @@ public class RabbitMqProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         var data = new KubernetesDeploymentTemplateData()
             .SetName("rabbitmq")
+            .SetIsService(false)
             .SetManifests(_manifests)
             .Validate();
 

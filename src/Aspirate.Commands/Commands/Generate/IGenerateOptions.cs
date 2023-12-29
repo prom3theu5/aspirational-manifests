@@ -23,6 +23,7 @@ public interface IGenerateOptions
 
     bool NonInteractive { get; set; }
     string? OutputFormat { get; set; }
+    string? RuntimeIdentifier { get; set; }
 
     ProviderType SecretProvider { get; set; }
 }

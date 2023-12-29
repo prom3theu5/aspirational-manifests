@@ -40,6 +40,10 @@ public sealed class ProjectProcessor(
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
+        var project = resource.Value as ProjectResource;
+
+        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+
         var data = new KubernetesDeploymentTemplateData()
             .SetName(resource.Key)
             .SetContainerImage(containerDetails.FullContainerImage)
@@ -49,6 +53,7 @@ public sealed class ProjectProcessor(
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetIsProject(true)
+            .SetPorts(ports)
             .SetManifests(_manifests)
             .Validate();
 
@@ -123,6 +128,24 @@ public sealed class ProjectProcessor(
         response.IsProject = true;
 
         return response;
+    }
+
+    protected override void PreSubstitutePlaceholders(Resource resource, Dictionary<string, Resource> resources)
+    {
+        if (resource is not IResourceWithBinding resourceWithBinding)
+        {
+            return;
+        }
+
+        if (resourceWithBinding.Bindings.TryGetValue("http", out var httpBinding) && httpBinding.ContainerPort == 0)
+        {
+            httpBinding.ContainerPort = 8080;
+        }
+
+        if (resourceWithBinding.Bindings.TryGetValue("https", out var httpsBinding) && httpsBinding.ContainerPort == 0)
+        {
+            httpsBinding.ContainerPort = 8443;
+        }
     }
 }
 

@@ -21,6 +21,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         var templateDataBuilder = new KubernetesDeploymentTemplateData()
             .SetNamespace(@namespace)
+            .SetIncludeGeneratorOptions(true)
             .SetIsService(false);
 
         HandleNamespace(outputPath, templatePath, @namespace, templateDataBuilder, manifests);

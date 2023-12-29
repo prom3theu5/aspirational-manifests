@@ -8,4 +8,6 @@ public sealed class BuildOptions : BaseCommandOptions, IBuildOptions
     public string? ContainerBuilder { get; set; }
     public string? ContainerRegistry { get; set; }
     public string? ContainerImageTag { get; set; }
+
+    public string? RuntimeIdentifier { get; set; }
 }
