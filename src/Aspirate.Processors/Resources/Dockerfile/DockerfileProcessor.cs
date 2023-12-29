@@ -55,7 +55,6 @@ public class DockerfileProcessor(
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(containerPorts)
-            .SetIsDockerfile(true)
             .SetManifests(_manifests)
             .Validate();
 

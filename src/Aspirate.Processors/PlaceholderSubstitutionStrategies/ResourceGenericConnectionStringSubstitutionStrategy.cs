@@ -30,6 +30,8 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
         }
     }
 
+    public void Reset() { }
+
     private static string SetupDatabaseConnectionString<TDatabase>(IReadOnlyDictionary<string, Resource> resources, string resourceName)
         where TDatabase : IResourceWithParent
     {

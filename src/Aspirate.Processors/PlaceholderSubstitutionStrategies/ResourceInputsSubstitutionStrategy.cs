@@ -30,4 +30,6 @@ public sealed class ResourceInputsSubstitutionStrategy : IPlaceholderSubstitutio
 
         resource.Env[placeholder.Key] = input.Value ?? string.Empty;
     }
+
+    public void Reset() { }
 }

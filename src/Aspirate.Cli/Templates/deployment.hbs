@@ -28,17 +28,11 @@ spec:
       - name: {{name}}
         image: {{containerImage}}
         imagePullPolicy: {{imagePullPolicy}}
-        {{#if isDockerfile}}
         {{#if hasPorts}}
         ports:
         {{#each ports}}
         - containerPort: {{port}}
         {{/each}}
-        {{/if}}
-        {{/if}}
-        {{#if isProject}}
-        ports:
-        - containerPort: 8080
         {{/if}}
         envFrom:
         - configMapRef:

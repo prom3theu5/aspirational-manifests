@@ -15,5 +15,6 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(ImagePullPolicyOption.Instance);
        AddOption(NamespaceOption.Instance);
        AddOption(OutputFormatOption.Instance);
+       AddOption(RuntimeIdentifierOption.Instance);
     }
 }

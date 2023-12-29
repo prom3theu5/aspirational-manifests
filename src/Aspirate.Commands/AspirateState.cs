@@ -30,6 +30,9 @@ public class AspirateState :
     [JsonPropertyName("containerImageTag")]
     public string? ContainerImageTag { get; set; }
 
+    [JsonPropertyName("runtimeIdentifier")]
+    public string? RuntimeIdentifier { get; set; }
+
     [JsonPropertyName("imagePullPolicy")]
     public string? ImagePullPolicy { get; set; }
 

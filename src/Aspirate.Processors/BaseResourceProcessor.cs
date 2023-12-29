@@ -127,12 +127,20 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     protected void LogCompletion(string outputPath) =>
         LogCompletionMessage(_fileSystem.GetFullPath(outputPath));
 
+    protected virtual void PreSubstitutePlaceholders(Resource resource, Dictionary<string, Resource> resources)
+    {
+    }
+
     public virtual void ReplacePlaceholders(Resource resource, Dictionary<string, Resource> resources)
     {
+        PreSubstitutePlaceholders(resource, resources);
+
         if (resource.Env is null)
         {
             return;
         }
+
+        _substitutionStrategies.ForEach(strategy => strategy.Reset());
 
         foreach (var entry in resource.Env)
         {

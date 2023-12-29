@@ -47,7 +47,6 @@ public class ContainerProcessor(
             .SetAnnotations(resource.Value.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
-            .SetIsContainer(true)
             .SetPorts(containerPorts)
             .SetManifests(_manifests)
             .Validate();
@@ -66,7 +65,7 @@ public class ContainerProcessor(
         var connectionStringHandler =
             _substitutionStrategies.FirstOrDefault(s => s is ResourceContainerConnectionStringSubstitutionStrategy);
 
-        connectionStringHandler?.Substitute(new KeyValuePair<string, string>(), resources, resource);
+        connectionStringHandler?.Substitute(new(), resources, resource);
 
         base.ReplacePlaceholders(resource, resources);
     }

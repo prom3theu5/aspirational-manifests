@@ -3,6 +3,7 @@
 public sealed class ResourceBindingsSubstitutionStrategy : IPlaceholderSubstitutionStrategy
 {
     public const string BindingPlaceholder = "bindings";
+    private int _servicePort = 10000;
 
     public bool CanSubstitute(KeyValuePair<string, string> placeholder) =>
         placeholder.Value.Contains($".{BindingPlaceholder}.", StringComparison.OrdinalIgnoreCase) &&
@@ -35,10 +36,41 @@ public sealed class ResourceBindingsSubstitutionStrategy : IPlaceholderSubstitut
         {
             "host" => resourceName,  // return the name of the resource for 'host'
             "port" => binding.ContainerPort.ToString(),
-            "url" => parts[2] == "http" ? $"http://{resourceName}:8080" : $"https://{resourceName}:8443",
+            "url" => HandleUrlBinding(resourceName, bindingName, binding),
             _ => throw new InvalidOperationException($"Unknown property {bindingProperty} in placeholder {placeholder}.")
         };
 
         resource.Env[placeholder.Key] = newValue;
     }
+
+    public void Reset() => _servicePort = 10000;
+
+    private string HandleUrlBinding(string resourceName, string bindingName, Binding binding) =>
+        bindingName switch
+        {
+            "http" => $"http://{resourceName}:{binding.ContainerPort}",
+            "https" =>  $"https://{resourceName}:{binding.ContainerPort}",
+            _ => HandleCustomServicePortBinding(resourceName, binding),
+        };
+
+    private string HandleCustomServicePortBinding(string resourceName, Binding binding)
+    {
+        if (binding.ContainerPort == 0)
+        {
+            binding.ContainerPort = _servicePort;
+            _servicePort++;
+        }
+
+        var prefix = HandleServiceBindingPrefix(binding);
+
+        return $"{prefix}{resourceName}:{binding.ContainerPort}";
+    }
+
+    private static string HandleServiceBindingPrefix(Binding binding) =>
+        binding.Protocol switch
+        {
+            "http" => "http://",
+            "https" => "https://",
+            _ => string.Empty,
+        };
 }

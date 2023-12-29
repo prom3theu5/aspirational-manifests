@@ -16,6 +16,7 @@ public static class DotNetSdkLiterals
     public const string PublisherArgument = "--publisher";
     public const string OutputPathArgument = "--output-path";
     public const string SelfContainedArgument = "--self-contained";
+    public const string RuntimeIdentifierArgument = "-r";
     public const string OsArgument = "--os";
     public const string ArchArgument = "--arch";
     public const string GetPropertyArgument = "--getProperty";
@@ -33,6 +34,7 @@ public static class DotNetSdkLiterals
     public const string DefaultSingleFile = "true";
     public const string DefaultSelfContained = "true";
     public const string DefaultPublishTrimmed = "false";
+    public const string DefaultRuntimeIdentifier = "linux-x64";
     public const string DefaultOs = "linux";
     public const string DefaultArch = "x64";
 

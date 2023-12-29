@@ -7,8 +7,10 @@ resources:
 - {{this}}
 {{/each}}
 
+{{#if includeGeneratorOptions}}
 generatorOptions:
   disableNameSuffixHash: true
+{{/if}}
 
 {{#if isService}}
 configMapGenerator:

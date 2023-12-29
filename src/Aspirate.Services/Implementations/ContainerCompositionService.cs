@@ -10,7 +10,8 @@ public sealed class ContainerCompositionService(
         ProjectResource projectResource,
         MsBuildContainerProperties containerDetails,
         string builder,
-        bool nonInteractive = false)
+        bool nonInteractive = false,
+        string? runtimeIdentifier = null)
     {
         await CheckIfBuilderIsRunning(builder);
 
@@ -18,7 +19,7 @@ public sealed class ContainerCompositionService(
 
         var argumentsBuilder = ArgumentsBuilder.Create();
 
-        await AddProjectPublishArguments(argumentsBuilder, fullProjectPath);
+        await AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
         await shellExecutionService.ExecuteCommand(new()
@@ -156,7 +157,7 @@ public sealed class ContainerCompositionService(
             "\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
     }
 
-    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath)
+    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
     {
         var propertiesJson = await projectPropertyService.GetProjectPropertiesAsync(
             fullProjectPath,
@@ -180,10 +181,9 @@ public sealed class ContainerCompositionService(
             .AppendArgument(DotNetSdkLiterals.PublishProfileArgument, DotNetSdkLiterals.ContainerPublishProfile)
             .AppendArgument(DotNetSdkLiterals.PublishSingleFileArgument, msbuildProperties.Properties.PublishSingleFile)
             .AppendArgument(DotNetSdkLiterals.PublishTrimmedArgument, msbuildProperties.Properties.PublishTrimmed)
-            .AppendArgument(DotNetSdkLiterals.SelfContainedArgument, DotNetSdkLiterals.DefaultSelfContained)
-            .AppendArgument(DotNetSdkLiterals.OsArgument, DotNetSdkLiterals.DefaultOs)
-            .AppendArgument(DotNetSdkLiterals.ArchArgument, DotNetSdkLiterals.DefaultArch);
+            .AppendArgument(DotNetSdkLiterals.SelfContainedArgument, DotNetSdkLiterals.DefaultSelfContained);
 
+        argumentsBuilder.AppendArgument(DotNetSdkLiterals.RuntimeIdentifierArgument, string.IsNullOrEmpty(runtimeIdentifier) ? DotNetSdkLiterals.DefaultRuntimeIdentifier : runtimeIdentifier);
     }
 
     private static void AddContainerDetailsToArguments(ArgumentsBuilder argumentsBuilder, MsBuildContainerProperties containerDetails)
