@@ -1,3 +1,4 @@
+{{#if hasPorts}}
 ---
 apiVersion: v1
 kind: Service
@@ -12,3 +13,4 @@ spec:
   - name: {{name}}
     port: {{port}}
   {{/each}}
+{{/if}}

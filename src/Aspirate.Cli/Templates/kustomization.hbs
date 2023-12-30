@@ -7,10 +7,8 @@ resources:
 - {{this}}
 {{/each}}
 
-{{#if includeGeneratorOptions}}
 generatorOptions:
   disableNameSuffixHash: true
-{{/if}}
 
 {{#if isService}}
 configMapGenerator:
@@ -20,7 +18,7 @@ configMapGenerator:
     - {{@key}}={{this}}
   {{/each}}
     {{#if isProject}}
-    - ASPNETCORE_URLS=http://+:8080
+    - ASPNETCORE_URLS=http://+:8080;https://+:8443
     {{/if}}
 
 {{/if}}

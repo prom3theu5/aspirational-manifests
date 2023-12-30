@@ -28,6 +28,12 @@ spec:
       - name: {{name}}
         image: {{containerImage}}
         imagePullPolicy: {{imagePullPolicy}}
+        {{#if hasArgs}}
+        args:
+        {{#each args}}
+        - {{this}}
+        {{/each}}
+        {{/if}}
         {{#if hasPorts}}
         ports:
         {{#each ports}}

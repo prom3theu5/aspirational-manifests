@@ -43,11 +43,13 @@ public class ContainerProcessor(
         var data = new KubernetesDeploymentTemplateData()
             .SetName(resource.Key)
             .SetContainerImage(container.Image)
+            .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
             .SetAnnotations(resource.Value.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(containerPorts)
+            .SetArgs(container.Args)
             .SetManifests(_manifests)
             .Validate();
 
@@ -88,8 +90,15 @@ public class ContainerProcessor(
             }
         }
 
-        response.Service = Builder.MakeService(resource.Key)
-            .WithImage(container.Image.ToLowerInvariant())
+        var service = Builder.MakeService(resource.Key)
+            .WithImage(container.Image.ToLowerInvariant());
+
+        if (container.Args is not null)
+        {
+            service.WithCommands(container.Args.ToArray());
+        }
+
+        response.Service = service
             .WithEnvironment(environment)
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
