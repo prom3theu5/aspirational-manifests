@@ -15,3 +15,4 @@ global using Aspirate.Shared.Models.AspireManifests.Interfaces;
 global using Aspirate.Shared.Models.MsBuild;
 global using HandlebarsDotNet;
 global using Spectre.Console;
+global using YamlDotNet.Serialization;
