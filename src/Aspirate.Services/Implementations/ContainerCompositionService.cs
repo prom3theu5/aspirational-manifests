@@ -110,30 +110,31 @@ public sealed class ContainerCompositionService(
         });
     }
 
-    private Task HandleBuildErrors(string command, ArgumentsBuilder argumentsBuilder, bool nonInteractive, string errors)
+    private async Task HandleBuildErrors(string command, ArgumentsBuilder argumentsBuilder, bool nonInteractive, string errors)
     {
         if (errors.Contains(DotNetSdkLiterals.DuplicateFileOutputError, StringComparison.OrdinalIgnoreCase))
         {
-            return HandleDuplicateFilesInOutput(argumentsBuilder, nonInteractive);
+            await HandleDuplicateFilesInOutput(argumentsBuilder, nonInteractive);
+            return;
         }
 
         if (errors.Contains(DotNetSdkLiterals.UnknownContainerRegistryAddress, StringComparison.OrdinalIgnoreCase))
         {
             console.MarkupLine($"\r\n[red bold]{DotNetSdkLiterals.UnknownContainerRegistryAddress}: Unknown container registry address, or container registry address not accessible.[/]");
-            throw new ActionCausesExitException(1013);
+            ActionCausesExitException.ExitNow(1013);
         }
 
-        throw new ActionCausesExitException(9999);
+        ActionCausesExitException.ExitNow();
     }
 
-    private Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder, bool nonInteractive = false)
+    private async Task HandleDuplicateFilesInOutput(ArgumentsBuilder argumentsBuilder, bool nonInteractive = false)
     {
         var shouldRetry = AskIfShouldRetryHandlingDuplicateFiles(nonInteractive);
         if (shouldRetry)
         {
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.ErrorOnDuplicatePublishOutputFilesArgument, "false");
 
-            return shellExecutionService.ExecuteCommand(new()
+            await shellExecutionService.ExecuteCommand(new()
             {
                 Command = DotNetSdkLiterals.DotNetCommand,
                 ArgumentsBuilder = argumentsBuilder,
@@ -141,9 +142,10 @@ public sealed class ContainerCompositionService(
                 OnFailed = HandleBuildErrors,
                 ShowOutput = true,
             });
+            return;
         }
 
-        throw new ActionCausesExitException(9999);
+        ActionCausesExitException.ExitNow();
     }
 
     private bool AskIfShouldRetryHandlingDuplicateFiles(bool nonInteractive)
@@ -218,10 +220,10 @@ public sealed class ContainerCompositionService(
     {
         var builderAvailable = shellExecutionService.IsCommandAvailable(builder);
 
-        if (builderAvailable is null || !builderAvailable.IsAvailable)
+        if (!builderAvailable.IsAvailable)
         {
             console.MarkupLine($"\r\n[red bold]{builder} is not available or found on your system.[/]");
-            throw new ActionCausesExitException(1);
+            ActionCausesExitException.ExitNow();
         }
 
         var argumentsBuilder = ArgumentsBuilder
@@ -255,14 +257,14 @@ public sealed class ContainerCompositionService(
         string messages = string.Join(Environment.NewLine, errorProperty.EnumerateArray());
         console.MarkupLine("[red][bold]The daemon server reported errors:[/][/]");
         console.MarkupLine($"[red]{messages}[/]");
-        throw new ActionCausesExitException(1);
+        ActionCausesExitException.ExitNow();
     }
 
     private static void CheckSuccess(ShellCommandResult result)
     {
         if (result.ExitCode != 0)
         {
-            throw new ActionCausesExitException(9999);
+            ActionCausesExitException.ExitNow(result.ExitCode);
         }
     }
 }

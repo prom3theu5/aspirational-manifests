@@ -31,7 +31,7 @@ public sealed class ProjectPropertyService(IFileSystem filesystem, IShellExecuti
         if (!result.Success)
         {
             console.MarkupLine($"[red]Failed to get project properties for '{projectPath}'.[/]");
-            throw new ActionCausesExitException(result.ExitCode);
+            ActionCausesExitException.ExitNow(result.ExitCode);
         }
 
         return result.Success ? result.Output : null;

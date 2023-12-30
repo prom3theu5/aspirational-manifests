@@ -14,27 +14,7 @@ public sealed class RemoveManifestsFromClusterAction(
 
         try
         {
-            if (!CurrentState.NonInteractive)
-            {
-
-                Logger.WriteLine();
-                var shouldDeploy = Logger.Confirm(
-                    "[bold]Would you like to remove the deployed manifests from a kubernetes cluster defined in your kubeconfig file?[/]");
-
-                if (!shouldDeploy)
-                {
-                    Logger.MarkupLine("[yellow]Cancelled![/]");
-
-                    return true;
-                }
-
-                CurrentState.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
-
-                if (!CurrentState.ActiveKubernetesContextIsSet)
-                {
-                    return false;
-                }
-            }
+            await InteractivelySelectKubernetesCluster();
 
             CreateEmptySecretFiles(secretFiles);
             await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
@@ -54,6 +34,32 @@ public sealed class RemoveManifestsFromClusterAction(
         finally
         {
             CleanupSecretEnvFiles(secretFiles);
+        }
+    }
+
+    private async Task InteractivelySelectKubernetesCluster()
+    {
+        if (CurrentState.ActiveKubernetesContextIsSet)
+        {
+            return;
+        }
+
+        Logger.WriteLine();
+        var shouldDeploy = Logger.Confirm(
+            "[bold]Would you like to remove the deployed manifests from a kubernetes cluster defined in your kubeconfig file?[/]");
+
+        if (!shouldDeploy)
+        {
+            Logger.MarkupLine("[yellow]Skipping deployment of manifests to cluster.[/]");
+            ActionCausesExitException.ExitNow();
+        }
+
+        CurrentState.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
+
+        if (string.IsNullOrEmpty(CurrentState.KubeContext))
+        {
+            Logger.MarkupLine("[red]Failed to set active kubernetes context.[/]");
+            ActionCausesExitException.ExitNow();
         }
     }
 
@@ -129,7 +135,7 @@ public sealed class RemoveManifestsFromClusterAction(
                 {
                     Logger.MarkupLine($"[red](!)[/] Failed to remove Dapr from cluster [blue]'{CurrentState.KubeContext}'[/]");
                     Logger.MarkupLine($"[red](!)[/] Error: {result.Error}");
-                    throw new ActionCausesExitException(9999);
+                    ActionCausesExitException.ExitNow();
                 }
 
                 Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr removed from cluster [blue]'{CurrentState.KubeContext}'[/]");

@@ -13,26 +13,7 @@ public sealed class ApplyManifestsToClusterAction(
 
         try
         {
-            if (!CurrentState.NonInteractive)
-            {
-                Logger.WriteLine();
-                var shouldDeploy = Logger.Confirm(
-                    "[bold]Would you like to deploy the generated manifests to a kubernetes cluster defined in your kubeconfig file?[/]");
-
-                if (!shouldDeploy)
-                {
-                    Logger.MarkupLine("[yellow]Cancelled![/]");
-
-                    return true;
-                }
-
-                CurrentState.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
-
-                if (!CurrentState.ActiveKubernetesContextIsSet)
-                {
-                    return false;
-                }
-            }
+            await InteractivelySelectKubernetesCluster();
 
             await HandleDapr();
 
@@ -51,6 +32,32 @@ public sealed class ApplyManifestsToClusterAction(
         finally
         {
             CleanupSecretEnvFiles(secretFiles);
+        }
+    }
+
+    private async Task InteractivelySelectKubernetesCluster()
+    {
+        if (CurrentState.ActiveKubernetesContextIsSet)
+        {
+            return;
+        }
+
+        Logger.WriteLine();
+        var shouldDeploy = Logger.Confirm(
+            "[bold]Would you like to deploy the generated manifests to a kubernetes cluster defined in your kubeconfig file?[/]");
+
+        if (!shouldDeploy)
+        {
+            Logger.MarkupLine("[yellow]Skipping deployment of manifests to cluster.[/]");
+            ActionCausesExitException.ExitNow();
+        }
+
+        CurrentState.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
+
+        if (string.IsNullOrEmpty(CurrentState.KubeContext))
+        {
+            Logger.MarkupLine("[red]Failed to set active kubernetes context.[/]");
+            ActionCausesExitException.ExitNow();
         }
     }
 
@@ -83,7 +90,7 @@ public sealed class ApplyManifestsToClusterAction(
             {
                 Logger.MarkupLine($"[red](!)[/] Failed to install Dapr in cluster [blue]'{CurrentState.KubeContext}'[/]");
                 Logger.MarkupLine($"[red](!)[/] Error: {result.Error}");
-                throw new ActionCausesExitException(9999);
+                ActionCausesExitException.ExitNow();
             }
 
             Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr installed in cluster [blue]'{CurrentState.KubeContext}'[/]");
@@ -124,7 +131,7 @@ public sealed class ApplyManifestsToClusterAction(
 
             Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Decrypting secrets from [blue]{CurrentState.InputPath}[/]");
 
-            foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x=>x.Value.Keys.Count > 0))
+            foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
             {
                 var secretFile = fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
 

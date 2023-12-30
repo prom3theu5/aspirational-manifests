@@ -23,7 +23,7 @@ public class AspirateConfigurationService(IAnsiConsole console, IFileSystem file
             if (!shouldDelete)
             {
                 LogExistingNotDeleted();
-                throw new ActionCausesExitException(1);
+                ActionCausesExitException.ExitNow();
             }
         }
 

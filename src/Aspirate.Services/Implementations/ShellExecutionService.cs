@@ -130,7 +130,7 @@ public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem)
 
         if (exitWithExitCode)
         {
-            throw new ActionCausesExitException(result.ExitCode);
+            ActionCausesExitException.ExitNow(result.ExitCode);
         }
 
         return Task.CompletedTask;

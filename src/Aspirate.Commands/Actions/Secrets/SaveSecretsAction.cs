@@ -38,7 +38,7 @@ public class SaveSecretsAction(
                 if (!correctPassword)
                 {
                     console.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
-                    throw new ActionCausesExitException(1);
+                    ActionCausesExitException.ExitNow();
                 }
 
                 passwordSecretProvider.SetPassword(password!);
@@ -106,7 +106,7 @@ public class SaveSecretsAction(
             if (!result)
             {
                 console.MarkupLine("[red]Aborting due to inability to create password.[/]");
-                throw new ActionCausesExitException(1);
+                ActionCausesExitException.ExitNow();
             }
         }
     }
