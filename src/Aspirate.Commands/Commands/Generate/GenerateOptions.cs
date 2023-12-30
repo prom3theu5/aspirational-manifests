@@ -1,6 +1,6 @@
 namespace Aspirate.Commands.Commands.Generate;
 
-public sealed class GenerateOptions : BaseCommandOptions, IGenerateOptions
+public sealed class GenerateOptions : BaseCommandOptions, IBuildOptions, IContainerOptions, IAspireOptions, IGenerateOptions, ISecretOption
 {
     public string? ProjectPath { get; set; }
     public string? AspireManifest { get; set; }
@@ -19,4 +19,6 @@ public sealed class GenerateOptions : BaseCommandOptions, IGenerateOptions
     public string? OutputFormat { get; set; }
 
     public string? RuntimeIdentifier { get; set; }
+
+    public string? SecretPassword { get; set; }
 }

@@ -5,7 +5,7 @@ public class ConnectionStringProtector(ISecretProvider secretProvider, IAnsiCons
     public override bool HasSecrets(KeyValuePair<string, Resource> component) =>
         component.Value.Env?.Any(x => x.Key.StartsWith(ProtectorType.ConnectionString.Value)) ?? false;
 
-    public override void ProtectSecrets(KeyValuePair<string, Resource> component)
+    public override void ProtectSecrets(KeyValuePair<string, Resource> component, bool nonInteractive)
     {
         if (component.Value.Env is null)
         {
@@ -21,7 +21,7 @@ public class ConnectionStringProtector(ISecretProvider secretProvider, IAnsiCons
 
         foreach (var input in connectionStrings)
         {
-            UpsertSecret(component, input);
+            UpsertSecret(component, input, nonInteractive);
         }
     }
 }

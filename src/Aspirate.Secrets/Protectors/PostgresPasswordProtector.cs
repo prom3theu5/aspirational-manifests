@@ -5,7 +5,7 @@ public class PostgresPasswordProtector(ISecretProvider secretProvider, IAnsiCons
     public override bool HasSecrets(KeyValuePair<string, Resource> component) =>
         component.Value.Env?.Any(x => x.Key.Equals(ProtectorType.PostgresPassword.Value, StringComparison.OrdinalIgnoreCase)) ?? false;
 
-    public override void ProtectSecrets(KeyValuePair<string, Resource> component)
+    public override void ProtectSecrets(KeyValuePair<string, Resource> component, bool nonInteractive)
     {
         if (component.Value.Env is null)
         {
@@ -16,7 +16,7 @@ public class PostgresPasswordProtector(ISecretProvider secretProvider, IAnsiCons
 
         if (!string.IsNullOrEmpty(postgresPasswordInput.Key) && postgresPasswordInput.Key.Equals(ProtectorType.PostgresPassword.Value, StringComparison.OrdinalIgnoreCase))
         {
-            UpsertSecret(component, postgresPasswordInput);
+            UpsertSecret(component, postgresPasswordInput, nonInteractive);
         }
     }
 }

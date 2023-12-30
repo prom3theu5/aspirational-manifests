@@ -44,25 +44,29 @@ public class SaveSecretsAction(
                 passwordSecretProvider.SetPassword(password!);
             }
 
-            var secretsAction = console.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select the action for the existing secrets...")
-                    .HighlightStyle("blue")
-                    .PageSize(3)
-                    .AddChoices(UseExisting, Augment, Overwrite));
-
-            switch (secretsAction)
+            if (!CurrentState.NonInteractive)
             {
-                case UseExisting:
-                    console.MarkupLine($"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/]");
-                    return Task.FromResult(true);
-                case Augment:
-                    console.MarkupLine($"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/] and augmenting with new values.");
-                    break;
-                case Overwrite:
-                    console.MarkupLine($"[yellow]Overwriting[/] secrets for provider [blue]{secretProvider.Type}[/]");
-                    secretProvider.RemoveState(CurrentState.OutputPath);
-                    break;
+                var secretsAction = console.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Select the action for the existing secrets...")
+                        .HighlightStyle("blue")
+                        .PageSize(3)
+                        .AddChoices(UseExisting, Augment, Overwrite));
+
+                switch (secretsAction)
+                {
+                    case UseExisting:
+                        console.MarkupLine($"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/]");
+                        return Task.FromResult(true);
+                    case Augment:
+                        console.MarkupLine(
+                            $"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/] and augmenting with new values.");
+                        break;
+                    case Overwrite:
+                        console.MarkupLine($"[yellow]Overwriting[/] secrets for provider [blue]{secretProvider.Type}[/]");
+                        secretProvider.RemoveState(CurrentState.OutputPath);
+                        break;
+                }
             }
         }
 
@@ -85,7 +89,7 @@ public class SaveSecretsAction(
 
             foreach (var strategy in ProtectionStrategies)
             {
-                strategy.ProtectSecrets(component);
+                strategy.ProtectSecrets(component, CurrentState.NonInteractive);
             }
         }
 
@@ -114,6 +118,12 @@ public class SaveSecretsAction(
     private bool CreatePassword(PasswordSecretProvider passwordSecretProvider)
     {
         console.MarkupLine("Secrets are to be protected by a [green]password[/]");
+
+        if (!string.IsNullOrEmpty(CurrentState.SecretPassword))
+        {
+            passwordSecretProvider.SetPassword(CurrentState.SecretPassword);
+            return true;
+        }
 
         for (int i = 3; i > 0; i--)
         {
@@ -144,6 +154,11 @@ public class SaveSecretsAction(
     {
         console.MarkupLine("Existing Secrets are protected by a [green]password[/].");
 
+        if (CliSecretPasswordSupplied(passwordSecretProvider, out var validPassword))
+        {
+            return (validPassword, CurrentState.SecretPassword);
+        }
+
         for (int i = 3; i > 0; i--)
         {
             console.WriteLine();
@@ -160,5 +175,27 @@ public class SaveSecretsAction(
         }
 
         return (false, null);
+    }
+
+    private bool CliSecretPasswordSupplied(PasswordSecretProvider passwordSecretProvider, out bool validPassword)
+    {
+        if (string.IsNullOrEmpty(CurrentState.SecretPassword))
+        {
+            validPassword = false;
+            return false;
+        }
+
+        if (passwordSecretProvider.CheckPassword(CurrentState.SecretPassword))
+        {
+            passwordSecretProvider.SetPassword(CurrentState.SecretPassword);
+            {
+                validPassword = true;
+                return true;
+            }
+        }
+
+        Logger.MarkupLine("[red]Incorrect password[/].");
+        validPassword = false;
+        return true;
     }
 }
