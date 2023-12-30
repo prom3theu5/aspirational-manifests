@@ -14,7 +14,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --skip-build --output-format compose",
+      "commandLineArgs": "generate",
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
