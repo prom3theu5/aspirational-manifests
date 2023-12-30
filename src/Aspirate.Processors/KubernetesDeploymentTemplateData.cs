@@ -9,9 +9,9 @@ public class KubernetesDeploymentTemplateData
     public Dictionary<string, string>? Secrets {get; private set;}
     public Dictionary<string, string>? Annotations {get; private set;}
     public IReadOnlyCollection<string>? Manifests {get; private set;}
+    public IReadOnlyCollection<string>? Args {get; private set;}
     public bool? IsService { get; private set; } = true;
     public bool? IsProject {get; private set;}
-    public bool? IncludeGeneratorOptions {get; private set;}
     public string? ContainerImage {get; private set;}
     public string? ImagePullPolicy {get; private set;}
     public List<Ports>? Ports {get; private set;}
@@ -59,6 +59,12 @@ public class KubernetesDeploymentTemplateData
         return this;
     }
 
+    public KubernetesDeploymentTemplateData SetArgs(IReadOnlyCollection<string>? args)
+    {
+        Args = args;
+        return this;
+    }
+
     public KubernetesDeploymentTemplateData SetIsProject(bool project)
     {
         IsProject = project;
@@ -86,12 +92,6 @@ public class KubernetesDeploymentTemplateData
     public KubernetesDeploymentTemplateData SetServiceType(string? serviceType)
     {
         ServiceType = serviceType ?? "ClusterIP";
-        return this;
-    }
-
-    public KubernetesDeploymentTemplateData SetIncludeGeneratorOptions(bool include)
-    {
-        IncludeGeneratorOptions = include;
         return this;
     }
 
@@ -127,6 +127,7 @@ public class KubernetesDeploymentTemplateData
     public bool HasPorts => Ports?.Any() == true;
     public bool HasAnySecrets => Secrets?.Any() == true;
     public bool HasAnyAnnotations => Annotations?.Any() == true;
+    public bool HasArgs => Args?.Any() == true;
     public bool WithNamespace => !string.IsNullOrWhiteSpace(Namespace);
 
     public KubernetesDeploymentTemplateData Validate()

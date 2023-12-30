@@ -146,6 +146,11 @@ public sealed class ProjectProcessor(
             return;
         }
 
+        if (resourceWithBinding.Bindings is null)
+        {
+            return;
+        }
+
         if (resourceWithBinding.Bindings.TryGetValue("http", out var httpBinding) && httpBinding.ContainerPort == 0)
         {
             httpBinding.ContainerPort = 8080;

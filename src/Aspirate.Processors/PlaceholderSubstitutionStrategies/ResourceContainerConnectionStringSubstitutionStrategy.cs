@@ -14,6 +14,11 @@ public partial class ResourceContainerConnectionStringSubstitutionStrategy : IPl
             throw new ArgumentException($"Resource {resource.Name} is not a container.");
         }
 
+        if (string.IsNullOrEmpty(container.ConnectionString))
+        {
+            return;
+        }
+
         container.ConnectionString = ReplaceConnectionStringPlaceholders(resources, container.ConnectionString);
     }
 
