@@ -1,4 +1,4 @@
-namespace Aspirate.Commands.Commands.Init;
+namespace Aspirate.Commands.Contracts;
 
 public interface IInitOptions
 {
@@ -9,8 +9,4 @@ public interface IInitOptions
     string? ContainerImageTag { get; set; }
 
     string? TemplatePath { get; set; }
-
-    bool NonInteractive { get; set; }
-
-    ProviderType SecretProvider { get; set; }
 }

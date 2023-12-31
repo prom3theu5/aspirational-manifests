@@ -17,6 +17,7 @@ global using Aspirate.Commands.Commands.Build;
 global using Aspirate.Commands.Commands.Destroy;
 global using Aspirate.Commands.Commands.Generate;
 global using Aspirate.Commands.Commands.Init;
+global using Aspirate.Commands.Contracts;
 global using Aspirate.Commands.Enums;
 global using Aspirate.Commands.Extensions;
 global using Aspirate.Commands.Options;

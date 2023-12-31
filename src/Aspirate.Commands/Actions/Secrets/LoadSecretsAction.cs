@@ -25,7 +25,7 @@ public class LoadSecretsAction(
                 if (!CheckPassword(passwordSecretProvider))
                 {
                     Logger.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
-                    throw new ActionCausesExitException(1);
+                    ActionCausesExitException.ExitNow();
                 }
             }
         }
@@ -37,6 +37,11 @@ public class LoadSecretsAction(
 
     private bool CheckPassword(PasswordSecretProvider passwordSecretProvider)
     {
+        if (CliSecretPasswordSupplied(passwordSecretProvider, out var validPassword))
+        {
+            return validPassword;
+        }
+
         for (int i = 0; i < 3; i++)
         {
             var password = Logger.Prompt(
@@ -53,6 +58,28 @@ public class LoadSecretsAction(
         }
 
         return false;
+    }
+
+    private bool CliSecretPasswordSupplied(PasswordSecretProvider passwordSecretProvider, out bool validPassword)
+    {
+        if (string.IsNullOrEmpty(CurrentState.SecretPassword))
+        {
+            validPassword = false;
+            return false;
+        }
+
+        if (passwordSecretProvider.CheckPassword(CurrentState.SecretPassword))
+        {
+            passwordSecretProvider.SetPassword(CurrentState.SecretPassword);
+            {
+                validPassword = true;
+                return true;
+            }
+        }
+
+        Logger.MarkupLine("[red]Incorrect password[/].");
+        validPassword = false;
+        return true;
     }
 
     public override void ValidateNonInteractiveState()

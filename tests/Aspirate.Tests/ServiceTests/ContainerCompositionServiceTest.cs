@@ -82,11 +82,16 @@ public class ContainerCompositionServiceTest
                         },
                     }));
 
+        var response = "{\"ServerErrors\":[\"Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\"]}";
+
         shellExecutionService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
-            .Returns(Task.FromResult(new ShellCommandResult(true, "test", string.Empty, 0)));
+            .Returns(Task.FromResult(new ShellCommandResult(true, response, string.Empty, 0)));
 
         shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(Arg.Any<string>(), Arg.Any<ArgumentsBuilder>(),Arg.Any<Dictionary<string, string?>>())
             .Returns(Task.FromResult(false));
+
+        shellExecutionService.IsCommandAvailable(Arg.Any<string>())
+            .Returns(CommandAvailableResult.Available(builder));
 
         // Act
         var action = () => service.BuildAndPushContainerForProject(project, containerDetails, builder);
@@ -203,6 +208,9 @@ public class ContainerCompositionServiceTest
 
         shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(Arg.Any<string>(), Arg.Any<ArgumentsBuilder>(),Arg.Any<Dictionary<string, string?>>())
             .Returns(Task.FromResult(false));
+
+        shellExecutionService.IsCommandAvailable(Arg.Any<string>())
+            .Returns(CommandAvailableResult.NotAvailable);
 
         // Act
         var action = () => service.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, true);

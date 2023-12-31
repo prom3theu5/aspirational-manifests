@@ -12,7 +12,7 @@ public sealed class GenerateKustomizeManifestsAction(
         {
             Logger.MarkupLine($"[red](!)[/] The output format '{CurrentState.OutputFormat}' is not supported for this action.");
             Logger.MarkupLine("[red](!)[/] Please use the output format 'compose' instead.");
-            throw new ActionCausesExitException(1);
+            ActionCausesExitException.ExitNow();
         }
 
         if (NoSupportedComponentsExitAction())

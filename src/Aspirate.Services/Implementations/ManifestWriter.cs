@@ -107,6 +107,24 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         CreateFile(templateFile, deploymentOutputPath, data, templatePath);
     }
 
+    /// <inheritdoc />
+    public void CreateImagePullSecret(string dockerUsername, string dockerPassword, string dockerEmail, string secretName, string outputPath)
+    {
+        var dockerConfigJson = CreateDockerConfigJson(dockerUsername, dockerPassword, dockerEmail);
+
+        var secret = ImagePullSecret.Create()
+            .WithName(secretName)
+            .WithDockerConfigJson(dockerConfigJson);
+
+        var serializer = new SerializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+
+        string secretYaml = serializer.Serialize(secret);
+
+        fileSystem.File.WriteAllText(outputPath, secretYaml);
+    }
+
     private void CreateFile<TTemplateData>(string inputFile, string outputPath, TTemplateData data, string? templatePath)
     {
         var templateFile = GetTemplateFilePath(inputFile, templatePath);
@@ -120,4 +138,19 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
 
     private string GetTemplateFilePath(string templateFile, string? templatePath) =>
         fileSystem.Path.Combine(templatePath ?? _defaultTemplatePath, templateFile);
+
+    private static DockerConfigJson CreateDockerConfigJson(string dockerUsername, string dockerPassword, string dockerEmail)
+    {
+        string auth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{dockerUsername}:{dockerPassword}"));
+
+        var dockerConfigJson = new DockerConfigJson
+        {
+            Auths = new()
+            {
+                Auth = auth,
+                Email = dockerEmail,
+            },
+        };
+        return dockerConfigJson;
+    }
 }

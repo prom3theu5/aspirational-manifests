@@ -61,6 +61,21 @@ public interface IManifestWriter
         string? templatePath);
 
     /// <summary>
+    /// Creates an image pull secret with the specified Docker credentials and saves it to the specified output path.
+    /// </summary>
+    /// <param name="dockerUsername">The Docker username for the image pull secret.</param>
+    /// <param name="dockerPassword">The Docker password for the image pull secret.</param>
+    /// <param name="dockerEmail">The Docker email for the image pull secret.</param>
+    /// <param name="secretName">The name of the image pull secret.</param>
+    /// <param name="outputPath">The output path where the image pull secret should be saved.</param>
+    /// <remarks>
+    /// This method creates an image pull secret using the provided Docker credentials and saves it to the specified output path.
+    /// The image pull secret can be used to authenticate with a Docker registry for pulling private images.
+    /// </remarks>
+    void CreateImagePullSecret(string dockerUsername, string dockerPassword, string dockerEmail, string secretName,
+        string outputPath);
+
+    /// <summary>
     /// Create a custom manifest file using the specified parameters.
     /// </summary>
     /// <param name="outputPath">The output path of the manifest file.</param>

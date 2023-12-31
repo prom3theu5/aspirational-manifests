@@ -12,7 +12,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         {
             Logger.MarkupLine($"[red](!)[/] The output format '{CurrentState.OutputFormat}' is not supported for this action.");
             Logger.MarkupLine($"[red](!)[/] Please use the output format 'compose' instead.");
-            throw new ActionCausesExitException(1);
+            ActionCausesExitException.ExitNow();
         }
 
         var outputFile = Path.Combine(AspirateLiterals.DefaultOutputPath, "docker-compose.yml");

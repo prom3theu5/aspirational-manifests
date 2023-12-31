@@ -125,6 +125,7 @@ public class PopulateInputsAction(
 
         var manualInputs = componentsWithInputs
             .Select(x => (IResourceWithInput) x.Value)
+            .Where(x=>x.Inputs is not null)
             .SelectMany(x => x.Inputs)
             .Where(x => x.Value.Default?.Generate is null);
 

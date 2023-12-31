@@ -1,11 +1,13 @@
 namespace Aspirate.Commands;
 
 public class AspirateState :
-    IApplyOptions,
-    IDestroyOptions,
     IInitOptions,
     IGenerateOptions,
     IBuildOptions,
+    IContainerOptions,
+    IAspireOptions,
+    IKubernetesOptions,
+    ISecretOption,
     IPasswordSecretState,
     IBase64SecretState
 {
