@@ -9,7 +9,7 @@ public sealed class SecretProviderOption : BaseOption<ProviderType>
 
     private SecretProviderOption() : base(_aliases, "ASPIRATE_SECRET_PROVIDER", ProviderType.Password)
     {
-        Name = nameof(BaseCommandOptions.SecretProvider);
+        Name = nameof(ICommandOptions.SecretProvider);
         Description = "Sets the secret provider. Default is 'Password'";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

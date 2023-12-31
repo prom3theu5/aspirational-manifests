@@ -9,7 +9,8 @@ public class AspirateState :
     IKubernetesOptions,
     ISecretOption,
     IPasswordSecretState,
-    IBase64SecretState
+    IBase64SecretState,
+    IPrivateRegistryCredentialsOptions
 {
     [JsonPropertyName("projectPath")]
     public string? ProjectPath { get; set; }
@@ -64,6 +65,18 @@ public class AspirateState :
 
     [JsonPropertyName("skipFinalKustomizeGeneration")]
     public bool SkipFinalKustomizeGeneration { get; set; }
+
+    [JsonPropertyName("registryUsername")]
+    public string? RegistryUsername { get; set; }
+
+    [JsonPropertyName("registryPassword")]
+    public string? RegistryPassword { get; set; }
+
+    [JsonPropertyName("registryEmail")]
+    public string? RegistryEmail { get; set; }
+
+    [JsonPropertyName("withPrivateRegistry")]
+    public bool? WithPrivateRegistry { get; set; }
 
     [JsonPropertyName("salt")]
     public string? Salt { get; set; }

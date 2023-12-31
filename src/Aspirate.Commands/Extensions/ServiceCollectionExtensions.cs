@@ -40,7 +40,8 @@ public static class ServiceCollectionExtensions
             .RegisterAction<ApplyDaprAnnotationsAction>()
             .RegisterAction<PopulateInputsAction>()
             .RegisterAction<SaveSecretsAction>()
-            .RegisterAction<LoadSecretsAction>();
+            .RegisterAction<LoadSecretsAction>()
+            .RegisterAction<AskPrivateRegistryCredentialsAction>();
 
     /// <summary>
     /// Registers an implementation of <see cref="IAction"/> with the specified <typeparamref name="TImplementation"/> type.

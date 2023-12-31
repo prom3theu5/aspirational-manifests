@@ -10,7 +10,7 @@ public sealed class KubernetesContextOption : BaseOption<string?>
 
     private KubernetesContextOption() : base(_aliases, "ASPIRATE_KUBERNETES_CONTEXT", null)
     {
-        Name = nameof(ApplyOptions.KubeContext);
+        Name = nameof(IKubernetesOptions.KubeContext);
         Description = "The name of the kubernetes context to use";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

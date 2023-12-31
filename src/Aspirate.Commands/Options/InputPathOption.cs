@@ -10,7 +10,7 @@ public sealed class InputPathOption : BaseOption<string>
 
     private InputPathOption() : base(_aliases, "ASPIRATE_INPUT_PATH", AspirateLiterals.DefaultOutputPath)
     {
-        Name = nameof(ApplyOptions.InputPath);
+        Name = nameof(IKubernetesOptions.InputPath);
         Description = "The path for the kustomize manifests directory";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

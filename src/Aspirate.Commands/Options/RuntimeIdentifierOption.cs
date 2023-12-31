@@ -6,7 +6,7 @@ public sealed class RuntimeIdentifierOption : BaseOption<string?>
 
     private RuntimeIdentifierOption() : base(_aliases, "ASPIRATE_RUNTIME_IDENTIFIER", null)
     {
-        Name = nameof(BuildOptions.RuntimeIdentifier);
+        Name = nameof(IBuildOptions.RuntimeIdentifier);
         Description = "The Custom Runtime identifier to use for .net project builds.";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

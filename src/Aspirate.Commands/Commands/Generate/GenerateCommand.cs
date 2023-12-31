@@ -17,5 +17,9 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(OutputFormatOption.Instance);
        AddOption(RuntimeIdentifierOption.Instance);
        AddOption(SecretPasswordOption.Instance);
+       AddOption(PrivateRegistryOption.Instance);
+       AddOption(RegistryUsernameOption.Instance);
+       AddOption(RegistryPasswordOption.Instance);
+       AddOption(RegistryEmailOption.Instance);
     }
 }

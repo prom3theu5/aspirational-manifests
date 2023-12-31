@@ -10,7 +10,7 @@ public sealed class ContainerRegistryOption : BaseOption<string?>
 
     private ContainerRegistryOption() : base(_aliases, "ASPIRATE_CONTAINER_REGISTRY", null)
     {
-        Name = nameof(BuildOptions.ContainerRegistry);
+        Name = nameof(IContainerOptions.ContainerRegistry);
         Description = "The Container Registry to use as the fall-back value for all containers";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

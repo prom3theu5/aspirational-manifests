@@ -6,7 +6,7 @@ public sealed class OutputFormatOption : BaseOption<string>
 
     private OutputFormatOption() : base(_aliases, "ASPIRATE_OUTPUT_FORMAT", OutputFormat.Kustomize.Value)
     {
-        Name = nameof(GenerateOptions.OutputFormat);
+        Name = nameof(IGenerateOptions.OutputFormat);
         Description = "The output format of the generated manifests. Can be kustomize or compose.";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;
