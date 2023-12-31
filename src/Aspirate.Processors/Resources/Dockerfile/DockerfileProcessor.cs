@@ -31,7 +31,8 @@ public class DockerfileProcessor(
         JsonSerializer.Deserialize<DockerfileResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
-        string? templatePath = null, bool? disableSecrets = false)
+        string? templatePath = null, bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -56,6 +57,7 @@ public class DockerfileProcessor(
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(containerPorts)
             .SetManifests(_manifests)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .Validate();
 
         _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);

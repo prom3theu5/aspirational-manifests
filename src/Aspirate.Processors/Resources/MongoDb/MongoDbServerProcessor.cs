@@ -21,7 +21,8 @@ public sealed class MongoDbServerProcessor(IFileSystem fileSystem, IAnsiConsole 
         string outputPath,
         string imagePullPolicy,
         string? templatePath = null,
-        bool? disableSecrets = false)
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 

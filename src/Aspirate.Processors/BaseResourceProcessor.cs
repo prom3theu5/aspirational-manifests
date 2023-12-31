@@ -98,10 +98,12 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// <param name="imagePullPolicy">The image pull policy for the resource.</param>
     /// <param name="templatePath">Optional. The path to the template used for creating the manifests.</param>
     /// <param name="disableSecrets">Passing this will disable all secret generation.</param>
+    /// <param name="withPrivateRegistry">Specifies if image pull secret should be set.</param>
     /// <returns>A task that represents the asynchronous operation. The task result is a boolean indicating if the manifests were created successfully.</returns>
     public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null,
-        bool? disableSecrets = false)
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         LogCreateManifestNotOverridden(GetType().Name);
 

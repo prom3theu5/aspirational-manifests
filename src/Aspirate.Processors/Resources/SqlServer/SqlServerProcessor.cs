@@ -30,7 +30,8 @@ public sealed class SqlServerProcessor(IFileSystem fileSystem, IAnsiConsole cons
         string outputPath,
         string imagePullPolicy,
         string? templatePath = null,
-        bool? disableSecrets = false)
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 

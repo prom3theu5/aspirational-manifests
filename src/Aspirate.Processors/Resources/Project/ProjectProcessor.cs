@@ -29,7 +29,8 @@ public sealed class ProjectProcessor(
         JsonSerializer.Deserialize<ProjectResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
-        string? templatePath = null, bool? disableSecrets = false)
+        string? templatePath = null, bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -55,6 +56,7 @@ public sealed class ProjectProcessor(
             .SetIsProject(true)
             .SetPorts(ports)
             .SetManifests(_manifests)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .Validate();
 
         _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);

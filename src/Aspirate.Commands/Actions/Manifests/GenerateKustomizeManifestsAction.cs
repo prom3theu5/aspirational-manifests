@@ -57,7 +57,7 @@ public sealed class GenerateKustomizeManifestsAction(
             return;
         }
 
-        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath, CurrentState.DisableSecrets);
+        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath, CurrentState.DisableSecrets, CurrentState.WithPrivateRegistry);
 
         if (success && !AspirateState.IsNotDeployable(resource.Value) && resource.Value is not DaprComponentResource)
         {

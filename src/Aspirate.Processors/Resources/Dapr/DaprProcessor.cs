@@ -13,7 +13,8 @@ public class DaprProcessor(
         JsonSerializer.Deserialize<DaprResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null,
-        bool? disableSecrets = false) =>
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false) =>
         // Do nothing for dapr, they are there for annotations on services.
         Task.FromResult(true);
 }

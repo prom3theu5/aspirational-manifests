@@ -30,7 +30,8 @@ public sealed class MySqlServerProcessor(IFileSystem fileSystem, IAnsiConsole co
         string outputPath,
         string imagePullPolicy,
         string? templatePath,
-        bool? disableSecrets = false)
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 

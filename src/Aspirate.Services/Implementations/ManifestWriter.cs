@@ -122,7 +122,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
 
         string secretYaml = serializer.Serialize(secret);
 
-        fileSystem.File.WriteAllText(outputPath, secretYaml);
+        fileSystem.File.WriteAllText(fileSystem.Path.Combine(outputPath, $"{TemplateLiterals.ImagePullSecretType}.yml"), secretYaml);
     }
 
     private void CreateFile<TTemplateData>(string inputFile, string outputPath, TTemplateData data, string? templatePath)

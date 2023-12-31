@@ -30,7 +30,8 @@ public class ContainerProcessor(
         string outputPath,
         string imagePullPolicy,
         string? templatePath = null,
-        bool? disableSecrets = false)
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -51,6 +52,7 @@ public class ContainerProcessor(
             .SetPorts(containerPorts)
             .SetArgs(container.Args)
             .SetManifests(_manifests)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .Validate();
 
         _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);
