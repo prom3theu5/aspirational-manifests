@@ -20,6 +20,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
         string? templatePath = null,
         string? @namespace = null,
         bool? withPrivateRegistry = false,
+        string? registryUrl = null,
         string? registryUsername = null,
         string? registryPassword = null,
         string? registryEmail = null)
@@ -31,7 +32,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
             .SetIsService(false);
 
         HandleNamespace(outputPath, templatePath, @namespace, templateDataBuilder, manifests);
-        HandlePrivateRegistry(outputPath, withPrivateRegistry, registryUsername, registryPassword, registryEmail, manifests);
+        HandlePrivateRegistry(outputPath, withPrivateRegistry, registryUrl, registryUsername, registryPassword, registryEmail, manifests);
 
         HandleDapr(outputPath, manifests);
 
@@ -44,15 +45,15 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
         _console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/kustomization.yml[/]");
     }
 
-    private void HandlePrivateRegistry(string outputPath, bool? withPrivateRegistry, string? registryUsername, string? registryPassword, string? registryEmail, List<string> manifests)
+    private void HandlePrivateRegistry(string outputPath, bool? withPrivateRegistry, string? registryUrl, string? registryUsername, string? registryPassword, string? registryEmail, List<string> manifests)
     {
         if (!withPrivateRegistry.GetValueOrDefault())
         {
             return;
         }
 
-        _console.MarkupLine($"\r\n[bold]Generating private registry secret manifest.[/]");
-        _manifestWriter.CreateImagePullSecret(registryUsername, registryPassword, registryEmail, TemplateLiterals.ImagePullSecretType, outputPath);
+        _console.MarkupLine("\r\n[bold]Generating private registry secret manifest.[/]");
+        _manifestWriter.CreateImagePullSecret(registryUrl, registryUsername, registryPassword, registryEmail, TemplateLiterals.ImagePullSecretType, outputPath);
         manifests.Add($"{TemplateLiterals.ImagePullSecretType}.yml");
         _console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/{TemplateLiterals.ImagePullSecretType}.yml[/]");
     }

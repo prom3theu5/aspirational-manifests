@@ -26,6 +26,10 @@ spec:
       labels:
         app: rabbitmq
     spec:
+    {{#if withPrivateRegistry}}
+      imagePullSecrets:
+      - name: image-pull-secret
+    {{/if}}
       containers:
         - name: rabbitmq
           image: rabbitmq:3.8-management

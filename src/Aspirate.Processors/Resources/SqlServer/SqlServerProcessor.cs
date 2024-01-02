@@ -41,6 +41,7 @@ public sealed class SqlServerProcessor(IFileSystem fileSystem, IAnsiConsole cons
             .SetSaPassword(resource.Value.Env["SaPassword"])
             .SetName("sqlserver")
             .SetIsService(false)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .SetManifests(_manifests)
             .Validate();
 

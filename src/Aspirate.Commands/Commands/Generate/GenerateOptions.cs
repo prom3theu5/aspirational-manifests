@@ -28,11 +28,13 @@ public sealed class GenerateOptions : BaseCommandOptions,
 
     public string? SecretPassword { get; set; }
 
-    public string? RegistryUsername { get; set; }
+    public string? PrivateRegistryUrl { get; set; }
 
-    public string? RegistryPassword { get; set; }
+    public string? PrivateRegistryUsername { get; set; }
 
-    public string? RegistryEmail { get; set; }
+    public string? PrivateRegistryPassword { get; set; }
+
+    public string? PrivateRegistryEmail { get; set; }
 
     public bool? WithPrivateRegistry { get; set; }
 }

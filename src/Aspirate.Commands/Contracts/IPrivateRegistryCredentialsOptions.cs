@@ -2,10 +2,11 @@ namespace Aspirate.Commands.Contracts;
 
 public interface IPrivateRegistryCredentialsOptions
 {
-    string? RegistryUsername { get; set; }
+    string? PrivateRegistryUrl { get; set; }
+    string? PrivateRegistryUsername { get; set; }
 
-    string? RegistryPassword { get; set; }
+    string? PrivateRegistryPassword { get; set; }
 
-    string? RegistryEmail { get; set; }
+    string? PrivateRegistryEmail { get; set; }
     bool?  WithPrivateRegistry { get; set; }
 }

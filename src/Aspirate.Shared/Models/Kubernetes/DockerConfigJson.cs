@@ -2,5 +2,6 @@ namespace Aspirate.Shared.Models.Kubernetes;
 
 public class DockerConfigJson
 {
-    public DockerAuth? Auths { get; set; }
+    [JsonPropertyName("auths")]
+    public Dictionary<string, DockerAuth>? Auths { get; set; }
 }

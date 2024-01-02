@@ -33,6 +33,10 @@ spec:
       labels:
         app: sqlserver
     spec:
+{{#if withPrivateRegistry}}
+      imagePullSecrets:
+      - name: image-pull-secret
+{{/if}}
       containers:
         - name: sqlserver
           image: mcr.microsoft.com/mssql/server:2022-latest

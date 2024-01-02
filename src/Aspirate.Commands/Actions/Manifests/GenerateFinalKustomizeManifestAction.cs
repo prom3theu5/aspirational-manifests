@@ -39,9 +39,10 @@ public sealed class GenerateFinalKustomizeManifestAction(
             CurrentState.TemplatePath,
             CurrentState.Namespace,
             CurrentState.WithPrivateRegistry,
-            CurrentState.RegistryUsername,
-            CurrentState.RegistryPassword,
-            CurrentState.RegistryEmail);
+            CurrentState.PrivateRegistryUrl,
+            CurrentState.PrivateRegistryUsername,
+            CurrentState.PrivateRegistryPassword,
+            CurrentState.PrivateRegistryEmail);
 
         return Task.FromResult(true);
     }

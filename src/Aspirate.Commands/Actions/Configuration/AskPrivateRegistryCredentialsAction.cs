@@ -18,26 +18,34 @@ public class AskPrivateRegistryCredentialsAction(
 
         Logger.MarkupLine("\r\nEnsuring private registry credentials are set so that we can produce an image pull secret.");
 
-        if (string.IsNullOrEmpty(CurrentState.RegistryUsername))
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryUrl))
         {
-            CurrentState.RegistryUsername = Logger.Prompt(
+            CurrentState.PrivateRegistryUrl = Logger.Prompt(
+                new TextPrompt<string>("Enter registry url:")
+                    .PromptStyle("blue")
+                    .Validate(url => !string.IsNullOrEmpty(url), "Url required and cannot be empty."));
+        }
+
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryUsername))
+        {
+            CurrentState.PrivateRegistryUsername = Logger.Prompt(
                 new TextPrompt<string>("Enter registry username:")
                     .PromptStyle("blue")
                     .Validate(username => !string.IsNullOrEmpty(username), "Username is required and cannot be empty."));
         }
 
-        if (string.IsNullOrEmpty(CurrentState.RegistryPassword))
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryPassword))
         {
-            CurrentState.RegistryPassword = Logger.Prompt(
+            CurrentState.PrivateRegistryPassword = Logger.Prompt(
                 new TextPrompt<string>("Enter registry password:")
                     .Secret()
                     .PromptStyle("red")
                     .Validate(password => !string.IsNullOrEmpty(password), "Password is required and cannot be empty."));
         }
 
-        if (string.IsNullOrEmpty(CurrentState.RegistryEmail))
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryEmail))
         {
-            CurrentState.RegistryEmail = Logger.Prompt(
+            CurrentState.PrivateRegistryEmail = Logger.Prompt(
                 new TextPrompt<string>("Enter registry email:")
                     .PromptStyle("blue")
                     .Validate(email => !string.IsNullOrEmpty(email), "Email is required and cannot be empty."));
@@ -55,17 +63,22 @@ public class AskPrivateRegistryCredentialsAction(
             return;
         }
 
-        if (string.IsNullOrEmpty(CurrentState.RegistryUsername))
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryUrl))
+        {
+            NonInteractiveValidationFailed("Registry url is required when running in non-interactive mode.");
+        }
+
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryUsername))
         {
             NonInteractiveValidationFailed("Registry username is required when running in non-interactive mode.");
         }
 
-        if (string.IsNullOrEmpty(CurrentState.RegistryPassword))
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryPassword))
         {
             NonInteractiveValidationFailed("Registry password is required when running in non-interactive mode.");
         }
 
-        if (string.IsNullOrEmpty(CurrentState.RegistryEmail))
+        if (string.IsNullOrEmpty(CurrentState.PrivateRegistryEmail))
         {
             NonInteractiveValidationFailed("Registry email is required when running in non-interactive mode.");
         }

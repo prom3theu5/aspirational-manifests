@@ -31,6 +31,7 @@ public sealed class MongoDbServerProcessor(IFileSystem fileSystem, IAnsiConsole 
         var data = new KubernetesDeploymentTemplateData()
             .SetName("mongo")
             .SetIsService(false)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .SetManifests(_manifests)
             .Validate();
 

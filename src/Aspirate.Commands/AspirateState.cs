@@ -16,7 +16,7 @@ public class AspirateState :
     public string? ProjectPath { get; set; }
 
     [JsonPropertyName("inputPath")]
-    public string? InputPath { get; set; } = null!;
+    public string? InputPath { get; set; }
 
     [JsonPropertyName("outputPath")]
     public string? OutputPath { get; set; } = null!;
@@ -66,14 +66,16 @@ public class AspirateState :
     [JsonPropertyName("skipFinalKustomizeGeneration")]
     public bool SkipFinalKustomizeGeneration { get; set; }
 
-    [JsonPropertyName("registryUsername")]
-    public string? RegistryUsername { get; set; }
+    [JsonPropertyName("privateRegistryUrl")]
+    public string? PrivateRegistryUrl { get; set; }
+    [JsonPropertyName("privateRegistryUsername")]
+    public string? PrivateRegistryUsername { get; set; }
 
-    [JsonPropertyName("registryPassword")]
-    public string? RegistryPassword { get; set; }
+    [JsonPropertyName("privateRegistryPassword")]
+    public string? PrivateRegistryPassword { get; set; }
 
-    [JsonPropertyName("registryEmail")]
-    public string? RegistryEmail { get; set; }
+    [JsonPropertyName("privateRegistryEmail")]
+    public string? PrivateRegistryEmail { get; set; }
 
     [JsonPropertyName("withPrivateRegistry")]
     public bool? WithPrivateRegistry { get; set; }

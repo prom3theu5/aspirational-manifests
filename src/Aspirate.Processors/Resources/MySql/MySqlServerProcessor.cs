@@ -41,6 +41,7 @@ public sealed class MySqlServerProcessor(IFileSystem fileSystem, IAnsiConsole co
             .SetRootPassword(resource.Value.Env["RootPassword"])
             .SetName("mysql")
             .SetIsService(false)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .SetManifests(_manifests)
             .Validate();
 

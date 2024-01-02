@@ -31,6 +31,7 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
         var data = new KubernetesDeploymentTemplateData()
             .SetName("postgresql")
             .SetIsService(false)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .SetManifests(_manifests)
             .Validate();
 

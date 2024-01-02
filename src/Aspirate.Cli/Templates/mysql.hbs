@@ -24,6 +24,10 @@ spec:
       labels:
         app: mysql
     spec:
+    {{#if withPrivateRegistry}}
+      imagePullSecrets:
+      - name: image-pull-secret
+    {{/if}}
       containers:
         - name: mysql
           image: mysql:latest
