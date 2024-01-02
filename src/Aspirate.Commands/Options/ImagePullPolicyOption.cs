@@ -17,11 +17,11 @@ public sealed class ImagePullPolicyOption : BaseOption<string?>
 
     private static void ValidateFormat(OptionResult optionResult)
     {
-        var value = optionResult.GetValueOrDefault<string>();
+        var value = optionResult.GetValueOrDefault<string?>();
 
         if (value is null)
         {
-            throw new ArgumentException("--image-pull-policy cannot be null.");
+            return;
         }
 
         if (!ImagePullPolicy.TryFromValue(value, out _))
