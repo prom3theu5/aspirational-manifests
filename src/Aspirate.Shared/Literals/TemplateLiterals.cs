@@ -15,4 +15,5 @@ public static class TemplateLiterals
     public const string MongoDbServerType = "mongo-server";
     public const string ComponentKustomizeType = "kustomization";
     public const string NamespaceType = "namespace";
+    public const string ImagePullSecretType = "image-pull-secret";
 }

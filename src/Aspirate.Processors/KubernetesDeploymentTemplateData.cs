@@ -12,6 +12,8 @@ public class KubernetesDeploymentTemplateData
     public IReadOnlyCollection<string>? Args {get; private set;}
     public bool? IsService { get; private set; } = true;
     public bool? IsProject {get; private set;}
+
+    public bool? WithPrivateRegistry { get; private set; } = false;
     public string? ContainerImage {get; private set;}
     public string? ImagePullPolicy {get; private set;}
     public List<Ports>? Ports {get; private set;}
@@ -68,6 +70,12 @@ public class KubernetesDeploymentTemplateData
     public KubernetesDeploymentTemplateData SetIsProject(bool project)
     {
         IsProject = project;
+        return this;
+    }
+
+    public KubernetesDeploymentTemplateData SetWithPrivateRegistry(bool isPrivateRegistry)
+    {
+        WithPrivateRegistry = isPrivateRegistry;
         return this;
     }
 

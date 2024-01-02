@@ -16,6 +16,10 @@ spec:
       labels:
         app: mongo
     spec:
+    {{#if withPrivateRegistry}}
+      imagePullSecrets:
+      - name: image-pull-secret
+    {{/if}}
       containers:
         - name: mongo
           image: mongo:latest

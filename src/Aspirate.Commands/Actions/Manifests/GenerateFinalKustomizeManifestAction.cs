@@ -32,7 +32,17 @@ public sealed class GenerateFinalKustomizeManifestAction(
         }
 
         var finalHandler = Services.GetRequiredKeyedService<IResourceProcessor>(AspireLiterals.Final) as FinalProcessor;
-        finalHandler.CreateFinalManifest(CurrentState.FinalResources, CurrentState.OutputPath, CurrentState.TemplatePath, CurrentState.Namespace);
+
+        finalHandler.CreateFinalManifest(
+            CurrentState.FinalResources,
+            CurrentState.OutputPath,
+            CurrentState.TemplatePath,
+            CurrentState.Namespace,
+            CurrentState.WithPrivateRegistry,
+            CurrentState.PrivateRegistryUrl,
+            CurrentState.PrivateRegistryUsername,
+            CurrentState.PrivateRegistryPassword,
+            CurrentState.PrivateRegistryEmail);
 
         return Task.FromResult(true);
     }

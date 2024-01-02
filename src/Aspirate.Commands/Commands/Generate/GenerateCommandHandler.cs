@@ -41,6 +41,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
+            .QueueAction(nameof(AskPrivateRegistryCredentialsAction))
             .QueueAction(nameof(PopulateInputsAction))
             .QueueAction(nameof(SubstituteValuesAspireManifestAction))
             .QueueAction(nameof(ApplyDaprAnnotationsAction))

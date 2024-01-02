@@ -24,7 +24,8 @@ public interface IResourceProcessor
         string outputPath,
         string imagePullPolicy,
         string? aspirateSettings = null,
-        bool? disableSecrets = false);
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false);
 
     /// <summary>
     /// Creates a compose entry using the specified resource.

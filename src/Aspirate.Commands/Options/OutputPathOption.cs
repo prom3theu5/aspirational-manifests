@@ -10,7 +10,7 @@ public sealed class OutputPathOption : BaseOption<string>
 
     private OutputPathOption() : base(_aliases,  "ASPIRATE_OUTPUT_PATH", AspirateLiterals.DefaultOutputPath)
     {
-        Name = nameof(GenerateOptions.OutputPath);
+        Name = nameof(IGenerateOptions.OutputPath);
         Description = "The output path for generated manifests";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

@@ -21,7 +21,8 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
         JsonSerializer.Deserialize<PostgresServerResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
-        string? templatePath = null, bool? disableSecrets = false)
+        string? templatePath = null, bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -30,6 +31,7 @@ public class PostgresServerProcessor(IFileSystem fileSystem, IAnsiConsole consol
         var data = new KubernetesDeploymentTemplateData()
             .SetName("postgresql")
             .SetIsService(false)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .SetManifests(_manifests)
             .Validate();
 

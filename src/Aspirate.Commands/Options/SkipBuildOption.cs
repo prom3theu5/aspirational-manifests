@@ -6,7 +6,7 @@ public sealed class SkipBuildOption : BaseOption<bool>
 
     private SkipBuildOption() : base(_aliases, "ASPIRATE_SKIP_BUILD", false)
     {
-        Name = nameof(GenerateOptions.SkipBuild);
+        Name = nameof(IGenerateOptions.SkipBuild);
         Description = "Skips build and Push of containers";
         Arity = ArgumentArity.ZeroOrOne;
         IsRequired = false;

@@ -30,7 +30,8 @@ public sealed class MySqlServerProcessor(IFileSystem fileSystem, IAnsiConsole co
         string outputPath,
         string imagePullPolicy,
         string? templatePath,
-        bool? disableSecrets = false)
+        bool? disableSecrets = false,
+        bool? withPrivateRegistry = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -40,6 +41,7 @@ public sealed class MySqlServerProcessor(IFileSystem fileSystem, IAnsiConsole co
             .SetRootPassword(resource.Value.Env["RootPassword"])
             .SetName("mysql")
             .SetIsService(false)
+            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .SetManifests(_manifests)
             .Validate();
 

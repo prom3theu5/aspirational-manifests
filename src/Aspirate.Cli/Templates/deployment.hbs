@@ -24,6 +24,10 @@ spec:
       labels:
         app: {{name}}
     spec:
+    {{#if withPrivateRegistry}}
+      imagePullSecrets:
+      - name: image-pull-secret
+    {{/if}}
       containers:
       - name: {{name}}
         image: {{containerImage}}

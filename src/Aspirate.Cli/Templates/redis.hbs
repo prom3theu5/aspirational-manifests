@@ -13,6 +13,10 @@ spec:
       labels:
         app: redis
     spec:
+{{#if withPrivateRegistry}}
+      imagePullSecrets:
+      - name: image-pull-secret
+{{/if}}
       containers:
         - name: redis
           image: bitnami/redis:latest

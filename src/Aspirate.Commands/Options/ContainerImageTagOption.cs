@@ -10,7 +10,7 @@ public sealed class ContainerImageTagOption : BaseOption<string?>
 
     private ContainerImageTagOption() : base(_aliases, "ASPIRATE_CONTAINER_IMAGE_TAG", null)
     {
-        Name = nameof(BuildOptions.ContainerImageTag);
+        Name = nameof(IContainerOptions.ContainerImageTag);
         Description = "The Container Image Tag to use as the fall-back value for all containers";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

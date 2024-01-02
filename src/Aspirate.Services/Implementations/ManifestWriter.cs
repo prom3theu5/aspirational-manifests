@@ -108,9 +108,9 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     }
 
     /// <inheritdoc />
-    public void CreateImagePullSecret(string dockerUsername, string dockerPassword, string dockerEmail, string secretName, string outputPath)
+    public void CreateImagePullSecret(string registryUrl, string registryUsername, string registryPassword, string registryEmail, string secretName, string outputPath)
     {
-        var dockerConfigJson = CreateDockerConfigJson(dockerUsername, dockerPassword, dockerEmail);
+        var dockerConfigJson = CreateDockerConfigJson(registryUrl, registryUsername, registryPassword, registryEmail);
 
         var secret = ImagePullSecret.Create()
             .WithName(secretName)
@@ -122,7 +122,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
 
         string secretYaml = serializer.Serialize(secret);
 
-        fileSystem.File.WriteAllText(outputPath, secretYaml);
+        fileSystem.File.WriteAllText(fileSystem.Path.Combine(outputPath, $"{TemplateLiterals.ImagePullSecretType}.yml"), secretYaml);
     }
 
     private void CreateFile<TTemplateData>(string inputFile, string outputPath, TTemplateData data, string? templatePath)
@@ -139,18 +139,22 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     private string GetTemplateFilePath(string templateFile, string? templatePath) =>
         fileSystem.Path.Combine(templatePath ?? _defaultTemplatePath, templateFile);
 
-    private static DockerConfigJson CreateDockerConfigJson(string dockerUsername, string dockerPassword, string dockerEmail)
+    private static DockerConfigJson CreateDockerConfigJson(string registryUrl, string registryUsername, string registryPassword, string registryEmail)
     {
-        string auth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{dockerUsername}:{dockerPassword}"));
+        string auth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{registryUsername}:{registryPassword}"));
 
         var dockerConfigJson = new DockerConfigJson
         {
             Auths = new()
             {
-                Auth = auth,
-                Email = dockerEmail,
+                [registryUrl] = new()
+                {
+                    Auth = auth,
+                    Email = registryEmail,
+                },
             },
         };
+
         return dockerConfigJson;
     }
 }

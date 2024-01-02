@@ -6,7 +6,7 @@
 
         private DisableSecretsOption() : base(_aliases, "ASPIRATE_DISABLE_SECRETS", false)
         {
-            Name = nameof(BaseCommandOptions.DisableSecrets);
+            Name = nameof(ICommandOptions.DisableSecrets);
             Description = "Disables Secret Support";
             Arity = ArgumentArity.ZeroOrOne;
             IsRequired = false;
