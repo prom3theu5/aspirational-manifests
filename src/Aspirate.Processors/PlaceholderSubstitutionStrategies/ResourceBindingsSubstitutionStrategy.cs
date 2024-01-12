@@ -17,7 +17,7 @@ public sealed class ResourceBindingsSubstitutionStrategy : IPlaceholderSubstitut
         var parts = cleanPlaceholder.Split('.');
         var resourceName = parts[0];
 
-        if (parts.Length < 4)
+        if (parts.Length != 4)
         {
             throw new InvalidOperationException($"Binding placeholder {placeholder} is not in the expected format.");
         }
