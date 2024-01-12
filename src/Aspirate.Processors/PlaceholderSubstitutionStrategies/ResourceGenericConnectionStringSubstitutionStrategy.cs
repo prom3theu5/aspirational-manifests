@@ -6,7 +6,7 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
 
     private readonly Dictionary<string, Func<string, Dictionary<string, Resource>, string>> _connectionStringMapping = new()
     {
-        [AspireComponentLiterals.Redis] = (_, _) => "redis",
+        [AspireComponentLiterals.Redis] = (resourceName, resources) => $"{resources[resourceName].Name}:{(resources[resourceName] as ContainerResource)?.Bindings.Select(a=> (int?)a.Value.ContainerPort).FirstOrDefault() ?? -1}",
         [AspireComponentLiterals.PostgresDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<PostgresDatabaseResource>(resources, resourceName),
         [AspireComponentLiterals.SqlServerDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<SqlServerDatabaseResource>(resources, resourceName),
         [AspireComponentLiterals.MySqlDatabase] = (resourceName, resources) => SetupDatabaseConnectionString<MySqlDatabaseResource>(resources, resourceName),
@@ -23,6 +23,11 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
         var parts = cleanPlaceholder.Split('.');
         var resourceName = parts[0];
         var resourceType = resources[resourceName].Type;
+
+        if (resources[resourceName] is ContainerResource containerResource)
+        {
+            if (containerResource.Image.StartsWith("redis")) resourceType = AspireComponentLiterals.Redis;
+        }
 
         if (_connectionStringMapping.TryGetValue(resourceType, out var typeHandler))
         {
@@ -48,8 +53,16 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
         return GetConnectionString(resourceName, databaseResource, parentResource);
     }
 
-    private static string GetConnectionString(string resourceName, IResourceWithParent databaseResource, Resource parentResource) =>
-        parentResource.GetType() switch
+    private static string GetConnectionString(string resourceName, IResourceWithParent databaseResource, Resource parentResource)
+    {
+        var parentType = parentResource.GetType();
+
+        if (parentResource is ContainerResource parentContainerResource)
+        {
+            if (parentContainerResource.Image.StartsWith("mcr.microsoft.com/mssql/server")) parentType = typeof(SqlServerResource);
+        }
+
+        return parentType switch
         {
             { } t when t == typeof(SqlServerResource) => GetSqlServerConnectionString(parentResource),
             { } t when t == typeof(MySqlServerResource) => GetMySqlServerConnectionString(parentResource),
@@ -57,9 +70,10 @@ public sealed class ResourceGenericConnectionStringSubstitutionStrategy : IPlace
             { } t when t == typeof(ContainerResource) => GetContainerConnectionString(resourceName, parentResource),
             _ => throw new InvalidOperationException($"Resource {databaseResource.Parent} is not a supported database server.")
         };
+    }
 
     private static string GetSqlServerConnectionString(Resource parentResource) =>
-        $"Server=sqlserver-service;User ID=sa;Password={(parentResource.Env["SaPassword"]).FromBase64()};TrustServerCertificate=true;";
+        $"Server={parentResource.Name};User ID=sa;Password={(parentResource.Env["MSSQL_SA_PASSWORD"])};TrustServerCertificate=true;";
 
     private static string GetMySqlServerConnectionString(Resource parentResource) =>
         $"Server=mysql-service;Port=3306;User ID=root;Password={(parentResource.Env["RootPassword"]).FromBase64()};";
