@@ -78,8 +78,9 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
                 console.MarkupLine($"[red bold]({exitException.ExitCode}): Aspirate will now exit.[/]");
                 return exitException.ExitCode;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                console.MarkupLine($"[red]Exception: {e.Message}[/]");
                 await HandleActionFailure(executionAction.OnFailure);
                 return 1;
             }
