@@ -10,8 +10,7 @@ public interface IContainerDetailsService
     /// </summary>
     /// <param name="resourceName">The name of the resource.</param>
     /// <param name="projectResource">The project instance.</param>
-    /// <param name="containerRegistry">The optional container registry.</param>
-    /// <param name="containerImageTag">The optional container image tag.</param>
+    /// <param name="parameters">Container parameters.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="MsBuildContainerProperties"/> object.</returns>
-    Task<MsBuildContainerProperties> GetContainerDetails(string resourceName, ProjectResource projectResource, string? containerRegistry, string? containerImageTag);
+    Task<MsBuildContainerProperties> GetContainerDetails(string resourceName, ProjectResource projectResource, ContainerParameters parameters);
 }

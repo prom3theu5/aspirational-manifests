@@ -4,6 +4,7 @@ global using System.CommandLine.Parsing;
 global using System.Diagnostics.CodeAnalysis;
 global using System.IO.Abstractions;
 global using System.Reflection;
+global using System.Text;
 global using System.Text.Json.Serialization;
 global using Ardalis.SmartEnum;
 global using Aspirate.Commands.Actions;

@@ -18,6 +18,9 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public bool SkipFinalKustomizeGeneration { get; set; }
     public string? ContainerBuilder { get; set; }
     public string? ContainerRegistry { get; set; }
+
+    public string? ContainerRepositoryPrefix { get; set; }
+
     public string? ContainerImageTag { get; set; }
 
     public string? ImagePullPolicy { get; set; }

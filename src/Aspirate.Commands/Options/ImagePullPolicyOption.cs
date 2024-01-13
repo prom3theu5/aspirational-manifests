@@ -26,7 +26,12 @@ public sealed class ImagePullPolicyOption : BaseOption<string?>
 
         if (!ImagePullPolicy.TryFromValue(value, out _))
         {
-            throw new ArgumentException($"--image-pull-policy must be either '{ImagePullPolicy.IfNotPresent.Value}', '{ImagePullPolicy.Always.Value}' or '{ImagePullPolicy.Never.Value}'. It is case sensitive, and must not be quoted.");
+            var errorBuilder = new StringBuilder();
+            errorBuilder.Append("--image-pull-policy must be one of: '");
+            errorBuilder.AppendJoin("', '", ImagePullPolicy.List.Select(x => x.Value));
+            errorBuilder.Append("' and not quoted. It is case sensitive.");
+
+            throw new ArgumentException(errorBuilder.ToString());
         }
     }
 }

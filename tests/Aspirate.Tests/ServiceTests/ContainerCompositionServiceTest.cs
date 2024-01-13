@@ -43,7 +43,10 @@ public class ContainerCompositionServiceTest
             .Returns(CommandAvailableResult.Available(builder));
 
         // Act
-        var result = await service.BuildAndPushContainerForProject(project, containerDetails, builder);
+        var result = await service.BuildAndPushContainerForProject(project, containerDetails, new()
+        {
+            ContainerBuilder = builder,
+        });
 
         // Assert
         await shellExecutionService.Received(2).ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null));
@@ -94,7 +97,10 @@ public class ContainerCompositionServiceTest
             .Returns(CommandAvailableResult.Available(builder));
 
         // Act
-        var action = () => service.BuildAndPushContainerForProject(project, containerDetails, builder);
+        var action = () => service.BuildAndPushContainerForProject(project, containerDetails, new()
+        {
+            ContainerBuilder = builder,
+        });
 
         // Assert
         await action.Should().ThrowAsync<ActionCausesExitException>();
@@ -116,6 +122,7 @@ public class ContainerCompositionServiceTest
 
         var dockerfile = new DockerfileResource { Path = "testPath", Context = "testContext" };
         var imageName = "testImageName";
+        var prefix = "testPrefix";
         var registry = "testRegistry";
 
         var response = builder == "docker" ? DockerInfoOutput : PodmanInfoOutput;
@@ -130,7 +137,13 @@ public class ContainerCompositionServiceTest
             .Returns(CommandAvailableResult.Available(builder));
 
         // Act
-        var result = await service.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, true);
+        var result = await service.BuildAndPushContainerForDockerfile(dockerfile, new()
+        {
+            ContainerBuilder = builder,
+            ImageName = imageName,
+            Registry = registry,
+            Prefix = prefix,
+        }, nonInteractive: true);
 
         // Assert
         shellExecutionService.Received(1).IsCommandAvailable(Arg.Any<string>());
@@ -175,7 +188,12 @@ public class ContainerCompositionServiceTest
             .Returns(CommandAvailableResult.Available(builder));
 
         // Act
-        await service.BuildAndPushContainerForDockerfile(dockerfile, builder, "testImageName", "testRegistry", true);
+        await service.BuildAndPushContainerForDockerfile(dockerfile, new()
+        {
+            ContainerBuilder = builder,
+            ImageName = "testImageName",
+            Registry = "testRegistry",
+        }, nonInteractive: true);
 
         // Assert
         var testFile = fileSystem.Path.GetFullPath("./testDockerfile");
@@ -187,6 +205,63 @@ public class ContainerCompositionServiceTest
 
         var pushCall = calls[3];
         VerifyDockerCall(pushCall, "push testregistry/testimagename:latest");
+    }
+
+    [Theory]
+    [InlineData("docker")]
+    [InlineData("podman")]
+    public async Task BuildAndPushContainerForDockerfile_ShouldSetEnvVarsAsBuildArgsWithPrefix_WhenCalled(string builder)
+    {
+        // Arrange
+        var fileSystem = new MockFileSystem();
+        fileSystem.AddFile("./testDockerfile", string.Empty);
+        var console = new TestConsole();
+        var projectPropertyService = Substitute.For<IProjectPropertyService>();
+        var shellExecutionService = Substitute.For<IShellExecutionService>();
+
+        var service = new ContainerCompositionService(fileSystem, console, projectPropertyService, shellExecutionService);
+
+        var dockerfile = new DockerfileResource
+        {
+            Path = "./testDockerfile",
+            Context = "testContext",
+            Env = new()
+            {
+                ["TestArg"] = "TestValue",
+                ["TestArgTwo"] = "TestValueTwo",
+            },
+        };
+
+        var response = builder == "docker" ? DockerInfoOutput : PodmanInfoOutput;
+
+        shellExecutionService.ExecuteCommand(Arg.Is<ShellCommandOptions>(options => options.Command != null && options.ArgumentsBuilder != null))
+            .Returns(Task.FromResult(new ShellCommandResult(true, response, string.Empty, 0)));
+
+        shellExecutionService.ExecuteCommandWithEnvironmentNoOutput(Arg.Any<string>(), Arg.Any<ArgumentsBuilder>(),Arg.Any<Dictionary<string, string?>>())
+            .Returns(Task.FromResult(true));
+
+        shellExecutionService.IsCommandAvailable(Arg.Any<string>())
+            .Returns(CommandAvailableResult.Available(builder));
+
+        // Act
+        await service.BuildAndPushContainerForDockerfile(dockerfile, new()
+        {
+            ContainerBuilder = builder,
+            ImageName = "testImageName",
+            Registry = "testRegistry",
+            Prefix = "testPrefix",
+        }, nonInteractive: true);
+
+        // Assert
+        var testFile = fileSystem.Path.GetFullPath("./testDockerfile");
+        var calls = shellExecutionService.ReceivedCalls().ToArray();
+        calls.Length.Should().Be(4);
+
+        var buildCall = calls[2];
+        VerifyDockerCall(buildCall, $"build --tag \"testregistry/testprefix/testimagename:latest\" --build-arg TestArg=\"TestValue\" --build-arg TestArgTwo=\"TestValueTwo\" --file \"{testFile}\" testContext");
+
+        var pushCall = calls[3];
+        VerifyDockerCall(pushCall, "push testregistry/testprefix/testimagename:latest");
     }
 
     [Theory]
@@ -213,7 +288,12 @@ public class ContainerCompositionServiceTest
             .Returns(CommandAvailableResult.NotAvailable);
 
         // Act
-        var action = () => service.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, true);
+        var action = () => service.BuildAndPushContainerForDockerfile(dockerfile, new()
+        {
+            ContainerBuilder = builder,
+            ImageName = imageName,
+            Registry = registry,
+        }, nonInteractive: true);
 
         // Assert
         await action.Should().ThrowAsync<ActionCausesExitException>();

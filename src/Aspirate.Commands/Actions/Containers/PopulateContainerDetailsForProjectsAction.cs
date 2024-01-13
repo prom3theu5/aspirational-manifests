@@ -27,7 +27,12 @@ public sealed class PopulateContainerDetailsForProjectsAction(
 
         foreach (var resource in CurrentState.SelectedProjectComponents)
         {
-            await projectProcessor.PopulateContainerDetailsCacheForProject(resource, CurrentState.ContainerRegistry, CurrentState.ContainerImageTag);
+            await projectProcessor.PopulateContainerDetailsCacheForProject(resource, new()
+            {
+                Registry = CurrentState.ContainerRegistry,
+                Prefix = CurrentState.ContainerRepositoryPrefix,
+                Tag = CurrentState.ContainerImageTag,
+            });
         }
     }
 

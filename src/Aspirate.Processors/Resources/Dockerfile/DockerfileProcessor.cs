@@ -69,27 +69,17 @@ public class DockerfileProcessor(
         return Task.FromResult(true);
     }
 
-    public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, string builder, string imageName, string registry, bool nonInteractive)
+    public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, ContainerParameters parameters, bool nonInteractive)
     {
         var dockerfile = resource.Value as DockerfileResource;
 
-        await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, builder, imageName, registry, nonInteractive);
+        await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, parameters, nonInteractive);
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for Dockerfile [blue]{resource.Key}[/]");
     }
 
-    public void PopulateContainerImageCacheWithImage(KeyValuePair<string, Resource> resource, string imageName, string registry)
+    public void PopulateContainerImageCacheWithImage(KeyValuePair<string, Resource> resource, ContainerParameters parameters)
     {
-        _tagBuilder.Clear();
-
-        if (!string.IsNullOrEmpty(registry))
-        {
-            _tagBuilder.Append($"{registry}/");
-        }
-
-        _tagBuilder.Append(imageName);
-        _tagBuilder.Append(":latest");
-
         _containerImageCache.Add(resource.Key, _tagBuilder.ToString());
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
@@ -132,6 +122,8 @@ public class DockerfileProcessor(
 
         return response;
     }
+
+
 }
 
 

@@ -26,7 +26,12 @@ public sealed class OutputFormatOption : BaseOption<string>
 
         if (!OutputFormat.TryFromValue(value, out _))
         {
-            throw new ArgumentException($"--output-format must be either '{OutputFormat.Kustomize.Value}' or '{OutputFormat.DockerCompose.Value}' and not quoted.");
+            var errorBuilder = new StringBuilder();
+            errorBuilder.Append("--output-format must be one of: '");
+            errorBuilder.AppendJoin("', '", OutputFormat.List.Select(x => x.Value));
+            errorBuilder.Append("' and not quoted.");
+
+            throw new ArgumentException(errorBuilder.ToString());
         }
     }
 }

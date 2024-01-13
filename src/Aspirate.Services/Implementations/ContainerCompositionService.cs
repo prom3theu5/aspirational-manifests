@@ -9,15 +9,20 @@ public sealed class ContainerCompositionService(
     public async Task<bool> BuildAndPushContainerForProject(
         ProjectResource projectResource,
         MsBuildContainerProperties containerDetails,
-        string builder,
+        ContainerParameters parameters,
         bool nonInteractive = false,
         string? runtimeIdentifier = null)
     {
-        await CheckIfBuilderIsRunning(builder);
+        await CheckIfBuilderIsRunning(parameters.ContainerBuilder);
 
         var fullProjectPath = filesystem.NormalizePath(projectResource.Path);
 
         var argumentsBuilder = ArgumentsBuilder.Create();
+
+        if (!string.IsNullOrEmpty(parameters.Prefix))
+        {
+            containerDetails.ContainerRepository = $"{parameters.Prefix}/{containerDetails.ContainerRepository}";
+        }
 
         await AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
@@ -34,49 +39,42 @@ public sealed class ContainerCompositionService(
         return true;
     }
 
-    public async Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, string builder, string imageName, string? registry, bool nonInteractive)
+    public async Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, ContainerParameters parameters, bool? nonInteractive = false)
     {
-        await CheckIfBuilderIsRunning(builder);
+        ArgumentNullException.ThrowIfNull(parameters, nameof(parameters));
 
-        var tagBuilder = new StringBuilder();
+        await CheckIfBuilderIsRunning(parameters.ContainerBuilder);
+
         var fullDockerfilePath = filesystem.GetFullPath(dockerfileResource.Path);
 
-        if (!string.IsNullOrEmpty(registry))
-        {
-            tagBuilder.Append($"{registry}/");
-        }
+        var fullImage = parameters.ToImageName();
 
-        tagBuilder.Append(imageName);
-        tagBuilder.Append(":latest");
-
-        var tag = tagBuilder.ToString();
-
-        var result = await BuildContainer(dockerfileResource, builder, nonInteractive, tag, fullDockerfilePath);
+        var result = await BuildContainer(dockerfileResource, parameters.ContainerBuilder, nonInteractive, fullImage, fullDockerfilePath);
 
         CheckSuccess(result);
 
-        result = await PushContainer(builder, registry, nonInteractive, tag);
+        result = await PushContainer(parameters.ContainerBuilder, parameters.Registry, fullImage, nonInteractive);
 
         CheckSuccess(result);
 
         return true;
     }
 
-    private async Task<ShellCommandResult> PushContainer(string builder, string? registry, bool nonInteractive, string tag)
+    private async Task<ShellCommandResult> PushContainer(string builder, string? registry, string fullImage, bool? nonInteractive)
     {
         if (!string.IsNullOrEmpty(registry))
         {
             var pushArgumentBuilder = ArgumentsBuilder
                 .Create()
                 .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
-                .AppendArgument(tag.ToLower(), string.Empty, quoteValue: false);
+                .AppendArgument(fullImage.ToLower(), string.Empty, quoteValue: false);
 
             return await shellExecutionService.ExecuteCommand(
                 new()
                 {
                     Command = builder,
                     ArgumentsBuilder = pushArgumentBuilder,
-                    NonInteractive = nonInteractive,
+                    NonInteractive = nonInteractive.GetValueOrDefault(),
                     ShowOutput = true,
                 });
         }
@@ -84,7 +82,7 @@ public sealed class ContainerCompositionService(
         return new ShellCommandResult(true, string.Empty, string.Empty, 0);
     }
 
-    private Task<ShellCommandResult> BuildContainer(DockerfileResource dockerfileResource, string builder, bool nonInteractive, string tag, string fullDockerfilePath)
+    private Task<ShellCommandResult> BuildContainer(DockerfileResource dockerfileResource, string builder, bool? nonInteractive, string tag, string fullDockerfilePath)
     {
         var buildArgumentBuilder = ArgumentsBuilder
             .Create()
@@ -105,7 +103,7 @@ public sealed class ContainerCompositionService(
         {
             Command = builder,
             ArgumentsBuilder = buildArgumentBuilder,
-            NonInteractive = nonInteractive,
+            NonInteractive = nonInteractive.GetValueOrDefault(),
             ShowOutput = true,
         });
     }
@@ -159,7 +157,8 @@ public sealed class ContainerCompositionService(
             "\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
     }
 
-    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
+    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath,
+        string? runtimeIdentifier)
     {
         var propertiesJson = await projectPropertyService.GetProjectPropertiesAsync(
             fullProjectPath,
@@ -188,7 +187,8 @@ public sealed class ContainerCompositionService(
         argumentsBuilder.AppendArgument(DotNetSdkLiterals.RuntimeIdentifierArgument, string.IsNullOrEmpty(runtimeIdentifier) ? DotNetSdkLiterals.DefaultRuntimeIdentifier : runtimeIdentifier);
     }
 
-    private static void AddContainerDetailsToArguments(ArgumentsBuilder argumentsBuilder, MsBuildContainerProperties containerDetails)
+    private static void AddContainerDetailsToArguments(ArgumentsBuilder argumentsBuilder,
+        MsBuildContainerProperties containerDetails)
     {
         if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
         {

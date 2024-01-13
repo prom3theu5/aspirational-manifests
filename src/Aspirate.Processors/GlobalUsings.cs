@@ -22,6 +22,7 @@ global using Aspirate.Secrets.Literals;
 global using Aspirate.Secrets.Protectors;
 global using Aspirate.Secrets.Services;
 global using Aspirate.Services.Interfaces;
+global using Aspirate.Services.Parameters;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Literals;
 global using Aspirate.Shared.Models.Aspirate;

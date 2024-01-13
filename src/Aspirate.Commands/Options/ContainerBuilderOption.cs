@@ -10,7 +10,28 @@ public sealed class ContainerBuilderOption : BaseOption<string>
         Description = "The Container Builder: can be 'docker' or 'podman'. The default is 'docker'";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;
+        this.AddValidator(ValidateFormat);
     }
 
     public static ContainerBuilderOption Instance { get; } = new();
+
+    private static void ValidateFormat(OptionResult optionResult)
+    {
+        var value = optionResult.GetValueOrDefault<string>();
+
+        if (value is null)
+        {
+            throw new ArgumentException("--container-builder cannot be null.");
+        }
+
+        if (!ContainerBuilder.TryFromValue(value, out _))
+        {
+            var errorBuilder = new StringBuilder();
+            errorBuilder.Append("--container-builder must be one of: '");
+            errorBuilder.AppendJoin("', '", ContainerBuilder.List.Select(x => x.Value));
+            errorBuilder.Append("' and not quoted.");
+
+            throw new ArgumentException(errorBuilder.ToString());
+        }
+    }
 }

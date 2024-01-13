@@ -6,8 +6,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
     public async Task<MsBuildContainerProperties> GetContainerDetails(
         string resourceName,
         ProjectResource projectResource,
-        string? containerRegistry,
-        string? containerImageTag)
+        ContainerParameters parameters)
     {
         var containerPropertiesJson = await propertyService.GetProjectPropertiesAsync(
             projectResource.Path,
@@ -19,7 +18,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         var msBuildProperties = JsonSerializer.Deserialize<MsBuildProperties<MsBuildContainerProperties>>(containerPropertiesJson ?? "{}");
 
         // Exit app if container registry is empty. We need it.
-        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, projectResource, containerRegistry);
+        EnsureContainerRegistryIsNotEmpty(msBuildProperties.Properties, projectResource, parameters.Registry);
 
         // Fallback to service name if image name is not provided from anywhere. (imageName is deprecated using repository like it says to).
         if (string.IsNullOrEmpty(msBuildProperties.Properties.ContainerRepository) && string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImageName))
@@ -28,20 +27,20 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         // Fallback to latest tag if tag not specified.
-        HandleTag(msBuildProperties, containerImageTag);
+        HandleTag(msBuildProperties, parameters.Tag);
 
-        msBuildProperties.Properties.FullContainerImage = GetFullImage(msBuildProperties.Properties);
+        msBuildProperties.Properties.FullContainerImage = GetFullImage(msBuildProperties.Properties, parameters.Prefix);
 
         return msBuildProperties.Properties;
     }
 
-    private static string GetFullImage(MsBuildContainerProperties containerDetails)
+    private static string GetFullImage(MsBuildContainerProperties containerDetails, string? containerPrefix)
     {
         _imageBuilder.Clear();
 
         HandleRegistry(containerDetails);
 
-        HandleRepository(containerDetails);
+        HandleRepository(containerDetails, containerPrefix);
 
         HandleImage(containerDetails);
 
@@ -61,11 +60,18 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
     }
 
-    private static void HandleRepository(MsBuildContainerProperties containerDetails)
+    private static void HandleRepository(MsBuildContainerProperties containerDetails, string imagePrefix)
     {
         if (HasRepository(containerDetails))
         {
-            _imageBuilder.Append($"{containerDetails.ContainerRepository}");
+            if (!string.IsNullOrEmpty(imagePrefix))
+            {
+                _imageBuilder.Append($"{imagePrefix}/{containerDetails.ContainerRepository}");
+            }
+            else
+            {
+                _imageBuilder.Append($"{containerDetails.ContainerRepository}");
+            }
         }
 
         if (HasImageName(containerDetails))

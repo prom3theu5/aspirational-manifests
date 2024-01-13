@@ -10,7 +10,7 @@ public interface IContainerCompositionService
     /// </summary>
     /// <param name="projectResource">The project to build and push the container for.</param>
     /// <param name="containerDetails">The container properties used to build and push the container.</param>
-    /// <param name="builder">docker or podman.</param>
+    /// <param name="parameters">Container parameters.</param>
     /// <param name="nonInteractive">Flag indicating whether the process should run in non-interactive mode.</param>
     /// <param name="runtimeIdentifier">The runtime identifier to use for project builds.</param>
     /// <returns>
@@ -19,7 +19,7 @@ public interface IContainerCompositionService
     /// </returns>
     Task<bool> BuildAndPushContainerForProject(ProjectResource projectResource,
         MsBuildContainerProperties containerDetails,
-        string builder,
+        ContainerParameters parameters,
         bool nonInteractive = false,
         string? runtimeIdentifier = null);
 
@@ -27,9 +27,7 @@ public interface IContainerCompositionService
     /// Build and push a container for a Dockerfile.
     /// </summary>
     /// <param name="dockerfileResource">The Dockerfile to build the container from.</param>
-    /// <param name="builder">The builder to use.</param>
-    /// <param name="imageName">The name of the image to create.</param>
-    /// <param name="registry">The registry to push the image to.</param>
+    /// <param name="parameters">The dockerfile parameters.</param>
     /// <param name="nonInteractive">Flag to determine if the build process should be non-interactive.</param>
     /// <returns>
     /// A <see cref="Task{T}"/> representing the asynchronous operation.
@@ -41,5 +39,5 @@ public interface IContainerCompositionService
     /// It then pushes the created image to the specified registry.
     /// The nonInteractive parameter can be set to true to suppress any interactive prompts during the build process.
     /// </remarks>
-    Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, string builder, string imageName, string? registry, bool nonInteractive);
+    Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, ContainerParameters parameters, bool? nonInteractive);
 }

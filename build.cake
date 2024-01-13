@@ -2,7 +2,7 @@
 
 using System.Text.Json;
 
-var target = Argument("Target", "Default");
+var target = Argument("Target", "CI");
 
 var configuration =
     HasArgument("Configuration") ? Argument<string>("Configuration") :
@@ -93,10 +93,45 @@ Task("Pack")
                         });
         });
 
-Task("Default")
+Task("CI")
     .Description("Cleans, restores NuGet packages, builds the solution and then runs unit tests.")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Pack");
+
+Task("LocalTestInstall")
+    .Description("Installs the tool locally")
+    .IsDependentOn("Build")
+    .Does(() =>
+    {
+        StartProcess("dotnet", new ProcessSettings()
+        {
+            Arguments = $"tool uninstall -g aspirate",
+        });
+        
+        DotNetPack("src/Aspirate.Cli/Aspirate.Cli.csproj",
+            new DotNetPackSettings()
+                    {
+                        NoBuild = true,
+                        NoRestore = true,
+                        NoLogo = true,
+                        OutputDirectory = "./artifacts",
+                        Verbosity = DotNetVerbosity.Minimal,
+                        Configuration = configuration,
+                        ArgumentCustomization = builder => builder.Append($"-p:PackageVersion=999.99.99")
+                    });
+
+        var package = GetFiles("./artifacts/*.nupkg").FirstOrDefault();
+        if (package == null)
+        {
+            throw new Exception("Could not find package");
+        }
+
+        StartProcess("dotnet", new ProcessSettings()
+        {
+            Arguments = $"tool install -g --add-source ./artifacts aspirate",
+        });
+    });
+
 
 RunTarget(target);
