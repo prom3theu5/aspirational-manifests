@@ -1,4 +1,5 @@
 using Aspirate.Processors.Resources.Dockerfile;
+using Aspirate.Services.Parameters;
 
 namespace Aspirate.Commands.Actions.Containers;
 
@@ -33,7 +34,12 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
         foreach (var resource in CurrentState.SelectedDockerfileComponents)
         {
-            dockerfileProcessor.PopulateContainerImageCacheWithImage(resource, resource.Key, CurrentState.ContainerRegistry);
+            dockerfileProcessor.PopulateContainerImageCacheWithImage(resource, new()
+            {
+                Registry = CurrentState.ContainerRegistry,
+                Prefix = CurrentState.ContainerRepositoryPrefix,
+                Tag = CurrentState.ContainerImageTag,
+            });
         }
 
         Logger.MarkupLine("\r\n[bold]Building and push completed for all selected dockerfile components.[/]");
@@ -45,7 +51,14 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
         foreach (var resource in CurrentState.SelectedDockerfileComponents)
         {
-            await dockerfileProcessor.BuildAndPushContainerForDockerfile(resource, CurrentState.ContainerBuilder, resource.Key, CurrentState.ContainerRegistry, CurrentState.NonInteractive);
+            await dockerfileProcessor.BuildAndPushContainerForDockerfile(resource, new()
+            {
+                ContainerBuilder = CurrentState.ContainerBuilder,
+                ImageName = resource.Key,
+                Registry = CurrentState.ContainerRegistry,
+                Prefix = CurrentState.ContainerRepositoryPrefix,
+                Tag = CurrentState.ContainerImageTag
+            }, CurrentState.NonInteractive);
         }
 
         Logger.MarkupLine("\r\n[bold]Building and push completed for all selected dockerfile components.[/]");

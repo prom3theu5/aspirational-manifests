@@ -50,11 +50,13 @@ public class InitializeConfigurationActionTests : BaseActionTests<InitializeConf
         act.Should().Throw<ActionCausesExitException>();
     }
 
-    [Fact]
-    public void InitializeConfigurationAction_ValidateStateNonInteractiveNullTemplatePath_DoesNotThrow()
+    [Theory]
+    [InlineData("docker")]
+    [InlineData("podman")]
+    public void InitializeConfigurationAction_ValidateStateNonInteractiveNullTemplatePath_DoesNotThrow(string builder)
     {
         // Arrange
-        var state = CreateAspirateState(nonInteractive: true, templatePath: null);
+        var state = CreateAspirateState(nonInteractive: true, templatePath: null, containerBuilder: builder);
         var serviceProvider = CreateServiceProvider(state);
         var initializeConfigurationAction = GetSystemUnderTest(serviceProvider);
 
@@ -72,7 +74,11 @@ public class InitializeConfigurationActionTests : BaseActionTests<InitializeConf
         var console = new TestConsole();
         console.Profile.Capabilities.Interactive = true;
         console.Input.PushTextWithEnter("y");
+        console.Input.PushKey(ConsoleKey.Enter);
+        console.Input.PushTextWithEnter("y");
         console.Input.PushTextWithEnter("localhost:5001");
+        console.Input.PushTextWithEnter("y");
+        console.Input.PushTextWithEnter("prefix");
         console.Input.PushTextWithEnter("y");
         console.Input.PushTextWithEnter("tests");
         console.Input.PushTextWithEnter("n");

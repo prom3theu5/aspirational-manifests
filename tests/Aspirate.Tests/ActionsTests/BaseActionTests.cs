@@ -4,6 +4,8 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
 {
     protected const string DefaultProjectPath = "/some-path";
     protected const string DefaultContainerRegistry = "test-registry";
+    protected const string DefaultContainerPrefix = "test-prefix";
+    protected const string DefaultContainerBuilder = "docker";
     protected const string DefaultContainerImageTag = "test-tag";
     protected const string DefaultTemplatePath = "/templates";
     protected const string DefaultOutputFormat = "kustomize";
@@ -11,6 +13,8 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
     protected static AspirateState CreateAspirateState(bool nonInteractive = false,
         string? projectPath = DefaultProjectPath,
         string? containerRegistry = DefaultContainerRegistry,
+        string? containerPrefix = null,
+        string? containerBuilder = null,
         string? containerImageTag = DefaultContainerImageTag,
         string? templatePath = DefaultTemplatePath,
         string? aspireManifest = null,
@@ -24,6 +28,8 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
             NonInteractive = nonInteractive,
             ContainerRegistry = containerRegistry,
             ContainerImageTag = containerImageTag,
+            ContainerBuilder = containerBuilder,
+            ContainerRepositoryPrefix = containerPrefix,
             TemplatePath = templatePath,
             InputPath = inputPath,
             KubeContext = kubeContext,

@@ -6,6 +6,9 @@ public sealed class BuildOptions : BaseCommandOptions, IBuildOptions, IContainer
     public string? AspireManifest { get; set; }
     public string? ContainerBuilder { get; set; }
     public string? ContainerRegistry { get; set; }
+
+    public string? ContainerRepositoryPrefix { get; set; }
+
     public string? ContainerImageTag { get; set; }
     public string? RuntimeIdentifier { get; set; }
 }

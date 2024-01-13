@@ -45,6 +45,9 @@ public class AspirateState :
     [JsonPropertyName("templatePath")]
     public string? TemplatePath { get; set; }
 
+    [JsonPropertyName("containerRepositoryPrefix")]
+    public string? ContainerRepositoryPrefix { get; set; }
+
     [JsonPropertyName("kubeContext")]
     public string? KubeContext { get; set; }
 

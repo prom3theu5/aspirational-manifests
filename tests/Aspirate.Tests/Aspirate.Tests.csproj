@@ -36,6 +36,9 @@
       <None Include="TestData\*.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRepositoryWithPrefixShouldBeImage.verified.txt" />
+      <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRepositoryOrTagWithPrefixShouldBeImageLatest.verified.txt" />
+      <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRegistryOrRepositoryOrTagWithPrefixShouldBeImageLatest.verified.txt" />
     </ItemGroup>
 
 </Project>

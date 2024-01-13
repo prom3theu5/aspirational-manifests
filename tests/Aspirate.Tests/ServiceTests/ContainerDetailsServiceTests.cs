@@ -23,8 +23,13 @@ public class ContainerDetailsServiceTests
 
         var containerDetailsService = new ContainerDetailsService(projectPropertyService, testConsole);
 
+        if (properties.Parameters is null)
+        {
+            properties = properties with { Parameters = new() };
+        }
+
         // Act
-        var containerDetails = await containerDetailsService.GetContainerDetails("test-service", new(), null, null);
+        var containerDetails = await containerDetailsService.GetContainerDetails("test-service", new(), properties.Parameters);
 
         // Assert
         await Verify(containerDetails)
@@ -43,6 +48,14 @@ public class ContainerDetailsServiceTests
             new object[]
             {
                 new TestContainerProperties(
+                    "FullResponseWithPrefix", CreateContainerProperties("test-registry", "test-repository", "test-image", "test-tag"), new()
+                    {
+                        Prefix = "test-prefix",
+                    }),
+            },
+            new object[]
+            {
+                new TestContainerProperties(
                     "NoTagShouldBeLatest", CreateContainerProperties("test-registry", "test-repository", "test-image")),
             },
             new object[]
@@ -53,7 +66,23 @@ public class ContainerDetailsServiceTests
             new object[]
             {
                 new TestContainerProperties(
+                    "NoImageShouldBeRepositoryWithPrefix", CreateContainerProperties("test-registry", "test-repository", null, "test-tag"), new ContainerParameters()
+                    {
+                        Prefix = "test-prefix",
+                    }),
+            },
+            new object[]
+            {
+                new TestContainerProperties(
                     "NoImageOrTagShouldBeRepositoryLatest", CreateContainerProperties("test-registry", "test-repository")),
+            },
+            new object[]
+            {
+                new TestContainerProperties(
+                    "NoImageOrTagShouldBeRepositoryWithPrefixLatest", CreateContainerProperties("test-registry", "test-repository"), new ContainerParameters()
+                    {
+                        Prefix = "test-prefix",
+                    }),
             },
             new object[]
             {
@@ -84,5 +113,5 @@ public class ContainerDetailsServiceTests
             },
         };
 
-    public record TestContainerProperties(string Value, MsBuildProperties<MsBuildContainerProperties> Properties);
+    public record TestContainerProperties(string Value, MsBuildProperties<MsBuildContainerProperties> Properties, ContainerParameters? Parameters = null);
 }

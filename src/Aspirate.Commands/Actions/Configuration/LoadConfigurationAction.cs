@@ -6,18 +6,20 @@ public class LoadConfigurationAction(
 {
     public override Task<bool> ExecuteAsync()
     {
-        //todo: Replace aspiratesettings with an instance of the state, also pass down the loaded json inside the LoadConfigurationFile method into the registered secret provider to populated the secrets.
-
         var aspirateSettings = configurationService.LoadConfigurationFile(CurrentState.ProjectPath);
 
-        if (aspirateSettings is not null)
+        if (aspirateSettings is null)
         {
-            CurrentState.TemplatePath = aspirateSettings.TemplatePath ?? null;
-            CurrentState.ContainerRegistry = aspirateSettings.ContainerSettings?.Registry ?? null;
-            CurrentState.ContainerImageTag = aspirateSettings.ContainerSettings?.Tag ?? null;
-            Logger.MarkupLine($"\r\n[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.ProjectPath}'[/].[/]");
-            Logger.WriteLine();
+            return Task.FromResult(true);
         }
+
+        CurrentState.TemplatePath = aspirateSettings.TemplatePath ?? null;
+        CurrentState.ContainerRegistry = aspirateSettings.ContainerSettings?.Registry ?? null;
+        CurrentState.ContainerBuilder = aspirateSettings.ContainerSettings?.Builder ?? null;
+        CurrentState.ContainerRepositoryPrefix = aspirateSettings.ContainerSettings?.RepositoryPrefix ?? null;
+        CurrentState.ContainerImageTag = aspirateSettings.ContainerSettings?.Tag ?? null;
+        Logger.MarkupLine($"\r\n[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.ProjectPath}'[/].[/]");
+        Logger.WriteLine();
 
         return Task.FromResult(true);
     }

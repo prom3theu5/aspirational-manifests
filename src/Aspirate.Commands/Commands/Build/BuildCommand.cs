@@ -9,6 +9,7 @@ public sealed class BuildCommand : BaseCommand<BuildOptions, BuildCommandHandler
        AddOption(ContainerBuilderOption.Instance);
        AddOption(ContainerImageTagOption.Instance);
        AddOption(ContainerRegistryOption.Instance);
+       AddOption(ContainerRepositoryPrefixOption.Instance);
        AddOption(RuntimeIdentifierOption.Instance);
     }
 }

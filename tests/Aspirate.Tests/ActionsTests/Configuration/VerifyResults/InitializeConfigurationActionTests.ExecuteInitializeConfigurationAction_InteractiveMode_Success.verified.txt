@@ -1,6 +1,8 @@
 ﻿{
   ContainerSettings: {
     Registry: localhost:5001,
-    Tag: tests
+    RepositoryPrefix: prefix,
+    Tag: tests,
+    Builder: docker
   }
 }

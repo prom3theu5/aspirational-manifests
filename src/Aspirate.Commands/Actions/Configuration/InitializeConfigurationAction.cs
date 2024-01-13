@@ -20,7 +20,11 @@ public class InitializeConfigurationAction(
     {
         var aspirateConfiguration = new AspirateSettings();
 
+        HandleContainerBuilder(aspirateConfiguration);
+
         HandleContainerRegistry(aspirateConfiguration);
+
+        HandleContainerRepositoryPrefix(aspirateConfiguration);
 
         HandleContainerTag(aspirateConfiguration);
 
@@ -29,6 +33,34 @@ public class InitializeConfigurationAction(
         AddTemplatesToTemplateDirectoryIfRequired(aspirateConfiguration);
 
         return aspirateConfiguration;
+    }
+
+    private void HandleContainerBuilder(AspirateSettings aspirateConfiguration)
+    {
+        if (!string.IsNullOrEmpty(CurrentState.ContainerBuilder))
+        {
+            aspirateConfiguration.ContainerSettings.Builder = CurrentState.ContainerBuilder;
+            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container builder'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Builder}'[/].");
+            return;
+        }
+
+        Logger.MarkupLine("\r\nAspirate supports [blue]Docker[/] and [blue]Podman[/] as container builders..");
+        var shouldSetBuilder = Logger.Confirm("Would you like to set a fall-back value for the container builder?", false);
+
+        if (!shouldSetBuilder)
+        {
+            return;
+        }
+
+        var builder = Logger.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Select the Container Builder to use...")
+                .HighlightStyle("blue")
+                .PageSize(3)
+                .AddChoices(ContainerBuilder.List.Select(x => x.Value).ToArray()));
+
+        aspirateConfiguration.ContainerSettings.Builder = builder;
+        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container Builder'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Builder}'[/].");
     }
 
     private void HandleContainerRegistry(AspirateSettings aspirateConfiguration)
@@ -51,6 +83,28 @@ public class InitializeConfigurationAction(
         var containerRegistry = Logger.Prompt(new TextPrompt<string>("Please enter the container registry to use as a fall-back value:").PromptStyle("blue"));
         aspirateConfiguration.ContainerSettings.Registry = containerRegistry;
         Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback registry'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Registry}'[/].");
+    }
+
+    private void HandleContainerRepositoryPrefix(AspirateSettings aspirateConfiguration)
+    {
+        if (!string.IsNullOrEmpty(CurrentState.ContainerRepositoryPrefix))
+        {
+            aspirateConfiguration.ContainerSettings.RepositoryPrefix = CurrentState.ContainerRepositoryPrefix;
+            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container repository prefix'[/] to [blue]'{aspirateConfiguration.ContainerSettings.RepositoryPrefix}'[/].");
+            return;
+        }
+
+        Logger.MarkupLine("\r\nAspirate supports setting a repository prefix for all for projects.");
+        var shouldSetContainerRepositoryPrefix = Logger.Confirm("Would you like to set this value?", false);
+
+        if (!shouldSetContainerRepositoryPrefix)
+        {
+            return;
+        }
+
+        var containerRepositoryPrefix = Logger.Prompt(new TextPrompt<string>("Please enter the container repository prefix to use as a fall-back value:").PromptStyle("blue"));
+        aspirateConfiguration.ContainerSettings.RepositoryPrefix = containerRepositoryPrefix;
+        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container repository prefix'[/] to [blue]'{aspirateConfiguration.ContainerSettings.RepositoryPrefix}'[/].");
     }
 
     private void HandleContainerTag(AspirateSettings aspirateConfiguration)
@@ -171,6 +225,11 @@ public class InitializeConfigurationAction(
 
     public override void ValidateNonInteractiveState()
     {
+        if (string.IsNullOrEmpty(CurrentState.ContainerBuilder))
+        {
+            NonInteractiveValidationFailed("Container builder must be supplied when running in non-interactive mode.");
+        }
+
         if (string.IsNullOrEmpty(CurrentState.ProjectPath))
         {
             NonInteractiveValidationFailed("Project path must be supplied when running in non-interactive mode.");
