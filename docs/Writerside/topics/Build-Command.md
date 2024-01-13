@@ -18,14 +18,15 @@ The command will first create the manifest file, however, this can be overridden
 
 ## Cli Options (Optional)
 
-| Option                | Alias | Environmental Variable Counterpart | Description                                                                       |
-|-----------------------|-------|------------------------------------|-----------------------------------------------------------------------------------|
-| --project-path        | -p    | `ASPIRATE_PROJECT_PATH`            | The path to the aspire project.                                                   |
-| --aspire-manifest     | -m    | `ASPIRATE_ASPIRE_MANIFEST_PATH`    | The aspire manifest file to use                                                   |
-| --container-image-tag | -ct   | `ASPIRATE_CONTAINER_IMAGE_TAG`     | The Container Image Tag to use as the fall-back value for all containers.         |
-| --container-registry  | -cr   | `ASPIRATE_CONTAINER_REGISTRY`      | The Container Registry to use as the fall-back value for all containers.          |
-| --container-builder   |       | `ASPIRATE_CONTAINER_BUILDER`       | The Container Builder: can be `docker` or `podman`. The default is `docker`.      |
-| --non-interactive     |       | `ASPIRATE_NON_INTERACTIVE`         | Disables interactive mode for the command                                         |
-| --secret-provider     |       | `ASPIRATE_SECRET_PROVIDER`         | The secret provider to use. Defaults to `Password`. Can be `Password` or `Base64` |
-| --disable-secrets     |       | `ASPIRATE_DISABLE_SECRETS`         | Disables secrets management features.                                             |
-| --runtime-identifier  |       | `ASPIRATE_RUNTIME_IDENTIFIER`      | Sets the runtime identifier for project builds. Defaults to `linux-x64`.          |
+| Option                        | Alias | Environmental Variable Counterpart     | Description                                                                       |
+|-------------------------------|-------|----------------------------------------|-----------------------------------------------------------------------------------|
+| --project-path                | -p    | `ASPIRATE_PROJECT_PATH`                | The path to the aspire project.                                                   |
+| --aspire-manifest             | -m    | `ASPIRATE_ASPIRE_MANIFEST_PATH`        | The aspire manifest file to use                                                   |
+| --container-image-tag         | -ct   | `ASPIRATE_CONTAINER_IMAGE_TAG`         | The Container Image Tag to use as the fall-back value for all containers.         |
+| --container-registry          | -cr   | `ASPIRATE_CONTAINER_REGISTRY`          | The Container Registry to use as the fall-back value for all containers.          |
+| --container-repository-prefix |       | `ASPIRATE_CONTAINER_REPOSITORY_PREFIX` | The Container Repository Prefix to use as the fall-back value for all containers. |
+| --container-builder           |       | `ASPIRATE_CONTAINER_BUILDER`           | The Container Builder: can be `docker` or `podman`. The default is `docker`.      |
+| --non-interactive             |       | `ASPIRATE_NON_INTERACTIVE`             | Disables interactive mode for the command                                         |
+| --secret-provider             |       | `ASPIRATE_SECRET_PROVIDER`             | The secret provider to use. Defaults to `Password`. Can be `Password` or `Base64` |
+| --disable-secrets             |       | `ASPIRATE_DISABLE_SECRETS`             | Disables secrets management features.                                             |
+| --runtime-identifier          |       | `ASPIRATE_RUNTIME_IDENTIFIER`          | Sets the runtime identifier for project builds. Defaults to `linux-x64`.          |
