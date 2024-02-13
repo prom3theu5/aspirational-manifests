@@ -28,7 +28,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
             {
                 ContainerBuilder = CurrentState.ContainerBuilder,
                 Prefix = CurrentState.ContainerRepositoryPrefix,
-            }, CurrentState.NonInteractive);
+            }, CurrentState.NonInteractive, CurrentState.RuntimeIdentifier);
         }
 
         Logger.MarkupLine("\r\n[bold]Building and push completed for all selected project components.[/]");

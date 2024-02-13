@@ -66,7 +66,7 @@ public sealed class ProjectProcessor(
         return Task.FromResult(true);
     }
 
-    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerParameters parameters, bool nonInteractive)
+    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerParameters parameters, bool nonInteractive, string? runtimeIdentifier)
     {
         var project = resource.Value as ProjectResource;
 
@@ -75,7 +75,7 @@ public sealed class ProjectProcessor(
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
-        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, parameters, nonInteractive);
+        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, parameters, nonInteractive, runtimeIdentifier);
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }
@@ -124,7 +124,7 @@ public sealed class ProjectProcessor(
             .WithEnvironment(environment)
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithPortMappings(ports.Select(x=> new Port
+            .WithPortMappings(ports.Select(x => new Port
             {
                 Target = x.Port,
                 Published = x.Port,
