@@ -5,6 +5,7 @@ public sealed class ContainerRepositoryPrefixOption : BaseOption<string?>
     private static readonly string[] _aliases =
     {
         "--container-repository-prefix",
+        "-crp",
     };
 
     private ContainerRepositoryPrefixOption() : base(_aliases, "ASPIRATE_CONTAINER_REPOSITORY_PREFIX", null)
