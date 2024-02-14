@@ -26,6 +26,9 @@ public static class ServiceCollectionExtensions
             .RegisterProcessor<MongoDbDatabaseProcessor>(AspireComponentLiterals.MongoDbDatabase)
             .RegisterProcessor<DaprProcessor>(AspireComponentLiterals.DaprSystem)
             .RegisterProcessor<DaprComponentProcessor>(AspireComponentLiterals.DaprComponent)
+            .RegisterProcessor<AzureStorageProcessor>(AspireComponentLiterals.AzureStorage)
+            .RegisterProcessor<AzureStorageBlobProcessor>(AspireComponentLiterals.AzureStorageBlob)
+            .RegisterProcessor<AzureKeyVaultProcessor>(AspireComponentLiterals.AzureKeyVault)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
 
     /// <summary>

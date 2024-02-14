@@ -1,5 +1,15 @@
 {
     "resources": {
+      "azurestorage": {
+        "type": "azure.storage.v0"
+      },
+      "azurestorageblob": {
+        "type": "azure.storage.blob.v0",
+        "parent": "azurestorage"
+      },
+      "azurekeyvault": {
+        "type": "azure.keyvault.v0"
+      },
       "postgres": {
         "type": "postgres.server.v0"
       },

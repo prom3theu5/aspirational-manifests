@@ -1,3 +1,5 @@
+using Aspirate.Shared.Models.AspireManifests.Components.V0.Azure;
+
 namespace Aspirate.Tests.ServiceTests;
 
 [UsesVerify]
@@ -134,8 +136,12 @@ public class ManifestFileParserServiceTest
         var result = state.LoadedAspireManifestResources;
 
         // Assert
-        result.Should().HaveCount(12);
+        result.Should().HaveCount(15);
         result["postgres"].Should().BeOfType<PostgresServerResource>();
+
+        result["azurekeyvault"].Should().BeOfType<AzureKeyVaultResource>();
+        result["azurestorage"].Should().BeOfType<AzureStorageResource>();
+        result["azurestorageblob"].Should().BeOfType<AzureStorageBlobResource>();
 
         result["sqlserver"].Should().BeOfType<SqlServerResource>();
         result["sqlserver"].Env["SaPassword"].Should().NotBeNull().And.NotBeEmpty();
