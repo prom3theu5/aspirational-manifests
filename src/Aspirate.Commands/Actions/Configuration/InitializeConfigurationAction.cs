@@ -87,7 +87,7 @@ public class InitializeConfigurationAction(
 
     private void HandleContainerRepositoryPrefix(AspirateSettings aspirateConfiguration)
     {
-        if (!string.IsNullOrEmpty(CurrentState.ContainerRepositoryPrefix))
+        if (!string.IsNullOrEmpty(CurrentState.ContainerRepositoryPrefix) || CurrentState.NonInteractive)
         {
             aspirateConfiguration.ContainerSettings.RepositoryPrefix = CurrentState.ContainerRepositoryPrefix;
             Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container repository prefix'[/] to [blue]'{aspirateConfiguration.ContainerSettings.RepositoryPrefix}'[/].");
