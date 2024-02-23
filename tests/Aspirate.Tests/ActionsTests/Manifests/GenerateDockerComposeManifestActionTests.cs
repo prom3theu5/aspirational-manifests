@@ -54,7 +54,7 @@ public class GenerateDockerComposeManifestActionTests : BaseActionTests<Generate
         var state = CreateAspirateStateWithInputs(() => CreateAspirateState(projectPath: DefaultProjectPath,
             outputFormat: OutputFormat.DockerCompose.Value,
             nonInteractive: true,
-            networkName: "nginx",
+            //networkName: "nginx",
             aspireManifest: Path.Combine(DefaultProjectPath, "TestData", "preview-2-manifest.json"),
             composeOverride: true),nonInteractive: true, generatedInputs: true);
 

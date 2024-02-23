@@ -22,8 +22,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         string? kubeContext = null,
         string? password = null,
         string? outputFormat = DefaultOutputFormat,
-        bool? composeOverride = null,
-        string? networkName = null)
+        bool? composeOverride = null)
     {
         var state = new AspirateState
         {
