@@ -92,6 +92,9 @@ public class AspirateState :
     [JsonPropertyName("secretsVersion")]
     public int? Version { get; set; }
 
+    [JsonPropertyName("composeOverride")]
+    public bool ComposeOverride { get; set; }
+
     public string? Hash { get; set; }
 
     public string? SecretPassword { get; set; }

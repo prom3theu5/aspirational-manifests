@@ -21,7 +21,9 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         string? inputPath = null,
         string? kubeContext = null,
         string? password = null,
-        string? outputFormat = DefaultOutputFormat)
+        string? outputFormat = DefaultOutputFormat,
+        bool? composeOverride = null,
+        string? networkName = null)
     {
         var state = new AspirateState
         {
@@ -35,6 +37,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
             KubeContext = kubeContext,
             SecretPassword = password,
             OutputFormat = outputFormat,
+            ComposeOverride = composeOverride ?? false
         };
 
         if (!string.IsNullOrEmpty(projectPath))
@@ -75,6 +78,24 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         services.AddSingleton(Substitute.For<IShellExecutionService>());
 
         return services.BuildServiceProvider();
+    }
+
+    protected AspirateState CreateAspirateStateWithInputs(Func<AspirateState> initState,bool nonInteractive = false, bool generatedInputs = false, bool passwordsSet = false)
+    {
+        var postgres = CreatePostgresContainerResourceManualInput("postgrescontainer", generatedInputs, passwordsSet);
+        var postgresTwo = CreatePostgresContainerResourceManualInput("postgrescontainer2", generatedInputs, passwordsSet);
+
+        var resources = new Dictionary<string, Resource>
+        {
+            { "postgrescontainer", postgres },
+            { "postgrescontainer2", postgresTwo },
+        };
+
+        var state = initState();
+        state.LoadedAspireManifestResources = resources;
+        state.AspireComponentsToProcess = resources.Keys.ToList();
+
+        return state;
     }
 
     protected AspirateState CreateAspirateStateWithInputs(bool nonInteractive = false, bool generatedInputs = false, bool passwordsSet = false)
