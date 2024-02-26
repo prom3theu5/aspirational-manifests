@@ -38,7 +38,7 @@
     },
     "apply": {
       "commandName": "Project",
-      "commandLineArgs": "apply",
+      "commandLineArgs": "apply -r",
       "workingDirectory": "/Users/prom3theu5/git/test-aspire/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },

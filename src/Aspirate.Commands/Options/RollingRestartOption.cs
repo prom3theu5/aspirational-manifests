@@ -8,10 +8,10 @@ public sealed class RollingRestartOption : BaseOption<bool>
         "--rolling-restart",
     };
 
-    private RollingRestartOption() : base(_aliases, "ASPIRATE_ROLLING_RESTART", true)
+    private RollingRestartOption() : base(_aliases, "ASPIRATE_ROLLING_RESTART", false)
     {
         Name = nameof(IApplyOptions.RollingRestart);
-        Description = "Indicates if a rolling restart should occur at the end of deploy. Defaults to 'true'.";
+        Description = "Indicates if a rolling restart should occur at the end of deploy. Defaults to 'false'.";
         Arity = ArgumentArity.ZeroOrOne;
         IsRequired = false;
     }
