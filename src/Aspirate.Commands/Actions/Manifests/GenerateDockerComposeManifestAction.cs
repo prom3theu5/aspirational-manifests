@@ -1,6 +1,9 @@
+using Aspirate.DockerCompose.Models.Services;
+
 namespace Aspirate.Commands.Actions.Manifests;
 
-public sealed class GenerateDockerComposeManifestAction(IServiceProvider serviceProvider, IFileSystem fileSystem) : BaseAction(serviceProvider)
+public sealed class GenerateDockerComposeManifestAction(IServiceProvider serviceProvider, IFileSystem fileSystem)
+    : BaseAction(serviceProvider)
 {
     private int _servicePort = 10000;
 
@@ -16,17 +19,57 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         }
 
         var outputFile = Path.Combine(AspirateLiterals.DefaultOutputPath, "docker-compose.yml");
+        var composeOverrideFile = Path.Combine(AspirateLiterals.DefaultOutputPath, "docker-compose.override.yml");
 
         Logger.MarkupLine($"\r\n[bold]Generating docker compose file: [blue]'{outputFile}'[/][/]\r\n");
 
         var services = new List<Service>();
+        var composeOverride = new List<Service>();
+
+        if (CurrentState.ComposeOverride)
+        {
+            // Add aspire dashboard by default
+            var aspireDashboardService = new Service
+            {
+                Name = "aspire",
+                Image = "mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.4",
+                Ports = new List<Port>
+                {
+                    new Port
+                    {
+                        Published = 18888,
+                        Target = 18888
+                    },
+                    new Port
+                    {
+                        Target = 18889,
+                        Published = 18889
+                    }
+                }
+            };
+            composeOverride.Add(aspireDashboardService);
+        }
+
+/*
+ *  aspire:
+    container_name: "aspire"
+    image: "mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.4"
+    ports:
+      - "18888:18888"
+      - "18889:18889"
+ *
+ */
 
         foreach (var resource in CurrentState.AllSelectedSupportedComponents)
         {
-            ProcessIndividualComponent(resource, services);
+            ProcessIndividualComponent(resource, services, composeOverride);
         }
 
         WriteFile(services, outputFile);
+        if (CurrentState.ComposeOverride)
+        {
+            WriteFile(composeOverride, composeOverrideFile);
+        }
 
         Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputFile}[/]");
 
@@ -35,9 +78,10 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
     private void WriteFile(List<Service> services, string outputFile)
     {
-        var composeFile = Builder.MakeCompose()
-            .WithServices(services.ToArray())
-            .Build();
+        var composeBuilder = Builder.MakeCompose()
+            .WithServices(services.ToArray());
+
+        var composeFile = composeBuilder.Build();
 
         var composeFileString = composeFile.Serialize();
 
@@ -49,24 +93,13 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         fileSystem.File.WriteAllText(outputFile, composeFileString);
     }
 
-    private void ProcessIndividualComponent(KeyValuePair<string, Resource> resource, List<Service> services)
+    private void ProcessIndividualComponent(KeyValuePair<string, Resource> resource, List<Service> services,
+        List<Service> composeOverride)
     {
-        if (resource.Value.Type is null)
+        if (resource.Value.Type is null || AspirateState.IsNotDeployable(resource.Value) ||
+            Services.GetKeyedService<IResourceProcessor>(resource.Value.Type) is not { } handler)
         {
-            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its type is unknown.[/]");
-            return;
-        }
-
-        if (AspirateState.IsNotDeployable(resource.Value))
-        {
-            return;
-        }
-
-        var handler = Services.GetKeyedService<IResourceProcessor>(resource.Value.Type);
-
-        if (handler is null)
-        {
-            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its type is unsupported.[/]");
+            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its type is unknown or unsupported.[/]");
             return;
         }
 
@@ -74,13 +107,30 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         if (response.IsProject)
         {
-            foreach (var port in response.Service.Ports)
-            {
-                port.Published = _servicePort;
-                _servicePort++;
-            }
+            response.Service.Ports.ForEach(port => port.Published = _servicePort++);
         }
 
-        services.Add(response.Service);
+        var serviceToAdd = CurrentState.ComposeOverride ? CreateNewService(response.Service) : response.Service;
+        services.Add(serviceToAdd);
+
+        if (CurrentState.ComposeOverride)
+        {
+            // Add reference to aspire OTLP collector
+            response.Service.Environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire:18889");
+            composeOverride.Add(response.Service);
+        }
     }
+
+    private Service CreateNewService(Service originalService) =>
+        new()
+        {
+            Name = originalService.Name,
+            Image = originalService.Image,
+            Environment = originalService.Environment,
+            ContainerName = originalService.ContainerName,
+            Restart = originalService.Restart,
+            Ports = new List<Port>(),
+            Expose = new List<string>(),
+            ExtraHosts = new List<string>(),
+        };
 }

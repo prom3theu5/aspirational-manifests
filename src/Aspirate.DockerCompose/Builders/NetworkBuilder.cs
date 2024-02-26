@@ -7,4 +7,5 @@ public class NetworkBuilder : BuilderBase<NetworkBuilder, Network>
     }
 
     public NetworkBuilder SetExternal(bool isExternal) => WithProperty("external", isExternal);
+    public NetworkBuilder SetDefault(bool isDefault) => WithProperty("default", true);
 }
