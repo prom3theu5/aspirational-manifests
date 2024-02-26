@@ -10,7 +10,8 @@ public class AspirateState :
     ISecretOption,
     IPasswordSecretState,
     IBase64SecretState,
-    IPrivateRegistryCredentialsOptions
+    IPrivateRegistryCredentialsOptions,
+    IApplyOptions
 {
     [JsonPropertyName("projectPath")]
     public string? ProjectPath { get; set; }
@@ -91,6 +92,9 @@ public class AspirateState :
 
     [JsonPropertyName("secretsVersion")]
     public int? Version { get; set; }
+
+    [JsonPropertyName("rollingRestart")]
+    public bool RollingRestart { get; set; }
 
     public string? Hash { get; set; }
 

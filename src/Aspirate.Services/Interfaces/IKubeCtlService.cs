@@ -27,6 +27,15 @@ public interface IKubeCtlService
     Task<bool> ApplyManifests(string context, string outputFolder);
 
     /// <summary>
+    /// Performs a rolling restart of the Kubernetes resources in the specified context and output folder.
+    /// </summary>
+    /// <param name="context">The context in which the rolling restart should be performed.</param>
+    /// <param name="outputFolder">The output folder that contains the manifests of the resources.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.
+    /// The task result indicates whether the rolling restart was successful.</returns>
+    Task<bool> PerformRollingRestart(string context, string outputFolder);
+
+    /// <summary>
     /// Removes manifests from the specified context and output folder.
     /// </summary>
     /// <param name="context">The context from which to remove manifests.</param>

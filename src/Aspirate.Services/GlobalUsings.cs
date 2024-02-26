@@ -2,6 +2,7 @@ global using System.IO.Abstractions;
 global using System.Security.Cryptography;
 global using System.Text;
 global using System.Text.Json;
+global using System.Text.RegularExpressions;
 global using Aspirate.Services.Extensions;
 global using Aspirate.Services.Implementations;
 global using Aspirate.Services.Interfaces;
