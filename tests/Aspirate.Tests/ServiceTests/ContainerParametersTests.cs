@@ -1,6 +1,5 @@
 namespace Aspirate.Tests.ServiceTests;
 
-[UsesVerify]
 public class ContainerParametersTests
 {
     [ModuleInitializer]

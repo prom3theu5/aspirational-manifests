@@ -19,6 +19,7 @@ public sealed class ApplyManifestsToClusterAction(
 
             await WriteSecretsOutToTempFiles(secretFiles);
             await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
+            await HandleRollingRestart();
             Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
 
             return true;
@@ -148,6 +149,22 @@ public sealed class ApplyManifestsToClusterAction(
                 await streamWriter.FlushAsync();
                 streamWriter.Close();
             }
+        }
+    }
+
+    private async Task HandleRollingRestart()
+    {
+        if (!CurrentState.RollingRestart)
+        {
+            return;
+        }
+
+        var result = await kubeCtlService.PerformRollingRestart(CurrentState.KubeContext, CurrentState.InputPath);
+
+        if (!result)
+        {
+            Logger.MarkupLine("[red](!)[/] Selected deployment options have failed.");
+            ActionCausesExitException.ExitNow();
         }
     }
 

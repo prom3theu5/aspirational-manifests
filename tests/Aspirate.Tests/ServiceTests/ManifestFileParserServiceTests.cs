@@ -2,7 +2,6 @@ using Aspirate.Shared.Models.AspireManifests.Components.V0.Azure;
 
 namespace Aspirate.Tests.ServiceTests;
 
-[UsesVerify]
 public class ManifestFileParserServiceTest
 {
     [Fact]

@@ -1,7 +1,10 @@
 namespace Aspirate.Services.Implementations;
 
-public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShellExecutionService shellExecutionService) : IKubeCtlService
+public partial class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShellExecutionService shellExecutionService) : IKubeCtlService
 {
+    [GeneratedRegex("name: (.*)")]
+    private static partial Regex NamespaceMatcher();
+
     public async Task<string?> SelectKubernetesContextForDeployment()
     {
         var contexts = await GatherContexts();
@@ -39,6 +42,38 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
             PreCommandMessage =
                 $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
             FailureCommandMessage = $"[red]Failed to deploy manifests in [blue]'{fullOutputPath}'[/][/]",
+            ShowOutput = true,
+        };
+
+        _ = await shellExecutionService.ExecuteCommand(executionOptions);
+
+        return true;
+    }
+
+    public async Task<bool> PerformRollingRestart(string context, string outputFolder)
+    {
+        if (!EnsureActiveContextIsSet(context))
+        {
+            return false;
+        }
+
+        var fullOutputPath = filesystem.GetFullPath(outputFolder);
+
+        var @namespace = await ParseNamespace(fullOutputPath);
+
+        var argumentsBuilder = ArgumentsBuilder.Create()
+            .AppendArgument(KubeCtlLiterals.KubeCtlRolloutArgument, string.Empty, quoteValue: false)
+            .AppendArgument(KubeCtlLiterals.KubeCtlRestartProperty, string.Empty, quoteValue: false)
+            .AppendArgument(KubeCtlLiterals.KubeCtlDeploymentProperty, string.Empty, quoteValue: false)
+            .AppendArgument(KubeCtlLiterals.KubeCtlNamespaceArgument, @namespace);
+
+        var executionOptions = new ShellCommandOptions
+        {
+            Command = KubeCtlLiterals.KubeCtlCommand,
+            ArgumentsBuilder = argumentsBuilder,
+            PreCommandMessage =
+                $"[cyan]Executing: [green]{KubeCtlLiterals.KubeCtlCommand} {argumentsBuilder.RenderArguments()}[/] against kubernetes context [blue]{context}.[/][/]",
+            FailureCommandMessage = "[red]Failed to perform rolling restart of deployments.[/]",
             ShowOutput = true,
         };
 
@@ -127,6 +162,22 @@ public class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShell
         }
 
         return true;
+    }
+
+    private async Task<string> ParseNamespace(string fullOutputPath)
+    {
+        var namespaceFile = filesystem.GetFullPath(Path.Combine(fullOutputPath, "namespace.yaml"));
+
+        if (!filesystem.File.Exists(namespaceFile))
+        {
+            return KubeCtlLiterals.KubeCtlDefaultNamespace;
+        }
+
+        var namespaceContent = await filesystem.File.ReadAllTextAsync(namespaceFile);
+
+        var namespaceMatch = NamespaceMatcher().Match(namespaceContent);
+
+        return namespaceMatch.Success ? namespaceMatch.Groups[1].Value : KubeCtlLiterals.KubeCtlDefaultNamespace;
     }
 
     private static List<string?> ParseResponseAsContextList(string jsonString)

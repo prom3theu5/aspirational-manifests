@@ -16,9 +16,7 @@ spec:
     matchLabels:
       app: {{name}}
   strategy:
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
+    type: Recreate
   template:
     metadata:
       labels:

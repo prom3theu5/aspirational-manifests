@@ -12,8 +12,12 @@ public static class KubeCtlLiterals
     public const string KubeCtlOutputJsonArgument = "json";
     public const string KubeCtlUseContextArgument = "use-context";
     public const string KubeCtlKustomizeManifestsArgument = "-k";
+    public const string KubeCtlRolloutArgument = "rollout";
+    public const string KubeCtlNamespaceArgument = "-n";
 
     public const string KubeCtlContextsProperty = "contexts";
     public const string KubeCtlNameProperty = "name";
-
+    public const string KubeCtlDeploymentProperty = "deployment";
+    public const string KubeCtlRestartProperty = "restart";
+    public const string KubeCtlDefaultNamespace = "default";
 }

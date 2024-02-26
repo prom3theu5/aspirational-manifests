@@ -1,6 +1,5 @@
 namespace Aspirate.Tests.DockerComposeTests;
 
-[UsesVerify]
 public class DockerComposeBuilderTests
 {
     [Fact]
