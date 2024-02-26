@@ -50,16 +50,6 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             composeOverride.Add(aspireDashboardService);
         }
 
-/*
- *  aspire:
-    container_name: "aspire"
-    image: "mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.4"
-    ports:
-      - "18888:18888"
-      - "18889:18889"
- *
- */
-
         foreach (var resource in CurrentState.AllSelectedSupportedComponents)
         {
             ProcessIndividualComponent(resource, services, composeOverride);
