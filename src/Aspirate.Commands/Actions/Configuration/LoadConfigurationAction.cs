@@ -13,11 +13,31 @@ public class LoadConfigurationAction(
             return Task.FromResult(true);
         }
 
-        CurrentState.TemplatePath = aspirateSettings.TemplatePath ?? null;
-        CurrentState.ContainerRegistry = aspirateSettings.ContainerSettings?.Registry ?? null;
-        CurrentState.ContainerBuilder = aspirateSettings.ContainerSettings?.Builder ?? null;
-        CurrentState.ContainerRepositoryPrefix = aspirateSettings.ContainerSettings?.RepositoryPrefix ?? null;
-        CurrentState.ContainerImageTag = aspirateSettings.ContainerSettings?.Tag ?? null;
+        if (string.IsNullOrEmpty(CurrentState.TemplatePath))
+        {
+            CurrentState.TemplatePath = aspirateSettings.TemplatePath ?? null;
+        }
+
+        if (string.IsNullOrEmpty(CurrentState.ContainerRegistry))
+        {
+            CurrentState.ContainerRegistry = aspirateSettings.ContainerSettings?.Registry ?? null;
+        }
+
+        if (string.IsNullOrEmpty(CurrentState.ContainerBuilder))
+        {
+            CurrentState.ContainerBuilder = aspirateSettings.ContainerSettings?.Builder ?? null;
+        }
+
+        if (string.IsNullOrEmpty(CurrentState.ContainerRepositoryPrefix))
+        {
+            CurrentState.ContainerRepositoryPrefix = aspirateSettings.ContainerSettings?.RepositoryPrefix ?? null;
+        }
+
+        if (string.IsNullOrEmpty(CurrentState.ContainerImageTag))
+        {
+            CurrentState.ContainerImageTag = aspirateSettings.ContainerSettings?.Tag ?? null;
+        }
+
         Logger.MarkupLine($"\r\n[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.ProjectPath}'[/].[/]");
         Logger.WriteLine();
 
