@@ -6,8 +6,5 @@ namespace Aspirate.Shared.Models.AspireManifests.Components;
 [ExcludeFromCodeCoverage]
 public class UnsupportedResource : Resource
 {
-    /// <summary>
-    /// The type of the unknown resource.
-    /// </summary>
-    public new const string Type = "unknown.resource.v0";
+    public UnsupportedResource() => Type = "unknown.resource.v0";
 }
