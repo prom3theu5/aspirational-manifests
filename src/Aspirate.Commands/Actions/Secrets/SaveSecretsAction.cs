@@ -82,7 +82,7 @@ public class SaveSecretsAction(
 
         foreach (var component in CurrentState.AllSelectedSupportedComponents)
         {
-            if (component.Value.Env is null)
+            if (component.Value is not IResourceWithEnvironmentalVariables { Env: not null })
             {
                 continue;
             }

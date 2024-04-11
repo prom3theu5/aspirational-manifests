@@ -1,6 +1,8 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="Ardalis.SmartEnum.SystemTextJson" Version="8.0.0" />
+    <PackageVersion Include="Aspire.Hosting" Version="8.0.0-preview.5.24201.12" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="8.0.0-preview.5.24201.12" />
     <PackageVersion Include="CliWrap" Version="3.6.6" />
     <PackageVersion Include="Handlebars.Net" Version="2.1.4" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />

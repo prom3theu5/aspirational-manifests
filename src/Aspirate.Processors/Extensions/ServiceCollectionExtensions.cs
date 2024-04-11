@@ -11,24 +11,16 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The service collection to add the processors to.</param>
     public static IServiceCollection AddAspirateProcessors(this IServiceCollection services) =>
         services
-            .RegisterProcessor<PostgresServerProcessor>(AspireComponentLiterals.PostgresServer)
-            .RegisterProcessor<PostgresDatabaseProcessor>(AspireComponentLiterals.PostgresDatabase)
             .RegisterProcessor<ProjectProcessor>(AspireComponentLiterals.Project)
             .RegisterProcessor<DockerfileProcessor>(AspireComponentLiterals.Dockerfile)
-            .RegisterProcessor<RedisProcessor>(AspireComponentLiterals.Redis)
-            .RegisterProcessor<RabbitMqProcessor>(AspireComponentLiterals.RabbitMq)
             .RegisterProcessor<ContainerProcessor>(AspireComponentLiterals.Container)
-            .RegisterProcessor<SqlServerProcessor>(AspireComponentLiterals.SqlServer)
-            .RegisterProcessor<SqlServerDatabaseProcessor>(AspireComponentLiterals.SqlServerDatabase)
-            .RegisterProcessor<MySqlServerProcessor>(AspireComponentLiterals.MySqlServer)
-            .RegisterProcessor<MySqlDatabaseProcessor>(AspireComponentLiterals.MySqlDatabase)
-            .RegisterProcessor<MongoDbServerProcessor>(AspireComponentLiterals.MongoDbServer)
-            .RegisterProcessor<MongoDbDatabaseProcessor>(AspireComponentLiterals.MongoDbDatabase)
             .RegisterProcessor<DaprProcessor>(AspireComponentLiterals.DaprSystem)
             .RegisterProcessor<DaprComponentProcessor>(AspireComponentLiterals.DaprComponent)
             .RegisterProcessor<AzureStorageProcessor>(AspireComponentLiterals.AzureStorage)
             .RegisterProcessor<AzureStorageBlobProcessor>(AspireComponentLiterals.AzureStorageBlob)
             .RegisterProcessor<AzureKeyVaultProcessor>(AspireComponentLiterals.AzureKeyVault)
+            .RegisterProcessor<ParameterProcessor>(AspireComponentLiterals.Parameter)
+            .RegisterProcessor<ValueProcessor>(AspireComponentLiterals.Value)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
 
     /// <summary>
@@ -38,9 +30,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAspiratePlaceholderSubstitutionStrategies(this IServiceCollection services) =>
         services
             .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceBindingsSubstitutionStrategy>()
-            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceInputsSubstitutionStrategy>()
-            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceGenericConnectionStringSubstitutionStrategy>()
-            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceContainerConnectionStringSubstitutionStrategy>();
+            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceConnectionStringSubstitutionStrategy>()
+            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceParameterSubstitutionStrategy>()
+            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceValueSubstitutionStrategy>();
 
     /// <summary>
     /// Registers a processor implementation with a specified key in the service collection.

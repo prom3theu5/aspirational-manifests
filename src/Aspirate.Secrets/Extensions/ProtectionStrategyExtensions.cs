@@ -10,7 +10,7 @@ public static class ProtectionStrategyExtensions
 
         foreach (var component in components)
         {
-            if (component.Value.Env is null)
+            if (component.Value is not IResourceWithEnvironmentalVariables)
             {
                 continue;
             }

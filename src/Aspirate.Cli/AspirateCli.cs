@@ -6,13 +6,15 @@ internal class AspirateCli : RootCommand
     {
         var skipLogo = Environment.GetEnvironmentVariable("ASPIRATE_NO_LOGO");
 
-        if (string.IsNullOrEmpty(skipLogo))
+        if (!string.IsNullOrEmpty(skipLogo))
         {
-            AnsiConsole.WriteLine();
-            AnsiConsole.Write(new FigletText("Aspir8").Color(Color.HotPink));
-            AnsiConsole.MarkupLine("[bold lime]Handle deployments of a .NET Aspire AppHost[/]");
-            AnsiConsole.WriteLine();
+            return;
         }
+
+        AnsiConsole.WriteLine();
+        AnsiConsole.Write(new FigletText("Aspir8").Color(Color.HotPink));
+        AnsiConsole.MarkupLine("[bold lime]Handle deployments of a .NET Aspire AppHost[/]");
+        AnsiConsole.WriteLine();
     }
 
     public AspirateCli()

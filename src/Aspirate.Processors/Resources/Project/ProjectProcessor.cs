@@ -41,14 +41,14 @@ public sealed class ProjectProcessor(
 
         var project = resource.Value as ProjectResource;
 
-        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         var data = new KubernetesDeploymentTemplateData()
             .SetName(resource.Key)
             .SetContainerImage(containerDetails.FullContainerImage)
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
-            .SetAnnotations(resource.Value.Annotations)
+            .SetAnnotations(project.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetIsProject(true)
@@ -107,9 +107,9 @@ public sealed class ProjectProcessor(
 
         var environment = new Dictionary<string, string?>();
 
-        if (resource.Value.Env is not null)
+        if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
         {
-            foreach (var entry in resource.Value.Env)
+            foreach (var entry in resourceWithEnv.Env)
             {
                 environment.Add(entry.Key, entry.Value);
             }
@@ -117,7 +117,7 @@ public sealed class ProjectProcessor(
 
         var project = resource.Value as ProjectResource;
 
-        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         response.Service = Builder.MakeService(resource.Key)
             .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
@@ -148,14 +148,14 @@ public sealed class ProjectProcessor(
             return;
         }
 
-        if (resourceWithBinding.Bindings.TryGetValue("http", out var httpBinding) && httpBinding.ContainerPort == 0)
+        if (resourceWithBinding.Bindings.TryGetValue("http", out var httpBinding) && httpBinding.TargetPort == 0 || httpBinding.TargetPort is null)
         {
-            httpBinding.ContainerPort = 8080;
+            httpBinding.TargetPort = 8080;
         }
 
-        if (resourceWithBinding.Bindings.TryGetValue("https", out var httpsBinding) && httpsBinding.ContainerPort == 0)
+        if (resourceWithBinding.Bindings.TryGetValue("https", out var httpsBinding) && httpsBinding.TargetPort == 0 || httpsBinding.TargetPort is null)
         {
-            httpsBinding.ContainerPort = 8443;
+            httpsBinding.TargetPort = 8443;
         }
     }
 }

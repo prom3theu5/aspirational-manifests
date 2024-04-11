@@ -12,10 +12,12 @@ public class SubstituteValuesAspireManifestAction(IServiceProvider serviceProvid
     private void ReplacePlaceholdersInParsedResources(Dictionary<string, Resource> resources)
     {
         var containers = resources.Where(x => x.Value.Type == AspireComponentLiterals.Container);
-        var nonContainers = resources.Where(x => x.Value.Type != AspireComponentLiterals.Container);
+        var projects = resources.Where(x => x.Value.Type == AspireComponentLiterals.Project);
+        var nonContainersOrProjects = resources.Where(x => x.Value.Type != AspireComponentLiterals.Container && x.Value.Type != AspireComponentLiterals.Project);
 
         ProcessPlaceholders(resources, containers);
-        ProcessPlaceholders(resources, nonContainers);
+        ProcessPlaceholders(resources, nonContainersOrProjects);
+        ProcessPlaceholders(resources, projects);
     }
 
     private void ProcessPlaceholders(Dictionary<string, Resource> resources, IEnumerable<KeyValuePair<string, Resource>> resourcesToProcess)

@@ -33,7 +33,7 @@ public class KubernetesDeploymentTemplateData
 
     public KubernetesDeploymentTemplateData SetEnv(Dictionary<string, string> env)
     {
-        Env = env;
+        Env = env.Where(x=>!string.IsNullOrEmpty(x.Value)).ToDictionary(x => x.Key, x => x.Value);
         return this;
     }
 

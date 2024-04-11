@@ -27,6 +27,12 @@ public class Binding
     /// <summary>
     /// The Container Port for the binding.
     /// </summary>
-    [JsonPropertyName("containerPort")]
-    public int ContainerPort { get; set; }
+    [JsonPropertyName("targetPort")]
+    public int? TargetPort { get; set; }
+
+    /// <summary>
+    /// Is External.
+    /// </summary>
+    [JsonPropertyName("external")]
+    public bool External { get; set; }
 }

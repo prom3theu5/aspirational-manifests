@@ -15,7 +15,6 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// </summary>
     protected readonly IAnsiConsole _console;
 
-
     /// <summary>
     /// Represents an instance of a manifest writer.
     /// </summary>
@@ -48,10 +47,10 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     public abstract string ResourceType { get; }
 
     /// <summary>
-    /// Deserializes JSON data from the provided <see cref="Utf8JsonReader"/> into a <see cref="Resource"/> object.
+    /// Deserializes JSON data from the provided <see cref="Utf8JsonReader"/> into a <see cref="Shared.Models.AspireManifests.Resource"/> object.
     /// </summary>
     /// <param name="reader">The <see cref="Utf8JsonReader"/> containing the JSON data.</param>
-    /// <returns>The deserialized <see cref="Resource"/> object, or null if the deserialization fails.</returns>
+    /// <returns>The deserialized <see cref="Shared.Models.AspireManifests.Resource"/> object, or null if the deserialization fails.</returns>
     public abstract Resource? Deserialize(ref Utf8JsonReader reader);
 
     /// <summary>
@@ -62,12 +61,17 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// <returns>A dictionary representing the filtered environmental variables.</returns>
     protected Dictionary<string, string> GetFilteredEnvironmentalVariables(Resource resource, bool? disableSecrets = false)
     {
-        if (disableSecrets == true)
+        if (resource is not IResourceWithEnvironmentalVariables resourceWithEnv)
         {
-            return resource.Env;
+            return [];
         }
 
-        var envVars = resource.Env;
+        if (disableSecrets == true)
+        {
+            return resourceWithEnv.Env;
+        }
+
+        var envVars = resourceWithEnv.Env;
 
         return envVars == null ? [] : envVars.Where(e => !ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
@@ -80,12 +84,17 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// <returns>A dictionary representing the secret environmental variables.</returns>
     protected Dictionary<string, string> GetSecretEnvironmentalVariables(Resource resource, bool? disableSecrets = false)
     {
+        if (resource is not IResourceWithEnvironmentalVariables resourceWithEnv)
+        {
+            return [];
+        }
+
         if (disableSecrets == true)
         {
             return [];
         }
 
-        var envVars = resource.Env;
+        var envVars = resourceWithEnv.Env;
 
         return envVars == null ? [] : envVars.Where(e => ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
@@ -136,24 +145,89 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     public virtual void ReplacePlaceholders(Resource resource, Dictionary<string, Resource> resources)
     {
         PreSubstitutePlaceholders(resource, resources);
+        HandleConnectionStrings(resource, resources);
+        HandleEnvironmentalVariables(resource, resources);
+        HandleValueResourcePlaceholders(resource, resources);
+    }
 
-        if (resource.Env is null)
+    private void HandleEnvironmentalVariables(Resource resource, Dictionary<string, Resource> resources)
+    {
+        if (resource is not IResourceWithEnvironmentalVariables resourceWithEnv)
+        {
+            return;
+        }
+
+        if (resourceWithEnv.Env is null)
         {
             return;
         }
 
         _substitutionStrategies.ForEach(strategy => strategy.Reset());
 
-        foreach (var entry in resource.Env)
+        foreach (var entry in resourceWithEnv.Env)
         {
             if (!entry.Value.StartsWith('{') || !entry.Value.EndsWith('}'))
             {
                 continue;
             }
 
-            var strategy = _substitutionStrategies.FirstOrDefault(s => s.CanSubstitute(entry));
+            var strategies = _substitutionStrategies.Where(s => s.CanSubstitute(entry));
 
-            strategy?.Substitute(entry, resources, resource);
+            foreach (var strategy in strategies)
+            {
+                strategy.Substitute(entry, resources, resource);
+            }
+        }
+    }
+
+    private void HandleConnectionStrings(Resource resource, Dictionary<string, Resource> resources)
+    {
+        if (resource is not IResourceWithConnectionString resourceWithConnectionString)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(resourceWithConnectionString.ConnectionString))
+        {
+            return;
+        }
+
+        if (!resourceWithConnectionString.ConnectionString.Contains('{') || !resourceWithConnectionString.ConnectionString.Contains('}'))
+        {
+            return;
+        }
+
+        _substitutionStrategies.ForEach(strategy => strategy.Reset());
+
+        var placeholder = new KeyValuePair<string, string>(ResourceConnectionStringSubstitutionStrategy.ConnectionStringPlaceholder, resourceWithConnectionString.ConnectionString);
+        var strategy = _substitutionStrategies.FirstOrDefault(s => s is ResourceConnectionStringSubstitutionStrategy strategy && strategy.CanSubstitute(placeholder));
+        strategy?.Substitute(placeholder, resources, resource);
+    }
+
+    private void HandleValueResourcePlaceholders(Resource resource, Dictionary<string, Resource> resources)
+    {
+        if (resource is not ValueResource valueResource)
+        {
+            return;
+        }
+
+        _substitutionStrategies.ForEach(strategy => strategy.Reset());
+        var strategy = _substitutionStrategies.FirstOrDefault(s => s is ResourceValueSubstitutionStrategy);
+
+        if (strategy is null)
+        {
+            return;
+        }
+
+        foreach (var entry in valueResource.Values)
+        {
+            if (!entry.Value.ToString().Contains('{') || !entry.Value.ToString().Contains('}'))
+            {
+                continue;
+            }
+
+            var placeholder = new KeyValuePair<string, string>(entry.Key, entry.Value.ToString());
+            strategy.Substitute(placeholder, resources, resource);
         }
     }
 

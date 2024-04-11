@@ -5,4 +5,3 @@ return await new CommandLineBuilder(new AspirateCli())
     .UseDependencyInjection(services => services.RegisterAspirateEssential())
     .Build()
     .InvokeAsync(args);
-

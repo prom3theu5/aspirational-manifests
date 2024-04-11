@@ -11,7 +11,7 @@ public class LoadAspireManifestActionTests : BaseActionTests<LoadAspireManifestA
         console.Input.PushKey(ConsoleKey.Spacebar);
         console.Input.PushKey(ConsoleKey.Enter);
 
-        var aspireManifest = Path.Combine(AppContext.BaseDirectory, "TestData", "manifest.json");
+        var aspireManifest = Path.Combine(AppContext.BaseDirectory, "TestData", "sqlserver-endtoend.json");
         var state = CreateAspirateState(aspireManifest: aspireManifest);
 
         var serviceProvider = CreateServiceProvider(state, console, new FileSystem());
@@ -22,15 +22,15 @@ public class LoadAspireManifestActionTests : BaseActionTests<LoadAspireManifestA
 
         // Assert
         result.Should().BeTrue();
-        state.SelectedProjectComponents.Should().HaveCount(2);
-        state.LoadedAspireManifestResources.Keys.Count.Should().Be(15);
+        state.SelectedProjectComponents.Should().HaveCount(1);
+        state.LoadedAspireManifestResources.Keys.Count.Should().Be(4);
     }
 
     [Fact]
     public async Task ExecuteLoadAspireManifestAction_NonInteractiveMode_Success()
     {
         // Arrange
-        var aspireManifest = Path.Combine(AppContext.BaseDirectory, "TestData", "manifest.json");
+        var aspireManifest = Path.Combine(AppContext.BaseDirectory, "TestData", "sqlserver-endtoend.json");
         var state = CreateAspirateState(nonInteractive: true, aspireManifest: aspireManifest);
         var serviceProvider = CreateServiceProvider(state, fileSystem: new FileSystem());
         var loadAspireManifestAction = GetSystemUnderTest(serviceProvider);
@@ -40,7 +40,7 @@ public class LoadAspireManifestActionTests : BaseActionTests<LoadAspireManifestA
 
         // Assert
         result.Should().BeTrue();
-        state.SelectedProjectComponents.Should().HaveCount(2);
-        state.LoadedAspireManifestResources.Keys.Count.Should().Be(15);
+        state.SelectedProjectComponents.Should().HaveCount(1);
+        state.LoadedAspireManifestResources.Keys.Count.Should().Be(4);
     }
 }

@@ -28,11 +28,16 @@ public class ApplyDaprAnnotationsAction(IServiceProvider serviceProvider, IAnsiC
 
     private static void ApplyDaprAnnotationsToTargetService(Resource serviceForSidecar, DaprResource resource)
     {
-        serviceForSidecar.Annotations ??= [];
+        if (serviceForSidecar is not IResourceWithAnnotations service)
+        {
+            return;
+        }
 
-        serviceForSidecar.Annotations.Add("dapr.io/enabled", "true");
-        serviceForSidecar.Annotations.Add("dapr.io/config", "tracing");
-        serviceForSidecar.Annotations.Add("dapr.io/app-id", resource.Metadata.AppId);
+        service.Annotations ??= [];
+
+        service.Annotations.Add("dapr.io/enabled", "true");
+        service.Annotations.Add("dapr.io/config", "tracing");
+        service.Annotations.Add("dapr.io/app-id", resource.Metadata.AppId);
 
         HandleContainerPort(serviceForSidecar);
     }
@@ -49,6 +54,6 @@ public class ApplyDaprAnnotationsAction(IServiceProvider serviceProvider, IAnsiC
             return;
         }
 
-        container.Annotations.Add("dapr.io/app-port", binding.ContainerPort.ToString());
+        container.Annotations.Add("dapr.io/app-port", binding.TargetPort.ToString());
     }
 }

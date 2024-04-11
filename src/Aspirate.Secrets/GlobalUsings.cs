@@ -12,5 +12,6 @@ global using Aspirate.Secrets.Providers.Password;
 global using Aspirate.Secrets.Services;
 global using Aspirate.Shared.Literals;
 global using Aspirate.Shared.Models.AspireManifests;
+global using Aspirate.Shared.Models.AspireManifests.Interfaces;
 global using Microsoft.Extensions.DependencyInjection;
 global using Spectre.Console;

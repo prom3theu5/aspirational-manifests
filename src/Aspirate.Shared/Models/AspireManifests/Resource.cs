@@ -4,26 +4,14 @@ namespace Aspirate.Shared.Models.AspireManifests;
 /// A resource in a manifest.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public abstract class Resource
+public abstract class Resource : IResource
 {
     [JsonPropertyName("name")]
-    public string? Name { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// The type of the resource.
     /// </summary>
     [JsonPropertyName("type")]
-    public string? Type { get; set; }
-
-    /// <summary>
-    /// The environment variables for the project.
-    /// </summary>
-    [JsonPropertyName("env")]
-    public Dictionary<string, string>? Env { get; set; }
-
-    /// <summary>
-    /// Annotations used for deployments.
-    /// </summary>
-    [JsonPropertyName("annotations")]
-    public Dictionary<string, string>? Annotations { get; set; }
+    public string Type { get; set; } = default!;
 }

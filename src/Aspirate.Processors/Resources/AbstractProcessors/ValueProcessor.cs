@@ -1,23 +1,20 @@
-namespace Aspirate.Processors.Resources.Postgresql;
+namespace Aspirate.Processors.Resources.AbstractProcessors;
 
-/// <summary>
-/// Handles producing the Postgres component as Kustomize manifest.
-/// </summary>
-public class PostgresDatabaseProcessor(IFileSystem fileSystem, IAnsiConsole console,
+public class ValueProcessor(IFileSystem fileSystem, IAnsiConsole console,
     IManifestWriter manifestWriter,
     IEnumerable<IPlaceholderSubstitutionStrategy>? substitutionStrategies)
     : BaseResourceProcessor(fileSystem, console, manifestWriter, substitutionStrategies)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireComponentLiterals.PostgresDatabase;
+    public override string ResourceType => AspireComponentLiterals.Value;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<PostgresDatabaseResource>(ref reader);
+        JsonSerializer.Deserialize<ValueResource>(ref reader);
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false,
         bool? withPrivateRegistry = false) =>
-        // Do nothing for databases, they are there for configuration.
+        // Do nothing for Value Resources, they are there for configuration.
         Task.FromResult(true);
 }

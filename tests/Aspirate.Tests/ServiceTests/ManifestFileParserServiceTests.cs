@@ -1,5 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests.Components.V0.Azure;
-
 namespace Aspirate.Tests.ServiceTests;
 
 public class ManifestFileParserServiceTest
@@ -98,7 +96,7 @@ public class ManifestFileParserServiceTest
         var fileSystem = new MockFileSystem();
         var manifestFile = "supportedType.json";
         fileSystem.AddFile(
-            manifestFile, new("{\"resources\": {\"resource1\": {\"type\": \"postgres.database.v0\"}}}"));
+            manifestFile, new("{\"resources\": {\"resource1\": {\"type\": \"container.v0\", \"image\": \"some-image\"}}}"));
 
         var serviceProvider = CreateServiceProvider(fileSystem);
         var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
@@ -109,122 +107,89 @@ public class ManifestFileParserServiceTest
         // Assert
         result.Should().HaveCount(1);
         result["resource1"].Should().NotBeOfType<UnsupportedResource>();
-        result["resource1"].Should().BeOfType<PostgresDatabaseResource>();
+        result["resource1"].Should().BeOfType<ContainerResource>();
+    }
+
+    [Theory]
+    [InlineData("pg-endtoend.json", 22)]
+    [InlineData("sqlserver-endtoend.json", 4)]
+    [InlineData("starter-with-redis.json", 3)]
+    public async Task EndToEnd_ParsesSuccessfully(string manifestFile, int expectedCount)
+    {
+        // Arrange
+        var fileSystem = new MockFileSystem();
+        var testData = Path.Combine(AppContext.BaseDirectory, "TestData", manifestFile);
+        fileSystem.AddFile(manifestFile, new(await File.ReadAllTextAsync(testData)));
+        var serviceProvider = CreateServiceProvider(fileSystem);
+        var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
+        var inputPopulator = serviceProvider.GetRequiredKeyedService<IAction>(nameof(PopulateInputsAction));
+        var valueSubstitutor = serviceProvider.GetRequiredKeyedService<IAction>(nameof(SubstituteValuesAspireManifestAction));
+
+        await PerformEndToEndTests(manifestFile, expectedCount, serviceProvider, service, inputPopulator, valueSubstitutor);
     }
 
     [Fact]
-    public async Task LoadAndParseAspireManifest_ParsesManifestFileCorrectly()
+    public async Task EndToEndWithManualEntry_ParsesSuccessfully()
     {
         // Arrange
         var fileSystem = new MockFileSystem();
-        var manifestFile = "manifest.json";
+        var manifestFile = "starter-with-db.json";
         var testData = Path.Combine(AppContext.BaseDirectory, "TestData", manifestFile);
-        fileSystem.AddFile(manifestFile, new(File.ReadAllText(testData)));
+        fileSystem.AddFile(manifestFile, new(await File.ReadAllTextAsync(testData)));
         var serviceProvider = CreateServiceProvider(fileSystem);
+
+        var console = serviceProvider.GetRequiredService<IAnsiConsole>() as TestConsole;
+        console.Profile.Capabilities.Interactive = true;
+        EnterPasswordInput(console, "secret_password");
+
         var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
+        var inputPopulator = serviceProvider.GetRequiredKeyedService<IAction>(nameof(PopulateInputsAction));
+        var valueSubstitutor = serviceProvider.GetRequiredKeyedService<IAction>(nameof(SubstituteValuesAspireManifestAction));
 
-        // Act
-        var state = serviceProvider.GetRequiredService<AspirateState>();
-        state.LoadedAspireManifestResources = service.LoadAndParseAspireManifest(manifestFile);
-
-        var postgresContainer = state.LoadedAspireManifestResources["postgrescontainer"] as ContainerResource;
-        postgresContainer.Inputs["password"].Value = "secret_password"; // inputs captured from user input
-
-        var postLoadAction = new SubstituteValuesAspireManifestAction(serviceProvider);
-        await postLoadAction.ExecuteAsync();
-        var result = state.LoadedAspireManifestResources;
-
-        // Assert
-        result.Should().HaveCount(15);
-        result["postgres"].Should().BeOfType<PostgresServerResource>();
-
-        result["azurekeyvault"].Should().BeOfType<AzureKeyVaultResource>();
-        result["azurestorage"].Should().BeOfType<AzureStorageResource>();
-        result["azurestorageblob"].Should().BeOfType<AzureStorageBlobResource>();
-
-        result["sqlserver"].Should().BeOfType<SqlServerResource>();
-        result["sqlserver"].Env["SaPassword"].Should().NotBeNull().And.NotBeEmpty();
-        result["sqldb"].Should().BeOfType<SqlServerDatabaseResource>();
-
-        result["mysqlserver"].Should().BeOfType<MySqlServerResource>();
-        result["mysqlserver"].Env["RootPassword"].Should().NotBeNull().And.NotBeEmpty();
-        result["mysqldb"].Should().BeOfType<MySqlDatabaseResource>();
-
-        result["mongodbserver"].Should().BeOfType<MongoDbServerResource>();
-        result["mongodbdb"].Should().BeOfType<MongoDbDatabaseResource>();
-
-        result["catalogdb"].Should().BeOfType<PostgresDatabaseResource>();
-
-        result["basketcache"].Should().BeOfType<RedisResource>();
-
-        result["catalogservice"].Should().BeOfType<ProjectResource>();
-        result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
-        result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
-        result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
-        result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
-
-        result["anotherservice"].Should().BeOfType<ProjectResource>();
-        result["anotherservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
-        result["anotherservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
-        result["anotherservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
-        result["anotherservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
-        result["anotherservice"].Env["services__catalogservice"].Should().Be("http://catalogservice:8080");
-        result["anotherservice"].Env["ConnectionStrings__basketcache"].Should().Be("redis");
-        result["anotherservice"].Env["ConnectionStrings__postgrescontainer"].Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password;");
-
-        postgresContainer = result["postgrescontainer"] as ContainerResource;
-        postgresContainer.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password;");
+        await PerformEndToEndTests(manifestFile, 8, serviceProvider, service, inputPopulator, valueSubstitutor);
     }
 
-     [Fact]
-    public async Task LoadAndParseAspirePreviewTwoManifest_ParsesManifestFileCorrectly()
+    private static async Task PerformEndToEndTests(string manifestFile, int expectedCount, IServiceProvider serviceProvider, IManifestFileParserService service, IAction inputPopulator, IAction valueSubstitutor)
     {
-        // Arrange
-        var fileSystem = new MockFileSystem();
-        var manifestFile = "preview-2-manifest.json";
-        var testData = Path.Combine(AppContext.BaseDirectory, "TestData", manifestFile);
-        fileSystem.AddFile(manifestFile, new(File.ReadAllText(testData)));
-        var serviceProvider = CreateServiceProvider(fileSystem);
-        var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
-
         // Act
         var state = serviceProvider.GetRequiredService<AspirateState>();
         state.LoadedAspireManifestResources = service.LoadAndParseAspireManifest(manifestFile);
-
-        var postgresContainer = state.LoadedAspireManifestResources["catalog"] as ContainerResource;
-        postgresContainer.Inputs["password"].Value = "secret_password"; // inputs captured from user input
-
-        var substituteValuesAspireManifestAction = new SubstituteValuesAspireManifestAction(serviceProvider);
-        await substituteValuesAspireManifestAction.ExecuteAsync();
-
-        var applyDaprAnnotationsAction = new ApplyDaprAnnotationsAction(serviceProvider, new TestConsole());
-        await applyDaprAnnotationsAction.ExecuteAsync();
-
+        await inputPopulator.ExecuteAsync();
+        await valueSubstitutor.ExecuteAsync();
         var result = state.LoadedAspireManifestResources;
 
         // Assert
-        result.Should().HaveCount(10);
-        result["catalog"].Should().BeOfType<ContainerResource>();
-        result["catalogdb"].Should().BeOfType<PostgresDatabaseResource>();
-        result["basketcache"].Should().BeOfType<ContainerResource>();
-        result["catalogservice-dapr"].Should().BeOfType<DaprResource>();
+        result.Should().HaveCount(expectedCount);
 
-        result["catalogservice"].Should().BeOfType<ProjectResource>();
-        result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES");
-        result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES"].Should().Be("true");
-        result["catalogservice"].Env.Should().ContainKey("OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES");
-        result["catalogservice"].Env["OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES"].Should().Be("true");
-        result["catalogservice"].Env["ConnectionStrings__catalogdb"].Should().Be("Host=catalog;Port=5432;Username=postgres;Password=secret_password;");
-        result["catalogservice"].Annotations.Should().NotBeEmpty();
-        result["catalogservice"].Annotations.Should().ContainKey("dapr.io/enabled");
-        result["catalogservice"].Annotations["dapr.io/enabled"].Should().Be("true");
-        result["catalogservice"].Annotations.Should().ContainKey("dapr.io/app-id");
-        result["catalogservice"].Annotations["dapr.io/app-id"].Should().Be("catalogservice");
+        foreach (var container in result.Where(x => x.Value is ContainerResource))
+        {
+            var containerResource = container.Value as ContainerResource;
+            containerResource.ConnectionString.Should().NotBeNullOrEmpty();
+            containerResource.ConnectionString.Should().NotContain("{");
+            containerResource.ConnectionString.Should().NotContain("}");
 
-        result["basketservice"].Env["ConnectionStrings__basketcache"].Should().Be("basketcache:6379");
+            foreach (var envVar in containerResource.Env)
+            {
+                envVar.Value.Should().NotContain("{");
+                envVar.Value.Should().NotContain("}");
+            }
+        }
 
-        postgresContainer = result["catalog"] as ContainerResource;
-        postgresContainer.ConnectionString.Should().Be("Host=catalog;Port=5432;Username=postgres;Password=secret_password;");
+        foreach (var project in result.Where(x => x.Value is ProjectResource))
+        {
+            var containerResource = project.Value as ProjectResource;
+
+            if (containerResource.Env is null)
+            {
+                continue;
+            }
+
+            foreach (var envVar in containerResource.Env)
+            {
+                envVar.Value.Should().NotContain("{");
+                envVar.Value.Should().NotContain("}");
+            }
+        }
     }
 
     private static IServiceProvider CreateServiceProvider(IFileSystem? fileSystem = null, IAnsiConsole? console = null)
@@ -240,5 +205,16 @@ public class ManifestFileParserServiceTest
         services.AddSingleton<ISecretProvider, Base64SecretProvider>();
 
         return services.BuildServiceProvider();
+    }
+
+    private static void EnterPasswordInput(TestConsole console, string password)
+    {
+        // first entry
+        console.Input.PushTextWithEnter(password);
+        console.Input.PushKey(ConsoleKey.Enter);
+
+        // confirmation entry
+        console.Input.PushTextWithEnter(password);
+        console.Input.PushKey(ConsoleKey.Enter);
     }
 }
