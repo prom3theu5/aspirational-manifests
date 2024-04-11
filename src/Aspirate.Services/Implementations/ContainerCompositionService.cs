@@ -120,7 +120,7 @@ public sealed class ContainerCompositionService(
 
         if (errors.Contains(DotNetSdkLiterals.UnknownContainerRegistryAddress, StringComparison.OrdinalIgnoreCase))
         {
-            console.MarkupLine($"\r\n[red bold]{DotNetSdkLiterals.UnknownContainerRegistryAddress}: Unknown container registry address, or container registry address not accessible.[/]");
+            console.MarkupLine($"[red bold]{DotNetSdkLiterals.UnknownContainerRegistryAddress}: Unknown container registry address, or container registry address not accessible.[/]");
             ActionCausesExitException.ExitNow(1013);
         }
 
@@ -156,7 +156,7 @@ public sealed class ContainerCompositionService(
         }
 
         return console.Confirm(
-            "\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
+            "[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.Would you like to retry the build explicitly allowing them?[/]");
     }
 
     private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
@@ -227,7 +227,7 @@ public sealed class ContainerCompositionService(
 
         if (!builderAvailable.IsAvailable)
         {
-            console.MarkupLine($"\r\n[red bold]{builder} is not available or found on your system.[/]");
+            console.MarkupLine($"[red bold]{builder} is not available or found on your system.[/]");
             ActionCausesExitException.ExitNow();
         }
 

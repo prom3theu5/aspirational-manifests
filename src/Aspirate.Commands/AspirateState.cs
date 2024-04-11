@@ -11,7 +11,8 @@ public class AspirateState :
     IPasswordSecretState,
     IBase64SecretState,
     IPrivateRegistryCredentialsOptions,
-    IApplyOptions
+    IApplyOptions,
+    IDashboardOptions
 {
     [JsonPropertyName("projectPath")]
     public string? ProjectPath { get; set; }
@@ -95,6 +96,9 @@ public class AspirateState :
 
     [JsonPropertyName("rollingRestart")]
     public bool RollingRestart { get; set; }
+
+    [JsonPropertyName("includeDashboard")]
+    public bool? IncludeDashboard { get; set; }
 
     public string? Hash { get; set; }
 

@@ -6,6 +6,8 @@ public class LoadAspireManifestAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Selecting Required Components[/]");
+
         var aspireManifest = manifestFileParserService.LoadAndParseAspireManifest(CurrentState.AspireManifest);
         CurrentState.LoadedAspireManifestResources = aspireManifest;
 
@@ -19,7 +21,7 @@ public class LoadAspireManifestAction(
     {
         if (CurrentState.NonInteractive)
         {
-            Logger.MarkupLine("\r\n[blue]Non-Interactive Mode: Processing all components in the loaded file.[/]\r\n");
+            Logger.MarkupLine("[blue]Non-Interactive Mode: Processing all components in the loaded file.[/]");
             return CurrentState.LoadedAspireManifestResources.Keys.ToList();
         }
 

@@ -23,5 +23,6 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(PrivateRegistryUsernameOption.Instance);
        AddOption(PrivateRegistryPasswordOption.Instance);
        AddOption(PrivateRegistryEmailOption.Instance);
+       AddOption(IncludeDashboardOption.Instance);
     }
 }

@@ -87,7 +87,8 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
             }
         }
 
-        console.MarkupLine($"\r\n[bold] {EmojiLiterals.Rocket} Execution Completed[/]");
+        console.WriteLine();
+        console.MarkupLine($"[bold] {EmojiLiterals.Rocket} Execution Completed {EmojiLiterals.Rocket}[/]");
         return 0;
     }
 

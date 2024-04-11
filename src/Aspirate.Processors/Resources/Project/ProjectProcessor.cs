@@ -28,7 +28,7 @@ public sealed class ProjectProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<ProjectResource>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null, bool? disableSecrets = false, bool? withPrivateRegistry = false)
+    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null, bool? disableSecrets = false, bool? withPrivateRegistry = false, bool? withDashboard = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -44,6 +44,7 @@ public sealed class ProjectProcessor(
         var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         var data = new KubernetesDeploymentTemplateData()
+            .SetWithDashboard(withDashboard.GetValueOrDefault())
             .SetName(resource.Key)
             .SetContainerImage(containerDetails.FullContainerImage)
             .SetImagePullPolicy(imagePullPolicy)
@@ -96,7 +97,7 @@ public sealed class ProjectProcessor(
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
     {
         var response = new ComposeService();
 
@@ -109,10 +110,15 @@ public sealed class ProjectProcessor(
 
         if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
         {
-            foreach (var entry in resourceWithEnv.Env)
+            foreach (var entry in resourceWithEnv.Env.Where(entry => !string.IsNullOrEmpty(entry.Value)))
             {
                 environment.Add(entry.Key, entry.Value);
             }
+        }
+
+        if (withDashboard.GetValueOrDefault())
+        {
+            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:4317");
         }
 
         var project = resource.Value as ProjectResource;

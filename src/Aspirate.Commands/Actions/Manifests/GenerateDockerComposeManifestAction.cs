@@ -8,6 +8,8 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling Docker Compose generation[/]");
+
         var outputFormat = OutputFormat.FromValue(CurrentState.OutputFormat);
 
         if (outputFormat == OutputFormat.Kustomize)
@@ -19,7 +21,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         var outputFile = Path.Combine(AspirateLiterals.DefaultOutputPath, "docker-compose.yml");
 
-        Logger.MarkupLine($"\r\n[bold]Generating docker compose file: [blue]'{outputFile}'[/][/]\r\n");
+        Logger.MarkupLine($"[bold]Generating docker compose file: [blue]'{outputFile}'[/][/]");
 
         var services = new List<Service>();
 
@@ -28,9 +30,14 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             ProcessIndividualComponent(resource, services);
         }
 
+        if (CurrentState.IncludeDashboard.GetValueOrDefault())
+        {
+            AddAspireDashboardToCompose(services);
+        }
+
         WriteFile(services, outputFile);
 
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputFile}[/]");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputFile}[/]");
 
         return Task.FromResult(true);
     }
@@ -84,7 +91,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             return;
         }
 
-        var response = handler.CreateComposeEntry(resource);
+        var response = handler.CreateComposeEntry(resource, CurrentState.IncludeDashboard);
 
         if (response.IsProject)
         {
@@ -96,5 +103,26 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         }
 
         services.Add(response.Service);
+    }
+
+    private static void AddAspireDashboardToCompose(List<Service> services)
+    {
+        var environment = new Dictionary<string, string?> { { "DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS", "true" } };
+
+        var ports = new List<Port>
+        {
+            new() { Published = 18888, Target = 18888 },
+            new() { Published = 4317, Target = 18889 }
+        };
+
+        var aspireDashboard = Builder.MakeService("aspire-dashboard")
+            .WithImage("mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.5")
+            .WithEnvironment(environment)
+            .WithContainerName("aspire-dashboard")
+            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithPortMappings(ports.ToArray())
+            .Build();
+
+        services.Insert(0, aspireDashboard);
     }
 }

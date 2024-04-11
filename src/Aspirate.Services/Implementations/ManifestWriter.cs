@@ -13,6 +13,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         [TemplateLiterals.ServiceType] = $"{TemplateLiterals.ServiceType}.hbs",
         [TemplateLiterals.ComponentKustomizeType] = $"{TemplateLiterals.ComponentKustomizeType}.hbs",
         [TemplateLiterals.NamespaceType] = $"{TemplateLiterals.NamespaceType}.hbs",
+        [TemplateLiterals.DashboardType] = $"{TemplateLiterals.DashboardType}.hbs",
     };
 
     /// <summary>
@@ -94,6 +95,17 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         var namespaceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.NamespaceType}.yml");
 
         CreateFile(templateFile, namespaceOutputPath, data, templatePath);
+    }
+
+    public void CreateDashboard<TTemplateData>(
+        string outputPath,
+        TTemplateData data,
+        string? templatePath)
+    {
+        _templateFileMapping.TryGetValue(TemplateLiterals.DashboardType, out var templateFile);
+        var dashboardOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DashboardType}.yml");
+
+        CreateFile(templateFile, dashboardOutputPath, data, templatePath);
     }
 
     /// <inheritdoc />

@@ -4,6 +4,8 @@ public class ApplyDaprAnnotationsAction(IServiceProvider serviceProvider, IAnsiC
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling DAPR Components[/]");
+
         var daprSystemComponents = CurrentState.LoadedAspireManifestResources.Where(
             x => x.Value.Type.Equals(AspireComponentLiterals.DaprSystem, StringComparison.OrdinalIgnoreCase))
             .ToList();

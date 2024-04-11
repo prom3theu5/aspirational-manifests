@@ -4,6 +4,8 @@ public class SubstituteValuesAspireManifestAction(IServiceProvider serviceProvid
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handle Value and Parameter Substitution[/]");
+
         ReplacePlaceholdersInParsedResources(CurrentState.LoadedAspireManifestResources);
 
         return Task.FromResult(true);

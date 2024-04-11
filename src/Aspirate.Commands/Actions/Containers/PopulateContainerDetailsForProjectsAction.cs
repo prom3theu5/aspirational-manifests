@@ -7,14 +7,17 @@ public sealed class PopulateContainerDetailsForProjectsAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Gathering Information about deployables[/]");
+
         if (NoSelectedProjectComponents())
         {
+            Logger.MarkupLine("[bold]No project components selected. Skipping execution of container detail gathering for them.[/]");
             return true;
         }
 
         await HandleProjects();
 
-        Logger.MarkupLine("\r\n[bold]Gathering Tasks Completed - Cache Populated.[/]");
+        Logger.MarkupLine("[bold]Gathering Tasks Completed - Cache Populated.[/]");
 
         return true;
     }
@@ -23,7 +26,7 @@ public sealed class PopulateContainerDetailsForProjectsAction(
     {
         var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
 
-        Logger.MarkupLine("\r\n[bold]Gathering container details for each project in selected components[/]\r\n");
+        Logger.MarkupLine("[bold]Gathering container details for each project in selected components[/]");
 
         foreach (var resource in CurrentState.SelectedProjectComponents)
         {
@@ -43,7 +46,7 @@ public sealed class PopulateContainerDetailsForProjectsAction(
             return false;
         }
 
-        Logger.MarkupLine("\r\n[bold]No project components selected. Skipping execution of container detail gathering for them.[/]");
+        Logger.MarkupLine("[bold]No project components selected. Skipping execution of container detail gathering for them.[/]");
         return true;
     }
 }

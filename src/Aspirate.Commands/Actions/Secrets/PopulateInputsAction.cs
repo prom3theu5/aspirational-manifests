@@ -6,6 +6,8 @@ public class PopulateInputsAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling Inputs[/]");
+
         var parameterResources = CurrentState.LoadedAspireManifestResources.Where(x => x.Value is ParameterResource).ToArray();
 
         if (parameterResources.Length == 0)
@@ -22,7 +24,7 @@ public class PopulateInputsAction(
 
         ApplyManualValues(parameterResources);
 
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
 
         return Task.FromResult(true);
     }
@@ -43,7 +45,6 @@ public class PopulateInputsAction(
 
     private void ApplyGeneratedValues(KeyValuePair<string, Resource>[] parameterResources)
     {
-        Logger.WriteLine();
         Logger.MarkupLine("Applying values for all [blue]automatically generated[/] [green]secrets[/].");
 
         foreach (var component in parameterResources)
@@ -73,8 +74,8 @@ public class PopulateInputsAction(
     {
         Logger.WriteLine();
 
-        var firstPrompt = new TextPrompt<string>($"\r\nEnter a value for resource [blue]{parameterResource.Name}'s[/] Input Value [blue]'{input.Key}'[/]: ");
-        var secondPrompt = new TextPrompt<string>("\r\nPlease repeat the value: ");
+        var firstPrompt = new TextPrompt<string>($"Enter a value for resource [blue]{parameterResource.Name}'s[/] Input Value [blue]'{input.Key}'[/]: ");
+        var secondPrompt = new TextPrompt<string>("Please repeat the value: ");
 
         if (input.Value.Secret)
         {

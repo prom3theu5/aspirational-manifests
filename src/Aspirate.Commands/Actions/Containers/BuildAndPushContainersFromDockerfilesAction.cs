@@ -8,6 +8,8 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling Dockerfiles[/]");
+
         if (NoSelectedDockerfileComponents())
         {
             return true;
@@ -19,7 +21,8 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
         if (CurrentState.SkipBuild)
         {
-            Logger.MarkupLine("\r\n[bold]Skipping build and push action as requested.[/]");
+            var rule = new Rule("[blue][bold]Skipping build and push action as requested.[/][/]");
+            AnsiConsole.Write(rule);
             return true;
         }
 
@@ -30,7 +33,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
     private void CacheContainerDetails(DockerfileProcessor? dockerfileProcessor)
     {
-        Logger.MarkupLine("\r\n[bold]Building all dockerfile resources, and pushing containers:[/]\r\n");
+        Logger.MarkupLine("[bold]Building all dockerfile resources, and pushing containers[/]");
 
         foreach (var resource in CurrentState.SelectedDockerfileComponents)
         {
@@ -42,12 +45,12 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             });
         }
 
-        Logger.MarkupLine("\r\n[bold]Building and push completed for all selected dockerfile components.[/]");
+        Logger.MarkupLine("[bold]Building and push completed for all selected dockerfile components.[/]");
     }
 
     private async Task PerformBuildAndPushes(DockerfileProcessor? dockerfileProcessor)
     {
-        Logger.MarkupLine("\r\n[bold]Building all dockerfile resources, and pushing containers:[/]\r\n");
+        Logger.MarkupLine("[bold]Building all dockerfile resources, and pushing containers:[/]");
 
         foreach (var resource in CurrentState.SelectedDockerfileComponents)
         {
@@ -61,7 +64,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             }, CurrentState.NonInteractive);
         }
 
-        Logger.MarkupLine("\r\n[bold]Building and push completed for all selected dockerfile components.[/]");
+        Logger.MarkupLine("[bold]Building and push completed for all selected dockerfile components.[/]");
     }
 
     private bool NoSelectedDockerfileComponents()
@@ -71,7 +74,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             return false;
         }
 
-        Logger.MarkupLine("\r\n[bold]No Dockerfile components selected. Skipping build and publish action.[/]");
+        Logger.MarkupLine("[bold]No Dockerfile components selected. Skipping build and publish action.[/]");
         return true;
     }
 }

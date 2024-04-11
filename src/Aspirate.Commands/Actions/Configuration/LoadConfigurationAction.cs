@@ -6,6 +6,8 @@ public class LoadConfigurationAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling Configuration[/]");
+
         var aspirateSettings = configurationService.LoadConfigurationFile(CurrentState.ProjectPath);
 
         if (aspirateSettings is null)
@@ -38,8 +40,7 @@ public class LoadConfigurationAction(
             CurrentState.ContainerImageTag = aspirateSettings.ContainerSettings?.Tag ?? null;
         }
 
-        Logger.MarkupLine($"\r\n[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.ProjectPath}'[/].[/]");
-        Logger.WriteLine();
+        Logger.MarkupLine($"[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.ProjectPath}'[/].[/]");
 
         return Task.FromResult(true);
     }

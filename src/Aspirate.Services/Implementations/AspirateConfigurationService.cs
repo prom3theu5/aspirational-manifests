@@ -71,17 +71,17 @@ public class AspirateConfigurationService(IAnsiConsole console, IFileSystem file
     }
 
     private void LogExistingConfigurationFound() =>
-        console.MarkupLine($"\r\n[bold yellow] {EmojiLiterals.Warning} Existing configuration found.[/]");
+        console.MarkupLine($"[bold yellow] {EmojiLiterals.Warning} Existing configuration found.[/]");
 
     private void LogExistingConfigurationDeleted() =>
-        console.MarkupLine($"\r\n[bold green] {EmojiLiterals.Warning} Existing configuration has been [red]deleted[/].[/]");
+        console.MarkupLine($"[bold green] {EmojiLiterals.Warning} Existing configuration has been [red]deleted[/].[/]");
 
     private void LogForceRemovalInNonInteractiveMode() =>
-        console.MarkupLine($"\r\n[bold green] {EmojiLiterals.Warning} Force Removing as Currently in [blue]Non Interactive Mode[/].[/]");
+        console.MarkupLine($"[bold green] {EmojiLiterals.Warning} Force Removing as Currently in [blue]Non Interactive Mode[/].[/]");
 
     private void LogExistingNotDeleted() =>
-        console.MarkupLine($"\r\n[bold red] {EmojiLiterals.Warning} Existing configuration has not been removed - aspirate will now terminate.[/]");
+        console.MarkupLine($"[bold red] {EmojiLiterals.Warning} Existing configuration has not been removed - aspirate will now terminate.[/]");
 
     private void LogConfigurationSaved(string path) =>
-        console.MarkupLine($"\r\n[bold green]({EmojiLiterals.CheckMark}) Done:[/] Configuration for aspirate has been bootstrapped successfully at [blue]'{path}'.[/]");
+        console.MarkupLine($"[bold green]({EmojiLiterals.CheckMark}) Done:[/] Configuration for aspirate has been bootstrapped successfully at [blue]'{path}'.[/]");
 }

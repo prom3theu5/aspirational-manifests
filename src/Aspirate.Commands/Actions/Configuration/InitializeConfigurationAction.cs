@@ -7,6 +7,8 @@ public class InitializeConfigurationAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handle Initialization Defaults[/]");
+
         configurationService.HandleExistingConfiguration(CurrentState.ProjectPath, CurrentState.NonInteractive);
 
         var aspirateSettings = PerformConfigurationBootstrapping();
@@ -40,11 +42,11 @@ public class InitializeConfigurationAction(
         if (!string.IsNullOrEmpty(CurrentState.ContainerBuilder))
         {
             aspirateConfiguration.ContainerSettings.Builder = CurrentState.ContainerBuilder;
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container builder'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Builder}'[/].");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container builder'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Builder}'[/].");
             return;
         }
 
-        Logger.MarkupLine("\r\nAspirate supports [blue]Docker[/] and [blue]Podman[/] as container builders..");
+        Logger.MarkupLine("Aspirate supports [blue]Docker[/] and [blue]Podman[/] as container builders..");
         var shouldSetBuilder = Logger.Confirm("Would you like to set a fall-back value for the container builder?", false);
 
         if (!shouldSetBuilder)
@@ -60,7 +62,7 @@ public class InitializeConfigurationAction(
                 .AddChoices(ContainerBuilder.List.Select(x => x.Value).ToArray()));
 
         aspirateConfiguration.ContainerSettings.Builder = builder;
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container Builder'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Builder}'[/].");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container Builder'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Builder}'[/].");
     }
 
     private void HandleContainerRegistry(AspirateSettings aspirateConfiguration)
@@ -68,11 +70,11 @@ public class InitializeConfigurationAction(
         if (!string.IsNullOrEmpty(CurrentState.ContainerRegistry))
         {
             aspirateConfiguration.ContainerSettings.Registry = CurrentState.ContainerRegistry;
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback registry'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Registry}'[/].");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback registry'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Registry}'[/].");
             return;
         }
 
-        Logger.MarkupLine("\r\nAspirate supports setting a fall-back value for projects that have not yet set a [blue]'ContainerRegistry'[/] in their csproj file.");
+        Logger.MarkupLine("Aspirate supports setting a fall-back value for projects that have not yet set a [blue]'ContainerRegistry'[/] in their csproj file.");
         var shouldSetContainerRegistry = Logger.Confirm("Would you like to set a fall-back value for the container registry?", false);
 
         if (!shouldSetContainerRegistry)
@@ -82,7 +84,7 @@ public class InitializeConfigurationAction(
 
         var containerRegistry = Logger.Prompt(new TextPrompt<string>("Please enter the container registry to use as a fall-back value:").PromptStyle("blue"));
         aspirateConfiguration.ContainerSettings.Registry = containerRegistry;
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback registry'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Registry}'[/].");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback registry'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Registry}'[/].");
     }
 
     private void HandleContainerRepositoryPrefix(AspirateSettings aspirateConfiguration)
@@ -90,11 +92,11 @@ public class InitializeConfigurationAction(
         if (!string.IsNullOrEmpty(CurrentState.ContainerRepositoryPrefix) || CurrentState.NonInteractive)
         {
             aspirateConfiguration.ContainerSettings.RepositoryPrefix = CurrentState.ContainerRepositoryPrefix;
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container repository prefix'[/] to [blue]'{aspirateConfiguration.ContainerSettings.RepositoryPrefix}'[/].");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container repository prefix'[/] to [blue]'{aspirateConfiguration.ContainerSettings.RepositoryPrefix}'[/].");
             return;
         }
 
-        Logger.MarkupLine("\r\nAspirate supports setting a repository prefix for all for projects.");
+        Logger.MarkupLine("Aspirate supports setting a repository prefix for all for projects.");
         var shouldSetContainerRepositoryPrefix = Logger.Confirm("Would you like to set this value?", false);
 
         if (!shouldSetContainerRepositoryPrefix)
@@ -104,7 +106,7 @@ public class InitializeConfigurationAction(
 
         var containerRepositoryPrefix = Logger.Prompt(new TextPrompt<string>("Please enter the container repository prefix to use as a fall-back value:").PromptStyle("blue"));
         aspirateConfiguration.ContainerSettings.RepositoryPrefix = containerRepositoryPrefix;
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container repository prefix'[/] to [blue]'{aspirateConfiguration.ContainerSettings.RepositoryPrefix}'[/].");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container repository prefix'[/] to [blue]'{aspirateConfiguration.ContainerSettings.RepositoryPrefix}'[/].");
     }
 
     private void HandleContainerTag(AspirateSettings aspirateConfiguration)
@@ -112,11 +114,11 @@ public class InitializeConfigurationAction(
         if (!string.IsNullOrEmpty(CurrentState.ContainerImageTag))
         {
             aspirateConfiguration.ContainerSettings.Tag = CurrentState.ContainerImageTag;
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tag}'[/].");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tag}'[/].");
             return;
         }
 
-        Logger.MarkupLine("\r\nAspirate supports setting a fall-back value for projects that have not yet set a [blue]'ContainerTag'[/] in their csproj file.");
+        Logger.MarkupLine("Aspirate supports setting a fall-back value for projects that have not yet set a [blue]'ContainerTag'[/] in their csproj file.");
         var shouldSetContainerTag = Logger.Confirm("Would you like to set a fall-back value for the container tag?", false);
 
         if (!shouldSetContainerTag)
@@ -126,7 +128,7 @@ public class InitializeConfigurationAction(
 
         var containerTag = Logger.Prompt(new TextPrompt<string>("Please enter the container tag to use as a fall-back value:").PromptStyle("blue"));
         aspirateConfiguration.ContainerSettings.Tag = containerTag;
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tag}'[/].");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tag}'[/].");
     }
 
     private void HandleTemplateDirectory(AspirateSettings aspirateConfiguration)
@@ -139,11 +141,11 @@ public class InitializeConfigurationAction(
         if (!string.IsNullOrEmpty(CurrentState.TemplatePath))
         {
             aspirateConfiguration.TemplatePath = CurrentState.TemplatePath;
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'TemplatePath'[/] to [blue]'{aspirateConfiguration.TemplatePath}'[/].");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'TemplatePath'[/] to [blue]'{aspirateConfiguration.TemplatePath}'[/].");
             return;
         }
 
-        Logger.MarkupLine("\r\nAspirate supports setting a custom directory for [blue]'Templates'[/] that are used when generating kustomize manifests.");
+        Logger.MarkupLine("Aspirate supports setting a custom directory for [blue]'Templates'[/] that are used when generating kustomize manifests.");
         var shouldSetCustomTemplateDirectory = Logger.Confirm("Would you like to use a custom directory (selecting [green]'n'[/] will default to built in templates ?", false);
 
         if (!shouldSetCustomTemplateDirectory)
@@ -153,7 +155,7 @@ public class InitializeConfigurationAction(
 
         var templatePath = Logger.Prompt(new TextPrompt<string>("Please enter the path to use as the template directory:").PromptStyle("blue"));
         aspirateConfiguration.TemplatePath = fileSystem.GetFullPath(templatePath);
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'TemplatePath'[/] to [blue]'{aspirateConfiguration.TemplatePath}'[/].");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'TemplatePath'[/] to [blue]'{aspirateConfiguration.TemplatePath}'[/].");
     }
 
     private void AddTemplatesToTemplateDirectoryIfRequired(AspirateSettings aspirateConfiguration)
@@ -183,7 +185,7 @@ public class InitializeConfigurationAction(
     {
         if (!CurrentState.NonInteractive)
         {
-            Logger.MarkupLine($"\r\nSelected Template directory [blue]'{aspirateConfiguration.TemplatePath}'[/] does not exist.");
+            Logger.MarkupLine($"Selected Template directory [blue]'{aspirateConfiguration.TemplatePath}'[/] does not exist.");
             var shouldCreate = Logger.Confirm("Would you like to create it?");
 
             if (!shouldCreate)
@@ -193,7 +195,7 @@ public class InitializeConfigurationAction(
         }
 
         fileSystem.Directory.CreateDirectory(aspirateConfiguration.TemplatePath);
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Directory [blue]'{aspirateConfiguration.TemplatePath}'[/] has been created.");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Directory [blue]'{aspirateConfiguration.TemplatePath}'[/] has been created.");
         return true;
     }
 
@@ -206,7 +208,7 @@ public class InitializeConfigurationAction(
 
         if (!CurrentState.NonInteractive)
         {
-            Logger.MarkupLine($"\r\nSelected Template directory [blue]'{aspirateConfiguration.TemplatePath}'[/] is empty.");
+            Logger.MarkupLine($"Selected Template directory [blue]'{aspirateConfiguration.TemplatePath}'[/] is empty.");
             var shouldCreate = Logger.Confirm("Would you like to populate it with the default templates?");
 
             if (!shouldCreate)
@@ -219,7 +221,7 @@ public class InitializeConfigurationAction(
         {
             var templateFileName = fileSystem.Path.GetFileName(templateFile);
             fileSystem.File.Copy(templateFile, fileSystem.Path.Combine(aspirateConfiguration.TemplatePath, templateFileName));
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] copied template [blue]'{templateFileName}'[/] to directory [blue]'{aspirateConfiguration.TemplatePath}'[/].");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] copied template [blue]'{templateFileName}'[/] to directory [blue]'{aspirateConfiguration.TemplatePath}'[/].");
         }
     }
 
