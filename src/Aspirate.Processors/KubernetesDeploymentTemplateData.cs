@@ -8,6 +8,7 @@ public class KubernetesDeploymentTemplateData
     public Dictionary<string, string>? Env {get; private set;}
     public Dictionary<string, string>? Secrets {get; private set;}
     public Dictionary<string, string>? Annotations {get; private set;}
+    public List<Volume>? Volumes {get; private set;}
     public IReadOnlyCollection<string>? Manifests {get; private set;}
     public IReadOnlyCollection<string>? Args {get; private set;}
     public bool? IsService { get; private set; } = true;
@@ -73,6 +74,12 @@ public class KubernetesDeploymentTemplateData
         return this;
     }
 
+    public KubernetesDeploymentTemplateData SetVolumes(List<Volume>? volumes)
+    {
+        Volumes = volumes ?? [];
+        return this;
+    }
+
     public KubernetesDeploymentTemplateData SetWithPrivateRegistry(bool isPrivateRegistry)
     {
         WithPrivateRegistry = isPrivateRegistry;
@@ -133,6 +140,7 @@ public class KubernetesDeploymentTemplateData
     }
 
     public bool HasPorts => Ports?.Any() == true;
+    public bool HasVolumes => Volumes?.Any() == true;
     public bool HasAnySecrets => Secrets?.Any() == true;
     public bool HasAnyAnnotations => Annotations?.Any() == true;
     public bool HasArgs => Args?.Any() == true;

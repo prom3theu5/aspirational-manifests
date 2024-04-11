@@ -1,6 +1,12 @@
 ﻿namespace Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
 
-public class ContainerResource : Resource, IResourceWithBinding, IResourceWithConnectionString, IResourceWithArgs, IResourceWithAnnotations, IResourceWithEnvironmentalVariables
+public class ContainerResource : Resource,
+    IResourceWithBinding,
+    IResourceWithConnectionString,
+    IResourceWithArgs,
+    IResourceWithAnnotations,
+    IResourceWithEnvironmentalVariables,
+    IResourceWithVolumes
 {
     [JsonPropertyName("image")]
     public required string Image { get; set; }
@@ -19,4 +25,7 @@ public class ContainerResource : Resource, IResourceWithBinding, IResourceWithCo
 
     [JsonPropertyName("env")]
     public Dictionary<string, string>? Env { get; set; } = [];
+
+    [JsonPropertyName("volumes")]
+    public List<Volume>? Volumes { get; set; } = [];
 }

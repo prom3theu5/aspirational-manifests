@@ -1,3 +1,6 @@
+using Aspirate.DockerCompose.Models;
+using Volume = Aspirate.Shared.Models.AspireManifests.Components.V0.Volume;
+
 namespace Aspirate.Processors.Resources.AbstractProcessors;
 
 /// <summary>
@@ -16,12 +19,6 @@ public class ContainerProcessor(
     /// <inheritdoc />
     public override string ResourceType => AspireComponentLiterals.Container;
 
-    private readonly IReadOnlyCollection<string> _manifests =
-    [
-        $"{TemplateLiterals.DeploymentType}.yml",
-        $"{TemplateLiterals.ServiceType}.yml",
-    ];
-
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<ContainerResource>(ref reader);
@@ -39,6 +36,16 @@ public class ContainerProcessor(
 
         var container = resource.Value as ContainerResource;
 
+        var manifests = new List<string>
+        {
+            container.Volumes.Count > 0
+                ? $"{TemplateLiterals.StatefulSetType}.yml"
+                : $"{TemplateLiterals.DeploymentType}.yml",
+            $"{TemplateLiterals.ServiceType}.yml",
+        };
+
+        KuberizeVolumeNames(container.Volumes);
+
         var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         var data = new KubernetesDeploymentTemplateData()
@@ -47,21 +54,43 @@ public class ContainerProcessor(
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
             .SetAnnotations(container.Annotations)
+            .SetVolumes(container.Volumes)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(containerPorts)
             .SetArgs(container.Args)
-            .SetManifests(_manifests)
+            .SetManifests(manifests)
             .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .Validate();
 
-        _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);
+        if (container.Volumes.Count > 0)
+        {
+            _manifestWriter.CreateStatefulSet(resourceOutputPath, data, templatePath);
+        }
+        else
+        {
+            _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);
+        }
+
         _manifestWriter.CreateService(resourceOutputPath, data, templatePath);
         _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
 
         LogCompletion(resourceOutputPath);
 
         return Task.FromResult(true);
+    }
+
+    private static void KuberizeVolumeNames(List<Volume> containerVolumes)
+    {
+        if (containerVolumes.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var volume in containerVolumes)
+        {
+            volume.Name = volume.Name.Replace("/", "-").Replace(".", "-").ToLowerInvariant();
+        }
     }
 
     public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
@@ -76,7 +105,7 @@ public class ContainerProcessor(
 
         if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
         {
-            foreach (var entry in resourceWithEnv.Env)
+            foreach (var entry in resourceWithEnv.Env.Where(entry => !string.IsNullOrEmpty(entry.Value)))
             {
                 environment.Add(entry.Key, entry.Value);
             }
@@ -90,10 +119,20 @@ public class ContainerProcessor(
             service.WithCommands(container.Args.ToArray());
         }
 
+        var composeVolumes = new List<string>();
+
+        if (container.Volumes.Count > 0)
+        {
+            KuberizeVolumeNames(container.Volumes);
+
+            composeVolumes.AddRange(container.Volumes.Where(x=>!string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
+        }
+
         response.Service = service
             .WithEnvironment(environment)
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithVolumes(composeVolumes.ToArray())
             .WithPortMappings(containerPorts.Select(x=> new Port
             {
                 Target = x.Port,

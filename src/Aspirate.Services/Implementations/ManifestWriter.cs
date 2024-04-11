@@ -8,15 +8,10 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     private readonly Dictionary<string, string> _templateFileMapping = new()
     {
         [TemplateLiterals.DeploymentType] = $"{TemplateLiterals.DeploymentType}.hbs",
+        [TemplateLiterals.StatefulSetType] = $"{TemplateLiterals.StatefulSetType}.hbs",
         [TemplateLiterals.DaprComponentType] = $"{TemplateLiterals.DaprComponentType}.hbs",
         [TemplateLiterals.ServiceType] = $"{TemplateLiterals.ServiceType}.hbs",
         [TemplateLiterals.ComponentKustomizeType] = $"{TemplateLiterals.ComponentKustomizeType}.hbs",
-        [TemplateLiterals.RedisType] = $"{TemplateLiterals.RedisType}.hbs",
-        [TemplateLiterals.SqlServerType] = $"{TemplateLiterals.SqlServerType}.hbs",
-        [TemplateLiterals.MysqlServerType] = $"{TemplateLiterals.MysqlServerType}.hbs",
-        [TemplateLiterals.RabbitMqType] = $"{TemplateLiterals.RabbitMqType}.hbs",
-        [TemplateLiterals.MongoDbServerType] = $"{TemplateLiterals.MongoDbServerType}.hbs",
-        [TemplateLiterals.PostgresServerType] = $"{TemplateLiterals.PostgresServerType}.hbs",
         [TemplateLiterals.NamespaceType] = $"{TemplateLiterals.NamespaceType}.hbs",
     };
 
@@ -41,6 +36,14 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.DeploymentType, out var templateFile);
         var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DeploymentType}.yml");
+
+        CreateFile(templateFile, deploymentOutputPath, data, templatePath);
+    }
+
+    public void CreateStatefulSet<TTemplateData>(string outputPath, TTemplateData data, string? templatePath)
+    {
+        _templateFileMapping.TryGetValue(TemplateLiterals.StatefulSetType, out var templateFile);
+        var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.StatefulSetType}.yml");
 
         CreateFile(templateFile, deploymentOutputPath, data, templatePath);
     }

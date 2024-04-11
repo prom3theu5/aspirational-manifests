@@ -1,3 +1,5 @@
+using Volume = Aspirate.DockerCompose.Models.Volume;
+
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateDockerComposeManifestAction(IServiceProvider serviceProvider, IFileSystem fileSystem) : BaseAction(serviceProvider)
@@ -35,8 +37,11 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
     private void WriteFile(List<Service> services, string outputFile)
     {
+        var volumes = CreateVolumes(services);
+
         var composeFile = Builder.MakeCompose()
             .WithServices(services.ToArray())
+            .WithVolumes(volumes.ToArray())
             .Build();
 
         var composeFileString = composeFile.Serialize();
@@ -49,14 +54,23 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         fileSystem.File.WriteAllText(outputFile, composeFileString);
     }
 
-    private void ProcessIndividualComponent(KeyValuePair<string, Resource> resource, List<Service> services)
+    private static List<Volume> CreateVolumes(List<Service> services)
     {
-        if (resource.Value.Type is null)
+        var volumes = new List<Volume>();
+
+        foreach (var service in services)
         {
-            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its type is unknown.[/]");
-            return;
+            if (service.Volumes is not null)
+            {
+                volumes.AddRange(service.Volumes.Select(volume => new Volume { Name = volume.Split(':')[0] }));
+            }
         }
 
+        return volumes;
+    }
+
+    private void ProcessIndividualComponent(KeyValuePair<string, Resource> resource, List<Service> services)
+    {
         if (AspirateState.IsNotDeployable(resource.Value))
         {
             return;

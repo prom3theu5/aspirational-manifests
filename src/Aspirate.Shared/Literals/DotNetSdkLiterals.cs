@@ -11,11 +11,13 @@ public static class DotNetSdkLiterals
     public const string RunArgument = "run";
     public const string PublishArgument = "publish";
     public const string ArgumentDelimiter = "--";
+    public const string VerbosityArgument = "--verbosity";
 
     public const string ProjectArgument = "--project";
     public const string PublisherArgument = "--publisher";
     public const string OutputPathArgument = "--output-path";
     public const string SelfContainedArgument = "--self-contained";
+    public const string NoLogoArgument = "--nologo";
     public const string RuntimeIdentifierArgument = "-r";
     public const string OsArgument = "--os";
     public const string ArchArgument = "--arch";
@@ -37,6 +39,7 @@ public static class DotNetSdkLiterals
     public const string DefaultRuntimeIdentifier = "linux-x64";
     public const string DefaultOs = "linux";
     public const string DefaultArch = "x64";
+    public const string DefaultVerbosity = "quiet";
 
     public const string DotNetCommand = "dotnet";
 
