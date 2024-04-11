@@ -78,8 +78,10 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
                 console.MarkupLine($"[red bold]({exitException.ExitCode}): Aspirate will now exit.[/]");
                 return exitException.ExitCode;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                console.MarkupLine($"[red bold]Error executing action [blue]'{executionAction.ActionKey}'[/]:[/]");
+                console.WriteException(ex);
                 await HandleActionFailure(executionAction.OnFailure);
                 return 1;
             }
