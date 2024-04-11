@@ -39,6 +39,9 @@
       <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRepositoryWithPrefixShouldBeImage.verified.txt" />
       <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRepositoryOrTagWithPrefixShouldBeImageLatest.verified.txt" />
       <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRegistryOrRepositoryOrTagWithPrefixShouldBeImageLatest.verified.txt" />
+      <None Update="TestData\project-no-binding.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

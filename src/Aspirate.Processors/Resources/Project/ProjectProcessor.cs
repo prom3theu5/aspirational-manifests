@@ -148,20 +148,14 @@ public sealed class ProjectProcessor(
             return;
         }
 
-        if (resourceWithBinding.Bindings.TryGetValue("http", out var httpBinding))
+        if (resourceWithBinding.Bindings.TryGetValue("http", out var httpBinding) && httpBinding.TargetPort is 0 or null)
         {
-            if (httpBinding.TargetPort is 0 or null)
-            {
-                httpBinding.TargetPort = 8080;
-            }
+            httpBinding.TargetPort = 8080;
         }
 
-        if (resourceWithBinding.Bindings.TryGetValue("https", out var httpsBinding))
+        if (resourceWithBinding.Bindings.TryGetValue("https", out var httpsBinding) && httpsBinding.TargetPort is 0 or null)
         {
-            if (httpsBinding.TargetPort is 0 or null)
-            {
-                httpsBinding.TargetPort = 8443;
-            }
+            httpsBinding.TargetPort = 8443;
         }
     }
 }
