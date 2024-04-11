@@ -5,13 +5,25 @@ public sealed class ResourceBindingsSubstitutionStrategy : IPlaceholderSubstitut
     public const string BindingPlaceholder = "bindings";
     private int _servicePort = 10000;
 
-    public bool CanSubstitute(KeyValuePair<string, string> placeholder) =>
-        placeholder.Value.Contains($".{BindingPlaceholder}.", StringComparison.OrdinalIgnoreCase) &&
-        !placeholder.Value.Contains(ResourceInputsSubstitutionStrategy.InputsPlaceholder, StringComparison.OrdinalIgnoreCase) &&
-        !placeholder.Value.Contains(ResourceGenericConnectionStringSubstitutionStrategy.ConnectionStringPlaceholder, StringComparison.OrdinalIgnoreCase);
+    public bool CanSubstitute(KeyValuePair<string, string> placeholder, bool ignorePlaceholder = false)
+    {
+        if (ignorePlaceholder)
+        {
+            return true;
+        }
+
+        return placeholder.Value.Contains($".{BindingPlaceholder}.", StringComparison.OrdinalIgnoreCase) &&
+               !placeholder.Key.Contains(ResourceConnectionStringSubstitutionStrategy.ConnectionStringPlaceholder,
+                   StringComparison.OrdinalIgnoreCase);
+    }
 
     public void Substitute(KeyValuePair<string, string> placeholder, Dictionary<string, Resource> resources, Resource resource)
     {
+        if (resource is not IResourceWithEnvironmentalVariables resourceWithEnv)
+        {
+            return;
+        }
+
         var cleanPlaceholder = placeholder.Value.Trim('{', '}');
 
         var parts = cleanPlaceholder.Split('.');
@@ -35,12 +47,12 @@ public sealed class ResourceBindingsSubstitutionStrategy : IPlaceholderSubstitut
         var newValue = bindingProperty switch
         {
             "host" => resourceName,  // return the name of the resource for 'host'
-            "port" => binding.ContainerPort.ToString(),
+            "port" => binding.TargetPort.ToString(),
             "url" => HandleUrlBinding(resourceName, bindingName, binding),
             _ => throw new InvalidOperationException($"Unknown property {bindingProperty} in placeholder {placeholder}.")
         };
 
-        resource.Env[placeholder.Key] = newValue;
+        resourceWithEnv.Env[placeholder.Key] = newValue;
     }
 
     public void Reset() => _servicePort = 10000;
@@ -48,22 +60,22 @@ public sealed class ResourceBindingsSubstitutionStrategy : IPlaceholderSubstitut
     private string HandleUrlBinding(string resourceName, string bindingName, Binding binding) =>
         bindingName switch
         {
-            "http" => $"http://{resourceName}:{binding.ContainerPort}",
-            "https" =>  $"https://{resourceName}:{binding.ContainerPort}",
+            "http" => $"http://{resourceName}:{binding.TargetPort}",
+            "https" =>  string.Empty, // For now - disable https, only http is supported until we have a way to generate dev certs and inject into container for startup.
             _ => HandleCustomServicePortBinding(resourceName, binding),
         };
 
     private string HandleCustomServicePortBinding(string resourceName, Binding binding)
     {
-        if (binding.ContainerPort == 0)
+        if (binding.TargetPort == 0)
         {
-            binding.ContainerPort = _servicePort;
+            binding.TargetPort = _servicePort;
             _servicePort++;
         }
 
         var prefix = HandleServiceBindingPrefix(binding);
 
-        return $"{prefix}{resourceName}:{binding.ContainerPort}";
+        return $"{prefix}{resourceName}:{binding.TargetPort}";
     }
 
     private static string HandleServiceBindingPrefix(Binding binding) =>

@@ -137,11 +137,7 @@ public class AspirateState :
         FinalResources.Add(key, resource);
 
     public static bool IsNotDeployable(Resource resource) =>
-        (resource is PostgresDatabaseResource
-            or SqlServerDatabaseResource
-            or MySqlDatabaseResource
-            or MongoDbDatabaseResource
-            or DaprResource)
+        (resource is DaprResource or ParameterResource or ValueResource)
         && !IsAzureResource(resource);
 
 

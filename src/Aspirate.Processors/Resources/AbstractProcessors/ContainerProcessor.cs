@@ -1,4 +1,4 @@
-namespace Aspirate.Processors.Resources.Container;
+namespace Aspirate.Processors.Resources.AbstractProcessors;
 
 /// <summary>
 /// A project component for version 0 of Aspire.
@@ -39,14 +39,14 @@ public class ContainerProcessor(
 
         var container = resource.Value as ContainerResource;
 
-        var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+        var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         var data = new KubernetesDeploymentTemplateData()
             .SetName(resource.Key)
             .SetContainerImage(container.Image)
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
-            .SetAnnotations(resource.Value.Annotations)
+            .SetAnnotations(container.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(containerPorts)
@@ -64,29 +64,19 @@ public class ContainerProcessor(
         return Task.FromResult(true);
     }
 
-    public override void ReplacePlaceholders(Resource resource, Dictionary<string, Resource> resources)
-    {
-        var connectionStringHandler =
-            _substitutionStrategies.FirstOrDefault(s => s is ResourceContainerConnectionStringSubstitutionStrategy);
-
-        connectionStringHandler?.Substitute(new(), resources, resource);
-
-        base.ReplacePlaceholders(resource, resources);
-    }
-
     public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
     {
         var response = new ComposeService();
 
         var container = resource.Value as ContainerResource;
 
-        var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+        var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         var environment = new Dictionary<string, string?>();
 
-        if (resource.Value.Env is not null)
+        if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
         {
-            foreach (var entry in resource.Value.Env)
+            foreach (var entry in resourceWithEnv.Env)
             {
                 environment.Add(entry.Key, entry.Value);
             }

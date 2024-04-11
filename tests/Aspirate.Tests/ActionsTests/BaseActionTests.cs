@@ -79,13 +79,15 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
 
     protected AspirateState CreateAspirateStateWithInputs(bool nonInteractive = false, bool generatedInputs = false, bool passwordsSet = false)
     {
-        var postgres = CreatePostgresContainerResourceManualInput("postgrescontainer", generatedInputs, passwordsSet);
-        var postgresTwo = CreatePostgresContainerResourceManualInput("postgrescontainer2", generatedInputs, passwordsSet);
+        var (postgres, params1) = CreatePostgresContainerResourceManualInput("postgrescontainer", generatedInputs, passwordsSet);
+        var (postgresTwo, params2) = CreatePostgresContainerResourceManualInput("postgrescontainer2", generatedInputs, passwordsSet);
 
         var resources = new Dictionary<string, Resource>
         {
             { "postgrescontainer", postgres },
             { "postgrescontainer2", postgresTwo },
+            { "postgresparams1", params1 },
+            { "postgresparams2", params2 },
         };
 
         var state = CreateAspirateState(nonInteractive: nonInteractive);
@@ -97,21 +99,23 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
 
     protected AspirateState CreateAspirateStateWithConnectionStrings(bool nonInteractive = false, string? password = null)
     {
-        var postgres = CreatePostgresContainerResourceManualInput("postgrescontainer");
-        var postgresTwo = CreatePostgresContainerResourceManualInput("postgrescontainer2");
+        var (postgres, params1) = CreatePostgresContainerResourceManualInput("postgrescontainer");
+        var (postgresTwo, params2) = CreatePostgresContainerResourceManualInput("postgrescontainer2");
 
         var resources = new Dictionary<string, Resource>
         {
             { "postgrescontainer", postgres },
             { "postgrescontainer2", postgresTwo },
+            { "postgresparams1", params1 },
+            { "postgresparams2", params2 },
         };
 
-        resources["postgrescontainer"].Env = new()
+        (resources["postgrescontainer"] as IResourceWithEnvironmentalVariables).Env = new Dictionary<string, string>
         {
             ["ConnectionString_Test"] = "some_secret_value",
         };
 
-        resources["postgrescontainer2"].Env = new()
+        (resources["postgrescontainer2"] as IResourceWithEnvironmentalVariables).Env = new Dictionary<string, string>
         {
             ["ConnectionString_Test"] = "some_secret_value",
         };
@@ -123,7 +127,7 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
         return state;
     }
 
-    private static ContainerResource CreatePostgresContainerResourceManualInput(string resourceName, bool generatedInput = false, bool passwordsSet = false)
+    private static (ContainerResource container, ParameterResource parameters) CreatePostgresContainerResourceManualInput(string resourceName, bool generatedInput = false, bool passwordsSet = false)
     {
         var postgres = new ContainerResource
         {
@@ -139,47 +143,55 @@ public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest :
                         Scheme = "tcp",
                         Protocol = "tcp",
                         Transport = "tcp",
-                        ContainerPort = 5432,
+                        TargetPort = 5432,
                     }
                 },
             },
-            Inputs = CreateInputs(generatedInput, passwordsSet),
         };
-        return postgres;
+
+        var parameters = CreateInputs(generatedInput, passwordsSet);
+
+        return (postgres, parameters);
     }
 
-    private static Dictionary<string, Input> CreateInputs(bool generated = false, bool passwordsSet = false)
+    private static ParameterResource CreateInputs(bool generated = false, bool passwordsSet = false)
     {
-        var inputs = new Dictionary<string, Input>();
+        var parameters = new ParameterResource
+        {
+            Name = "password",
+            Type = "string"
+        };
 
         if (generated)
         {
-            inputs.Add("password", new()
+            parameters.Inputs = new Dictionary<string, ParameterInput>
             {
-                Type = "string",
-                Default = new()
+                ["value"] = new()
                 {
-                    Generate = new()
+                    Default = new ParameterDefault
                     {
-                        MinLength = 20,
-                    },
-                },
-            });
+                        Generate = new Generate
+                        {
+                            MinLength = 22,
+                        },
+                    }
+                }
+            };
         }
         else
         {
-            inputs.Add("password", new()
+            parameters.Inputs = new Dictionary<string, ParameterInput>
             {
-                Type = "string",
-            });
+                ["value"] = new(),
+            };
         }
 
         if (passwordsSet)
         {
-            inputs["password"].Value = "some-password";
+            parameters.Value = "some-password";
         }
 
-        return inputs;
+        return parameters;
     }
 
     protected TSystemUnderTest? GetSystemUnderTest(IServiceProvider serviceProvider) =>

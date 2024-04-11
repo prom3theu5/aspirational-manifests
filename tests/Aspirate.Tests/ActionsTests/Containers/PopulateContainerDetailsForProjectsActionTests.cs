@@ -18,7 +18,7 @@ public class PopulateContainerDetailsForProjectsActionTests : BaseActionTests<Po
     public async Task ExecutePopulateContainerDetailsForProjectsAction_NonInteractive_Success()
     {
         // Arrange
-        var aspireManifest = Path.Combine(AppContext.BaseDirectory, "TestData", "manifest.json");
+        var aspireManifest = Path.Combine(AppContext.BaseDirectory, "TestData", "sqlserver-endtoend.json");
         var state = CreateAspirateState(nonInteractive: true, aspireManifest: aspireManifest);
         var serviceProvider = CreateServiceProvider(state, fileSystem: new FileSystem());
         var loadManifestAction =

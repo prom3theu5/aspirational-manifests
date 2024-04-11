@@ -8,8 +8,13 @@ public static class StringExtensions
         return Convert.ToBase64String(plainTextBytes);
     }
 
-    public static string FromBase64(this string value)
+    public static string? FromBase64(this string? value)
     {
+        if (string.IsNullOrEmpty(value))
+        {
+            return null;
+        }
+
         var base64EncodedBytes = Convert.FromBase64String(value);
         return Encoding.UTF8.GetString(base64EncodedBytes);
     }

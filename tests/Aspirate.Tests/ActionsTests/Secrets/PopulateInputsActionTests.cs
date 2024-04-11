@@ -20,11 +20,11 @@ public class PopulateInputsActionTests : BaseActionTests<PopulateInputsAction>
         // Assert
         result.Should().BeTrue();
 
-        var postgres = state.LoadedAspireManifestResources["postgrescontainer"] as IResourceWithInput;
-        var postgres2 = state.LoadedAspireManifestResources["postgrescontainer2"] as IResourceWithInput;
+        var postgresParams = state.LoadedAspireManifestResources["postgresparams1"] as ParameterResource;
+        var postgres2Params = state.LoadedAspireManifestResources["postgresparams2"] as ParameterResource;
 
-        postgres.Inputs["password"].Value.Should().Be("secret_password");
-        postgres2.Inputs["password"].Value.Should().Be("other_secret_password");
+        postgresParams.Value.Should().Be("secret_password");
+        postgres2Params.Value.Should().Be("other_secret_password");
     }
 
     [Fact]
@@ -43,12 +43,12 @@ public class PopulateInputsActionTests : BaseActionTests<PopulateInputsAction>
         // Assert
         result.Should().BeTrue();
 
-        var postgres = state.LoadedAspireManifestResources["postgrescontainer"] as IResourceWithInput;
-        var postgres2 = state.LoadedAspireManifestResources["postgrescontainer2"] as IResourceWithInput;
+        var postgresParams = state.LoadedAspireManifestResources["postgresparams1"] as ParameterResource;
+        var postgres2Params = state.LoadedAspireManifestResources["postgresparams2"] as ParameterResource;
 
-        postgres.Inputs["password"].Value.Should().HaveLength(20);
-        postgres2.Inputs["password"].Value.Should().HaveLength(20);
-        postgres.Inputs["password"].Value.Should().NotBe(postgres2.Inputs["password"].Value);
+        postgresParams.Value.Should().HaveLength(22);
+        postgres2Params.Value.Should().HaveLength(22);
+        postgresParams.Value.Should().NotBe(postgres2Params.Value);
     }
 
     [Fact]

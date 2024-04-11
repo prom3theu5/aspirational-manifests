@@ -40,7 +40,7 @@ public class DockerfileProcessor(
 
         var dockerFile = resource.Value as DockerfileResource;
 
-        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
         {
@@ -52,7 +52,7 @@ public class DockerfileProcessor(
             .SetContainerImage(containerImage)
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
-            .SetAnnotations(resource.Value.Annotations)
+            .SetAnnotations(dockerFile.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(containerPorts)
@@ -91,7 +91,7 @@ public class DockerfileProcessor(
 
         var dockerFile = resource.Value as DockerfileResource;
 
-        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.ContainerPort }).ToList() ?? [];
+        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
         {
@@ -100,9 +100,9 @@ public class DockerfileProcessor(
 
         var environment = new Dictionary<string, string?>();
 
-        if (resource.Value.Env is not null)
+        if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
         {
-            foreach (var entry in resource.Value.Env)
+            foreach (var entry in resourceWithEnv.Env)
             {
                 environment.Add(entry.Key, entry.Value);
             }
