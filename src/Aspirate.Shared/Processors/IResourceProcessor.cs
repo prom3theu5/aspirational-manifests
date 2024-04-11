@@ -25,12 +25,14 @@ public interface IResourceProcessor
         string imagePullPolicy,
         string? aspirateSettings = null,
         bool? disableSecrets = false,
-        bool? withPrivateRegistry = false);
+        bool? withPrivateRegistry = false,
+        bool? withDashboard = false);
 
     /// <summary>
     /// Creates a compose entry using the specified resource.
     /// </summary>
     /// <param name="resource">The key-value pair containing the compose entry's identifier and resource.</param>
+    /// <param name="withDashboard">Should include the aspire dashboard.</param>
     /// <returns>The created compose entry as a <see cref="Service"/> object, or null if the operation fails.</returns>
-    ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource);
+    ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false);
 }

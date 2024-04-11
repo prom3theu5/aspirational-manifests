@@ -28,7 +28,8 @@ public class ContainerProcessor(
         string imagePullPolicy,
         string? templatePath = null,
         bool? disableSecrets = false,
-        bool? withPrivateRegistry = false)
+        bool? withPrivateRegistry = false,
+        bool? withDashboard = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -49,6 +50,7 @@ public class ContainerProcessor(
         var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
 
         var data = new KubernetesDeploymentTemplateData()
+            .SetWithDashboard(withDashboard.GetValueOrDefault())
             .SetName(resource.Key)
             .SetContainerImage(container.Image)
             .SetImagePullPolicy(imagePullPolicy)
@@ -93,7 +95,7 @@ public class ContainerProcessor(
         }
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
     {
         var response = new ComposeService();
 
@@ -109,6 +111,11 @@ public class ContainerProcessor(
             {
                 environment.Add(entry.Key, entry.Value);
             }
+        }
+
+        if (withDashboard.GetValueOrDefault())
+        {
+            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:4317");
         }
 
         var service = Builder.MakeService(resource.Key)

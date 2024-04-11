@@ -9,6 +9,8 @@ public sealed class ApplyManifestsToClusterAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handle Deployment to Cluster[/]");
+
         var secretFiles = new List<string>();
 
         try
@@ -20,7 +22,7 @@ public sealed class ApplyManifestsToClusterAction(
             await WriteSecretsOutToTempFiles(secretFiles);
             await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
             await HandleRollingRestart();
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
 
             return true;
         }
@@ -43,7 +45,6 @@ public sealed class ApplyManifestsToClusterAction(
             return;
         }
 
-        Logger.WriteLine();
         var shouldDeploy = Logger.Confirm(
             "[bold]Would you like to deploy the generated manifests to a kubernetes cluster defined in your kubeconfig file?[/]");
 
@@ -84,7 +85,7 @@ public sealed class ApplyManifestsToClusterAction(
         if (!daprInstalled)
         {
             Logger.MarkupLine("Dapr is required for this workload as you have dapr components, but is not installed in the cluster.");
-            Logger.MarkupLine($"\r\nInstalling Dapr in cluster [blue]'{CurrentState.KubeContext}'[/]");
+            Logger.MarkupLine($"Installing Dapr in cluster [blue]'{CurrentState.KubeContext}'[/]");
             var result = await daprCliService.InstallDaprInCluster();
 
             if (result.ExitCode != 0)
@@ -94,7 +95,7 @@ public sealed class ApplyManifestsToClusterAction(
                 ActionCausesExitException.ExitNow();
             }
 
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr installed in cluster [blue]'{CurrentState.KubeContext}'[/]");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr installed in cluster [blue]'{CurrentState.KubeContext}'[/]");
         }
     }
 
@@ -130,7 +131,7 @@ public sealed class ApplyManifestsToClusterAction(
                 return;
             }
 
-            Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Decrypting secrets from [blue]{CurrentState.InputPath}[/]");
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Decrypting secrets from [blue]{CurrentState.InputPath}[/]");
 
             foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
             {

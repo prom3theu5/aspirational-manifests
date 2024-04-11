@@ -6,6 +6,8 @@ public class LoadSecretsAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Loading Existing Secrets[/]");
+
         if (CurrentState.DisableSecrets)
         {
             return Task.FromResult(true);
@@ -30,7 +32,7 @@ public class LoadSecretsAction(
             }
         }
 
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State populated successfully from [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State populated successfully from [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
 
         return Task.FromResult(true);
     }

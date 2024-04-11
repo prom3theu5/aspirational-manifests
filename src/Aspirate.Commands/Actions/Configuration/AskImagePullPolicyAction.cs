@@ -6,6 +6,8 @@ public class AskImagePullPolicyAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handle Image Pull Policy[/]");
+
         if (CurrentState.NonInteractive)
         {
             return Task.FromResult(true);
@@ -22,8 +24,6 @@ public class AskImagePullPolicyAction(
             "Always",
             "Never",
         };
-
-        Logger.WriteLine();
 
         var choice = Logger.Prompt(
             new SelectionPrompt<string>()

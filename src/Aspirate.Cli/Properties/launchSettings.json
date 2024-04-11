@@ -15,7 +15,7 @@
     "generate": {
       "commandName": "Project",
       "commandLineArgs": "generate",
-      "workingDirectory": "/Users/prom3theu5/git/test-volumes/AspireSample/AspireSample.AppHost",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
     "generate-non-interactive": {
@@ -39,7 +39,7 @@
     "apply": {
       "commandName": "Project",
       "commandLineArgs": "apply",
-      "workingDirectory": "/Users/prom3theu5/git/test-volumes/AspireSample/AspireSample.AppHost",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
     "apply-non-interactive": {
@@ -51,7 +51,7 @@
     "destroy": {
       "commandName": "Project",
       "commandLineArgs": "destroy",
-      "workingDirectory": "/Users/prom3theu5/git/test-volumes/AspireSample/AspireSample.AppHost",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
     "destroy-non-interactive": {

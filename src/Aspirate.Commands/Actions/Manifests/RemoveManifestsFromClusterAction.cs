@@ -10,6 +10,8 @@ public sealed class RemoveManifestsFromClusterAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handle Removal from Cluster[/]");
+
         var secretFiles = new List<string>();
 
         try
@@ -19,7 +21,7 @@ public sealed class RemoveManifestsFromClusterAction(
             CreateEmptySecretFiles(secretFiles);
             await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
             Logger.MarkupLine(
-                $"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
+                $"[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
 
             await HandleDapr();
 
@@ -44,7 +46,6 @@ public sealed class RemoveManifestsFromClusterAction(
             return;
         }
 
-        Logger.WriteLine();
         var shouldDeploy = Logger.Confirm(
             "[bold]Would you like to remove the deployed manifests from a kubernetes cluster defined in your kubeconfig file?[/]");
 
@@ -138,7 +139,7 @@ public sealed class RemoveManifestsFromClusterAction(
                     ActionCausesExitException.ExitNow();
                 }
 
-                Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
+                Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
             }
         }
     }

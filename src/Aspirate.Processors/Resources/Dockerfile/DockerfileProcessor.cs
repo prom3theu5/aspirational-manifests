@@ -32,7 +32,8 @@ public class DockerfileProcessor(
 
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null, bool? disableSecrets = false,
-        bool? withPrivateRegistry = false)
+        bool? withPrivateRegistry = false,
+        bool? withDashboard = false)
     {
         var resourceOutputPath = Path.Combine(outputPath, resource.Key);
 
@@ -48,6 +49,7 @@ public class DockerfileProcessor(
         }
 
         var data = new KubernetesDeploymentTemplateData()
+            .SetWithDashboard(withDashboard.GetValueOrDefault())
             .SetName(resource.Key)
             .SetContainerImage(containerImage)
             .SetImagePullPolicy(imagePullPolicy)
@@ -85,7 +87,7 @@ public class DockerfileProcessor(
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
     {
         var response = new ComposeService();
 
@@ -102,10 +104,15 @@ public class DockerfileProcessor(
 
         if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
         {
-            foreach (var entry in resourceWithEnv.Env)
+            foreach (var entry in resourceWithEnv.Env.Where(entry => !string.IsNullOrEmpty(entry.Value)))
             {
                 environment.Add(entry.Key, entry.Value);
             }
+        }
+
+        if (withDashboard.GetValueOrDefault())
+        {
+            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:4317");
         }
 
         response.Service = Builder.MakeService(resource.Key)

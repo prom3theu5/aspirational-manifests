@@ -68,6 +68,11 @@ public interface IManifestWriter
         TTemplateData data,
         string? templatePath);
 
+    void CreateDashboard<TTemplateData>(
+        string outputPath,
+        TTemplateData data,
+        string? templatePath);
+
     /// <summary>
     /// Creates an image pull secret with the specified parameters.
     /// </summary>

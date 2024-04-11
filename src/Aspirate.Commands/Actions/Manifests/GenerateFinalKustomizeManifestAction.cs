@@ -8,8 +8,11 @@ public sealed class GenerateFinalKustomizeManifestAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling Final Manifest[/]");
+
         if (CurrentState.SkipFinalKustomizeGeneration)
         {
+            Logger.MarkupLine("[blue]Skipping final manifest generation as requested.[/]");
             return Task.FromResult(true);
         }
 
@@ -20,13 +23,8 @@ public sealed class GenerateFinalKustomizeManifestAction(
 
         if (!CurrentState.NonInteractive)
         {
-            Logger.WriteLine();
-            var shouldGenerateFinalKustomizeManifest = Logger.Confirm(
-                "[bold]Would you like to generate the top level kustomize manifest to run against your kubernetes cluster?[/]");
-
-            if (!shouldGenerateFinalKustomizeManifest)
+            if (!ShouldCreateFinalManifest())
             {
-                Logger.MarkupLine("[yellow](!)[/] Skipping final manifest");
                 return Task.FromResult(true);
             }
         }
@@ -42,9 +40,24 @@ public sealed class GenerateFinalKustomizeManifestAction(
             CurrentState.PrivateRegistryUrl,
             CurrentState.PrivateRegistryUsername,
             CurrentState.PrivateRegistryPassword,
-            CurrentState.PrivateRegistryEmail);
+            CurrentState.PrivateRegistryEmail,
+            CurrentState.IncludeDashboard);
 
         return Task.FromResult(true);
+    }
+
+    private bool ShouldCreateFinalManifest()
+    {
+        var shouldGenerateFinalKustomizeManifest = Logger.Confirm(
+            "[bold]Would you like to generate the top level kustomize manifest to run against your kubernetes cluster?[/]");
+
+        if (!shouldGenerateFinalKustomizeManifest)
+        {
+            Logger.MarkupLine("[yellow](!)[/] Skipping final manifest");
+            return false;
+        }
+
+        return true;
     }
 
     private bool NoSupportedComponentsExitAction()
@@ -54,7 +67,7 @@ public sealed class GenerateFinalKustomizeManifestAction(
             return false;
         }
 
-        Logger.MarkupLine("\r\n[bold]No supported components selected. Final manifest does not need to be generated as it would be empty.[/]");
+        Logger.MarkupLine("[bold]No supported components selected. Final manifest does not need to be generated as it would be empty.[/]");
         return true;
     }
 }

@@ -6,6 +6,8 @@ public sealed class GenerateKustomizeManifestsAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handle Kustomize Manifests[/]");
+
         var outputFormat = OutputFormat.FromValue(CurrentState.OutputFormat);
 
         if (outputFormat == OutputFormat.DockerCompose)
@@ -20,7 +22,7 @@ public sealed class GenerateKustomizeManifestsAction(
             return true;
         }
 
-        Logger.MarkupLine("\r\n[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]\r\n");
+        Logger.MarkupLine("[bold]Generating kustomize manifests to run against your kubernetes cluster:[/]");
 
         foreach (var resource in CurrentState.AllSelectedSupportedComponents)
         {
@@ -37,18 +39,12 @@ public sealed class GenerateKustomizeManifestsAction(
             return false;
         }
 
-        Logger.MarkupLine("\r\n[bold]No supported components selected. Skipping generation of kustomize manifests.[/]");
+        Logger.MarkupLine("[bold]No supported components selected. Skipping generation of kustomize manifests.[/]");
         return true;
     }
 
     private async Task ProcessIndividualResourceManifests(KeyValuePair<string, Resource> resource)
     {
-        if (resource.Value.Type is null)
-        {
-            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its type is unknown.[/]");
-            return;
-        }
-
         var handler = Services.GetKeyedService<IResourceProcessor>(resource.Value.Type);
 
         if (handler is null)
@@ -57,7 +53,7 @@ public sealed class GenerateKustomizeManifestsAction(
             return;
         }
 
-        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath, CurrentState.DisableSecrets, CurrentState.WithPrivateRegistry);
+        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath, CurrentState.DisableSecrets, CurrentState.WithPrivateRegistry, CurrentState.IncludeDashboard);
 
         if (success && !AspirateState.IsNotDeployable(resource.Value) && resource.Value is not DaprComponentResource)
         {

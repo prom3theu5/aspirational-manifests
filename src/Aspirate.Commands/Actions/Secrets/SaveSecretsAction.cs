@@ -14,8 +14,11 @@ public class SaveSecretsAction(
 
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Populating Secrets File[/]");
+
         if (CurrentState.DisableSecrets)
         {
+            Logger.MarkupLine("Secrets have been [red]disabled[/] for this run.");
             return Task.FromResult(true);
         }
 
@@ -95,7 +98,7 @@ public class SaveSecretsAction(
 
         secretProvider.SaveState(CurrentState.OutputPath);
 
-        console.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved to [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
+        console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved to [blue]{CurrentState.OutputPath}/{AspirateSecretLiterals.SecretsStateFile}[/]");
 
         return Task.FromResult(true);
     }

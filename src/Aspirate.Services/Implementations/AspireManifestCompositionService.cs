@@ -24,6 +24,7 @@ public class AspireManifestCompositionService(IFileSystem fileSystem, IAnsiConso
         var newManifestFile = await shellExecutionService.ExecuteCommand(new()
         {
             Command = DotNetSdkLiterals.DotNetCommand,
+            PreCommandMessage = "Generating Aspire Manifest...",
             ArgumentsBuilder =  argumentsBuilder,
             ShowOutput = true,
         });

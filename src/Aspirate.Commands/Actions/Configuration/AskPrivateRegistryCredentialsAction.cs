@@ -6,6 +6,8 @@ public class AskPrivateRegistryCredentialsAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling private registry credentials[/]");
+
         if (CurrentState.NonInteractive)
         {
             return Task.FromResult(true);
@@ -16,7 +18,7 @@ public class AskPrivateRegistryCredentialsAction(
             return Task.FromResult(true);
         }
 
-        Logger.MarkupLine("\r\nEnsuring private registry credentials are set so that we can produce an image pull secret.");
+        Logger.MarkupLine("Ensuring private registry credentials are set so that we can produce an image pull secret.");
 
         if (string.IsNullOrEmpty(CurrentState.PrivateRegistryUrl))
         {
@@ -51,7 +53,7 @@ public class AskPrivateRegistryCredentialsAction(
                     .Validate(email => !string.IsNullOrEmpty(email), "Email is required and cannot be empty."));
         }
 
-        Logger.MarkupLine($"\r\n[green]({EmojiLiterals.CheckMark}) Done: [/] Setting private registry credentials for image pull secret.");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting private registry credentials for image pull secret.");
 
         return Task.FromResult(true);
     }

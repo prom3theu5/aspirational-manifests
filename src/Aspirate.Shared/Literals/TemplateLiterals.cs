@@ -10,5 +10,6 @@ public static class TemplateLiterals
     public const string ServiceType = "service";
     public const string ComponentKustomizeType = "kustomization";
     public const string NamespaceType = "namespace";
+    public const string DashboardType = "dashboard";
     public const string ImagePullSecretType = "image-pull-secret";
 }

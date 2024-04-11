@@ -7,9 +7,11 @@ public sealed class BuildAndPushContainersFromProjectsAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling Projects[/]");
+
         if (CurrentState.SkipBuild)
         {
-            Logger.MarkupLine("\r\n[bold]Skipping build and push action as requested.[/]");
+            Logger.MarkupLine("[bold]Skipping build and push action as requested.[/]");
             return true;
         }
 
@@ -20,7 +22,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
 
         var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
 
-        Logger.MarkupLine("\r\n[bold]Building all project resources, and pushing containers:[/]\r\n");
+        Logger.MarkupLine("[bold]Building all project resources, and pushing containers[/]");
 
         foreach (var resource in CurrentState.SelectedProjectComponents)
         {
@@ -31,7 +33,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
             }, CurrentState.NonInteractive, CurrentState.RuntimeIdentifier);
         }
 
-        Logger.MarkupLine("\r\n[bold]Building and push completed for all selected project components.[/]");
+        Logger.MarkupLine("[bold]Building and push completed for all selected project components.[/]");
 
         return true;
     }
@@ -43,7 +45,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
             return false;
         }
 
-        Logger.MarkupLine("\r\n[bold]No project components selected. Skipping build and publish action.[/]");
+        Logger.MarkupLine("[bold]No project components selected. Skipping build and publish action.[/]");
         return true;
     }
 }

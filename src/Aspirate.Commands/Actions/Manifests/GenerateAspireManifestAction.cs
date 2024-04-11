@@ -6,15 +6,16 @@ public sealed class GenerateAspireManifestAction(
 {
     public override async Task<bool> ExecuteAsync()
     {
+        Logger.WriteRuler("[purple]Handling Aspire Manifest[/]");
+
         if (!string.IsNullOrEmpty(CurrentState.AspireManifest))
         {
-            Logger.MarkupLine($"\r\n[bold]Aspire Manifest supplied at path: [blue]{CurrentState.AspireManifest}[/].[/]");
+            Logger.MarkupLine($"[bold]Aspire Manifest supplied at path: [blue]{CurrentState.AspireManifest}[/].[/]");
             Logger.MarkupLine("[bold]Skipping Aspire Manifest generation.[/]");
-            Logger.WriteLine();
             return true;
         }
 
-        Logger.MarkupLine("\r\n[bold]Generating Aspire Manifest for supplied App Host:[/]\r\n");
+        Logger.MarkupLine("[bold]Generating Aspire Manifest for supplied App Host:[/]");
 
         var result = await manifestCompositionService.BuildManifestForProject(CurrentState.ProjectPath);
 

@@ -108,11 +108,13 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// <param name="templatePath">Optional. The path to the template used for creating the manifests.</param>
     /// <param name="disableSecrets">Passing this will disable all secret generation.</param>
     /// <param name="withPrivateRegistry">Specifies if image pull secret should be set.</param>
+    /// <param name="withDashboard">Specifies if the dashboard OTLP endpoint should be included.</param>
     /// <returns>A task that represents the asynchronous operation. The task result is a boolean indicating if the manifests were created successfully.</returns>
     public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null,
         bool? disableSecrets = false,
-        bool? withPrivateRegistry = false)
+        bool? withPrivateRegistry = false,
+        bool? withDashboard = false)
     {
         LogCreateManifestNotOverridden(GetType().Name);
 
@@ -123,8 +125,9 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// Creates a compose entry with the given resource.
     /// </summary>
     /// <param name="resource">The key-value pair representing the resource.</param>
+    /// <param name="withDashboard">Should include the dashboard OTLP endpoint.</param>
     /// <returns>The created compose entry service, or null if creation is not overridden.</returns>
-    public virtual ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource)
+    public virtual ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
     {
         LogCreateComposeNotOverridden(GetType().Name);
 

@@ -6,7 +6,7 @@ public abstract class BaseActionWithNonInteractiveValidation(IServiceProvider se
 
     protected void NonInteractiveValidationFailed(string message)
     {
-        Logger.MarkupLine($"\r\n[red](!)[/] {message}");
+        Logger.MarkupLine($"[red](!)[/] {message}");
         ActionCausesExitException.ExitNow();
     }
 }

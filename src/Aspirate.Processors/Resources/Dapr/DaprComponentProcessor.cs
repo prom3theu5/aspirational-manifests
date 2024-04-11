@@ -15,7 +15,8 @@ public class DaprComponentProcessor(
     public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
         string? templatePath = null,
         bool? disableSecrets = false,
-        bool? withPrivateRegistry = false)
+        bool? withPrivateRegistry = false,
+        bool? withDashboard = false)
     {
         var daprComponentResource = resource.Value as DaprComponentResource;
 
