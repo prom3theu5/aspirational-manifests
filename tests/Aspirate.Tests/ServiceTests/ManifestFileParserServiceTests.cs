@@ -114,6 +114,7 @@ public class ManifestFileParserServiceTest
     [InlineData("pg-endtoend.json", 22)]
     [InlineData("sqlserver-endtoend.json", 4)]
     [InlineData("starter-with-redis.json", 3)]
+    [InlineData("project-no-binding.json", 1)]
     public async Task EndToEnd_ParsesSuccessfully(string manifestFile, int expectedCount)
     {
         // Arrange
@@ -149,7 +150,28 @@ public class ManifestFileParserServiceTest
         await PerformEndToEndTests(manifestFile, 8, serviceProvider, service, inputPopulator, valueSubstitutor);
     }
 
-    private static async Task PerformEndToEndTests(string manifestFile, int expectedCount, IServiceProvider serviceProvider, IManifestFileParserService service, IAction inputPopulator, IAction valueSubstitutor)
+    [Fact]
+    public async Task EndToEndShop_ParsesSuccessfully()
+    {
+        // Arrange
+        var fileSystem = new MockFileSystem();
+        var manifestFile = "shop.json";
+        var testData = Path.Combine(AppContext.BaseDirectory, "TestData", manifestFile);
+        fileSystem.AddFile(manifestFile, new(await File.ReadAllTextAsync(testData)));
+        var serviceProvider = CreateServiceProvider(fileSystem);
+
+        var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
+        var inputPopulator = serviceProvider.GetRequiredKeyedService<IAction>(nameof(PopulateInputsAction));
+        var valueSubstitutor = serviceProvider.GetRequiredKeyedService<IAction>(nameof(SubstituteValuesAspireManifestAction));
+
+        var results = await PerformEndToEndTests(manifestFile, 12, serviceProvider, service, inputPopulator, valueSubstitutor);
+
+        var shopResource = results["basketcache"] as ContainerResource;
+        shopResource.Volumes.Should().HaveCount(1);
+        shopResource.Volumes[0].Name.Should().Be("basketcache-data");
+    }
+
+    private static async Task<Dictionary<string, Resource>> PerformEndToEndTests(string manifestFile, int expectedCount, IServiceProvider serviceProvider, IManifestFileParserService service, IAction inputPopulator, IAction valueSubstitutor)
     {
         // Act
         var state = serviceProvider.GetRequiredService<AspirateState>();
@@ -190,6 +212,8 @@ public class ManifestFileParserServiceTest
                 envVar.Value.Should().NotContain("}");
             }
         }
+
+        return result;
     }
 
     private static IServiceProvider CreateServiceProvider(IFileSystem? fileSystem = null, IAnsiConsole? console = null)

@@ -18,6 +18,14 @@ public interface IManifestWriter
     void CreateDeployment<TTemplateData>(string outputPath, TTemplateData data, string? templatePath);
 
     /// <summary>
+    /// Create a statefulset file using the specified template file and template data.
+    /// </summary>
+    /// <param name="outputPath">The path where the statefulset file will be created.</param>
+    /// <param name="data">The template data.</param>
+    /// <param name="templatePath">The path of the template file (optional).</param>
+    void CreateStatefulSet<TTemplateData>(string outputPath, TTemplateData data, string? templatePath);
+
+    /// <summary>
     /// Creates a Dapr manifest file based on the provided template data and saves it to the specified output path.
     /// </summary>
     /// <typeparam name="TTemplateData">The type of data used by the template.</typeparam>

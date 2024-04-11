@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
@@ -157,9 +159,10 @@ public sealed class ContainerCompositionService(
             "\r\n[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.\r\nWould you like to retry the build explicitly allowing them?[/]\r\n");
     }
 
-    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath,
-        string? runtimeIdentifier)
+    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
     {
+        var defaultRuntimeIdentifier = GetRuntimeIdentifier();
+
         var propertiesJson = await projectPropertyService.GetProjectPropertiesAsync(
             fullProjectPath,
             MsBuildPropertiesLiterals.PublishSingleFileArgument,
@@ -182,9 +185,11 @@ public sealed class ContainerCompositionService(
             .AppendArgument(DotNetSdkLiterals.PublishProfileArgument, DotNetSdkLiterals.ContainerPublishProfile)
             .AppendArgument(DotNetSdkLiterals.PublishSingleFileArgument, msbuildProperties.Properties.PublishSingleFile)
             .AppendArgument(DotNetSdkLiterals.PublishTrimmedArgument, msbuildProperties.Properties.PublishTrimmed)
-            .AppendArgument(DotNetSdkLiterals.SelfContainedArgument, DotNetSdkLiterals.DefaultSelfContained);
+            .AppendArgument(DotNetSdkLiterals.SelfContainedArgument, DotNetSdkLiterals.DefaultSelfContained)
+            .AppendArgument(DotNetSdkLiterals.VerbosityArgument, DotNetSdkLiterals.DefaultVerbosity)
+            .AppendArgument(DotNetSdkLiterals.NoLogoArgument, string.Empty, quoteValue: false);
 
-        argumentsBuilder.AppendArgument(DotNetSdkLiterals.RuntimeIdentifierArgument, string.IsNullOrEmpty(runtimeIdentifier) ? DotNetSdkLiterals.DefaultRuntimeIdentifier : runtimeIdentifier);
+        argumentsBuilder.AppendArgument(DotNetSdkLiterals.RuntimeIdentifierArgument, string.IsNullOrEmpty(runtimeIdentifier) ? defaultRuntimeIdentifier : runtimeIdentifier);
     }
 
     private static void AddContainerDetailsToArguments(ArgumentsBuilder argumentsBuilder,
@@ -266,5 +271,12 @@ public sealed class ContainerCompositionService(
         {
             ActionCausesExitException.ExitNow(result.ExitCode);
         }
+    }
+
+    private static string GetRuntimeIdentifier()
+    {
+        var architecture = RuntimeInformation.OSArchitecture;
+
+        return architecture == Architecture.Arm64 ? "linux-arm64" : "linux-x64";
     }
 }
