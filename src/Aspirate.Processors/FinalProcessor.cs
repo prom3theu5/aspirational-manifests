@@ -76,7 +76,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
     private void HandleDashboard(bool? withDashboard, string outputPath, string? templatePath, KubernetesDeploymentTemplateData templateDataBuilder, List<string> manifests)
     {
-        if (!withDashboard.GetValueOrDefault())
+        if (withDashboard == false)
         {
             return;
         }

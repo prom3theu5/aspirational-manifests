@@ -15,7 +15,7 @@ public class ContainerParametersTests
 
 
         // Act
-        var fullImageName = containerParameters.ToImageName();
+        var fullImageName = containerParameters.ToImageName(testParameters.Parameters.ImageName);
 
 
         // Assert

@@ -10,7 +10,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
     {
         Logger.WriteRuler("[purple]Handling Dockerfiles[/]");
 
-        if (NoSelectedDockerfileComponents())
+        if (!HasSelectedDockerfileComponents())
         {
             return true;
         }
@@ -67,14 +67,14 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         Logger.MarkupLine("[bold]Building and push completed for all selected dockerfile components.[/]");
     }
 
-    private bool NoSelectedDockerfileComponents()
+    private bool HasSelectedDockerfileComponents()
     {
-        if (CurrentState.SelectedDockerfileComponents.Count != 0)
+        if (CurrentState.SelectedDockerfileComponents.Count > 0)
         {
-            return false;
+            return true;
         }
 
         Logger.MarkupLine("[bold]No Dockerfile components selected. Skipping build and publish action.[/]");
-        return true;
+        return false;
     }
 }

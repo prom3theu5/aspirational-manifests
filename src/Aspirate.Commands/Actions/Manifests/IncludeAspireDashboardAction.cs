@@ -30,6 +30,7 @@ public class IncludeAspireDashboardAction(IServiceProvider serviceProvider) : Ba
         {
             Logger.MarkupLine("[yellow](!)[/] Skipping Aspire Dashboard deployment");
             CurrentState.IncludeDashboard = false;
+            return;
         }
 
         CurrentState.IncludeDashboard = true;

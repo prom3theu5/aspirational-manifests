@@ -22,8 +22,6 @@ public class DockerfileProcessor(
         $"{TemplateLiterals.ServiceType}.yml",
     ];
 
-    private readonly StringBuilder _tagBuilder = new();
-
     private readonly Dictionary<string, string> _containerImageCache = [];
 
     /// <inheritdoc />
@@ -41,8 +39,6 @@ public class DockerfileProcessor(
 
         var dockerFile = resource.Value as DockerfileResource;
 
-        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
-
         if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
         {
             throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
@@ -57,7 +53,7 @@ public class DockerfileProcessor(
             .SetAnnotations(dockerFile.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
-            .SetPorts(containerPorts)
+            .SetPorts(resource.MapBindingsToPorts())
             .SetManifests(_manifests)
             .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .Validate();
@@ -82,7 +78,7 @@ public class DockerfileProcessor(
 
     public void PopulateContainerImageCacheWithImage(KeyValuePair<string, Resource> resource, ContainerParameters parameters)
     {
-        _containerImageCache.Add(resource.Key, _tagBuilder.ToString());
+        _containerImageCache.Add(resource.Key, parameters.ToImageName(resource.Key));
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
     }
@@ -91,40 +87,17 @@ public class DockerfileProcessor(
     {
         var response = new ComposeService();
 
-        var dockerFile = resource.Value as DockerfileResource;
-
-        var containerPorts = dockerFile.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
-
         if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
         {
             throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
         }
 
-        var environment = new Dictionary<string, string?>();
-
-        if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
-        {
-            foreach (var entry in resourceWithEnv.Env.Where(entry => !string.IsNullOrEmpty(entry.Value)))
-            {
-                environment.Add(entry.Key, entry.Value);
-            }
-        }
-
-        if (withDashboard.GetValueOrDefault())
-        {
-            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:4317");
-        }
-
         response.Service = Builder.MakeService(resource.Key)
             .WithImage(containerImage.ToLowerInvariant())
-            .WithEnvironment(environment)
+            .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithPortMappings(containerPorts.Select(x=> new Port
-            {
-                Target = x.Port,
-                Published = x.Port,
-            }).ToArray())
+            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();
 
         return response;

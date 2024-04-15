@@ -47,7 +47,8 @@ public sealed class ResourceBindingsSubstitutionStrategy : IPlaceholderSubstitut
         var newValue = bindingProperty switch
         {
             "host" => resourceName,  // return the name of the resource for 'host'
-            "port" => binding.TargetPort.ToString(),
+            "port" => binding.Port.ToString(),
+            "targetPort" => binding.TargetPort.ToString(),
             "url" => HandleUrlBinding(resourceName, bindingName, binding),
             _ => throw new InvalidOperationException($"Unknown property {bindingProperty} in placeholder {placeholder}.")
         };

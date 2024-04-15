@@ -49,7 +49,7 @@ public sealed class ContainerCompositionService(
 
         var fullDockerfilePath = filesystem.GetFullPath(dockerfileResource.Path);
 
-        var fullImage = parameters.ToImageName();
+        var fullImage = parameters.ToImageName(dockerfileResource.Name);
 
         var result = await BuildContainer(dockerfileResource, parameters.ContainerBuilder, nonInteractive, fullImage, fullDockerfilePath);
 
