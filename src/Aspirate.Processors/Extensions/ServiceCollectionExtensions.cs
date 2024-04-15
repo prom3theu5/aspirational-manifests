@@ -16,9 +16,6 @@ public static class ServiceCollectionExtensions
             .RegisterProcessor<ContainerProcessor>(AspireComponentLiterals.Container)
             .RegisterProcessor<DaprProcessor>(AspireComponentLiterals.DaprSystem)
             .RegisterProcessor<DaprComponentProcessor>(AspireComponentLiterals.DaprComponent)
-            .RegisterProcessor<AzureStorageProcessor>(AspireComponentLiterals.AzureStorage)
-            .RegisterProcessor<AzureStorageBlobProcessor>(AspireComponentLiterals.AzureStorageBlob)
-            .RegisterProcessor<AzureKeyVaultProcessor>(AspireComponentLiterals.AzureKeyVault)
             .RegisterProcessor<ParameterProcessor>(AspireComponentLiterals.Parameter)
             .RegisterProcessor<ValueProcessor>(AspireComponentLiterals.Value)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);

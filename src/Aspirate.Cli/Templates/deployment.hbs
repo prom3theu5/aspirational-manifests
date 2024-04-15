@@ -39,7 +39,7 @@ spec:
         {{#if hasPorts}}
         ports:
         {{#each ports}}
-        - containerPort: {{port}}
+        - containerPort: {{internalPort}}
         {{/each}}
         {{/if}}
         envFrom:

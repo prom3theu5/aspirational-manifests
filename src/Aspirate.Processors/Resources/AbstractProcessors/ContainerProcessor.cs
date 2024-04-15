@@ -1,6 +1,3 @@
-using Aspirate.DockerCompose.Models;
-using Volume = Aspirate.Shared.Models.AspireManifests.Components.V0.Volume;
-
 namespace Aspirate.Processors.Resources.AbstractProcessors;
 
 /// <summary>
@@ -45,10 +42,6 @@ public class ContainerProcessor(
             $"{TemplateLiterals.ServiceType}.yml",
         };
 
-        KuberizeVolumeNames(container.Volumes);
-
-        var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
-
         var data = new KubernetesDeploymentTemplateData()
             .SetWithDashboard(withDashboard.GetValueOrDefault())
             .SetName(resource.Key)
@@ -56,10 +49,10 @@ public class ContainerProcessor(
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
             .SetAnnotations(container.Annotations)
-            .SetVolumes(container.Volumes)
+            .SetVolumes(container.Volumes.KuberizeVolumeNames())
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
-            .SetPorts(containerPorts)
+            .SetPorts(resource.MapBindingsToPorts())
             .SetArgs(container.Args)
             .SetManifests(manifests)
             .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
@@ -82,41 +75,13 @@ public class ContainerProcessor(
         return Task.FromResult(true);
     }
 
-    private static void KuberizeVolumeNames(List<Volume> containerVolumes)
-    {
-        if (containerVolumes.Count == 0)
-        {
-            return;
-        }
 
-        foreach (var volume in containerVolumes)
-        {
-            volume.Name = volume.Name.Replace("/", "-").Replace(".", "-").ToLowerInvariant();
-        }
-    }
 
     public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
     {
         var response = new ComposeService();
 
         var container = resource.Value as ContainerResource;
-
-        var containerPorts = container.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
-
-        var environment = new Dictionary<string, string?>();
-
-        if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
-        {
-            foreach (var entry in resourceWithEnv.Env.Where(entry => !string.IsNullOrEmpty(entry.Value)))
-            {
-                environment.Add(entry.Key, entry.Value);
-            }
-        }
-
-        if (withDashboard.GetValueOrDefault())
-        {
-            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:4317");
-        }
 
         var service = Builder.MakeService(resource.Key)
             .WithImage(container.Image.ToLowerInvariant());
@@ -126,29 +91,18 @@ public class ContainerProcessor(
             service.WithCommands(container.Args.ToArray());
         }
 
-        var composeVolumes = new List<string>();
-
-        if (container.Volumes.Count > 0)
-        {
-            KuberizeVolumeNames(container.Volumes);
-
-            composeVolumes.AddRange(container.Volumes.Where(x=>!string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
-        }
-
         response.Service = service
-            .WithEnvironment(environment)
+            .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithVolumes(composeVolumes.ToArray())
-            .WithPortMappings(containerPorts.Select(x=> new Port
-            {
-                Target = x.Port,
-                Published = x.Port,
-            }).ToArray())
+            .WithVolumes(resource.MapComposeVolumes())
+            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();
 
         return response;
     }
+
+
 }
 
 

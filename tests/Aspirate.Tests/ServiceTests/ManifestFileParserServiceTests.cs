@@ -1,3 +1,5 @@
+using Aspirate.Shared.Processors;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public class ManifestFileParserServiceTest
@@ -169,6 +171,29 @@ public class ManifestFileParserServiceTest
         var shopResource = results["basketcache"] as ContainerResource;
         shopResource.Volumes.Should().HaveCount(1);
         shopResource.Volumes[0].Name.Should().Be("basketcache-data");
+    }
+
+    [Fact]
+    public async Task EndToEndNodeJs_ParsesSuccessfully()
+    {
+        // Arrange
+        var fileSystem = new MockFileSystem();
+        var manifestFile = "nodejs.json";
+        var testData = Path.Combine(AppContext.BaseDirectory, "TestData", manifestFile);
+        fileSystem.AddFile(manifestFile, new(await File.ReadAllTextAsync(testData)));
+        var serviceProvider = CreateServiceProvider(fileSystem);
+
+        var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
+        var inputPopulator = serviceProvider.GetRequiredKeyedService<IAction>(nameof(PopulateInputsAction));
+        var valueSubstitutor = serviceProvider.GetRequiredKeyedService<IAction>(nameof(SubstituteValuesAspireManifestAction));
+        var cachePopulator = serviceProvider.GetRequiredKeyedService<IAction>(nameof(BuildAndPushContainersFromDockerfilesAction));
+        var state = serviceProvider.GetRequiredService<AspirateState>();
+
+        // Act
+        state.SkipBuild = true;
+        await PerformEndToEndTests(manifestFile, 1, serviceProvider, service, inputPopulator, valueSubstitutor);
+        state.AspireComponentsToProcess = state.LoadedAspireManifestResources.Select(x=>x.Key).ToList();
+        await cachePopulator.ExecuteAsync();
     }
 
     private static async Task<Dictionary<string, Resource>> PerformEndToEndTests(string manifestFile, int expectedCount, IServiceProvider serviceProvider, IManifestFileParserService service, IAction inputPopulator, IAction valueSubstitutor)

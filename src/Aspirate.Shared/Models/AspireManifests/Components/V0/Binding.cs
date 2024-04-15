@@ -27,6 +27,12 @@ public class Binding
     /// <summary>
     /// The Container Port for the binding.
     /// </summary>
+    [JsonPropertyName("port")]
+    public int? Port { get; set; }
+
+    /// <summary>
+    /// The Container Port for the binding.
+    /// </summary>
     [JsonPropertyName("targetPort")]
     public int? TargetPort { get; set; }
 

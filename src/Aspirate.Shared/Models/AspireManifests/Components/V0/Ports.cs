@@ -4,5 +4,7 @@ public class Ports
 {
     public required string Name { get; set; }
 
-    public int Port { get; set; }
+    public int InternalPort { get; set; }
+
+    public int ExternalPort { get; set; }
 }

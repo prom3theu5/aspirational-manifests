@@ -41,8 +41,6 @@ public sealed class ProjectProcessor(
 
         var project = resource.Value as ProjectResource;
 
-        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
-
         var data = new KubernetesDeploymentTemplateData()
             .SetWithDashboard(withDashboard.GetValueOrDefault())
             .SetName(resource.Key)
@@ -53,7 +51,7 @@ public sealed class ProjectProcessor(
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetIsProject(true)
-            .SetPorts(ports)
+            .SetPorts(resource.MapBindingsToPorts())
             .SetManifests(_manifests)
             .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .Validate();
@@ -106,35 +104,12 @@ public sealed class ProjectProcessor(
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
-        var environment = new Dictionary<string, string?>();
-
-        if (resource.Value is IResourceWithEnvironmentalVariables { Env: not null } resourceWithEnv)
-        {
-            foreach (var entry in resourceWithEnv.Env.Where(entry => !string.IsNullOrEmpty(entry.Value)))
-            {
-                environment.Add(entry.Key, entry.Value);
-            }
-        }
-
-        if (withDashboard.GetValueOrDefault())
-        {
-            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:4317");
-        }
-
-        var project = resource.Value as ProjectResource;
-
-        var ports = project.Bindings?.Select(b => new Ports { Name = b.Key, Port = b.Value.TargetPort.GetValueOrDefault() }).ToList() ?? [];
-
         response.Service = Builder.MakeService(resource.Key)
             .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
-            .WithEnvironment(environment)
+            .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithPortMappings(ports.Select(x => new Port
-            {
-                Target = x.Port,
-                Published = x.Port,
-            }).ToArray())
+            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();
 
         response.IsProject = true;

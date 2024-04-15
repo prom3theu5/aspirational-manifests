@@ -4,7 +4,7 @@ public static class DockerfileParametersExtensions
 {
     private static readonly StringBuilder _tagBuilder = new();
 
-    public static string ToImageName(this ContainerParameters parameters)
+    public static string ToImageName(this ContainerParameters parameters, string resourceKey)
     {
         _tagBuilder.Clear();
 
@@ -16,6 +16,11 @@ public static class DockerfileParametersExtensions
         if (!string.IsNullOrEmpty(parameters.Prefix))
         {
             _tagBuilder.Append($"{parameters.Prefix}/");
+        }
+
+        if (string.IsNullOrEmpty(parameters.ImageName))
+        {
+            parameters.ImageName = resourceKey;
         }
 
         _tagBuilder.Append(parameters.ImageName);

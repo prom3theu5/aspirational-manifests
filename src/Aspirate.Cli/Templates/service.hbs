@@ -11,6 +11,11 @@ spec:
   ports:
   {{#each ports}}
   - name: {{name}}
-    port: {{port}}
+  {{#if externalPort}}
+    port: {{externalPort}}
+  {{else}}
+    port: {{internalPort}}
+  {{/if}}
+    targetPort: {{internalPort}}
   {{/each}}
 {{/if}}
