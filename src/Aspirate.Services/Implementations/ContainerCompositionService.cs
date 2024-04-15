@@ -247,14 +247,13 @@ public sealed class ContainerCompositionService(
 
     private void ValidateBuilderOutput(ShellCommandResult builderCheckResult)
     {
-        if (!(builderCheckResult.Success && !string.IsNullOrWhiteSpace(builderCheckResult.Output) && builderCheckResult.Output.Contains("ServerErrors")))
+        if (builderCheckResult.Success)
         {
             return;
         }
 
-        var builderInfo = JsonDocument.Parse(builderCheckResult.Output);
-
-        if (!builderInfo.RootElement.TryGetProperty("ServerErrors", out var errorProperty))
+        var builderInfo = builderCheckResult.Output.TryParseJson();
+        if (builderInfo == null || !builderInfo.RootElement.TryGetProperty("ServerErrors", out var errorProperty))
         {
             return;
         }
