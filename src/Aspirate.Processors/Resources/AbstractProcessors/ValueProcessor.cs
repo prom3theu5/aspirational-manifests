@@ -1,9 +1,8 @@
 namespace Aspirate.Processors.Resources.AbstractProcessors;
 
 public class ValueProcessor(IFileSystem fileSystem, IAnsiConsole console,
-    IManifestWriter manifestWriter,
-    IEnumerable<IPlaceholderSubstitutionStrategy>? substitutionStrategies)
-    : BaseResourceProcessor(fileSystem, console, manifestWriter, substitutionStrategies)
+    IManifestWriter manifestWriter)
+    : BaseResourceProcessor(fileSystem, console, manifestWriter)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireComponentLiterals.Value;

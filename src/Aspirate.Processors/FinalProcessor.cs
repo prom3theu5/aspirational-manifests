@@ -4,9 +4,8 @@ namespace Aspirate.Processors;
 /// A project component for version 0 of Aspire.
 /// </summary>
 public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
-    IManifestWriter manifestWriter,
-    IEnumerable<IPlaceholderSubstitutionStrategy>? substitutionStrategies)
-    : BaseResourceProcessor(fileSystem, console, manifestWriter, substitutionStrategies)
+    IManifestWriter manifestWriter)
+    : BaseResourceProcessor(fileSystem, console, manifestWriter)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireLiterals.Final;

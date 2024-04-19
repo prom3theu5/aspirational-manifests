@@ -117,6 +117,7 @@ public class ManifestFileParserServiceTest
     [InlineData("sqlserver-endtoend.json", 4)]
     [InlineData("starter-with-redis.json", 3)]
     [InlineData("project-no-binding.json", 1)]
+    [InlineData("connectionstring-resource-expression.json", 5)]
     public async Task EndToEnd_ParsesSuccessfully(string manifestFile, int expectedCount)
     {
         // Arrange

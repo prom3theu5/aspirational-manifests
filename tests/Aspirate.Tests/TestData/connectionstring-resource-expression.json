@@ -1,0 +1,69 @@
+{
+  "resources": {
+    "sql-svr": {
+      "type": "container.v0",
+      "connectionString": "Server={sql-svr.bindings.tcp.host},{sql-svr.bindings.tcp.port};User ID=sa;Password={sql-svr-password.value};TrustServerCertificate=true",
+      "image": "mcr.microsoft.com/mssql/server:2022-latest",
+      "env": {
+        "ACCEPT_EULA": "Y",
+        "MSSQL_SA_PASSWORD": "{sql-svr-password.value}"
+      },
+      "bindings": {
+        "tcp": {
+          "scheme": "tcp",
+          "protocol": "tcp",
+          "transport": "tcp",
+          "targetPort": 1433
+        }
+      }
+    },
+    "db": {
+      "type": "value.v0",
+      "connectionString": "{sql-svr.connectionString};Database=db"
+    },
+    "db-ConnectionString": {
+      "type": "value.v0",
+      "connectionString": "{db.connectionString};MultipleActiveResultSets=true"
+    },
+    "webapplication1": {
+      "type": "project.v0",
+      "path": "../AspireSample.ApiService/AspireSample.ApiService.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "ConnectionStrings__db": "{db-ConnectionString.connectionString}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http"
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http"
+        }
+      }
+    },
+    "sql-svr-password": {
+      "type": "parameter.v0",
+      "value": "{sql-svr-password.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string",
+          "secret": true,
+          "default": {
+            "generate": {
+              "minLength": 22,
+              "minLower": 1,
+              "minUpper": 1,
+              "minNumeric": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

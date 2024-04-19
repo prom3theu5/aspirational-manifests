@@ -24,30 +24,23 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     protected readonly IManifestWriter _manifestWriter;
 
     /// <summary>
-    /// The list of placeholder substitution strategies used for string formatting.
-    /// </summary>
-    protected readonly List<IPlaceholderSubstitutionStrategy> _substitutionStrategies;
-
-    /// <summary>
     /// Represents the base processor class for handling template data.
     /// </summary>
     protected BaseResourceProcessor(
         IFileSystem fileSystem,
         IAnsiConsole console,
-        IManifestWriter manifestWriter,
-        IEnumerable<IPlaceholderSubstitutionStrategy>? substitutionStrategies)
+        IManifestWriter manifestWriter)
     {
         _fileSystem = fileSystem;
         _console = console;
         _manifestWriter = manifestWriter;
-        _substitutionStrategies = substitutionStrategies?.ToList() ?? [];
     }
 
     /// <inheritdoc />
     public abstract string ResourceType { get; }
 
     /// <summary>
-    /// Deserializes JSON data from the provided <see cref="Utf8JsonReader"/> into a <see cref="Shared.Models.AspireManifests.Resource"/> object.
+    /// Deserializes JSON data from the provided <see cref="Utf8JsonReader"/> into an <see cref="Shared.Models.AspireManifests.Resource"/> object.
     /// </summary>
     /// <param name="reader">The <see cref="Utf8JsonReader"/> containing the JSON data.</param>
     /// <returns>The deserialized <see cref="Shared.Models.AspireManifests.Resource"/> object, or null if the deserialization fails.</returns>
@@ -140,99 +133,6 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// <param name="outputPath">The path of the output file or directory.</param>
     protected void LogCompletion(string outputPath) =>
         LogCompletionMessage(_fileSystem.GetFullPath(outputPath));
-
-    protected virtual void PreSubstitutePlaceholders(Resource resource, Dictionary<string, Resource> resources)
-    {
-    }
-
-    public virtual void ReplacePlaceholders(Resource resource, Dictionary<string, Resource> resources)
-    {
-        PreSubstitutePlaceholders(resource, resources);
-        HandleConnectionStrings(resource, resources);
-        HandleEnvironmentalVariables(resource, resources);
-        HandleValueResourcePlaceholders(resource, resources);
-    }
-
-    private void HandleEnvironmentalVariables(Resource resource, Dictionary<string, Resource> resources)
-    {
-        if (resource is not IResourceWithEnvironmentalVariables resourceWithEnv)
-        {
-            return;
-        }
-
-        if (resourceWithEnv.Env is null)
-        {
-            return;
-        }
-
-        _substitutionStrategies.ForEach(strategy => strategy.Reset());
-
-        foreach (var entry in resourceWithEnv.Env)
-        {
-            if (!entry.Value.StartsWith('{') || !entry.Value.EndsWith('}'))
-            {
-                continue;
-            }
-
-            var strategies = _substitutionStrategies.Where(s => s.CanSubstitute(entry));
-
-            foreach (var strategy in strategies)
-            {
-                strategy.Substitute(entry, resources, resource);
-            }
-        }
-    }
-
-    private void HandleConnectionStrings(Resource resource, Dictionary<string, Resource> resources)
-    {
-        if (resource is not IResourceWithConnectionString resourceWithConnectionString)
-        {
-            return;
-        }
-
-        if (string.IsNullOrEmpty(resourceWithConnectionString.ConnectionString))
-        {
-            return;
-        }
-
-        if (!resourceWithConnectionString.ConnectionString.Contains('{') || !resourceWithConnectionString.ConnectionString.Contains('}'))
-        {
-            return;
-        }
-
-        _substitutionStrategies.ForEach(strategy => strategy.Reset());
-
-        var placeholder = new KeyValuePair<string, string>(ResourceConnectionStringSubstitutionStrategy.ConnectionStringPlaceholder, resourceWithConnectionString.ConnectionString);
-        var strategy = _substitutionStrategies.FirstOrDefault(s => s is ResourceConnectionStringSubstitutionStrategy strategy && strategy.CanSubstitute(placeholder));
-        strategy?.Substitute(placeholder, resources, resource);
-    }
-
-    private void HandleValueResourcePlaceholders(Resource resource, Dictionary<string, Resource> resources)
-    {
-        if (resource is not ValueResource valueResource)
-        {
-            return;
-        }
-
-        _substitutionStrategies.ForEach(strategy => strategy.Reset());
-        var strategy = _substitutionStrategies.FirstOrDefault(s => s is ResourceValueSubstitutionStrategy);
-
-        if (strategy is null)
-        {
-            return;
-        }
-
-        foreach (var entry in valueResource.Values)
-        {
-            if (!entry.Value.ToString().Contains('{') || !entry.Value.ToString().Contains('}'))
-            {
-                continue;
-            }
-
-            var placeholder = new KeyValuePair<string, string>(entry.Key, entry.Value.ToString());
-            strategy.Substitute(placeholder, resources, resource);
-        }
-    }
 
     private void LogCreateManifestNotOverridden(string processor) =>
         _console.MarkupLine($"[bold yellow]Processor {processor} has not been configured. CreateManifest must be overridden.[/]");

@@ -5,7 +5,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSecretProtectionStrategies(this IServiceCollection services) =>
         services
             .AddSingleton<ISecretProtectionStrategy, ConnectionStringProtector>()
-            .AddSingleton<ISecretProtectionStrategy, PostgresPasswordProtector>();
+            .AddSingleton<ISecretProtectionStrategy, PostgresPasswordProtector>()
+            .AddSingleton<ISecretProtectionStrategy, MsSqlPasswordProtector>();
 
     public static IServiceCollection RegisterAspirateSecretProvider(this IServiceCollection services, ProviderType providerType) =>
         providerType switch

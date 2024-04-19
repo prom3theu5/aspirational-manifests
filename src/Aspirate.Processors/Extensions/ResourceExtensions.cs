@@ -73,4 +73,25 @@ public static class ResourceExtensions
             Target = x.InternalPort,
             Published = x.ExternalPort != 0 ? x.ExternalPort : x.InternalPort,
         }).ToArray();
+
+    public static void EnsureBindingsHavePorts(this Dictionary<string, Resource> resources)
+    {
+        foreach (var resource in resources.Where(x=>x.Value is IResourceWithBinding {Bindings: not null}))
+        {
+            var bindingResource = resource.Value as IResourceWithBinding;
+
+            foreach (var binding in bindingResource.Bindings)
+            {
+                if (binding.Key.Equals("http", StringComparison.OrdinalIgnoreCase) && binding.Value.TargetPort is 0 or null)
+                {
+                    binding.Value.TargetPort = 8080;
+                }
+
+                if (binding.Key.Equals("https", StringComparison.OrdinalIgnoreCase) && binding.Value.TargetPort is 0 or null)
+                {
+                    binding.Value.TargetPort = 8443;
+                }
+            }
+        }
+    }
 }
