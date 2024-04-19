@@ -12,4 +12,8 @@
       <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="JsonPath.Net" />
+    </ItemGroup>
+
 </Project>

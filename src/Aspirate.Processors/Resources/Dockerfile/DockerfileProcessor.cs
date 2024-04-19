@@ -9,9 +9,8 @@ public class DockerfileProcessor(
     ISecretProvider secretProvider,
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService,
-    IManifestWriter manifestWriter,
-    IEnumerable<IPlaceholderSubstitutionStrategy>? substitutionStrategies)
-    : BaseResourceProcessor(fileSystem, console, manifestWriter, substitutionStrategies)
+    IManifestWriter manifestWriter)
+    : BaseResourceProcessor(fileSystem, console, manifestWriter)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireComponentLiterals.Dockerfile;

@@ -9,9 +9,8 @@ public sealed class ProjectProcessor(
     ISecretProvider secretProvider,
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService,
-    IManifestWriter manifestWriter,
-    IEnumerable<IPlaceholderSubstitutionStrategy>? substitutionStrategies)
-    : BaseResourceProcessor(fileSystem, console, manifestWriter, substitutionStrategies)
+    IManifestWriter manifestWriter)
+    : BaseResourceProcessor(fileSystem, console, manifestWriter)
 {
     /// <inheritdoc />
     public override string ResourceType => AspireComponentLiterals.Project;
@@ -115,29 +114,6 @@ public sealed class ProjectProcessor(
         response.IsProject = true;
 
         return response;
-    }
-
-    protected override void PreSubstitutePlaceholders(Resource resource, Dictionary<string, Resource> resources)
-    {
-        if (resource is not IResourceWithBinding resourceWithBinding)
-        {
-            return;
-        }
-
-        if (resourceWithBinding.Bindings is null)
-        {
-            return;
-        }
-
-        if (resourceWithBinding.Bindings.TryGetValue("http", out var httpBinding) && httpBinding.TargetPort is 0 or null)
-        {
-            httpBinding.TargetPort = 8080;
-        }
-
-        if (resourceWithBinding.Bindings.TryGetValue("https", out var httpsBinding) && httpsBinding.TargetPort is 0 or null)
-        {
-            httpsBinding.TargetPort = 8443;
-        }
     }
 }
 

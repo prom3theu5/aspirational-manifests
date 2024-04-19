@@ -14,8 +14,6 @@ public interface IResourceProcessor
     /// <returns>A Resource instance.</returns>
     Resource? Deserialize(ref Utf8JsonReader reader);
 
-    void ReplacePlaceholders(Resource resource, Dictionary<string, Resource> resources);
-
     /// <summary>
     /// Produces the output manifest file.
     /// </summary>

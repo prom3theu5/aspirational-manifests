@@ -18,4 +18,10 @@ public static class StringExtensions
         var base64EncodedBytes = Convert.FromBase64String(value);
         return Encoding.UTF8.GetString(base64EncodedBytes);
     }
+
+    public static string AsJsonPath(this IEnumerable<string> pathParts)
+    {
+        var formattedParts = pathParts.Select(part => $"['{part}']");
+        return "$" + string.Join("", formattedParts);
+    }
 }

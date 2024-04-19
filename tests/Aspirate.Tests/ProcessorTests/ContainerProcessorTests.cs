@@ -6,22 +6,12 @@ public class ContainerProcessorTests
     public void ReplacePlaceholders_ReplacesPlaceholdersInConnectionString()
     {
         // Arrange
-        var fileSystem = new FileSystem();
-        var console = new TestConsole();
-        var containerCompositionService = Substitute.For<IContainerCompositionService>();
-        var containerDetailsService = Substitute.For<IContainerDetailsService>();
-        var secretProvider = Substitute.For<ISecretProvider>();
-        var manifestWriter = Substitute.For<IManifestWriter>();
-        var strategies =
-            new List<IPlaceholderSubstitutionStrategy> { new ResourceConnectionStringSubstitutionStrategy() };
-        var containerProcessor = new ContainerProcessor(fileSystem, console, secretProvider, containerCompositionService,
-            containerDetailsService, manifestWriter, strategies);
+        var transformer = ResourceExpressionProcessor.CreateDefaultExpressionProcessor();
 
         var resource = new ContainerResource
         {
             Type = AspireComponentLiterals.Container,
-            ConnectionString =
-                "Host={postgrescontainer.bindings.tcp.host};Port={postgrescontainer.bindings.tcp.port};Username=postgres;Password={postgres-password.value}",
+            ConnectionString = "Host={postgrescontainer.bindings.tcp.host};Port={postgrescontainer.bindings.tcp.targetPort};Username=postgres;Password={postgres-password.value}",
             Bindings = new()
             {
                 {
@@ -43,7 +33,7 @@ public class ContainerProcessorTests
         };
 
         // Act
-        containerProcessor.ReplacePlaceholders(resource, resources);
+        transformer.ProcessEvaluations(resources);
 
         // Assert
         resource.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password");

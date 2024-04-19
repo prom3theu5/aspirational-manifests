@@ -3,9 +3,8 @@ namespace Aspirate.Processors.Resources.Dapr;
 public class DaprProcessor(
     IFileSystem fileSystem,
     IAnsiConsole console,
-    IManifestWriter manifestWriter,
-    IEnumerable<IPlaceholderSubstitutionStrategy>? substitutionStrategies)
-    : BaseResourceProcessor(fileSystem, console, manifestWriter, substitutionStrategies)
+    IManifestWriter manifestWriter)
+    : BaseResourceProcessor(fileSystem, console, manifestWriter)
 {
     public override string ResourceType => AspireComponentLiterals.DaprSystem;
 

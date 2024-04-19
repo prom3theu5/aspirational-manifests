@@ -252,7 +252,7 @@ public sealed class ContainerCompositionService(
             return;
         }
 
-        var builderInfo = builderCheckResult.Output.TryParseJson();
+        var builderInfo = builderCheckResult.Output.TryParseAsJsonDocument();
         if (builderInfo == null || !builderInfo.RootElement.TryGetProperty("ServerErrors", out var errorProperty))
         {
             return;

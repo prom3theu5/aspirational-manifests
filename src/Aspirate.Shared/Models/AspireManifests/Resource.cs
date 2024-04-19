@@ -4,6 +4,13 @@ namespace Aspirate.Shared.Models.AspireManifests;
 /// A resource in a manifest.
 /// </summary>
 [ExcludeFromCodeCoverage]
+[JsonPolymorphic]
+[JsonDerivedType(typeof(ProjectResource))]
+[JsonDerivedType(typeof(DockerfileResource))]
+[JsonDerivedType(typeof(ContainerResource))]
+[JsonDerivedType(typeof(DaprResource))]
+[JsonDerivedType(typeof(ParameterResource))]
+[JsonDerivedType(typeof(ValueResource))]
 public abstract class Resource : IResource
 {
     [JsonPropertyName("name")]

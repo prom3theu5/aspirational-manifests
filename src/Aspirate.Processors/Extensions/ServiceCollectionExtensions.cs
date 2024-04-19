@@ -1,3 +1,5 @@
+using Aspirate.Processors.Transformation;
+
 namespace Aspirate.Processors.Extensions;
 
 /// <summary>
@@ -20,16 +22,12 @@ public static class ServiceCollectionExtensions
             .RegisterProcessor<ValueProcessor>(AspireComponentLiterals.Value)
             .RegisterProcessor<FinalProcessor>(AspireLiterals.Final);
 
-    /// <summary>
-    /// Adds the necessary Aspirate processor Value Substitutors to the service collection.
-    /// </summary>
-    /// <param name="services">The service collection to add the processors to.</param>
-    public static IServiceCollection AddAspiratePlaceholderSubstitutionStrategies(this IServiceCollection services) =>
+    public static IServiceCollection AddPlaceholderTransformation(this IServiceCollection services) =>
         services
-            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceBindingsSubstitutionStrategy>()
-            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceConnectionStringSubstitutionStrategy>()
-            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceParameterSubstitutionStrategy>()
-            .AddSingleton<IPlaceholderSubstitutionStrategy, ResourceValueSubstitutionStrategy>();
+            .AddSingleton<IResourceExpressionProcessor, ResourceExpressionProcessor>()
+            .AddSingleton<IJsonExpressionProcessor, JsonExpressionProcessor>()
+            .AddSingleton<IBindingProcessor, BindingProcessor>();
+
 
     /// <summary>
     /// Registers a processor implementation with a specified key in the service collection.
