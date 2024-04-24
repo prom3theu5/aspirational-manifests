@@ -17,6 +17,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
 
     public bool SkipBuild { get; set; }
     public bool SkipFinalKustomizeGeneration { get; set; }
+    public bool SkipHelmGeneration { get; set; }
     public string? ContainerBuilder { get; set; }
     public string? ContainerRegistry { get; set; }
 

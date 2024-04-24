@@ -54,5 +54,6 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(SaveSecretsAction))
             .QueueAction(nameof(GenerateKustomizeManifestsAction))
             .QueueAction(nameof(GenerateFinalKustomizeManifestAction))
+            .QueueAction(nameof(GenerateHelmChartAction))
             .ExecuteCommandsAsync();
 }

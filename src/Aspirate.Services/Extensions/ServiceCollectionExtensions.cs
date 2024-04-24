@@ -18,7 +18,8 @@ public static class ServiceCollectionExtensions
             .AddAspirateConfigurationSupport()
             .AddContainerSupport()
             .AddKubeCtlSupport()
-            .AddDaprCliSupport();
+            .AddDaprCliSupport()
+            .AddHelmSupport();
 
     /// <summary>
     /// Adds the password generator implementation to the service collection.
@@ -39,6 +40,11 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IAspireManifestCompositionService, AspireManifestCompositionService>()
             .AddSingleton<IManifestFileParserService, ManifestFileParserService>()
             .AddSingleton<IManifestWriter, ManifestWriter>();
+
+    private static IServiceCollection AddHelmSupport(this IServiceCollection services) =>
+        services
+            .AddSingleton<IKustomizeService, KustomizeService>()
+            .AddSingleton<IHelmChartCreator, HelmChartCreator>();
 
     /// <summary>
     /// Adds the AspirateConfigurationSupport to the specified service collection.
