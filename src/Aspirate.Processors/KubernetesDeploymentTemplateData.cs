@@ -16,6 +16,7 @@ public class KubernetesDeploymentTemplateData
     public bool? WithPrivateRegistry { get; private set; } = false;
     public bool? WithDashboard { get; private set; } = false;
     public string? ContainerImage {get; private set;}
+    public string? Entrypoint {get; private set;}
     public string? ImagePullPolicy {get; private set;}
     public List<Ports>? Ports {get; private set;}
     public string? ServiceType { get; private set; } = "ClusterIP";
@@ -74,6 +75,12 @@ public class KubernetesDeploymentTemplateData
         return this;
     }
 
+    public KubernetesDeploymentTemplateData SetEntrypoint(string? entrypoint)
+    {
+        Entrypoint = entrypoint;
+        return this;
+    }
+    
     public KubernetesDeploymentTemplateData SetVolumes(List<Volume>? volumes)
     {
         Volumes = volumes ?? [];
