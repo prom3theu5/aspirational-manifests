@@ -97,6 +97,11 @@ public sealed class ContainerCompositionService(
             AddDockerBuildArgs(buildArgumentBuilder, dockerfileResource.Env);
         }
 
+        if (dockerfileResource.BuildArgs is not null)
+        {
+            AddDockerBuildArgs(buildArgumentBuilder, dockerfileResource.BuildArgs);
+        }
+
         buildArgumentBuilder
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
             .AppendArgument(dockerfileResource.Context, string.Empty, quoteValue: false);

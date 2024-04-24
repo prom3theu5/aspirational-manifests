@@ -4,7 +4,7 @@ namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
 /// A project within an aspire manifest.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ProjectResource : Resource, IResourceWithBinding, IResourceWithAnnotations, IResourceWithEnvironmentalVariables
+public class ProjectResource : Resource, IResourceWithBinding, IResourceWithAnnotations, IResourceWithEnvironmentalVariables, IResourceWithArgs
 {
     /// <summary>
     /// The path to the project.
@@ -23,4 +23,7 @@ public class ProjectResource : Resource, IResourceWithBinding, IResourceWithAnno
 
     [JsonPropertyName("env")]
     public Dictionary<string, string>? Env { get; set; } = [];
+
+    [JsonPropertyName("args")]
+    public List<string>? Args { get; set; } = [];
 }

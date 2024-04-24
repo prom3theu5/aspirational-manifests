@@ -47,6 +47,7 @@ public sealed class ProjectProcessor(
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
             .SetAnnotations(project.Annotations)
+            .SetArgs(project.Args)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetIsProject(true)

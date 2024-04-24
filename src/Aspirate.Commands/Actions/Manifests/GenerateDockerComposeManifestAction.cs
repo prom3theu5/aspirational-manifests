@@ -116,7 +116,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         };
 
         var aspireDashboard = Builder.MakeService("aspire-dashboard")
-            .WithImage("mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.5")
+            .WithImage("mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.6")
             .WithEnvironment(environment)
             .WithContainerName("aspire-dashboard")
             .WithRestartPolicy(RestartMode.UnlessStopped)

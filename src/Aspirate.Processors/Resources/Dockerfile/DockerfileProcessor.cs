@@ -48,6 +48,7 @@ public class DockerfileProcessor(
             .SetName(resource.Key)
             .SetContainerImage(containerImage)
             .SetImagePullPolicy(imagePullPolicy)
+            .SetArgs(dockerFile.Args)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
             .SetAnnotations(dockerFile.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
