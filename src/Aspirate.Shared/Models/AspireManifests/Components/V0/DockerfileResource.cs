@@ -4,7 +4,7 @@ namespace Aspirate.Shared.Models.AspireManifests.Components.V0;
 /// A Dockerfile within an aspire manifest.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DockerfileResource : Resource, IResourceWithBinding, IResourceWithAnnotations, IResourceWithEnvironmentalVariables
+public class DockerfileResource : Resource, IResourceWithBinding, IResourceWithAnnotations, IResourceWithEnvironmentalVariables, IResourceWithArgs
 {
     /// <summary>
     /// The path to the dockerfile.
@@ -32,4 +32,7 @@ public class DockerfileResource : Resource, IResourceWithBinding, IResourceWithA
 
     [JsonPropertyName("buildArgs")]
     public Dictionary<string, string>? BuildArgs { get; set; }
+
+    [JsonPropertyName("args")]
+    public List<string>? Args { get; set; } = [];
 }
