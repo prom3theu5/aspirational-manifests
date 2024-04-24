@@ -5,6 +5,7 @@ public sealed class ApplyManifestsToClusterAction(
     ISecretProvider secretProvider,
     IFileSystem fileSystem,
     IDaprCliService daprCliService,
+    IKustomizeService kustomizeService,
     IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public override async Task<bool> ExecuteAsync()
@@ -19,7 +20,7 @@ public sealed class ApplyManifestsToClusterAction(
 
             await HandleDapr();
 
-            await WriteSecretsOutToTempFiles(secretFiles);
+            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState.DisableSecrets, CurrentState.InputPath, secretFiles, secretProvider);
             await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
             await HandleRollingRestart();
             Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
@@ -34,7 +35,7 @@ public sealed class ApplyManifestsToClusterAction(
         }
         finally
         {
-            CleanupSecretEnvFiles(secretFiles);
+            kustomizeService.CleanupSecretEnvFiles(CurrentState.DisableSecrets, secretFiles);
         }
     }
 
@@ -112,47 +113,6 @@ public sealed class ApplyManifestsToClusterAction(
         }
     }
 
-    private async Task WriteSecretsOutToTempFiles(List<string> files)
-    {
-        if (CurrentState.DisableSecrets)
-        {
-            return;
-        }
-
-        if (!secretProvider.SecretStateExists(CurrentState.InputPath))
-        {
-            return;
-        }
-
-        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
-        {
-            if (passwordSecretProvider.State?.Secrets is null || passwordSecretProvider.State.Secrets.Count == 0)
-            {
-                return;
-            }
-
-            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Decrypting secrets from [blue]{CurrentState.InputPath}[/]");
-
-            foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
-            {
-                var secretFile = fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
-
-                files.Add(secretFile);
-
-                await using var streamWriter = fileSystem.File.CreateText(secretFile);
-
-                foreach (var key in resourceSecrets.Value.Keys)
-                {
-                    var secretValue = secretProvider.GetSecret(resourceSecrets.Key, key);
-                    await streamWriter.WriteLineAsync($"{key}={secretValue}");
-                }
-
-                await streamWriter.FlushAsync();
-                streamWriter.Close();
-            }
-        }
-    }
-
     private async Task HandleRollingRestart()
     {
         if (!CurrentState.RollingRestart)
@@ -166,19 +126,6 @@ public sealed class ApplyManifestsToClusterAction(
         {
             Logger.MarkupLine("[red](!)[/] Selected deployment options have failed.");
             ActionCausesExitException.ExitNow();
-        }
-    }
-
-    private void CleanupSecretEnvFiles(IEnumerable<string> secretFiles)
-    {
-        if (CurrentState.DisableSecrets)
-        {
-            return;
-        }
-
-        foreach (var secretFile in secretFiles.Where(secretFile => fileSystem.File.Exists(secretFile)))
-        {
-            fileSystem.File.Delete(secretFile);
         }
     }
 }

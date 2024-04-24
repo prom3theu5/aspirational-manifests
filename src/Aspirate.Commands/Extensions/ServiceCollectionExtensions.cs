@@ -42,7 +42,8 @@ public static class ServiceCollectionExtensions
             .RegisterAction<SaveSecretsAction>()
             .RegisterAction<LoadSecretsAction>()
             .RegisterAction<AskPrivateRegistryCredentialsAction>()
-            .RegisterAction<IncludeAspireDashboardAction>();
+            .RegisterAction<IncludeAspireDashboardAction>()
+            .RegisterAction<GenerateHelmChartAction>();
 
     /// <summary>
     /// Registers an implementation of <see cref="IAction"/> with the specified <typeparamref name="TImplementation"/> type.

@@ -71,6 +71,9 @@ public class AspirateState :
     [JsonPropertyName("skipFinalKustomizeGeneration")]
     public bool SkipFinalKustomizeGeneration { get; set; }
 
+    [JsonPropertyName("skipHelmGeneration")]
+    public bool SkipHelmGeneration { get; set; }
+
     [JsonPropertyName("privateRegistryUrl")]
     public string? PrivateRegistryUrl { get; set; }
     [JsonPropertyName("privateRegistryUsername")]
