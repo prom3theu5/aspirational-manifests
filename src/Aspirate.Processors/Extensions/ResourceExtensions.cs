@@ -25,7 +25,7 @@ public static class ResourceExtensions
         return environment;
     }
 
-    public static List<Volume> KuberizeVolumeNames(this List<Volume> containerVolumes)
+    public static List<Volume> KuberizeVolumeNames(this List<Volume> containerVolumes,  KeyValuePair<string, Resource> resource)
     {
         if (containerVolumes.Count == 0)
         {
@@ -34,7 +34,12 @@ public static class ResourceExtensions
 
         foreach (var volume in containerVolumes)
         {
-            volume.Name = volume.Name.Replace("/", "-").Replace(".", "-").ToLowerInvariant();
+            if (string.IsNullOrEmpty(volume.Name))
+            {
+                volume.Name = $"{resource.Key}-{volume.Target}".ToLowerInvariant();
+            }
+
+            volume.Name = volume.Name.Replace("/", "-").Replace(".", "-").Replace("--", "-").ToLowerInvariant();
         }
 
         return containerVolumes;
@@ -50,7 +55,7 @@ public static class ResourceExtensions
         }
 
 
-        KuberizeVolumeNames(resourceWithVolumes.Volumes);
+        KuberizeVolumeNames(resourceWithVolumes.Volumes, resource);
 
         composeVolumes.AddRange(resourceWithVolumes.Volumes.Where(x=>!string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
 

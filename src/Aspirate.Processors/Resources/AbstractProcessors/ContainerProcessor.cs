@@ -48,7 +48,7 @@ public class ContainerProcessor(
             .SetImagePullPolicy(imagePullPolicy)
             .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
             .SetAnnotations(container.Annotations)
-            .SetVolumes(container.Volumes.KuberizeVolumeNames())
+            .SetVolumes(container.Volumes.KuberizeVolumeNames(resource))
             .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(resource.MapBindingsToPorts())
