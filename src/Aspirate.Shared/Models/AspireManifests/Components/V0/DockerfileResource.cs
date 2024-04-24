@@ -29,4 +29,7 @@ public class DockerfileResource : Resource, IResourceWithBinding, IResourceWithA
 
     [JsonPropertyName("env")]
     public Dictionary<string, string>? Env { get; set; }
+
+    [JsonPropertyName("buildArgs")]
+    public Dictionary<string, string>? BuildArgs { get; set; }
 }
