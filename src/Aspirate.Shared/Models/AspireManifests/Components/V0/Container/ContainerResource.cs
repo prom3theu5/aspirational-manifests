@@ -28,4 +28,7 @@ public class ContainerResource : Resource,
 
     [JsonPropertyName("volumes")]
     public List<Volume>? Volumes { get; set; } = [];
+
+    [JsonPropertyName("entrypoint")]
+    public string? Entrypoint { get; set; }
 }

@@ -53,6 +53,7 @@ public class ContainerProcessor(
             .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
             .SetPorts(resource.MapBindingsToPorts())
             .SetArgs(container.Args)
+            .SetEntrypoint(container.Entrypoint)
             .SetManifests(manifests)
             .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
             .Validate();
@@ -90,18 +91,22 @@ public class ContainerProcessor(
             service.WithCommands(container.Args.ToArray());
         }
 
-        response.Service = service
+        var newService = service
             .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
-            .WithContainerName(resource.Key)
-            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithContainerName(resource.Key);
+
+        if (!string.IsNullOrEmpty(container.Entrypoint))
+        {
+            newService = newService.WithCommands(container.Entrypoint);
+        }
+
+        response.Service = newService.WithRestartPolicy(RestartMode.UnlessStopped)
             .WithVolumes(resource.MapComposeVolumes())
             .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();
 
         return response;
     }
-
-
 }
 
 
