@@ -37,9 +37,10 @@ public class ApplyDaprAnnotationsAction(IServiceProvider serviceProvider, IAnsiC
 
         service.Annotations ??= [];
 
-        service.Annotations.Add("dapr.io/enabled", "true");
+        service.Annotations.Add("dapr.io/enabled", "'true'");
         service.Annotations.Add("dapr.io/config", "tracing");
         service.Annotations.Add("dapr.io/app-id", resource.Metadata.AppId);
+        service.Annotations.Add("dapr.io/enable-api-logging", "'true'");
 
         HandleContainerPort(serviceForSidecar);
     }

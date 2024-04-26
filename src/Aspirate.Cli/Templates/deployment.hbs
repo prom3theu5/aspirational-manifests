@@ -3,6 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{name}}
+  labels:
+    app: {{name}}
 {{#if hasAnyAnnotations}}
   annotations:
   {{#each annotations}}
@@ -21,6 +23,12 @@ spec:
     metadata:
       labels:
         app: {{name}}
+{{#if hasAnyAnnotations}}
+      annotations:
+      {{#each annotations}}
+        {{@key}}: {{this}}
+      {{/each}}
+{{/if}}
     spec:
     {{#if withPrivateRegistry}}
       imagePullSecrets:

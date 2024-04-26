@@ -3,10 +3,12 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{name}}
+  labels:
+    app: {{name}}
   {{#if hasAnyAnnotations}}
-    annotations:
-      {{#each annotations}}
-        {{@key}}: {{this}}
+  annotations:
+    {{#each annotations}}
+      {{@key}}: {{this}}
   {{/each}}
   {{/if}}
 spec:
@@ -19,6 +21,12 @@ spec:
     metadata:
       labels:
         app: {{name}}
+{{#if hasAnyAnnotations}}
+      annotations:
+      {{#each annotations}}
+        {{@key}}: {{this}}
+      {{/each}}
+{{/if}}
     spec:
     {{#if withPrivateRegistry}}
       imagePullSecrets:
