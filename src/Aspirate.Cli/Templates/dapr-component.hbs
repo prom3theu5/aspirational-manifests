@@ -2,6 +2,8 @@ apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
   name: {{name}}
+  labels:
+    app: {{name}}
 spec:
   type: {{type}}
   version: {{version}}

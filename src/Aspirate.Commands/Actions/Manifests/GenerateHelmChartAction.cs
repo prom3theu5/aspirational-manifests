@@ -59,7 +59,7 @@ public sealed class GenerateHelmChartAction(
         if (!shouldGenerateHelmChart)
         {
             Logger.MarkupLine("[blue]Skipping helm chart generation as requested.[/]");
-            return true;
+            return false;
         }
 
         return true;
