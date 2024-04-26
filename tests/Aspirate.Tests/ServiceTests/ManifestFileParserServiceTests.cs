@@ -118,6 +118,7 @@ public class ManifestFileParserServiceTest
     [InlineData("starter-with-redis.json", 3)]
     [InlineData("project-no-binding.json", 1)]
     [InlineData("connectionstring-resource-expression.json", 5)]
+    [InlineData("with-unsupported-resource.json", 6)]
     public async Task EndToEnd_ParsesSuccessfully(string manifestFile, int expectedCount)
     {
         // Arrange
