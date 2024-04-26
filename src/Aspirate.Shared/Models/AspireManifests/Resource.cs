@@ -9,6 +9,7 @@ namespace Aspirate.Shared.Models.AspireManifests;
 [JsonDerivedType(typeof(DockerfileResource))]
 [JsonDerivedType(typeof(ContainerResource))]
 [JsonDerivedType(typeof(DaprResource))]
+[JsonDerivedType(typeof(DaprComponentResource))]
 [JsonDerivedType(typeof(ParameterResource))]
 [JsonDerivedType(typeof(ValueResource))]
 public abstract class Resource : IResource
