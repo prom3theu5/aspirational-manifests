@@ -21,6 +21,7 @@ global using Aspirate.Services.Parameters;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Literals;
 global using Aspirate.Shared.Models.Aspirate;
+global using Aspirate.Shared.Models.AspireManifests.Components;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0.Dapr;

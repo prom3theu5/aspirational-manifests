@@ -8,7 +8,11 @@ public sealed class ResourceExpressionProcessor(IJsonExpressionProcessor jsonExp
     public void ProcessEvaluations(Dictionary<string, Resource> resources)
     {
         resources.EnsureBindingsHavePorts();
-        var jsonDocument = resources.TryParseAsJsonNode();
+
+        var jsonDocument = resources.Where(r => r.Value is not UnsupportedResource)
+            .ToDictionary(p => p.Key, p => p.Value)
+            .TryParseAsJsonNode();
+
         var rootNode = jsonDocument.Root;
 
         jsonExpressionProcessor.ResolveJsonExpressions(rootNode, rootNode);
