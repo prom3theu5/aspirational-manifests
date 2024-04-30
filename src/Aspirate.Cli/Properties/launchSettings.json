@@ -14,8 +14,8 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate",
-      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "commandLineArgs": "generate --output-format compose --compose-builds",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "generate-non-interactive": {

@@ -83,27 +83,42 @@ public class DockerfileProcessor(
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false,
+        bool? composeBuilds = false)
     {
         var response = new ComposeService();
+
+        var dockerfile = resource.Value as DockerfileResource;
 
         if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
         {
             throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
         }
 
-        response.Service = Builder.MakeService(resource.Key)
-            .WithImage(containerImage.ToLowerInvariant())
+        var newService = Builder.MakeService(resource.Key)
             .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
-            .Build();
+            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts());
+
+        if (composeBuilds == true)
+        {
+            newService = newService.WithBuild(builder =>
+            {
+                builder.WithContext(Path.Combine(AppContext.BaseDirectory, dockerfile.Path))
+                    .WithDockerfile("Dockerfile")
+                    .Build();
+            });
+        }
+        else
+        {
+            newService = newService.WithImage(containerImage.ToLowerInvariant());
+        }
+
+        response.Service = newService.Build();
 
         return response;
     }
-
-
 }
 
 

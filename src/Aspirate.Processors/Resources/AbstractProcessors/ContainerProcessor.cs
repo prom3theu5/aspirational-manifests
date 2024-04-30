@@ -75,9 +75,7 @@ public class ContainerProcessor(
         return Task.FromResult(true);
     }
 
-
-
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false, bool? composeBuilds = false)
     {
         var response = new ComposeService();
 

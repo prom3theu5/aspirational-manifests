@@ -31,6 +31,7 @@ public interface IResourceProcessor
     /// </summary>
     /// <param name="resource">The key-value pair containing the compose entry's identifier and resource.</param>
     /// <param name="withDashboard">Should include the aspire dashboard.</param>
+    /// <param name="composeBuilds">Should the compose file take responsibility for building images.</param>
     /// <returns>The created compose entry as a <see cref="Service"/> object, or null if the operation fails.</returns>
-    ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false);
+    ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false, bool? composeBuilds = false);
 }

@@ -19,10 +19,9 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
         CacheContainerDetails(dockerfileProcessor);
 
-        if (CurrentState.SkipBuild)
+        if (CurrentState.SkipBuild || CurrentState.ComposeBuilds == true)
         {
-            var rule = new Rule("[blue][bold]Skipping build and push action as requested.[/][/]");
-            AnsiConsole.Write(rule);
+            Logger.MarkupLine("[bold]Skipping build and push action as requested.[/]");
             return true;
         }
 

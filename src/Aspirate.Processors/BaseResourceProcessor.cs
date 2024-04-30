@@ -119,8 +119,10 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// </summary>
     /// <param name="resource">The key-value pair representing the resource.</param>
     /// <param name="withDashboard">Should include the dashboard OTLP endpoint.</param>
+    /// <param name="composeBuilds">Should the compose file take responsibility for building images.</param>
     /// <returns>The created compose entry service, or null if creation is not overridden.</returns>
-    public virtual ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
+    public virtual ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false,
+        bool? composeBuilds = false)
     {
         LogCreateComposeNotOverridden(GetType().Name);
 

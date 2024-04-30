@@ -95,26 +95,69 @@ public sealed class ProjectProcessor(
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
+    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource,
+        bool? withDashboard = false,
+        bool? composeBuilds = false)
     {
         var response = new ComposeService();
+
+        var project = resource.Value as ProjectResource;
 
         if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
         {
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
-        response.Service = Builder.MakeService(resource.Key)
-            .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
+        var newService = Builder.MakeService(resource.Key)
             .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
             .WithContainerName(resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
-            .Build();
+            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts());
 
+        if (composeBuilds == true)
+        {
+            var projectPath = Directory.GetParent(Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), project.Path))).FullName;
+
+            newService = newService.WithBuild(builder =>
+            {
+
+                builder.WithContext(projectPath)
+                    .WithDockerfile("Dockerfile")
+                    .Build();
+            });
+
+            WriteDockerfileForProject(project, projectPath);
+        }
+        else
+        {
+            newService = newService.WithImage(containerDetails.FullContainerImage.ToLowerInvariant());
+        }
+
+        response.Service = newService.Build();
         response.IsProject = true;
 
         return response;
+    }
+
+    private static void WriteDockerfileForProject(ProjectResource? project, string projectPath)
+    {
+        if (project is null)
+        {
+            return;
+        }
+
+        var dockerfile = new DockerfileBuilder()
+            .From("mcr.microsoft.com/dotnet/sdk:8.0 AS build")
+            .Copy(".", "/app")
+            .WorkDir("/app")
+            .Run($"dotnet publish -c Release -o /app/publish /p:AssemblyName=\"{project.Name}\"")
+            .From("mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.19")
+            .WorkDir("/app")
+            .Copy("--from=build /app/publish", ".")
+            .EntryPoint("dotnet", $"{project.Name}.dll")
+            .Build();
+
+        File.WriteAllText(Path.Combine(projectPath, "Dockerfile"), dockerfile);
     }
 }
 
