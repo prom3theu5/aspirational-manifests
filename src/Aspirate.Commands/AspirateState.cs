@@ -39,7 +39,7 @@ public class AspirateState :
     public string? RuntimeIdentifier { get; set; }
 
     [JsonPropertyName("composeBuilds")]
-    public bool? ComposeBuilds { get; set; }
+    public List<string>? ComposeBuilds { get; set; }
 
     [JsonPropertyName("imagePullPolicy")]
     public string? ImagePullPolicy { get; set; }

@@ -19,19 +19,13 @@ public class ContainerProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<ContainerResource>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource,
-        string outputPath,
-        string imagePullPolicy,
-        string? templatePath = null,
-        bool? disableSecrets = false,
-        bool? withPrivateRegistry = false,
-        bool? withDashboard = false)
+    public override Task<bool> CreateManifests(CreateManifestsOptions options)
     {
-        var resourceOutputPath = Path.Combine(outputPath, resource.Key);
+        var resourceOutputPath = Path.Combine(options.OutputPath, options.Resource.Key);
 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var container = resource.Value as ContainerResource;
+        var container = options.Resource.Value as ContainerResource;
 
         var manifests = new List<string>
         {
@@ -42,46 +36,46 @@ public class ContainerProcessor(
         };
 
         var data = new KubernetesDeploymentTemplateData()
-            .SetWithDashboard(withDashboard.GetValueOrDefault())
-            .SetName(resource.Key)
+            .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
+            .SetName(options.Resource.Key)
             .SetContainerImage(container.Image)
-            .SetImagePullPolicy(imagePullPolicy)
-            .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
+            .SetImagePullPolicy(options.ImagePullPolicy)
+            .SetEnv(GetFilteredEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
             .SetAnnotations(container.Annotations)
-            .SetVolumes(container.Volumes.KuberizeVolumeNames(resource))
-            .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
-            .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
-            .SetPorts(resource.MapBindingsToPorts())
+            .SetVolumes(container.Volumes.KuberizeVolumeNames(options.Resource))
+            .SetSecrets(GetSecretEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
+            .SetSecretsFromSecretState(options.Resource, secretProvider, options.DisableSecrets)
+            .SetPorts(options.Resource.MapBindingsToPorts())
             .SetArgs(container.Args)
             .SetEntrypoint(container.Entrypoint)
             .SetManifests(manifests)
-            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
+            .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
             .Validate();
 
         if (container.Volumes.Count > 0)
         {
-            _manifestWriter.CreateStatefulSet(resourceOutputPath, data, templatePath);
+            _manifestWriter.CreateStatefulSet(resourceOutputPath, data, options.TemplatePath);
         }
         else
         {
-            _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);
+            _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
         }
 
-        _manifestWriter.CreateService(resourceOutputPath, data, templatePath);
-        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
+        _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, options.TemplatePath);
 
         LogCompletion(resourceOutputPath);
 
         return Task.FromResult(true);
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false, bool? composeBuilds = false)
+    public override ComposeService CreateComposeEntry(CreateComposeEntryOptions options)
     {
         var response = new ComposeService();
 
-        var container = resource.Value as ContainerResource;
+        var container = options.Resource.Value as ContainerResource;
 
-        var service = Builder.MakeService(resource.Key)
+        var service = Builder.MakeService(options.Resource.Key)
             .WithImage(container.Image.ToLowerInvariant());
 
         if (container.Args is not null)
@@ -90,8 +84,8 @@ public class ContainerProcessor(
         }
 
         var newService = service
-            .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
-            .WithContainerName(resource.Key);
+            .WithEnvironment(options.Resource.MapResourceToEnvVars(options.WithDashboard))
+            .WithContainerName(options.Resource.Key);
 
         if (!string.IsNullOrEmpty(container.Entrypoint))
         {
@@ -99,8 +93,8 @@ public class ContainerProcessor(
         }
 
         response.Service = newService.WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithVolumes(resource.MapComposeVolumes())
-            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
+            .WithVolumes(options.Resource.MapComposeVolumes())
+            .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();
 
         return response;

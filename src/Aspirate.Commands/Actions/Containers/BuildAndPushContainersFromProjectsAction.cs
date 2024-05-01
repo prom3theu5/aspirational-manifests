@@ -9,7 +9,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
     {
         Logger.WriteRuler("[purple]Handling Projects[/]");
 
-        if (CurrentState.SkipBuild || CurrentState.ComposeBuilds == true)
+        if (CurrentState.SkipBuild)
         {
             Logger.MarkupLine("[bold]Skipping build and push action as requested.[/]");
             return true;

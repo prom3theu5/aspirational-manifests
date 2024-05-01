@@ -27,40 +27,37 @@ public class DockerfileProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<DockerfileResource>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
-        string? templatePath = null, bool? disableSecrets = false,
-        bool? withPrivateRegistry = false,
-        bool? withDashboard = false)
+    public override Task<bool> CreateManifests(CreateManifestsOptions options)
     {
-        var resourceOutputPath = Path.Combine(outputPath, resource.Key);
+        var resourceOutputPath = Path.Combine(options.OutputPath, options.Resource.Key);
 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var dockerFile = resource.Value as DockerfileResource;
+        var dockerFile = options.Resource.Value as DockerfileResource;
 
-        if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
+        if (!_containerImageCache.TryGetValue(options.Resource.Key, out var containerImage))
         {
-            throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
+            throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
         }
 
         var data = new KubernetesDeploymentTemplateData()
-            .SetWithDashboard(withDashboard.GetValueOrDefault())
-            .SetName(resource.Key)
+            .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
+            .SetName(options.Resource.Key)
             .SetContainerImage(containerImage)
-            .SetImagePullPolicy(imagePullPolicy)
+            .SetImagePullPolicy(options.ImagePullPolicy)
             .SetArgs(dockerFile.Args)
-            .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
+            .SetEnv(GetFilteredEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
             .SetAnnotations(dockerFile.Annotations)
-            .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
-            .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
-            .SetPorts(resource.MapBindingsToPorts())
+            .SetSecrets(GetSecretEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
+            .SetSecretsFromSecretState(options.Resource, secretProvider, options.DisableSecrets)
+            .SetPorts(options.Resource.MapBindingsToPorts())
             .SetManifests(_manifests)
-            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
+            .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
             .Validate();
 
-        _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);
-        _manifestWriter.CreateService(resourceOutputPath, data, templatePath);
-        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
+        _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, options.TemplatePath);
 
         LogCompletion(resourceOutputPath);
 
@@ -83,35 +80,34 @@ public class DockerfileProcessor(
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false,
-        bool? composeBuilds = false)
+    public override ComposeService CreateComposeEntry(CreateComposeEntryOptions options)
     {
         var response = new ComposeService();
 
-        var dockerfile = resource.Value as DockerfileResource;
+        var dockerfile = options.Resource.Value as DockerfileResource;
 
-        if (!_containerImageCache.TryGetValue(resource.Key, out var containerImage))
-        {
-            throw new InvalidOperationException($"Container Image for dockerfile {resource.Key} not found.");
-        }
-
-        var newService = Builder.MakeService(resource.Key)
-            .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
-            .WithContainerName(resource.Key)
+        var newService = Builder.MakeService(options.Resource.Key)
+            .WithEnvironment(options.Resource.MapResourceToEnvVars(options.WithDashboard))
+            .WithContainerName(options.Resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts());
+            .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts());
 
-        if (composeBuilds == true)
+        if (options.ComposeBuilds == true)
         {
             newService = newService.WithBuild(builder =>
             {
-                builder.WithContext(Path.Combine(AppContext.BaseDirectory, dockerfile.Path))
-                    .WithDockerfile("Dockerfile")
+                builder.WithContext(dockerfile.Context)
+                    .WithDockerfile(_fileSystem.GetFullPath(dockerfile.Path))
                     .Build();
             });
         }
         else
         {
+            if (!_containerImageCache.TryGetValue(options.Resource.Key, out var containerImage))
+            {
+                throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
+            }
+
             newService = newService.WithImage(containerImage.ToLowerInvariant());
         }
 

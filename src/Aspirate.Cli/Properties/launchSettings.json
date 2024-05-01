@@ -14,7 +14,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --output-format compose --compose-builds",
+      "commandLineArgs": "generate --output-format compose --compose-build ham --compose-build cheese --non-interactive --include-dashboard=false",
       "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },

@@ -91,7 +91,12 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             return;
         }
 
-        var response = handler.CreateComposeEntry(resource, CurrentState.IncludeDashboard, CurrentState.ComposeBuilds);
+        var response = handler.CreateComposeEntry(new()
+        {
+            Resource = resource,
+            WithDashboard = CurrentState.IncludeDashboard,
+            ComposeBuilds = CurrentState.ComposeBuilds?.Any(x=> x == resource.Key) ?? false,
+        });
 
         if (response.IsProject)
         {
