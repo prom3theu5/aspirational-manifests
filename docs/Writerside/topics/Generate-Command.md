@@ -20,6 +20,16 @@ aspirate generate --output-format compose
 
 Your docker-compose file will be at the path `%output-dir%/docker-compose.yml` directory by default.
 
+When using the `--output-format compose` flag, you can also build certain dockerfiles using the compose file.
+This will skip the build and push in Aspirate.
+To do this, include the `--compose-build` flag one or more times.
+
+```bash
+aspirate generate --output-format compose --compose-build hamburger --compose-build fries
+```
+
+This will build the `hamburger` and `fries` dockerfiles using the compose file.
+
 ## Cli Options (Optional)
 
 | Option                        | Alias | Environmental Variable Counterpart         | Description                                                                                                                                                                    |
@@ -46,3 +56,5 @@ Your docker-compose file will be at the path `%output-dir%/docker-compose.yml` d
 | --private-registry-username   |       | `ASPIRATE_PRIVATE_REGISTRY_USERNAME`       | The username for the private registry. This is required if passing `--private-registry`.                                                                                       |
 | --private-registry-password   |       | `ASPIRATE_PRIVATE_REGISTRY_PASSWORD`       | The password for the private registry. This is required if passing `--private-registry`.                                                                                       |
 | --private-registry-email      |       | `ASPIRATE_PRIVATE_REGISTRY_EMAIL`          | The email for the private registry. This is purely optional and will default to `aspirate@aspirate.com`.                                                                       |
+| --include-dashboard           |       | `ASPIRATE_INCLUDE_DASHBOARD`               | Boolean flag to specify if the Aspire dashboard should also be included in deployments.                                                                                        |
+| --compose-build               |       |                                            | Can be included one or more times to set certain dockerfile resource building to be handled by the compose file. This will skip build and push in aspirate.                    |
