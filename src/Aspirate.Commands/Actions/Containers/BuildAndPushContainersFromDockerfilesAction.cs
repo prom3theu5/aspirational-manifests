@@ -12,19 +12,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             return true;
         }
 
-        if (CurrentState.ComposeBuilds?.Any() == false)
-        {
-            SelectComposeItemsToIncludeAsComposeBuilds();
-        }
-
-        if (CurrentState.ComposeBuilds?.Any() == true)
-        {
-            Logger.MarkupLine("[bold]Compose builds selected:[/]");
-            foreach (var composeBuild in CurrentState.ComposeBuilds)
-            {
-                Logger.MarkupLine($"[blue] - {composeBuild}[/]");
-            }
-        }
+        HandleComposeOutputBuildSelectionForDockerfiles();
 
         var dockerfileProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Dockerfile) as DockerfileProcessor;
 
@@ -39,6 +27,28 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         await PerformBuildAndPushes(dockerfileProcessor);
 
         return true;
+    }
+
+    private void HandleComposeOutputBuildSelectionForDockerfiles()
+    {
+        if (string.IsNullOrEmpty(CurrentState.OutputFormat) || OutputFormat.FromValue(CurrentState.OutputFormat) != OutputFormat.DockerCompose)
+        {
+            return;
+        }
+
+        if (CurrentState.ComposeBuilds?.Any() == false)
+        {
+            SelectComposeItemsToIncludeAsComposeBuilds();
+        }
+
+        if (CurrentState.ComposeBuilds?.Any() == true)
+        {
+            Logger.MarkupLine("[bold]Compose builds selected:[/]");
+            foreach (var composeBuild in CurrentState.ComposeBuilds)
+            {
+                Logger.MarkupLine($"[blue] - {composeBuild}[/]");
+            }
+        }
     }
 
     private void CacheContainerDetails(DockerfileProcessor? dockerfileProcessor)
@@ -129,7 +139,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
     public override void ValidateNonInteractiveState()
     {
-        if (!CurrentState.NonInteractive || !HasSelectedDockerfileComponents())
+        if (!CurrentState.NonInteractive || !HasSelectedDockerfileComponents() || OutputFormat.FromValue(CurrentState.OutputFormat) != OutputFormat.DockerCompose)
         {
             return;
         }
