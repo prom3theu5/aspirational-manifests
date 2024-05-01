@@ -22,6 +22,7 @@ global using Aspirate.DockerCompose.Enums;
 global using Aspirate.DockerCompose.Extensions;
 global using Aspirate.DockerCompose.Models;
 global using Aspirate.DockerCompose.Models.Services;
+global using Aspirate.Processors.Resources.Dockerfile;
 global using Aspirate.Processors.Transformation;
 global using Aspirate.Secrets.Extensions;
 global using Aspirate.Secrets.Literals;

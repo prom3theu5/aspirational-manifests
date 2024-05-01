@@ -53,7 +53,16 @@ public sealed class GenerateKustomizeManifestsAction(
             return;
         }
 
-        var success = await handler.CreateManifests(resource, CurrentState.OutputPath, CurrentState.ImagePullPolicy, CurrentState.TemplatePath, CurrentState.DisableSecrets, CurrentState.WithPrivateRegistry, CurrentState.IncludeDashboard);
+        var success = await handler.CreateManifests(new()
+        {
+            Resource = resource,
+            OutputPath =  CurrentState.OutputPath,
+            ImagePullPolicy =  CurrentState.ImagePullPolicy,
+            TemplatePath = CurrentState.TemplatePath,
+            DisableSecrets =  CurrentState.DisableSecrets,
+            WithPrivateRegistry = CurrentState.WithPrivateRegistry,
+            WithDashboard = CurrentState.IncludeDashboard
+        });
 
         if (success && !AspirateState.IsNotDeployable(resource.Value) && resource.Value is not DaprComponentResource)
         {

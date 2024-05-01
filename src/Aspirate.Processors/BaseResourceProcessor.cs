@@ -92,35 +92,16 @@ public abstract class BaseResourceProcessor : IResourceProcessor
         return envVars == null ? [] : envVars.Where(e => ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
 
-    /// <summary>
-    /// Creates manifests for a resource.
-    /// </summary>
-    /// <param name="resource">The key-value pair representing the resource and its name.</param>
-    /// <param name="outputPath">The path where the manifests will be created.</param>
-    /// <param name="imagePullPolicy">The image pull policy for the resource.</param>
-    /// <param name="templatePath">Optional. The path to the template used for creating the manifests.</param>
-    /// <param name="disableSecrets">Passing this will disable all secret generation.</param>
-    /// <param name="withPrivateRegistry">Specifies if image pull secret should be set.</param>
-    /// <param name="withDashboard">Specifies if the dashboard OTLP endpoint should be included.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is a boolean indicating if the manifests were created successfully.</returns>
-    public virtual Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
-        string? templatePath = null,
-        bool? disableSecrets = false,
-        bool? withPrivateRegistry = false,
-        bool? withDashboard = false)
+    /// <inheritdoc />
+    public virtual Task<bool> CreateManifests(CreateManifestsOptions options)
     {
         LogCreateManifestNotOverridden(GetType().Name);
 
         return Task.FromResult(false);
     }
 
-    /// <summary>
-    /// Creates a compose entry with the given resource.
-    /// </summary>
-    /// <param name="resource">The key-value pair representing the resource.</param>
-    /// <param name="withDashboard">Should include the dashboard OTLP endpoint.</param>
-    /// <returns>The created compose entry service, or null if creation is not overridden.</returns>
-    public virtual ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
+    /// <inheritdoc />
+    public virtual ComposeService CreateComposeEntry(CreateComposeEntryOptions options)
     {
         LogCreateComposeNotOverridden(GetType().Name);
 

@@ -11,13 +11,9 @@ public class DaprComponentProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<DaprComponentResource>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy,
-        string? templatePath = null,
-        bool? disableSecrets = false,
-        bool? withPrivateRegistry = false,
-        bool? withDashboard = false)
+    public override Task<bool> CreateManifests(CreateManifestsOptions options)
     {
-        var daprComponentResource = resource.Value as DaprComponentResource;
+        var daprComponentResource = options.Resource.Value as DaprComponentResource;
 
         if (daprComponentResource?.DaprComponentProperty is null)
         {
@@ -30,9 +26,9 @@ public class DaprComponentProcessor(
             .SetMetadata(daprComponentResource.DaprComponentProperty.Metadata)
             .SetName(daprComponentResource.Name);
 
-        _manifestWriter.CreateDaprManifest(outputPath, templateData, daprComponentResource.Name, templatePath);
+        _manifestWriter.CreateDaprManifest(options.OutputPath, templateData, daprComponentResource.Name, options.TemplatePath);
 
-        LogCompletion($"{outputPath}/dapr/{daprComponentResource.Name}.yml");
+        LogCompletion($"{options.OutputPath}/dapr/{daprComponentResource.Name}.yml");
 
         return Task.FromResult(true);
     }

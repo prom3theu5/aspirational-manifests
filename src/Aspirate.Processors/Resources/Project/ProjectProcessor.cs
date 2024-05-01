@@ -27,38 +27,38 @@ public sealed class ProjectProcessor(
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
         JsonSerializer.Deserialize<ProjectResource>(ref reader);
 
-    public override Task<bool> CreateManifests(KeyValuePair<string, Resource> resource, string outputPath, string imagePullPolicy, string? templatePath = null, bool? disableSecrets = false, bool? withPrivateRegistry = false, bool? withDashboard = false)
+    public override Task<bool> CreateManifests(CreateManifestsOptions options)
     {
-        var resourceOutputPath = Path.Combine(outputPath, resource.Key);
+        var resourceOutputPath = Path.Combine(options.OutputPath, options.Resource.Key);
 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
+        if (!_containerDetailsCache.TryGetValue(options.Resource.Key, out var containerDetails))
         {
-            throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
+            throw new InvalidOperationException($"Container details for project {options.Resource.Key} not found.");
         }
 
-        var project = resource.Value as ProjectResource;
+        var project = options.Resource.Value as ProjectResource;
 
         var data = new KubernetesDeploymentTemplateData()
-            .SetWithDashboard(withDashboard.GetValueOrDefault())
-            .SetName(resource.Key)
+            .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
+            .SetName(options.Resource.Key)
             .SetContainerImage(containerDetails.FullContainerImage)
-            .SetImagePullPolicy(imagePullPolicy)
-            .SetEnv(GetFilteredEnvironmentalVariables(resource.Value, disableSecrets))
+            .SetImagePullPolicy(options.ImagePullPolicy)
+            .SetEnv(GetFilteredEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
             .SetAnnotations(project.Annotations)
             .SetArgs(project.Args)
-            .SetSecrets(GetSecretEnvironmentalVariables(resource.Value, disableSecrets))
-            .SetSecretsFromSecretState(resource, secretProvider, disableSecrets)
+            .SetSecrets(GetSecretEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
+            .SetSecretsFromSecretState(options.Resource, secretProvider, options.DisableSecrets)
             .SetIsProject(true)
-            .SetPorts(resource.MapBindingsToPorts())
+            .SetPorts(options.Resource.MapBindingsToPorts())
             .SetManifests(_manifests)
-            .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault())
+            .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
             .Validate();
 
-        _manifestWriter.CreateDeployment(resourceOutputPath, data, templatePath);
-        _manifestWriter.CreateService(resourceOutputPath, data, templatePath);
-        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, templatePath);
+        _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, options.TemplatePath);
 
         LogCompletion(resourceOutputPath);
 
@@ -95,21 +95,21 @@ public sealed class ProjectProcessor(
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Populated container details cache for project [blue]{resource.Key}[/]");
     }
 
-    public override ComposeService CreateComposeEntry(KeyValuePair<string, Resource> resource, bool? withDashboard = false)
+    public override ComposeService CreateComposeEntry(CreateComposeEntryOptions options)
     {
         var response = new ComposeService();
 
-        if (!_containerDetailsCache.TryGetValue(resource.Key, out var containerDetails))
+        if (!_containerDetailsCache.TryGetValue(options.Resource.Key, out var containerDetails))
         {
-            throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
+            throw new InvalidOperationException($"Container details for project {options.Resource.Key} not found.");
         }
 
-        response.Service = Builder.MakeService(resource.Key)
-            .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
-            .WithEnvironment(resource.MapResourceToEnvVars(withDashboard))
-            .WithContainerName(resource.Key)
+        response.Service = Builder.MakeService(options.Resource.Key)
+            .WithEnvironment(options.Resource.MapResourceToEnvVars(options.WithDashboard))
+            .WithContainerName(options.Resource.Key)
             .WithRestartPolicy(RestartMode.UnlessStopped)
-            .WithPortMappings(resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
+            .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
+            .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
             .Build();
 
         response.IsProject = true;
