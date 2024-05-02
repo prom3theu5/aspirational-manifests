@@ -24,6 +24,7 @@ global using Aspirate.Shared.Models.MsBuild;
 global using DockerComposeBuilder.Builders;
 global using DockerComposeBuilder.Model.Services.BuildArguments;
 global using FluentAssertions;
+global using k8s.Models;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
 global using NSubstitute;
