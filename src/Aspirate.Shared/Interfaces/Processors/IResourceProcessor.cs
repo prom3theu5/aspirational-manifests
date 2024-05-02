@@ -35,5 +35,5 @@ public interface IResourceProcessor
     /// </summary>
     /// <param name="options">Options for creating Kubernetes objects.</param>
     /// <returns>An array of objects representing the created Kubernetes objects.</returns>
-    object[] CreateKubernetesObjects(CreateKubernetesObjectsOptions options);
+    List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options);
 }

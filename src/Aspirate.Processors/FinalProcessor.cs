@@ -27,7 +27,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
     {
         var manifests = resources.Select(x => x.Key).ToList();
 
-        var templateDataBuilder = new KubernetesDeploymentTemplateData()
+        var templateDataBuilder = new KubernetesDeploymentData()
             .SetNamespace(@namespace)
             .SetIsService(false)
             .SetWithPrivateRegistry(withPrivateRegistry.GetValueOrDefault());
@@ -60,7 +60,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/{TemplateLiterals.ImagePullSecretType}.yaml[/]");
     }
 
-    private void HandleNamespace(string outputPath, string? templatePath, string @namespace, KubernetesDeploymentTemplateData templateDataBuilder, List<string> manifests)
+    private void HandleNamespace(string outputPath, string? templatePath, string @namespace, KubernetesDeploymentData templateDataBuilder, List<string> manifests)
     {
         if (string.IsNullOrEmpty(@namespace))
         {
@@ -73,7 +73,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/namespace.yaml[/]");
     }
 
-    private void HandleDashboard(bool? withDashboard, string outputPath, string? templatePath, KubernetesDeploymentTemplateData templateDataBuilder, List<string> manifests)
+    private void HandleDashboard(bool? withDashboard, string outputPath, string? templatePath, KubernetesDeploymentData templateDataBuilder, List<string> manifests)
     {
         if (withDashboard == false)
         {

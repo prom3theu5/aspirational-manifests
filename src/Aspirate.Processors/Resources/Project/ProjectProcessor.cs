@@ -40,7 +40,19 @@ public sealed class ProjectProcessor(
 
         var project = options.Resource.Value as ProjectResource;
 
-        var data = new KubernetesDeploymentTemplateData()
+        var data = PopulateKubernetesDeploymentData(options, containerDetails, project);
+
+        _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, options.TemplatePath);
+
+        LogCompletion(resourceOutputPath);
+
+        return Task.FromResult(true);
+    }
+
+    private KubernetesDeploymentData PopulateKubernetesDeploymentData(BaseKubernetesCreateOptions options, MsBuildContainerProperties containerDetails, ProjectResource? project) =>
+        new KubernetesDeploymentData()
             .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
             .SetName(options.Resource.Key)
             .SetContainerImage(containerDetails.FullContainerImage)
@@ -55,15 +67,6 @@ public sealed class ProjectProcessor(
             .SetManifests(_manifests)
             .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
             .Validate();
-
-        _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
-        _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
-        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, options.TemplatePath);
-
-        LogCompletion(resourceOutputPath);
-
-        return Task.FromResult(true);
-    }
 
     public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive, string? runtimeIdentifier)
     {
@@ -115,5 +118,43 @@ public sealed class ProjectProcessor(
         response.IsProject = true;
 
         return response;
+    }
+
+    public override List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
+    {
+        var project = options.Resource.Value as ProjectResource;
+
+        if (!_containerDetailsCache.TryGetValue(options.Resource.Key, out var containerDetails))
+        {
+            throw new InvalidOperationException($"Container details for project {options.Resource.Key} not found.");
+        }
+
+        var data = PopulateKubernetesDeploymentData(options, containerDetails, project);
+
+        var objects = new List<object>();
+
+        if (data.Env is not null)
+        {
+            objects.Add(data.ToKubernetesConfigMap());
+        }
+
+        if (data.Secrets is not null)
+        {
+            objects.Add(data.ToKubernetesSecret());
+        }
+
+        switch (data.HasVolumes)
+        {
+            case true:
+                objects.Add(data.ToKubernetesStatefulSet());
+                break;
+            case false:
+                objects.Add(data.ToKubernetesDeployment());
+                break;
+        }
+
+        objects.Add(data.ToKubernetesService());
+
+        return objects;
     }
 }

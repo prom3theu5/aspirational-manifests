@@ -1,4 +1,4 @@
-namespace Aspirate.Secrets.Protectors;
+namespace Aspirate.Shared.Enums;
 
 public class ProtectorType(string name, string value) : SmartEnum<ProtectorType, string>(name, value)
 {

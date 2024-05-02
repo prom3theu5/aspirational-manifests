@@ -10,6 +10,7 @@ global using Aspirate.Processors.Resources.Project;
 global using Aspirate.Processors.Transformation.Bindings;
 global using Aspirate.Processors.Transformation.Json;
 global using Aspirate.Secrets.Protectors;
+global using Aspirate.Shared.Enums;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Inputs;
 global using Aspirate.Shared.Interfaces.Processors;

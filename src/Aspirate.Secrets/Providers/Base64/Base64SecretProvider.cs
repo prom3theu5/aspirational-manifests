@@ -1,6 +1,3 @@
-using Aspirate.Shared.Enums;
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Secrets.Providers.Base64;
 
 public sealed class Base64SecretProvider(IFileSystem fileSystem) : BaseSecretProvider<Base64SecretState>(fileSystem)

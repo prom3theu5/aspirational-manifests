@@ -101,7 +101,7 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     }
 
     /// <inheritdoc />
-    public virtual object[] CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
+    public virtual List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
     {
         LogCreateKubernetesObjectsNotOverridden(GetType().Name);
 

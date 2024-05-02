@@ -1,7 +1,9 @@
-namespace Aspirate.Processors;
+using Volume = Aspirate.Shared.Models.AspireManifests.Components.V0.Volume;
+
+namespace Aspirate.Shared.Models.Aspirate;
 
 [ExcludeFromCodeCoverage]
-public class KubernetesDeploymentTemplateData
+public class KubernetesDeploymentData
 {
     public string? Name {get; private set;}
     public string? Namespace {get; private set;}
@@ -21,109 +23,109 @@ public class KubernetesDeploymentTemplateData
     public List<Ports>? Ports {get; private set;}
     public string? ServiceType { get; private set; } = "ClusterIP";
 
-    public KubernetesDeploymentTemplateData SetName(string name)
+    public KubernetesDeploymentData SetName(string name)
     {
         Name = name.ToLowerInvariant();
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetNamespace(string ns)
+    public KubernetesDeploymentData SetNamespace(string ns)
     {
         Namespace = ns.ToLowerInvariant();
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetEnv(Dictionary<string, string> env)
+    public KubernetesDeploymentData SetEnv(Dictionary<string, string> env)
     {
         Env = env.Where(x=>!string.IsNullOrEmpty(x.Value)).ToDictionary(x => x.Key, x => x.Value);
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetSecrets(Dictionary<string, string> secrets)
+    public KubernetesDeploymentData SetSecrets(Dictionary<string, string> secrets)
     {
         Secrets = secrets;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetAnnotations(Dictionary<string, string> annotations)
+    public KubernetesDeploymentData SetAnnotations(Dictionary<string, string> annotations)
     {
         Annotations = annotations;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetManifests(IReadOnlyCollection<string> manifests)
+    public KubernetesDeploymentData SetManifests(IReadOnlyCollection<string> manifests)
     {
         Manifests = manifests;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetIsService(bool service)
+    public KubernetesDeploymentData SetIsService(bool service)
     {
         IsService = service;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetArgs(IReadOnlyCollection<string>? args)
+    public KubernetesDeploymentData SetArgs(IReadOnlyCollection<string>? args)
     {
         Args = args;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetIsProject(bool project)
+    public KubernetesDeploymentData SetIsProject(bool project)
     {
         IsProject = project;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetEntrypoint(string? entrypoint)
+    public KubernetesDeploymentData SetEntrypoint(string? entrypoint)
     {
         Entrypoint = entrypoint;
         return this;
     }
-    
-    public KubernetesDeploymentTemplateData SetVolumes(List<Volume>? volumes)
+
+    public KubernetesDeploymentData SetVolumes(List<Volume>? volumes)
     {
         Volumes = volumes ?? [];
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetWithPrivateRegistry(bool isPrivateRegistry)
+    public KubernetesDeploymentData SetWithPrivateRegistry(bool isPrivateRegistry)
     {
         WithPrivateRegistry = isPrivateRegistry;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetContainerImage(string containerImage)
+    public KubernetesDeploymentData SetContainerImage(string containerImage)
     {
         ContainerImage = containerImage.ToLowerInvariant();
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetImagePullPolicy(string? imagePullPolicy)
+    public KubernetesDeploymentData SetImagePullPolicy(string? imagePullPolicy)
     {
         ImagePullPolicy = imagePullPolicy ?? "IfNotPresent";
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetWithDashboard(bool? withDashboard)
+    public KubernetesDeploymentData SetWithDashboard(bool? withDashboard)
     {
         WithDashboard = withDashboard ?? false;
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetPorts(List<Ports>? ports)
+    public KubernetesDeploymentData SetPorts(List<Ports>? ports)
     {
         Ports = ports ?? [];
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetServiceType(string? serviceType)
+    public KubernetesDeploymentData SetServiceType(string? serviceType)
     {
         ServiceType = serviceType ?? "ClusterIP";
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetSecretsFromSecretState(KeyValuePair<string, Resource> resource, ISecretProvider secretProvider, bool? disableSecrets = false)
+    public KubernetesDeploymentData SetSecretsFromSecretState(KeyValuePair<string, Resource> resource, ISecretProvider secretProvider, bool? disableSecrets = false)
     {
         if (disableSecrets == true)
         {
@@ -159,7 +161,7 @@ public class KubernetesDeploymentTemplateData
     public bool HasArgs => Args?.Any() == true;
     public bool WithNamespace => !string.IsNullOrWhiteSpace(Namespace);
 
-    public KubernetesDeploymentTemplateData Validate()
+    public KubernetesDeploymentData Validate()
     {
         if (string.IsNullOrWhiteSpace(Name))
         {

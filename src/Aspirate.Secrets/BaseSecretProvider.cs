@@ -1,6 +1,3 @@
-using Aspirate.Shared.Enums;
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Secrets;
 
 public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecretProvider where TState : BaseSecretState, new()

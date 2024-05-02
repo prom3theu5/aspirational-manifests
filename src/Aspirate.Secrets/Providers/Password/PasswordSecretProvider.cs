@@ -1,6 +1,3 @@
-using Aspirate.Shared.Enums;
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Secrets.Providers.Password;
 
 public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider<PasswordSecretState>(fileSystem)

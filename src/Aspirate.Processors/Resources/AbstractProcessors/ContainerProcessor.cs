@@ -35,22 +35,7 @@ public class ContainerProcessor(
             $"{TemplateLiterals.ServiceType}.yaml",
         };
 
-        var data = new KubernetesDeploymentTemplateData()
-            .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
-            .SetName(options.Resource.Key)
-            .SetContainerImage(container.Image)
-            .SetImagePullPolicy(options.ImagePullPolicy)
-            .SetEnv(GetFilteredEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
-            .SetAnnotations(container.Annotations)
-            .SetVolumes(container.Volumes.KuberizeVolumeNames(options.Resource))
-            .SetSecrets(GetSecretEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
-            .SetSecretsFromSecretState(options.Resource, secretProvider, options.DisableSecrets)
-            .SetPorts(options.Resource.MapBindingsToPorts())
-            .SetArgs(container.Args)
-            .SetEntrypoint(container.Entrypoint)
-            .SetManifests(manifests)
-            .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
-            .Validate();
+        var data = PopulateKubernetesDeploymentData(options, container, manifests);
 
         if (container.Volumes.Count > 0)
         {
@@ -68,6 +53,24 @@ public class ContainerProcessor(
 
         return Task.FromResult(true);
     }
+
+    private KubernetesDeploymentData PopulateKubernetesDeploymentData(BaseKubernetesCreateOptions options, ContainerResource? container, List<string> manifests) =>
+        new KubernetesDeploymentData()
+            .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
+            .SetName(options.Resource.Key)
+            .SetContainerImage(container.Image)
+            .SetImagePullPolicy(options.ImagePullPolicy)
+            .SetEnv(GetFilteredEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
+            .SetAnnotations(container.Annotations)
+            .SetVolumes(container.Volumes.KuberizeVolumeNames(options.Resource))
+            .SetSecrets(GetSecretEnvironmentalVariables(options.Resource.Value, options.DisableSecrets))
+            .SetSecretsFromSecretState(options.Resource, secretProvider, options.DisableSecrets)
+            .SetPorts(options.Resource.MapBindingsToPorts())
+            .SetArgs(container.Args)
+            .SetEntrypoint(container.Entrypoint)
+            .SetManifests(manifests)
+            .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
+            .Validate();
 
     public override ComposeService CreateComposeEntry(CreateComposeEntryOptions options)
     {
@@ -98,5 +101,37 @@ public class ContainerProcessor(
             .Build();
 
         return response;
+    }
+
+    public override List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
+    {
+        var container = options.Resource.Value as ContainerResource;
+        var data = PopulateKubernetesDeploymentData(options, container, []);
+
+        var objects = new List<object>();
+
+        if (data.Env is not null)
+        {
+            objects.Add(data.ToKubernetesConfigMap());
+        }
+
+        if (data.Secrets is not null)
+        {
+            objects.Add(data.ToKubernetesSecret());
+        }
+
+        switch (data.HasVolumes)
+        {
+            case true:
+                objects.Add(data.ToKubernetesStatefulSet());
+                break;
+            case false:
+                objects.Add(data.ToKubernetesDeployment());
+                break;
+        }
+
+        objects.Add(data.ToKubernetesService());
+
+        return objects;
     }
 }

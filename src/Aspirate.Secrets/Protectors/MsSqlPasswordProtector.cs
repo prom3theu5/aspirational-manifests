@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Secrets.Protectors;
 
 public class MsSqlPasswordProtector(ISecretProvider secretProvider, IAnsiConsole console) : BaseProtector(secretProvider, console)
