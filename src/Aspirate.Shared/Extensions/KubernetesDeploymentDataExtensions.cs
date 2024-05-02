@@ -233,6 +233,35 @@ public static class KubernetesDeploymentDataExtensions
         };
     }
 
+    public static List<object> ToKubernetesObjects(this KubernetesDeploymentData data)
+    {
+        var objects = new List<object>();
+
+        if (data.Env is not null)
+        {
+            objects.Add(data.ToKubernetesConfigMap());
+        }
+
+        if (data.Secrets is not null)
+        {
+            objects.Add(data.ToKubernetesSecret());
+        }
+
+        switch (data.HasVolumes)
+        {
+            case true:
+                objects.Add(data.ToKubernetesStatefulSet());
+                break;
+            case false:
+                objects.Add(data.ToKubernetesDeployment());
+                break;
+        }
+
+        objects.Add(data.ToKubernetesService());
+
+        return objects;
+    }
+
     private static List<V1LocalObjectReference> SetKubernetesImagePullSecrets =>
     [
         new V1LocalObjectReference { Name = "image-pull-secret", }

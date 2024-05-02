@@ -131,30 +131,6 @@ public sealed class ProjectProcessor(
 
         var data = PopulateKubernetesDeploymentData(options, containerDetails, project);
 
-        var objects = new List<object>();
-
-        if (data.Env is not null)
-        {
-            objects.Add(data.ToKubernetesConfigMap());
-        }
-
-        if (data.Secrets is not null)
-        {
-            objects.Add(data.ToKubernetesSecret());
-        }
-
-        switch (data.HasVolumes)
-        {
-            case true:
-                objects.Add(data.ToKubernetesStatefulSet());
-                break;
-            case false:
-                objects.Add(data.ToKubernetesDeployment());
-                break;
-        }
-
-        objects.Add(data.ToKubernetesService());
-
-        return objects;
+        return data.ToKubernetesObjects();
     }
 }
