@@ -1,12 +1,12 @@
 namespace Aspirate.Commands.Commands.Generate;
 
-public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<GenerateOptions>(serviceProvider)
+public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<GenerateOptionses>(serviceProvider)
 {
-    public override Task<int> HandleAsync(GenerateOptions options)
+    public override Task<int> HandleAsync(GenerateOptionses optionses)
     {
-        if (!OutputFormat.TryFromValue(options.OutputFormat, out var outputFormat))
+        if (!OutputFormat.TryFromValue(optionses.OutputFormat, out var outputFormat))
         {
-            throw new ArgumentOutOfRangeException(nameof(options.OutputFormat), $"The output format '{options.OutputFormat}' is not supported.");
+            throw new ArgumentOutOfRangeException(nameof(optionses.OutputFormat), $"The output format '{optionses.OutputFormat}' is not supported.");
         }
 
         if (outputFormat.Name == nameof(OutputFormat.DockerCompose))
@@ -18,7 +18,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
         {
             nameof(OutputFormat.Kustomize) => GenerateKustomizeManifests(),
             nameof(OutputFormat.DockerCompose) => GenerateDockerComposeManifests(),
-            _ => throw new ArgumentOutOfRangeException(nameof(options.OutputFormat), $"The output format '{options.OutputFormat}' is not supported."),
+            _ => throw new ArgumentOutOfRangeException(nameof(optionses.OutputFormat), $"The output format '{optionses.OutputFormat}' is not supported."),
         };
     }
 

@@ -92,7 +92,7 @@ public class ContainerProcessor(
             newService = newService.WithCommands(container.Entrypoint);
         }
 
-        response.Service = newService.WithRestartPolicy(RestartMode.UnlessStopped)
+        response.Service = newService.WithRestartPolicy(ERestartMode.UnlessStopped)
             .WithVolumes(options.Resource.MapComposeVolumes())
             .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();

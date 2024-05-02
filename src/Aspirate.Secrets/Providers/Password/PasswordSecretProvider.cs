@@ -1,3 +1,6 @@
+using Aspirate.Shared.Enums;
+using Aspirate.Shared.Interfaces.Secrets;
+
 namespace Aspirate.Secrets.Providers.Password;
 
 public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider<PasswordSecretState>(fileSystem)
@@ -10,7 +13,7 @@ public class PasswordSecretProvider(IFileSystem fileSystem) : BaseSecretProvider
 
     public override PasswordSecretState? State { get; protected set; }
 
-    public override ProviderType Type => ProviderType.Password;
+    public override SecretProviderType Type => SecretProviderType.Password;
 
     public override IEncrypter? Encrypter => _encrypter;
 

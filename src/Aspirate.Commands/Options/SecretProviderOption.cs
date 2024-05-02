@@ -1,13 +1,16 @@
-﻿namespace Aspirate.Commands.Options;
+﻿using Aspirate.Shared.Enums;
+using Aspirate.Shared.Interfaces.Commands;
 
-public sealed class SecretProviderOption : BaseOption<ProviderType>
+namespace Aspirate.Commands.Options;
+
+public sealed class SecretProviderOption : BaseOption<SecretProviderType>
 {
     private static readonly string[] _aliases =
     {
         "--secret-provider"
     };
 
-    private SecretProviderOption() : base(_aliases, "ASPIRATE_SECRET_PROVIDER", ProviderType.Password)
+    private SecretProviderOption() : base(_aliases, "ASPIRATE_SECRET_PROVIDER", SecretProviderType.Password)
     {
         Name = nameof(ICommandOptions.SecretProvider);
         Description = "Sets the secret provider. Default is 'Password'";

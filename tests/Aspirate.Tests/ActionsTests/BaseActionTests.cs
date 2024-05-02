@@ -1,3 +1,6 @@
+using Aspirate.Shared.Interfaces.Secrets;
+using Aspirate.Shared.Interfaces.Services;
+
 namespace Aspirate.Tests.ActionsTests;
 
 public abstract class BaseActionTests<TSystemUnderTest> where TSystemUnderTest : class, IAction

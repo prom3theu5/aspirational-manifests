@@ -1,5 +1,3 @@
-using Aspirate.Shared.Literals;
-
 namespace Aspirate.Shared.Models.MsBuild;
 
 [ExcludeFromCodeCoverage]

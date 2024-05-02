@@ -1,3 +1,5 @@
+using Aspirate.Shared.Interfaces.Secrets;
+
 namespace Aspirate.Commands.Actions.Secrets;
 
 public class PopulateInputsAction(

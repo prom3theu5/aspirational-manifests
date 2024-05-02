@@ -1,4 +1,4 @@
-using Aspirate.Commands.Actions;
+using Aspirate.Shared.Interfaces.Commands;
 
 namespace Aspirate.Commands.Commands;
 

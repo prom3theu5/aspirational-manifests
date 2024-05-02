@@ -1,6 +1,6 @@
 namespace Aspirate.Commands.Commands.Generate;
 
-public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateCommandHandler>
+public sealed class GenerateCommand : BaseCommand<GenerateOptionses, GenerateCommandHandler>
 {
     public GenerateCommand() : base("generate", "Builds, pushes containers, generates aspire manifest, helm chart and kustomize manifests.")
     {

@@ -1,3 +1,5 @@
+using Aspirate.Shared.Interfaces.Secrets;
+
 namespace Aspirate.Secrets.Providers.Password;
 
 public class AesGcmCrypter : IEncrypter, IDecrypter

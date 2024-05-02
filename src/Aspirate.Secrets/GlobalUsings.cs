@@ -9,7 +9,6 @@ global using Aspirate.Secrets.Protectors;
 global using Aspirate.Secrets.Providers;
 global using Aspirate.Secrets.Providers.Base64;
 global using Aspirate.Secrets.Providers.Password;
-global using Aspirate.Secrets.Services;
 global using Aspirate.Shared.Literals;
 global using Aspirate.Shared.Models.AspireManifests;
 global using Aspirate.Shared.Models.AspireManifests.Interfaces;

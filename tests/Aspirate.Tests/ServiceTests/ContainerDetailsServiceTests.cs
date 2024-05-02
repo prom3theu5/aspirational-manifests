@@ -1,3 +1,6 @@
+using Aspirate.Shared.Inputs;
+using Aspirate.Shared.Interfaces.Services;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public class ContainerDetailsServiceTests
@@ -65,7 +68,7 @@ public class ContainerDetailsServiceTests
             new object[]
             {
                 new TestContainerProperties(
-                    "NoImageShouldBeRepositoryWithPrefix", CreateContainerProperties("test-registry", "test-repository", null, "test-tag"), new ContainerParameters()
+                    "NoImageShouldBeRepositoryWithPrefix", CreateContainerProperties("test-registry", "test-repository", null, "test-tag"), new ContainerOptions()
                     {
                         Prefix = "test-prefix",
                     }),
@@ -78,7 +81,7 @@ public class ContainerDetailsServiceTests
             new object[]
             {
                 new TestContainerProperties(
-                    "NoImageOrTagShouldBeRepositoryWithPrefixLatest", CreateContainerProperties("test-registry", "test-repository"), new ContainerParameters()
+                    "NoImageOrTagShouldBeRepositoryWithPrefixLatest", CreateContainerProperties("test-registry", "test-repository"), new ContainerOptions()
                     {
                         Prefix = "test-prefix",
                     }),
@@ -112,5 +115,5 @@ public class ContainerDetailsServiceTests
             },
         };
 
-    public record TestContainerProperties(string Value, MsBuildProperties<MsBuildContainerProperties> Properties, ContainerParameters? Parameters = null);
+    public record TestContainerProperties(string Value, MsBuildProperties<MsBuildContainerProperties> Properties, ContainerOptions? Parameters = null);
 }

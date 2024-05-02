@@ -1,4 +1,5 @@
-using Aspirate.Shared.Processors;
+using Aspirate.Shared.Interfaces.Secrets;
+using Aspirate.Shared.Interfaces.Services;
 
 namespace Aspirate.Tests.ServiceTests;
 

@@ -1,3 +1,5 @@
+using Aspirate.Shared.Outputs;
+
 namespace Aspirate.Services.Implementations;
 
 public class DaprCliService(IShellExecutionService shellExecutionService, IAnsiConsole console) : IDaprCliService

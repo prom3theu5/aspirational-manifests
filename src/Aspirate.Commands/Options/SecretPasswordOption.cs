@@ -1,4 +1,6 @@
-﻿namespace Aspirate.Commands.Options;
+﻿using Aspirate.Shared.Interfaces.Commands.Contracts;
+
+namespace Aspirate.Commands.Options;
 
 public sealed class SecretPasswordOption : BaseOption<string?>
 {
@@ -9,7 +11,7 @@ public sealed class SecretPasswordOption : BaseOption<string?>
 
     private SecretPasswordOption() : base(_aliases, "ASPIRATE_SECRET_PASSWORD", null)
     {
-        Name = nameof(ISecretOption.SecretPassword);
+        Name = nameof(ISecretOptions.SecretPassword);
         Description = "The Secret Password to use";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

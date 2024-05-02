@@ -65,7 +65,7 @@ public sealed class ProjectProcessor(
         return Task.FromResult(true);
     }
 
-    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerParameters parameters, bool nonInteractive, string? runtimeIdentifier)
+    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive, string? runtimeIdentifier)
     {
         var project = resource.Value as ProjectResource;
 
@@ -74,16 +74,16 @@ public sealed class ProjectProcessor(
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
-        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, parameters, nonInteractive, runtimeIdentifier);
+        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, options, nonInteractive, runtimeIdentifier);
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }
 
-    public async Task PopulateContainerDetailsCacheForProject(KeyValuePair<string, Resource> resource, ContainerParameters parameters)
+    public async Task PopulateContainerDetailsCacheForProject(KeyValuePair<string, Resource> resource, ContainerOptions options)
     {
         var project = resource.Value as ProjectResource;
 
-        var details = await containerDetailsService.GetContainerDetails(resource.Key, project, parameters);
+        var details = await containerDetailsService.GetContainerDetails(resource.Key, project, options);
 
         var success = _containerDetailsCache.TryAdd(resource.Key, details);
 
@@ -107,7 +107,7 @@ public sealed class ProjectProcessor(
         response.Service = Builder.MakeService(options.Resource.Key)
             .WithEnvironment(options.Resource.MapResourceToEnvVars(options.WithDashboard))
             .WithContainerName(options.Resource.Key)
-            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithRestartPolicy(ERestartMode.UnlessStopped)
             .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
             .Build();

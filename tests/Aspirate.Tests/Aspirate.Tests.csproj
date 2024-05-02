@@ -21,7 +21,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Aspirate.Cli\Aspirate.Cli.csproj" />
-      <ProjectReference Include="..\..\src\Aspirate.DockerCompose\Aspirate.DockerCompose.csproj" />
       <ProjectReference Include="..\..\src\Aspirate.Secrets\Aspirate.Secrets.csproj" />
     </ItemGroup>
 

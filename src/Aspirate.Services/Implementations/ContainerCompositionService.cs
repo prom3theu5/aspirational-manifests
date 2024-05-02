@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Aspirate.Shared.Outputs;
 
 namespace Aspirate.Services.Implementations;
 
@@ -11,19 +12,19 @@ public sealed class ContainerCompositionService(
     public async Task<bool> BuildAndPushContainerForProject(
         ProjectResource projectResource,
         MsBuildContainerProperties containerDetails,
-        ContainerParameters parameters,
+        ContainerOptions options,
         bool nonInteractive = false,
         string? runtimeIdentifier = null)
     {
-        await CheckIfBuilderIsRunning(parameters.ContainerBuilder);
+        await CheckIfBuilderIsRunning(options.ContainerBuilder);
 
         var fullProjectPath = filesystem.NormalizePath(projectResource.Path);
 
         var argumentsBuilder = ArgumentsBuilder.Create();
 
-        if (!string.IsNullOrEmpty(parameters.Prefix))
+        if (!string.IsNullOrEmpty(options.Prefix))
         {
-            containerDetails.ContainerRepository = $"{parameters.Prefix}/{containerDetails.ContainerRepository}";
+            containerDetails.ContainerRepository = $"{options.Prefix}/{containerDetails.ContainerRepository}";
         }
 
         await AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
@@ -41,21 +42,21 @@ public sealed class ContainerCompositionService(
         return true;
     }
 
-    public async Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, ContainerParameters parameters, bool? nonInteractive = false)
+    public async Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, ContainerOptions options, bool? nonInteractive = false)
     {
-        ArgumentNullException.ThrowIfNull(parameters, nameof(parameters));
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
 
-        await CheckIfBuilderIsRunning(parameters.ContainerBuilder);
+        await CheckIfBuilderIsRunning(options.ContainerBuilder);
 
         var fullDockerfilePath = filesystem.GetFullPath(dockerfileResource.Path);
 
-        var fullImage = parameters.ToImageName(dockerfileResource.Name);
+        var fullImage = options.ToImageName(dockerfileResource.Name);
 
-        var result = await BuildContainer(dockerfileResource, parameters.ContainerBuilder, nonInteractive, fullImage, fullDockerfilePath);
+        var result = await BuildContainer(dockerfileResource, options.ContainerBuilder, nonInteractive, fullImage, fullDockerfilePath);
 
         CheckSuccess(result);
 
-        result = await PushContainer(parameters.ContainerBuilder, parameters.Registry, fullImage, nonInteractive);
+        result = await PushContainer(options.ContainerBuilder, options.Registry, fullImage, nonInteractive);
 
         CheckSuccess(result);
 
