@@ -29,4 +29,11 @@ public interface IResourceProcessor
     /// <param name="options">The create compose entry options instance.</param>
     /// <returns>The created compose entry service, or null if creation is not overridden.</returns>
     ComposeService CreateComposeEntry(CreateComposeEntryOptions options);
+
+    /// <summary>
+    /// Creates Kubernetes objects for a specific resource in the Aspirate application.
+    /// </summary>
+    /// <param name="options">Options for creating Kubernetes objects.</param>
+    /// <returns>An array of objects representing the created Kubernetes objects.</returns>
+    object[] CreateKubernetesObjects(CreateKubernetesObjectsOptions options);
 }

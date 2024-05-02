@@ -12,6 +12,7 @@ global using Aspirate.Processors.Transformation.Json;
 global using Aspirate.Secrets.Protectors;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Inputs;
+global using Aspirate.Shared.Interfaces.Processors;
 global using Aspirate.Shared.Interfaces.Secrets;
 global using Aspirate.Shared.Interfaces.Services;
 global using Aspirate.Shared.Literals;
