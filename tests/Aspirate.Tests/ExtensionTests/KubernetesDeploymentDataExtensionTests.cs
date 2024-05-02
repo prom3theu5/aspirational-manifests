@@ -98,22 +98,6 @@ public class KubernetesDeploymentDataExtensionTests
     }
 
     [Fact]
-    public void ToKubernetesStatefulSet_ShouldReturnCorrectStatefulSet()
-    {
-        // Arrange
-        var data = new KubernetesDeploymentData()
-            .SetName("test")
-            .SetContainerImage("test-image");
-
-        // Act
-        var result = data.ToKubernetesStatefulSet();
-
-        // Assert
-        result.Spec.Template.Spec.Containers[0].Name.Should().Be("test");
-        result.Spec.Template.Spec.Containers[0].Image.Should().Be("test-image");
-    }
-
-    [Fact]
     public void ToKubernetesService_ShouldReturnCorrectService()
     {
         // Arrange
@@ -165,5 +149,24 @@ public class KubernetesDeploymentDataExtensionTests
         var secret = result.OfType<V1Secret>().First();
         secret.StringData.Should().ContainKey("key");
         secret.StringData["key"].Should().Be("secretvalue");
+    }
+
+    [Fact]
+    public void ToKubernetesStatefulSet_ShouldReturnCorrectStatefulSet()
+    {
+        // Arrange
+        var data = new KubernetesDeploymentData()
+            .SetName("test")
+            .SetContainerImage("test-image")
+            .SetVolumes(new List<Volume> { new Volume { Name = "test-volume", Target = "/data" } });
+
+        // Act
+        var result = data.ToKubernetesStatefulSet();
+
+        // Assert
+        result.Spec.Template.Spec.Containers[0].Name.Should().Be("test");
+        result.Spec.Template.Spec.Containers[0].Image.Should().Be("test-image");
+        result.Spec.Template.Spec.Containers[0].VolumeMounts[0].Name.Should().Be("test-volume");
+        result.Spec.VolumeClaimTemplates[0].Metadata.Name.Should().Be("test-volume");
     }
 }
