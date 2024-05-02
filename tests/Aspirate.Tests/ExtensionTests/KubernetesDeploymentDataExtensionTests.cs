@@ -136,13 +136,34 @@ public class KubernetesDeploymentDataExtensionTests
         var data = new KubernetesDeploymentData()
             .SetName("test")
             .SetContainerImage("test-image")
-            .SetPorts(new List<Ports> { new Ports { Name = "test-port", InternalPort = 8080, ExternalPort = 8080 } });
+            .SetPorts(new List<Ports> { new Ports { Name = "test-port", InternalPort = 8080, ExternalPort = 8080 } })
+            .SetEnv(new Dictionary<string, string> { { "key", "envvalue" } })
+            .SetSecrets(new Dictionary<string, string> { { "key", "secretvalue" } });
 
         // Act
         var result = data.ToKubernetesObjects();
 
         // Assert
+        result.Should().NotBeEmpty();
         result.Should().ContainItemsAssignableTo<V1Deployment>();
         result.Should().ContainItemsAssignableTo<V1Service>();
+        result.Should().ContainItemsAssignableTo<V1ConfigMap>();
+        result.Should().ContainItemsAssignableTo<V1Secret>();
+
+        var deployment = result.OfType<V1Deployment>().First();
+        deployment.Spec.Template.Spec.Containers[0].Name.Should().Be("test");
+        deployment.Spec.Template.Spec.Containers[0].Image.Should().Be("test-image");
+
+        var service = result.OfType<V1Service>().First();
+        service.Spec.Ports[0].Name.Should().Be("test-port");
+        service.Spec.Ports[0].Port.Should().Be(8080);
+
+        var configMap = result.OfType<V1ConfigMap>().First();
+        configMap.Data.Should().ContainKey("key");
+        configMap.Data["key"].Should().Be("envvalue");
+
+        var secret = result.OfType<V1Secret>().First();
+        secret.StringData.Should().ContainKey("key");
+        secret.StringData["key"].Should().Be("secretvalue");
     }
 }
