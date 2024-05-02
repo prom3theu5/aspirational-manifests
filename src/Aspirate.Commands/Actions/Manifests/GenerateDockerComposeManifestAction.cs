@@ -1,3 +1,5 @@
+using Aspirate.Shared.Enums;
+using Aspirate.Shared.Interfaces.Processors;
 using Volume = DockerComposeBuilder.Model.Volume;
 
 namespace Aspirate.Commands.Actions.Manifests;

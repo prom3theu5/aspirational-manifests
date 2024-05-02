@@ -18,7 +18,6 @@ global using Aspirate.Shared.Models.AspireManifests.Components;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0;
 global using Aspirate.Shared.Models.Kubernetes;
 global using Aspirate.Shared.Models.MsBuild;
-global using Aspirate.Shared.Processors;
 global using CliWrap;
 global using CliWrap.Buffered;
 global using HandlebarsDotNet;

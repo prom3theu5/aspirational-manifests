@@ -1,4 +1,5 @@
 using Aspirate.Processors.Transformation;
+using Aspirate.Shared.Interfaces.Processors;
 
 namespace Aspirate.Processors;
 

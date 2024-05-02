@@ -1,3 +1,5 @@
+using Aspirate.Shared.Enums;
+using Aspirate.Shared.Interfaces.Processors;
 using Aspirate.Shared.Interfaces.Services;
 
 namespace Aspirate.Commands.Actions.Manifests;

@@ -1,4 +1,4 @@
-namespace Aspirate.Secrets.Literals;
+namespace Aspirate.Shared.Literals;
 
 public static class AspirateSecretLiterals
 {

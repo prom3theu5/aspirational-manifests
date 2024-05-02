@@ -1,5 +1,6 @@
 <Project>
   <ItemGroup>
+    <PackageVersion Include="Ardalis.SmartEnum" Version="8.0.0" />
     <PackageVersion Include="Ardalis.SmartEnum.SystemTextJson" Version="8.0.0" />
     <PackageVersion Include="Aspire.Hosting" Version="8.0.0-preview.5.24201.12" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="8.0.0-preview.5.24201.12" />

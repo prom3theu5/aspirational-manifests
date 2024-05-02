@@ -1,4 +1,4 @@
-namespace Aspirate.Shared.Processors;
+namespace Aspirate.Shared.Interfaces.Processors;
 
 public interface IResourceProcessor
 {

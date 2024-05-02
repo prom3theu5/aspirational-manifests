@@ -5,6 +5,7 @@ global using System.Reflection;
 global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+global using Ardalis.SmartEnum;
 global using Aspirate.Shared.Enums;
 global using Aspirate.Shared.Extensions;
 global using Aspirate.Shared.Inputs;

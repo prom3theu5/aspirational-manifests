@@ -7,7 +7,6 @@ global using Aspirate.Commands.Actions;
 global using Aspirate.Commands.Actions.Containers;
 global using Aspirate.Commands.Actions.Manifests;
 global using Aspirate.Commands.Actions.Secrets;
-global using Aspirate.Commands.Enums;
 global using Aspirate.Processors.Transformation;
 global using Aspirate.Secrets.Providers.Base64;
 global using Aspirate.Secrets.Providers.Password;

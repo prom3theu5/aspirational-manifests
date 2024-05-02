@@ -1,4 +1,4 @@
-namespace Aspirate.Commands.Enums;
+namespace Aspirate.Shared.Enums;
 
 public class OutputFormat : SmartEnum<OutputFormat, string>
 {

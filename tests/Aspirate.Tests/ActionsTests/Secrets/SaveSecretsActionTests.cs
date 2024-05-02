@@ -1,5 +1,3 @@
-using Aspirate.Secrets.Literals;
-
 namespace Aspirate.Tests.ActionsTests.Secrets;
 
 public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>

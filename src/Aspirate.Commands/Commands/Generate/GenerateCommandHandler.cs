@@ -1,3 +1,5 @@
+using Aspirate.Shared.Enums;
+
 namespace Aspirate.Commands.Commands.Generate;
 
 public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<GenerateOptionses>(serviceProvider)
