@@ -167,6 +167,7 @@ public class KubernetesDeploymentDataExtensionTests
         result.Spec.Template.Spec.Containers[0].Name.Should().Be("test");
         result.Spec.Template.Spec.Containers[0].Image.Should().Be("test-image");
         result.Spec.Template.Spec.Containers[0].VolumeMounts[0].Name.Should().Be("test-volume");
+        result.Spec.Template.Spec.Containers[0].VolumeMounts[0].MountPath.Should().Be("/data");
         result.Spec.VolumeClaimTemplates[0].Metadata.Name.Should().Be("test-volume");
     }
 }
