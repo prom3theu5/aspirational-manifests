@@ -1,4 +1,4 @@
-using Volume = Aspirate.DockerCompose.Models.Volume;
+using Volume = DockerComposeBuilder.Model.Volume;
 
 namespace Aspirate.Commands.Actions.Manifests;
 
@@ -124,7 +124,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             .WithImage("mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.6")
             .WithEnvironment(environment)
             .WithContainerName("aspire-dashboard")
-            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithRestartPolicy(ERestartMode.UnlessStopped)
             .WithPortMappings(ports.ToArray())
             .Build();
 

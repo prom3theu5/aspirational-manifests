@@ -1,6 +1,3 @@
-using Aspirate.Shared.Inputs;
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Processors.Resources.AbstractProcessors;
 
 public class ParameterProcessor(IFileSystem fileSystem, IAnsiConsole console,

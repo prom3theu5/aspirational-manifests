@@ -6,6 +6,7 @@
     </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DockerComposeBuilder" />
     <PackageReference Include="Handlebars.Net" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Spectre.Console" />
@@ -20,10 +21,6 @@
 
   <ItemGroup>
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Aspirate.DockerCompose\Aspirate.DockerCompose.csproj" />
   </ItemGroup>
 
 </Project>

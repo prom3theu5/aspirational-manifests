@@ -4,6 +4,7 @@
     <PackageVersion Include="Aspire.Hosting" Version="8.0.0-preview.5.24201.12" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="8.0.0-preview.5.24201.12" />
     <PackageVersion Include="CliWrap" Version="3.6.6" />
+    <PackageVersion Include="DockerComposeBuilder" Version="0.2.4" />
     <PackageVersion Include="Handlebars.Net" Version="2.1.6" />
     <PackageVersion Include="JsonPath.Net" Version="1.0.1.2" />
     <PackageVersion Include="KubernetesClient" Version="13.0.26" />

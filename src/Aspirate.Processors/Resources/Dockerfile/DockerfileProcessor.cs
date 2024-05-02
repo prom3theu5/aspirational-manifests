@@ -1,7 +1,3 @@
-using Aspirate.Shared.Inputs;
-using Aspirate.Shared.Interfaces.Secrets;
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Processors.Resources.Dockerfile;
 
 /// <summary>
@@ -93,7 +89,7 @@ public class DockerfileProcessor(
         var newService = Builder.MakeService(options.Resource.Key)
             .WithEnvironment(options.Resource.MapResourceToEnvVars(options.WithDashboard))
             .WithContainerName(options.Resource.Key)
-            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithRestartPolicy(ERestartMode.UnlessStopped)
             .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts());
 
         if (options.ComposeBuilds == true)

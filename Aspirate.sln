@@ -52,10 +52,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Processors", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Services", "src\Aspirate.Services\Aspirate.Services.csproj", "{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.DockerCompose", "src\Aspirate.DockerCompose\Aspirate.DockerCompose.csproj", "{5479D778-01FF-4695-8634-E5098191A5D8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Kubernetes", "src\Aspirate.Kubernetes\Aspirate.Kubernetes.csproj", "{F711667F-51BD-49DD-A3C3-E7B5B2364EBC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,14 +86,6 @@ Global
 		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5479D778-01FF-4695-8634-E5098191A5D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5479D778-01FF-4695-8634-E5098191A5D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5479D778-01FF-4695-8634-E5098191A5D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5479D778-01FF-4695-8634-E5098191A5D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F711667F-51BD-49DD-A3C3-E7B5B2364EBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F711667F-51BD-49DD-A3C3-E7B5B2364EBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F711667F-51BD-49DD-A3C3-E7B5B2364EBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F711667F-51BD-49DD-A3C3-E7B5B2364EBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,8 +101,6 @@ Global
 		{BF110CDB-51B7-4320-84D1-464691D83A88} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
 		{86DA91EC-8297-48C9-A594-A70416464676} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
 		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
-		{5479D778-01FF-4695-8634-E5098191A5D8} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
-		{F711667F-51BD-49DD-A3C3-E7B5B2364EBC} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4990E3C8-4D86-44BB-BC2B-7D055DBC7958}

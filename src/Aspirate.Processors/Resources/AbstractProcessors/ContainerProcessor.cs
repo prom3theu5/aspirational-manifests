@@ -1,7 +1,3 @@
-using Aspirate.Shared.Inputs;
-using Aspirate.Shared.Interfaces.Secrets;
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Processors.Resources.AbstractProcessors;
 
 /// <summary>
@@ -96,7 +92,7 @@ public class ContainerProcessor(
             newService = newService.WithCommands(container.Entrypoint);
         }
 
-        response.Service = newService.WithRestartPolicy(RestartMode.UnlessStopped)
+        response.Service = newService.WithRestartPolicy(ERestartMode.UnlessStopped)
             .WithVolumes(options.Resource.MapComposeVolumes())
             .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();

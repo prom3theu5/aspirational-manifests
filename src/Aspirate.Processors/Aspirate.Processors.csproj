@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Aspirate.DockerCompose\Aspirate.DockerCompose.csproj" />
       <ProjectReference Include="..\Aspirate.Secrets\Aspirate.Secrets.csproj" />
       <ProjectReference Include="..\Aspirate.Services\Aspirate.Services.csproj" />
       <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />

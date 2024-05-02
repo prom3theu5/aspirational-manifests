@@ -1,7 +1,3 @@
-using Aspirate.Shared.Inputs;
-using Aspirate.Shared.Interfaces.Secrets;
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Processors.Resources.Project;
 
 /// <summary>
@@ -111,7 +107,7 @@ public sealed class ProjectProcessor(
         response.Service = Builder.MakeService(options.Resource.Key)
             .WithEnvironment(options.Resource.MapResourceToEnvVars(options.WithDashboard))
             .WithContainerName(options.Resource.Key)
-            .WithRestartPolicy(RestartMode.UnlessStopped)
+            .WithRestartPolicy(ERestartMode.UnlessStopped)
             .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .WithImage(containerDetails.FullContainerImage.ToLowerInvariant())
             .Build();
