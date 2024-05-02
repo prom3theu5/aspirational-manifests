@@ -1,8 +1,11 @@
+using Aspirate.Shared.Enums;
+using Aspirate.Shared.Interfaces.Secrets;
+
 namespace Aspirate.Secrets.Providers.Base64;
 
 public sealed class Base64SecretProvider(IFileSystem fileSystem) : BaseSecretProvider<Base64SecretState>(fileSystem)
 {
-    public override ProviderType Type => ProviderType.Base64;
+    public override SecretProviderType Type => SecretProviderType.Base64;
 
     public override Base64SecretState? State { get; protected set; }
 

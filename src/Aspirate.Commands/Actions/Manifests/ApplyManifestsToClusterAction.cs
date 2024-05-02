@@ -1,3 +1,6 @@
+using Aspirate.Shared.Interfaces.Secrets;
+using Aspirate.Shared.Interfaces.Services;
+
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class ApplyManifestsToClusterAction(

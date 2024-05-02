@@ -1,3 +1,6 @@
+using Aspirate.Shared.Inputs;
+using Aspirate.Shared.Interfaces.Services;
+
 namespace Aspirate.Processors;
 
 /// <summary>

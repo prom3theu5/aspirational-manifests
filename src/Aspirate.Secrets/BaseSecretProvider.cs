@@ -1,3 +1,6 @@
+using Aspirate.Shared.Enums;
+using Aspirate.Shared.Interfaces.Secrets;
+
 namespace Aspirate.Secrets;
 
 public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecretProvider where TState : BaseSecretState, new()
@@ -8,7 +11,7 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    public abstract ProviderType Type { get; }
+    public abstract SecretProviderType Type { get; }
 
     public abstract TState? State { get; protected set; }
 

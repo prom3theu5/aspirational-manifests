@@ -1,3 +1,7 @@
+using Aspirate.Shared.Inputs;
+using Aspirate.Shared.Interfaces.Secrets;
+using Aspirate.Shared.Interfaces.Services;
+
 namespace Aspirate.Processors.Resources.Dockerfile;
 
 /// <summary>
@@ -64,18 +68,18 @@ public class DockerfileProcessor(
         return Task.FromResult(true);
     }
 
-    public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, ContainerParameters parameters, bool nonInteractive)
+    public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive)
     {
         var dockerfile = resource.Value as DockerfileResource;
 
-        await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, parameters, nonInteractive);
+        await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, options, nonInteractive);
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for Dockerfile [blue]{resource.Key}[/]");
     }
 
-    public void PopulateContainerImageCacheWithImage(KeyValuePair<string, Resource> resource, ContainerParameters parameters)
+    public void PopulateContainerImageCacheWithImage(KeyValuePair<string, Resource> resource, ContainerOptions options)
     {
-        _containerImageCache.Add(resource.Key, parameters.ToImageName(resource.Key));
+        _containerImageCache.Add(resource.Key, options.ToImageName(resource.Key));
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
     }

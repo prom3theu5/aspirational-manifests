@@ -1,3 +1,5 @@
+using Aspirate.Shared.Interfaces.Secrets;
+
 namespace Aspirate.Processors;
 
 [ExcludeFromCodeCoverage]

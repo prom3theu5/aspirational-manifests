@@ -1,3 +1,5 @@
+using Aspirate.Shared.Outputs;
+
 namespace Aspirate.Services.Implementations;
 
 public class KustomizeService(IFileSystem fileSystem, IShellExecutionService shellExecutionService, IAnsiConsole logger) : IKustomizeService

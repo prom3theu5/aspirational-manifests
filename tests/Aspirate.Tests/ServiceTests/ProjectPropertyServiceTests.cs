@@ -1,3 +1,7 @@
+using Aspirate.Shared.Inputs;
+using Aspirate.Shared.Interfaces.Services;
+using Aspirate.Shared.Outputs;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public class ProjectPropertyServiceTest

@@ -1,3 +1,6 @@
+using Aspirate.Shared.Enums;
+using Aspirate.Shared.Interfaces.Secrets;
+
 namespace Aspirate.Commands.Actions.Secrets;
 
 public class LoadSecretsAction(
@@ -98,7 +101,7 @@ public class LoadSecretsAction(
 
         secretProvider.LoadState(CurrentState.InputPath);
 
-        if (CurrentState.SecretProvider == ProviderType.Password && string.IsNullOrEmpty(CurrentState.SecretPassword))
+        if (CurrentState.SecretProvider == SecretProviderType.Password && string.IsNullOrEmpty(CurrentState.SecretPassword))
         {
             NonInteractiveValidationFailed("Secrets are protected by a password, but no password has been provided.");
         }
