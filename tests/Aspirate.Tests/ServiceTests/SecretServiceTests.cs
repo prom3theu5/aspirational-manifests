@@ -1,5 +1,3 @@
-using Aspirate.Secrets;
-
 namespace Aspirate.Tests.ServiceTests;
 
 public class SecretServiceTests : BaseServiceTests<ISecretService>
@@ -27,26 +25,22 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         // Arrange
         var console = new TestConsole();
         console.Profile.Capabilities.Interactive = true;
-
-        var fileSystem = new MockFileSystem();
-
-        var secretProvider = new SecretProvider(fileSystem);
-
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = null;
+        var serviceProvider = CreateServiceProvider(state, console);
         var service = GetSystemUnderTest(serviceProvider);
 
         // Act
         service.LoadSecrets(new SecretManagementOptions
         {
             State = state,
-            NonInteractive = false,
+            NonInteractive = true,
             DisableSecrets = false,
-            SecretPassword = string.Empty,
+            SecretPassword = "test-password",
         });
 
         // Assert
-        state.SecretState.Secrets.Count.Should().Be(0);
+        state.SecretState.Should().BeNull();
     }
 
     [Fact]
@@ -56,15 +50,11 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         var console = new TestConsole();
         console.Profile.Capabilities.Interactive = true;
         console.Input.PushTextWithEnter("password_for_secrets");
-
-        var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(SecretStoragePath, ValidState);
-
-        var secretProvider = new SecretProvider(fileSystem);
-
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var serviceProvider = CreateServiceProvider(state, console);
+        var secretProvider = serviceProvider.GetRequiredService<ISecretProvider>();
         var service = GetSystemUnderTest(serviceProvider);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
 
         // Act
         service.LoadSecrets(new SecretManagementOptions
@@ -86,13 +76,12 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
     {
         // Arrange
         var console = new TestConsole();
-        var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(SecretStoragePath, ValidState);
-
-        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true, password: "password_for_secrets");
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
+
+        var serviceProvider = CreateServiceProvider(state, console);
+        var secretProvider = serviceProvider.GetRequiredService<ISecretProvider>();
         var service = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -115,13 +104,9 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
     {
         // Arrange
         var console = new TestConsole();
-        var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(SecretStoragePath, ValidState);
-
-        var secretProvider = new SecretProvider(fileSystem);
-
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true);
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var serviceProvider = CreateServiceProvider(state, console);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
         var service = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -142,13 +127,9 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
     {
         // Arrange
         var console = new TestConsole();
-        var fileSystem = new MockFileSystem();
-        fileSystem.AddFile(SecretStoragePath, ValidState);
-
-        var secretProvider = new SecretProvider(fileSystem);
-
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true, password: "invalid_password");
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
+        var serviceProvider = CreateServiceProvider(state, console);
         var service = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -169,12 +150,10 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
     {
         // Arrange
         var console = new TestConsole();
-        var fileSystem = new MockFileSystem();
-
-        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true);
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = null;
+        var serviceProvider = CreateServiceProvider(state, console);
         var service = GetSystemUnderTest(serviceProvider);
 
         // Act

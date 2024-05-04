@@ -71,29 +71,27 @@ public sealed class RemoveManifestsFromClusterAction(
             return;
         }
 
-        if (!secretProvider.SecretStateExists(CurrentState.InputPath))
+        if (!secretProvider.SecretStateExists(CurrentState))
         {
             return;
         }
 
-        if (secretProvider is SecretProvider passwordSecretProvider)
+        secretProvider.LoadState(CurrentState);
+
+        if (secretProvider.State?.Secrets is null || secretProvider.State.Secrets.Count == 0)
         {
-            passwordSecretProvider.LoadState(CurrentState.InputPath);
+            return;
+        }
 
-            if (passwordSecretProvider.State?.Secrets is null || passwordSecretProvider.State.Secrets.Count == 0)
-            {
-                return;
-            }
+        foreach (var resourceSecrets in secretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
+        {
+            var secretFile =
+                fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
 
-            foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x=>x.Value.Keys.Count > 0))
-            {
-                var secretFile = fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
+            files.Add(secretFile);
 
-                files.Add(secretFile);
-
-                var stream = fileSystem.File.Create(secretFile);
-                stream.Close();
-            }
+            var stream = fileSystem.File.Create(secretFile);
+            stream.Close();
         }
     }
 

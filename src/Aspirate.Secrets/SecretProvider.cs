@@ -7,12 +7,7 @@ public class SecretProvider(IFileSystem fileSystem) : ISecretProvider
     private IEncrypter? _encrypter;
     private IDecrypter? _decrypter;
     private byte[]? _salt;
-
     public SecretState? State { get; set; }
-
-    public IEncrypter? Encrypter => _encrypter;
-
-    public IDecrypter? Decrypter => _decrypter;
 
     public void SetPassword(string password)
     {
@@ -70,8 +65,6 @@ public class SecretProvider(IFileSystem fileSystem) : ISecretProvider
         State.Hash = Convert.ToBase64String(pbkdf2.GetBytes(32));
     }
 
-
-
      protected readonly JsonSerializerOptions _serializerOptions = new()
     {
         WriteIndented = true,
@@ -80,12 +73,12 @@ public class SecretProvider(IFileSystem fileSystem) : ISecretProvider
 
     public void AddSecret(string resourceName, string key, string value)
     {
-        if (State?.Secrets == null || Encrypter == null)
+        if (State?.Secrets == null || _encrypter == null)
         {
             return;
         }
 
-        var protectedValue = Encrypter?.EncryptValue(value);
+        var protectedValue = _encrypter?.EncryptValue(value);
         State.Secrets[resourceName][key] = protectedValue;
     }
 
@@ -104,7 +97,7 @@ public class SecretProvider(IFileSystem fileSystem) : ISecretProvider
     public virtual void TransformStateForStorage() =>
         State.Version++;
 
-    public void SaveState(string path)
+    public void SetState(AspirateState state)
     {
         if (State == null)
         {
@@ -113,55 +106,33 @@ public class SecretProvider(IFileSystem fileSystem) : ISecretProvider
 
         TransformStateForStorage();
 
-        var state = JsonSerializer.Serialize(State, _serializerOptions);
-        var fileInfo = new FileInfo(path);
-        var directory = fileInfo.Directory;
-
-        if (!fileSystem.Directory.Exists(directory.FullName))
-        {
-            fileSystem.Directory.CreateDirectory(directory.FullName);
-        }
-
-        fileSystem.File.WriteAllText(path, state);
+        state.SecretState = State;
     }
 
-    public void LoadState(string path)
+    public void LoadState(AspirateState state)
     {
-        if (!fileSystem.File.Exists(path))
-        {
-            throw new FileNotFoundException($"State file not found: {path}");
-        }
-
-        var stateJson = fileSystem.File.ReadAllText(path);
-        State = JsonSerializer.Deserialize<SecretState>(stateJson, _serializerOptions);
+        State = state.SecretState;
 
         ProcessAfterStateRestoration();
     }
 
-    public void RemoveState(string path)
+    public void RemoveState(AspirateState state)
     {
-        if (!fileSystem.File.Exists(path))
-        {
-            throw new FileNotFoundException($"State file not found: {path}");
-        }
-
-        fileSystem.File.Delete(path);
-
         State = null;
+        state.SecretState = null;
 
         ProcessAfterStateRestoration();
     }
 
-    public bool SecretStateExists(string path) =>
-        fileSystem.File.Exists(path);
+    public bool SecretStateExists(AspirateState state) => state.SecretState != null;
 
     public string? GetSecret(string resourceName, string key)
     {
-        if (State?.Secrets == null || Decrypter == null)
+        if (State?.Secrets == null || _decrypter == null)
         {
             return null;
         }
 
-        return State.Secrets[resourceName].TryGetValue(key, out var encryptedValue) ? Decrypter.DecryptValue(encryptedValue) : null;
+        return State.Secrets[resourceName].TryGetValue(key, out var encryptedValue) ? _decrypter.DecryptValue(encryptedValue) : null;
     }
 }

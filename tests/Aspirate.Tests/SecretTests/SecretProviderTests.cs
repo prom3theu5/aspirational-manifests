@@ -1,5 +1,3 @@
-using Aspirate.Secrets;
-
 namespace Aspirate.Tests.SecretTests;
 
 public class SecretProviderTests
@@ -13,22 +11,11 @@ public class SecretProviderTests
     private readonly IFileSystem _fileSystem = CreateMockFilesystem();
 
     [Fact]
-    public void SetPassword_ShouldInitializeEncrypterAndDecrypter()
-    {
-        var provider = new SecretProvider(_fileSystem);
-        provider.SetPassword(TestPassword);
-
-        provider.Encrypter.Should().NotBeNull();
-        provider.Decrypter.Should().NotBeNull();
-    }
-
-    [Fact]
     public void SetPassword_ShouldSetHash()
     {
         var provider = new SecretProvider(_fileSystem);
         provider.SetPassword(TestPassword);
 
-        provider.Encrypter.Should().NotBeNull();
         provider.State.Hash.Should().NotBeNullOrEmpty();
     }
 
@@ -45,16 +32,15 @@ public class SecretProviderTests
     {
         var provider = new SecretProvider(_fileSystem);
         var state = GetState();
-        WriteStateFile(state);
-        provider.SecretStateExists(SecretStoragePath).Should().BeTrue();
+        provider.SecretStateExists(state).Should().BeTrue();
     }
 
     [Fact]
     public void SecretState_ShouldNotExist()
     {
-        _fileSystem.File.Delete(SecretStoragePath);
         var provider = new SecretProvider(_fileSystem);
-        provider.SecretStateExists(SecretStoragePath).Should().BeFalse();
+        var state = new AspirateState();
+        provider.SecretStateExists(state).Should().BeFalse();
     }
 
     [Fact]
@@ -62,8 +48,7 @@ public class SecretProviderTests
     {
         var provider = new SecretProvider(_fileSystem);
         var state = GetState();
-        WriteStateFile(state);
-        provider.LoadState(SecretStoragePath);
+        provider.LoadState(state);
         provider.State.Should().NotBeNull();
         provider.State.Salt.Should().BeNull();
     }
@@ -73,10 +58,9 @@ public class SecretProviderTests
     {
         var provider = new SecretProvider(_fileSystem);
         var state = GetState(Base64Salt, 1);
-        WriteStateFile(state);
-        provider.LoadState(SecretStoragePath);
+        provider.LoadState(state);
 
-        provider.SaveState(SecretStoragePath);
+        provider.SetState(state);
 
         provider.State.Version.Should().Be(2);
     }
@@ -86,8 +70,7 @@ public class SecretProviderTests
     {
         var provider = new SecretProvider(_fileSystem);
         var state = GetState(Base64Salt);
-        WriteStateFile(state);
-        provider.LoadState(SecretStoragePath);
+        provider.LoadState(state);
         provider.SetPassword(TestPassword);
 
         provider.AddResource(TestResource);
@@ -110,8 +93,7 @@ public class SecretProviderTests
                },
             });
 
-        WriteStateFile(state);
-        provider.LoadState(SecretStoragePath);
+        provider.LoadState(state);
 
         provider.SetPassword(TestPassword);
 
@@ -134,8 +116,7 @@ public class SecretProviderTests
                 },
             });
 
-        WriteStateFile(state);
-        provider.LoadState(SecretStoragePath);
+        provider.LoadState(state);
 
         provider.SetPassword(TestPassword);
 
@@ -144,7 +125,7 @@ public class SecretProviderTests
         secret.Should().Be(DecryptedTestValue);
     }
 
-    private static string GetState(string? salt = null, int? version = null, Dictionary<string, Dictionary<string, string>>? secrets = null)
+    private static AspirateState GetState(string? salt = null, int? version = null, Dictionary<string, Dictionary<string, string>>? secrets = null)
     {
         var state = new SecretState
         {
@@ -153,13 +134,8 @@ public class SecretProviderTests
             Secrets = secrets ?? [],
         };
 
-        return JsonSerializer.Serialize(state);
+        return new AspirateState { SecretState = state };
     }
-
-    private void WriteStateFile(string state) =>
-        _fileSystem.File.WriteAllText(SecretStoragePath, state);
-
-    private static string SecretStoragePath => $"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}";
 
     private static MockFileSystem CreateMockFilesystem()
     {

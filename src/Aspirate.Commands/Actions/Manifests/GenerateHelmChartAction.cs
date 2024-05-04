@@ -34,7 +34,7 @@ public sealed class GenerateHelmChartAction(
 
         try
         {
-            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState.DisableSecrets, fileSystem.GetSecretsStateFilePath(CurrentState), secretFiles, secretProvider);
+            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState, secretFiles, secretProvider);
             await helmChartCreator.CreateHelmChart(CurrentState.OutputPath, Path.Combine(CurrentState.OutputPath, "Chart"), "AspireProject");
         }
         catch (Exception e)

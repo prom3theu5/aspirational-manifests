@@ -15,13 +15,6 @@ public class SecretService(
 
     public void SaveSecrets(SecretManagementOptions options)
     {
-        var secretStatePath = fs.GetSecretsStateFilePath(options.State);
-
-        if (string.IsNullOrEmpty(secretStatePath))
-        {
-            logger.ValidationFailed("Secrets state file path is not valid.");
-        }
-
         if (options.DisableSecrets)
         {
             logger.MarkupLine("Secrets have been [red]disabled[/] for this run.");
@@ -34,11 +27,11 @@ public class SecretService(
             return;
         }
 
-        if (secretProvider.SecretStateExists(secretStatePath))
+        if (secretProvider.SecretStateExists(options.State))
         {
             logger.MarkupLine("Aspirate Secrets [blue]already exist[/] for manifest.");
 
-            secretProvider.LoadState(secretStatePath);
+            secretProvider.LoadState(options.State);
 
             if (!CheckPassword(options))
             {
@@ -66,13 +59,13 @@ public class SecretService(
                         break;
                     case Overwrite:
                         logger.MarkupLine($"[yellow]Overwriting[/] secrets");
-                        secretProvider.RemoveState(secretStatePath);
+                        secretProvider.RemoveState(options.State);
                         break;
                 }
             }
         }
 
-        if (!secretProvider.SecretStateExists(secretStatePath))
+        if (!secretProvider.SecretStateExists(options.State))
         {
             HandleInitialisation(options);
         }
@@ -95,29 +88,20 @@ public class SecretService(
             }
         }
 
-        secretProvider.SaveState(secretStatePath);
+        secretProvider.SetState(options.State);
 
-        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved to [blue]{secretStatePath}[/]");
+        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved.");
     }
 
     public void LoadSecrets(SecretManagementOptions options)
     {
-        var secretStatePath = fs.GetSecretsStateFilePath(options.State);
-
-        if (string.IsNullOrEmpty(secretStatePath))
-        {
-            logger.ValidationFailed("Secrets state file path is not valid.");
-        }
-
-        logger.WriteRuler("[purple]Loading Existing Secrets[/]");
-
         if (options.DisableSecrets)
         {
             logger.MarkupLine("[green]Secrets are disabled[/].");
             return;
         }
 
-        if (!secretProvider.SecretStateExists(secretStatePath))
+        if (!secretProvider.SecretStateExists(options.State))
         {
             logger.MarkupLine("[green]No existing secrets state found[/].");
             return;
@@ -131,7 +115,7 @@ public class SecretService(
             }
         }
 
-        secretProvider.LoadState(secretStatePath);
+        secretProvider.LoadState(options.State);
 
         if (!CheckPassword(options))
         {
@@ -141,7 +125,7 @@ public class SecretService(
 
         options.State.SecretState = secretProvider.State;
 
-        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State populated successfully from [blue]{secretStatePath}[/]");
+        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State populated successfully.");
     }
 
     private bool CheckPassword(SecretManagementOptions options)

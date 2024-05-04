@@ -7,6 +7,7 @@ global using Aspirate.Commands.Actions.Containers;
 global using Aspirate.Commands.Actions.Manifests;
 global using Aspirate.Commands.Actions.Secrets;
 global using Aspirate.Processors.Transformation;
+global using Aspirate.Secrets;
 global using Aspirate.Services.Implementations;
 global using Aspirate.Shared.Exceptions;
 global using Aspirate.Shared.Extensions;

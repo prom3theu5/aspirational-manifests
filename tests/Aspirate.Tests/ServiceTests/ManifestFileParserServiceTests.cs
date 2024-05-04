@@ -1,5 +1,4 @@
 using Aspirate.Cli;
-using Aspirate.Secrets;
 
 namespace Aspirate.Tests.ServiceTests;
 

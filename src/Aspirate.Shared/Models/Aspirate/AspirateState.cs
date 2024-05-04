@@ -96,10 +96,6 @@ public class AspirateState :
     public string? PrivateRegistryUsername { get; set; }
 
     [RestorableStateProperty]
-    [JsonPropertyName("privateRegistryPassword")]
-    public string? PrivateRegistryPassword { get; set; }
-
-    [RestorableStateProperty]
     [JsonPropertyName("privateRegistryEmail")]
     public string? PrivateRegistryEmail { get; set; }
 
@@ -125,7 +121,10 @@ public class AspirateState :
 
     [RestorableStateProperty]
     [JsonPropertyName("secrets")]
-    public SecretState SecretState { get; set; } = new();
+    public SecretState? SecretState { get; set; }
+
+    [JsonIgnore]
+    public string? PrivateRegistryPassword { get; set; }
 
     [JsonIgnore]
     public Dictionary<string, Resource> FinalResources { get; } = new();

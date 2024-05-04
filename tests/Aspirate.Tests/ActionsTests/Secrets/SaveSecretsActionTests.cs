@@ -1,5 +1,3 @@
-using Aspirate.Secrets;
-
 namespace Aspirate.Tests.ActionsTests.Secrets;
 
 public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
@@ -30,11 +28,12 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         console.Input.PushTextWithEnter("password_for_secrets");
         console.Input.PushTextWithEnter("password_for_secrets");
 
-        var fileSystem = CreateMockFileSystem();
+        var fileSystem = new MockFileSystem();
 
         var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings();
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
@@ -43,12 +42,11 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         // Assert
         result.Should().BeTrue();
-        console.Output.Should().Contain("Secret State has been saved to");
-        secretProvider.State.Secrets.Count.Should().Be(4);
+        secretProvider.State.Secrets.Count.Should().Be(2);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
-        secretProvider.LoadState(SecretStoragePath);
-        secretProvider.State.Secrets.Count.Should().Be(4);
+        secretProvider.LoadState(state);
+        secretProvider.State.Secrets.Count.Should().Be(2);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
         secretProvider.State.Version.GetValueOrDefault().Should().Be(1);
@@ -64,16 +62,14 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         console.Input.PushTextWithEnter("incorrect_password");
         console.Input.PushTextWithEnter("incorrect_password");
 
-        var fileSystem = CreateMockFileSystem();
-
-        var secretProvider = new SecretProvider(fileSystem);
-        secretProvider.SetPassword("password_for_secrets");
-        secretProvider.SaveState(SecretStoragePath);
-
+        var mockFilesystem = new MockFileSystem();
+        var secretProvider = new SecretProvider(mockFilesystem);
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
+        secretProvider.SetPassword("password_for_secrets");
+        secretProvider.SetState(state);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: mockFilesystem);
         var action = GetSystemUnderTest(serviceProvider);
-
 
         // Act
         var act = () => action.ExecuteAsync();
@@ -96,14 +92,11 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         // Select Use Existing
         console.Input.PushKey(ConsoleKey.Enter);
 
-        var fileSystem = CreateMockFileSystem();
-
-        var secretProvider = new SecretProvider(fileSystem);
-        fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
-
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
+        var serviceProvider = CreateServiceProvider(state, console);
         var action = GetSystemUnderTest(serviceProvider);
+        var secretProvider = serviceProvider.GetRequiredService<ISecretProvider>();
 
         // Act
         var act = () => action.ExecuteAsync();
@@ -136,21 +129,18 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         // Confirm new password
         console.Input.PushTextWithEnter("password_for_secrets");
 
-        var fileSystem = CreateMockFileSystem();
-
-        var secretProvider = new SecretProvider(fileSystem);
-        fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
-
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
+        var serviceProvider = CreateServiceProvider(state, console);
         var action = GetSystemUnderTest(serviceProvider);
+        var secretProvider = serviceProvider.GetRequiredService<ISecretProvider>();
 
         // Act
         var act = () => action.ExecuteAsync();
 
         // Assert
         await act.Should().NotThrowAsync();
-        console.Output.Should().Contain("Secret State has been saved to");
+        console.Output.Should().Contain("Secret State has been saved");
         secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
@@ -179,13 +169,10 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         // Select Use Existing
         console.Input.PushKey(ConsoleKey.Enter);
 
-        var fileSystem = CreateMockFileSystem();
-
-        var secretProvider = new SecretProvider(fileSystem);
-        fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
-
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        state.SecretState = JsonSerializer.Deserialize<SecretState>(ValidState);
+        var serviceProvider = CreateServiceProvider(state, console);
+        var secretProvider = serviceProvider.GetRequiredService<ISecretProvider>();
         var action = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -193,23 +180,10 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         // Assert
         await act.Should().NotThrowAsync();
-        console.Output.Should().Contain("Secret State has been saved to");
+        console.Output.Should().Contain("Secret State has been saved");
         secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
         secretProvider.State.Version.GetValueOrDefault().Should().Be(2);
     }
-
-    private static MockFileSystem CreateMockFileSystem()
-    {
-        const string path = "/some-path";
-
-        var fileSystem = new MockFileSystem();
-        fileSystem.Directory.CreateDirectory(path);
-        fileSystem.Directory.SetCurrentDirectory(path);
-
-        return fileSystem;
-    }
-
-    private static string SecretStoragePath => $"/some-path/aspirate-output/{AspirateLiterals.SecretFileName}";
 }
