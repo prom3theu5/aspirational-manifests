@@ -152,7 +152,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             {
                 if (!CurrentState.LoadedAspireManifestResources.ContainsKey(composeBuild))
                 {
-                    NonInteractiveValidationFailed($"The resource '{composeBuild}' is not found in the loaded manifest.");
+                    Logger.ValidationFailed($"The resource '{composeBuild}' is not found in the loaded manifest.");
                 }
             }
         }

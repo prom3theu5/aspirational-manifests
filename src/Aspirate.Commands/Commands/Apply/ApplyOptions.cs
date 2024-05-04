@@ -4,7 +4,5 @@ public sealed class ApplyOptions : BaseCommandOptions, IKubernetesOptions, ISecr
 {
     public string? InputPath { get; set; }
     public string? KubeContext { get; set; }
-    public string? SecretPassword { get; set; }
-
     public bool RollingRestart { get; set; }
 }

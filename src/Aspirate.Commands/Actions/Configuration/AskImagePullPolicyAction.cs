@@ -46,7 +46,7 @@ public class AskImagePullPolicyAction(
     {
         if (string.IsNullOrEmpty(CurrentState.ImagePullPolicy))
         {
-            NonInteractiveValidationFailed("Image pull policy is required when running in non-interactive mode.");
+            Logger.ValidationFailed("Image pull policy is required when running in non-interactive mode.");
         }
     }
 }

@@ -20,16 +20,40 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
         var handler = ActivatorUtilities.CreateInstance<TOptionsHandler>(services.BuildServiceProvider());
 
-        var stateService = handler.Services.GetRequiredService<IStateService>();
+        var stateOptions = GetStateManagementOptions(options, handler);
 
-        await stateService.RestoreState(handler.CurrentState);
+        var stateService = handler.Services.GetRequiredService<IStateService>();
+        await stateService.RestoreState(stateOptions);
 
         handler.CurrentState.PopulateStateFromOptions(options);
 
+        LoadSecrets(options, handler);
+
         var exitCode = await handler.HandleAsync(options);
 
-        await stateService.SaveState(handler.CurrentState);
+        await stateService.SaveState(stateOptions);
 
         return exitCode;
     }
+
+    private static void LoadSecrets(TOptions options, TOptionsHandler handler)
+    {
+        var secretService = handler.Services.GetRequiredService<ISecretService>();
+
+        secretService.LoadSecrets(new SecretManagementOptions
+        {
+            DisableSecrets = options.DisableSecrets,
+            NonInteractive = options.NonInteractive,
+            SecretPassword = options.SecretPassword,
+            State = handler.CurrentState,
+        });
+    }
+
+    private static StateManagementOptions GetStateManagementOptions(TOptions options, TOptionsHandler handler) =>
+        new()
+        {
+            NonInteractive = options.NonInteractive,
+            DisableState = options.DisableState,
+            State = handler.CurrentState
+        };
 }

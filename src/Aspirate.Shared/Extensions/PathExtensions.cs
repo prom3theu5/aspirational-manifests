@@ -35,4 +35,18 @@ public static class PathExtensions
             // The path is relative to the current working directory
             fileSystem.Path.GetFullPath(path);
     }
+
+    public static string? GetSecretsStateFilePath(this IFileSystem fileSystem, AspirateState state)
+    {
+        if (string.IsNullOrEmpty(state.ProjectPath))
+        {
+            return null;
+        }
+
+        var subPath = !string.IsNullOrEmpty(state.OutputPath) ?
+            state.OutputPath : (!string.IsNullOrEmpty(state.InputPath) ?
+                state.InputPath : AspirateLiterals.DefaultArtifactsPath);
+
+        return fileSystem.Path.Combine(state.ProjectPath, subPath, AspirateLiterals.SecretFileName);
+    }
 }

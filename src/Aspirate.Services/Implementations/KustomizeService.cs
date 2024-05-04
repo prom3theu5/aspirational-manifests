@@ -1,5 +1,3 @@
-using Aspirate.Shared.Outputs;
-
 namespace Aspirate.Services.Implementations;
 
 public class KustomizeService(IFileSystem fileSystem, IShellExecutionService shellExecutionService, IAnsiConsole logger) : IKustomizeService
@@ -36,17 +34,20 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
         return result.Output;
     }
 
-    public async Task WriteSecretsOutToTempFiles(bool disableSecrets, string inputPath, List<string> files, ISecretProvider secretProvider)
+    public async Task WriteSecretsOutToTempFiles(bool disableSecrets, string secretFilePath, List<string> files, ISecretProvider secretProvider)
     {
         if (disableSecrets)
         {
             return;
         }
 
-        if (!secretProvider.SecretStateExists(inputPath))
+        if (!secretProvider.SecretStateExists(secretFilePath))
         {
             return;
         }
+
+        var secretPathInfo = new FileInfo(secretFilePath);
+        var secretDirectory = secretPathInfo.Directory.FullName;
 
         if (secretProvider is PasswordSecretProvider passwordSecretProvider)
         {
@@ -57,7 +58,7 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
 
             foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
             {
-                var secretFile = fileSystem.Path.Combine(inputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
+                var secretFile = fileSystem.Path.Combine(secretDirectory, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
 
                 files.Add(secretFile);
 

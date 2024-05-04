@@ -45,7 +45,7 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
     public virtual void ProcessAfterStateRestoration()
     {}
 
-    public void SaveState(string? path = null)
+    public void SaveState(string path)
     {
         if (State == null)
         {
@@ -54,59 +54,47 @@ public abstract class BaseSecretProvider<TState>(IFileSystem fileSystem) : ISecr
 
         TransformStateForStorage();
 
-        path ??= fileSystem.Directory.GetCurrentDirectory();
-
         var state = JsonSerializer.Serialize(State, _serializerOptions);
-        var outputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
+        var fileInfo = new FileInfo(path);
+        var directory = fileInfo.Directory;
 
-        if (!fileSystem.Directory.Exists(path))
+        if (!fileSystem.Directory.Exists(directory.FullName))
         {
-            fileSystem.Directory.CreateDirectory(path);
+            fileSystem.Directory.CreateDirectory(directory.FullName);
         }
 
-        fileSystem.File.WriteAllText(outputFile, state);
+        fileSystem.File.WriteAllText(path, state);
     }
 
-    public void LoadState(string? path = null)
+    public void LoadState(string path)
     {
-        path ??= fileSystem.Directory.GetCurrentDirectory();
-        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
-
-        if (!fileSystem.File.Exists(inputFile))
+        if (!fileSystem.File.Exists(path))
         {
-            throw new FileNotFoundException($"State file not found: {inputFile}");
+            throw new FileNotFoundException($"State file not found: {path}");
         }
 
-        var stateJson = fileSystem.File.ReadAllText(inputFile);
+        var stateJson = fileSystem.File.ReadAllText(path);
         State = JsonSerializer.Deserialize<TState>(stateJson, _serializerOptions);
 
         ProcessAfterStateRestoration();
     }
 
-    public void RemoveState(string? path = null)
+    public void RemoveState(string path)
     {
-        path ??= fileSystem.Directory.GetCurrentDirectory();
-        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
-
-        if (!fileSystem.File.Exists(inputFile))
+        if (!fileSystem.File.Exists(path))
         {
-            throw new FileNotFoundException($"State file not found: {inputFile}");
+            throw new FileNotFoundException($"State file not found: {path}");
         }
 
-        fileSystem.File.Delete(inputFile);
+        fileSystem.File.Delete(path);
 
         State = null;
 
         ProcessAfterStateRestoration();
     }
 
-    public bool SecretStateExists(string? path = null)
-    {
-        path ??= fileSystem.Directory.GetCurrentDirectory();
-        var inputFile = fileSystem.Path.Combine(path, AspirateSecretLiterals.SecretsStateFile);
-
-        return fileSystem.File.Exists(inputFile);
-    }
+    public bool SecretStateExists(string path) =>
+        fileSystem.File.Exists(path);
 
     public string? GetSecret(string resourceName, string key)
     {

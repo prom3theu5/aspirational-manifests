@@ -2,7 +2,7 @@ namespace Aspirate.Shared.Interfaces.Services;
 
 public interface IStateService
 {
-    Task SaveState(AspirateState state);
+    Task SaveState(StateManagementOptions options);
 
-    Task RestoreState(AspirateState state);
+    Task RestoreState(StateManagementOptions options);
 }

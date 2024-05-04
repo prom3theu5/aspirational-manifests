@@ -3,6 +3,7 @@ public interface ISecretProvider
 {
     SecretProviderType Type { get; }
 
+
     IEncrypter? Encrypter { get; }
 
     IDecrypter? Decrypter { get; }
@@ -13,9 +14,9 @@ public interface ISecretProvider
     bool SecretExists(string resourceName, string key);
     void AddSecret(string resourceName, string key, string value);
     void RemoveSecret(string resourceName, string key);
-    void SaveState(string? path = null);
-    void LoadState(string? path = null);
-    void RemoveState(string? path = null);
-    bool SecretStateExists(string? path = null);
+    void SaveState(string path);
+    void LoadState(string path);
+    void RemoveState(string path);
+    bool SecretStateExists(string path);
     string? GetSecret(string resourceName, string key);
 }

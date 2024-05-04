@@ -18,7 +18,7 @@ public class IncludeAspireDashboardAction(IServiceProvider serviceProvider) : Ba
 
         if (CurrentState.NonInteractive)
         {
-            NonInteractiveValidationFailed("The include dashboard option is required in non-interactive mode.");
+            Logger.ValidationFailed("The include dashboard option is required in non-interactive mode.");
         }
 
         AskShouldIncludeDashboard();
@@ -45,7 +45,7 @@ public class IncludeAspireDashboardAction(IServiceProvider serviceProvider) : Ba
     {
         if (CurrentState.IncludeDashboard == null)
         {
-            NonInteractiveValidationFailed("The include dashboard option is required in non-interactive mode.");
+            Logger.ValidationFailed("The include dashboard option is required in non-interactive mode.");
         }
     }
 }

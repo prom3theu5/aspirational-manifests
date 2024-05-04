@@ -27,7 +27,7 @@
     "build": {
       "commandName": "Project",
       "commandLineArgs": "build",
-      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "build-non-interactive": {
@@ -39,7 +39,7 @@
     "apply": {
       "commandName": "Project",
       "commandLineArgs": "apply",
-      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "apply-non-interactive": {

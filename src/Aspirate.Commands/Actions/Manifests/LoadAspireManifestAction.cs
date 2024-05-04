@@ -41,7 +41,7 @@ public class LoadAspireManifestAction(
     {
         if (string.IsNullOrEmpty(CurrentState.AspireManifest))
         {
-            NonInteractiveValidationFailed("No Aspire Manifest file was supplied.");
+            Logger.ValidationFailed("No Aspire Manifest file was supplied.");
         }
     }
 }

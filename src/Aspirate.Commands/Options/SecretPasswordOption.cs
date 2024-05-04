@@ -9,7 +9,7 @@ public sealed class SecretPasswordOption : BaseOption<string?>
 
     private SecretPasswordOption() : base(_aliases, "ASPIRATE_SECRET_PASSWORD", null)
     {
-        Name = nameof(ISecretOptions.SecretPassword);
+        Name = nameof(ICommandOptions.SecretPassword);
         Description = "The Secret Password to use";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;

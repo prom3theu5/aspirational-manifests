@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class RemoveManifestsFromClusterAction(
@@ -150,12 +148,12 @@ public sealed class RemoveManifestsFromClusterAction(
     {
         if (!CurrentState.ActiveKubernetesContextIsSet)
         {
-            NonInteractiveValidationFailed("Cannot remove manifests from a cluster without specifying the kubernetes context to use.");
+            Logger.ValidationFailed("Cannot remove manifests from a cluster without specifying the kubernetes context to use.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.InputPath))
         {
-            NonInteractiveValidationFailed("Cannot remove manifests from a cluster without specifying the input path to use for manifests.");
+            Logger.ValidationFailed("Cannot remove manifests from a cluster without specifying the input path to use for manifests.");
         }
     }
 

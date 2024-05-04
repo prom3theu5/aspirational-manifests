@@ -40,7 +40,6 @@ public static class ServiceCollectionExtensions
             .RegisterAction<ApplyDaprAnnotationsAction>()
             .RegisterAction<PopulateInputsAction>()
             .RegisterAction<SaveSecretsAction>()
-            .RegisterAction<LoadSecretsAction>()
             .RegisterAction<AskPrivateRegistryCredentialsAction>()
             .RegisterAction<IncludeAspireDashboardAction>()
             .RegisterAction<GenerateHelmChartAction>();

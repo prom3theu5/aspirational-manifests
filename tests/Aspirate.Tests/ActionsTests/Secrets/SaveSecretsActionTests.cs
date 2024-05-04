@@ -28,12 +28,12 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         console.Input.PushTextWithEnter("password_for_secrets");
         console.Input.PushTextWithEnter("password_for_secrets");
 
-        var fileSystem = new MockFileSystem();
+        var fileSystem = CreateMockFileSystem();
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -45,7 +45,7 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
-        secretProvider.LoadState();
+        secretProvider.LoadState(SecretStoragePath);
         secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
@@ -62,14 +62,14 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         console.Input.PushTextWithEnter("incorrect_password");
         console.Input.PushTextWithEnter("incorrect_password");
 
-        var fileSystem = new MockFileSystem();
+        var fileSystem = CreateMockFileSystem();
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
         secretProvider.SetPassword("password_for_secrets");
-        secretProvider.SaveState();
+        secretProvider.SaveState(SecretStoragePath);
 
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
 
@@ -94,13 +94,13 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         // Select Use Existing
         console.Input.PushKey(ConsoleKey.Enter);
 
-        var fileSystem = new MockFileSystem();
+        var fileSystem = CreateMockFileSystem();
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
-        fileSystem.AddFile($"/{AspirateSecretLiterals.SecretsStateFile}", ValidState);
+        fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
 
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -134,13 +134,13 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         // Confirm new password
         console.Input.PushTextWithEnter("password_for_secrets");
 
-        var fileSystem = new MockFileSystem();
+        var fileSystem = CreateMockFileSystem();
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
-        fileSystem.AddFile($"/{AspirateSecretLiterals.SecretsStateFile}", ValidState);
+        fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
 
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -177,13 +177,13 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         // Select Use Existing
         console.Input.PushKey(ConsoleKey.Enter);
 
-        var fileSystem = new MockFileSystem();
+        var fileSystem = CreateMockFileSystem();
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
-        fileSystem.AddFile($"/{AspirateSecretLiterals.SecretsStateFile}", ValidState);
+        fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
 
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
         // Act
@@ -197,4 +197,17 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
         secretProvider.State.Version.GetValueOrDefault().Should().Be(2);
     }
+
+    private static MockFileSystem CreateMockFileSystem()
+    {
+        const string path = "/some-path";
+
+        var fileSystem = new MockFileSystem();
+        fileSystem.Directory.CreateDirectory(path);
+        fileSystem.Directory.SetCurrentDirectory(path);
+
+        return fileSystem;
+    }
+
+    private static string SecretStoragePath => $"/some-path/aspirate-output/{AspirateLiterals.SecretFileName}";
 }

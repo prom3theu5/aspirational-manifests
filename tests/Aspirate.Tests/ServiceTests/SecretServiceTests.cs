@@ -1,6 +1,6 @@
-namespace Aspirate.Tests.ActionsTests.Secrets;
+namespace Aspirate.Tests.ServiceTests;
 
-public class LoadSecretsActionTests : BaseActionTests<LoadSecretsAction>
+public class SecretServiceTests : BaseServiceTests<ISecretService>
 {
     private const string ValidState =
         """
@@ -20,7 +20,7 @@ public class LoadSecretsActionTests : BaseActionTests<LoadSecretsAction>
         """;
 
     [Fact]
-    public async Task LoadState_NotExists_Success()
+    public void LoadState_NotExists_Success()
     {
         // Arrange
         var console = new TestConsole();
@@ -31,18 +31,24 @@ public class LoadSecretsActionTests : BaseActionTests<LoadSecretsAction>
         var secretProvider = new PasswordSecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
-        var action = GetSystemUnderTest(serviceProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var service = GetSystemUnderTest(serviceProvider);
 
         // Act
-        var result = await action.ExecuteAsync();
+        service.LoadSecrets(new SecretManagementOptions
+        {
+            State = state,
+            NonInteractive = false,
+            DisableSecrets = false,
+            SecretPassword = string.Empty,
+        });
 
         // Assert
-        result.Should().BeTrue();
+        state.Secrets.Count.Should().Be(0);
     }
 
     [Fact]
-    public async Task LoadState_ExistingState_Success()
+    public void  LoadState_ExistingState_Success()
     {
         // Arrange
         var console = new TestConsole();
@@ -50,45 +56,53 @@ public class LoadSecretsActionTests : BaseActionTests<LoadSecretsAction>
         console.Input.PushTextWithEnter("password_for_secrets");
 
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile($"/{AspirateSecretLiterals.SecretsStateFile}", ValidState);
+        fileSystem.AddFile(SecretStoragePath, ValidState);
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings();
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
-        var action = GetSystemUnderTest(serviceProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var service = GetSystemUnderTest(serviceProvider);
 
         // Act
-
-        var result = await action.ExecuteAsync();
+        service.LoadSecrets(new SecretManagementOptions
+        {
+            State = state,
+            NonInteractive = false,
+            DisableSecrets = false,
+            SecretPassword = string.Empty,
+        });
 
         // Assert
-        result.Should().BeTrue();
         secretProvider.State.Secrets.Count.Should().Be(2);
         secretProvider.State.Secrets.ElementAt(0).Value.Count.Should().Be(1);
         secretProvider.State.Secrets.ElementAt(1).Value.Count.Should().Be(1);
     }
 
     [Fact]
-    public async Task LoadState_ExistingStateNonInteractive_Success()
+    public void LoadState_ExistingStateNonInteractive_Success()
     {
         // Arrange
         var console = new TestConsole();
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile($"/{AspirateSecretLiterals.SecretsStateFile}", ValidState);
+        fileSystem.AddFile(SecretStoragePath, ValidState);
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true, password: "password_for_secrets");
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
-        var action = GetSystemUnderTest(serviceProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var service = GetSystemUnderTest(serviceProvider);
 
         // Act
-        action.ValidateNonInteractiveState();
-        var result = await action.ExecuteAsync();
+        service.LoadSecrets(new SecretManagementOptions
+        {
+            State = state,
+            NonInteractive = true,
+            DisableSecrets = false,
+            SecretPassword = state.SecretPassword,
+        });
 
         // Assert
-        result.Should().BeTrue();
         secretProvider.State.Secrets.Count.Should().Be(2);
         secretProvider.State.Secrets.ElementAt(0).Value.Count.Should().Be(1);
         secretProvider.State.Secrets.ElementAt(1).Value.Count.Should().Be(1);
@@ -100,16 +114,22 @@ public class LoadSecretsActionTests : BaseActionTests<LoadSecretsAction>
         // Arrange
         var console = new TestConsole();
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile($"/{AspirateSecretLiterals.SecretsStateFile}", ValidState);
+        fileSystem.AddFile(SecretStoragePath, ValidState);
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true);
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
-        var action = GetSystemUnderTest(serviceProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var service = GetSystemUnderTest(serviceProvider);
 
         // Act
-        var result = () => action.ValidateNonInteractiveState();
+        var result = () => service.LoadSecrets(new SecretManagementOptions
+        {
+            State = state,
+            NonInteractive = true,
+            DisableSecrets = false,
+            SecretPassword = string.Empty,
+        });;
 
         // Assert
         result.Should().Throw<ActionCausesExitException>();
@@ -121,16 +141,22 @@ public class LoadSecretsActionTests : BaseActionTests<LoadSecretsAction>
         // Arrange
         var console = new TestConsole();
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile($"/{AspirateSecretLiterals.SecretsStateFile}", ValidState);
+        fileSystem.AddFile(SecretStoragePath, ValidState);
 
         var secretProvider = new PasswordSecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true, password: "invalid_password");
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
-        var action = GetSystemUnderTest(serviceProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var service = GetSystemUnderTest(serviceProvider);
 
         // Act
-        var result = () => action.ValidateNonInteractiveState();
+        var result = () => service.LoadSecrets(new SecretManagementOptions
+        {
+            State = state,
+            NonInteractive = true,
+            DisableSecrets = false,
+            SecretPassword = string.Empty,
+        });;
 
         // Assert
         result.Should().Throw<ActionCausesExitException>();
@@ -146,13 +172,21 @@ public class LoadSecretsActionTests : BaseActionTests<LoadSecretsAction>
         var secretProvider = new PasswordSecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true);
-        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider);
-        var action = GetSystemUnderTest(serviceProvider);
+        var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
+        var service = GetSystemUnderTest(serviceProvider);
 
         // Act
-        var result = () => action.ValidateNonInteractiveState();
+        var result = () => service.LoadSecrets(new SecretManagementOptions
+        {
+            State = state,
+            NonInteractive = true,
+            DisableSecrets = false,
+            SecretPassword = string.Empty,
+        });;
 
         // Assert
         result.Should().NotThrow();
     }
+
+    private static string SecretStoragePath => $"/some-path/aspirate-output/{AspirateLiterals.SecretFileName}";
 }

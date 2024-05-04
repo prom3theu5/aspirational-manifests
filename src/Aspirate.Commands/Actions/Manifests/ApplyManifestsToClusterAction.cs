@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class ApplyManifestsToClusterAction(
@@ -22,7 +20,7 @@ public sealed class ApplyManifestsToClusterAction(
 
             await HandleDapr();
 
-            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState.DisableSecrets, CurrentState.InputPath, secretFiles, secretProvider);
+            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState.DisableSecrets, fileSystem.GetSecretsStateFilePath(CurrentState), secretFiles, secretProvider);
             await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
             await HandleRollingRestart();
             Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments successfully applied to cluster [blue]'{CurrentState.KubeContext}'[/]");
@@ -106,12 +104,12 @@ public sealed class ApplyManifestsToClusterAction(
     {
         if (!CurrentState.ActiveKubernetesContextIsSet)
         {
-            NonInteractiveValidationFailed("Cannot apply manifests to cluster without specifying the kubernetes context to use.");
+            Logger.ValidationFailed("Cannot apply manifests to cluster without specifying the kubernetes context to use.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.InputPath))
         {
-            NonInteractiveValidationFailed("Cannot apply manifests to cluster without specifying the input path to use for manifests.");
+            Logger.ValidationFailed("Cannot apply manifests to cluster without specifying the input path to use for manifests.");
         }
     }
 

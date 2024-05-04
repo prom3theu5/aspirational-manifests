@@ -8,7 +8,7 @@ public class Base64SecretProviderTests
     private const string TestResource = "testresource";
     private const string DecryptedTestValue = "testValue";
     private const string EncryptedTestValue = "dGVzdFZhbHVl";
-    private readonly IFileSystem _fileSystem = new MockFileSystem();
+    private readonly IFileSystem _fileSystem = CreateMockFilesystem();
 
     [Fact]
     public void RestoreState_ShouldSetState()
@@ -16,7 +16,7 @@ public class Base64SecretProviderTests
         var provider = new Base64SecretProvider(_fileSystem);
         var state = GetState();
         WriteStateFile(state);
-        provider.LoadState("/");
+        provider.LoadState(SecretStoragePath);
         provider.State.Should().NotBeNull();
     }
 
@@ -26,15 +26,15 @@ public class Base64SecretProviderTests
         var provider = new Base64SecretProvider(_fileSystem);
         var state = GetState();
         WriteStateFile(state);
-        provider.SecretStateExists().Should().BeTrue();
+        provider.SecretStateExists(SecretStoragePath).Should().BeTrue();
     }
 
     [Fact]
     public void SecretState_ShouldNotExist()
     {
-        _fileSystem.File.Delete(_fileSystem.Path.Combine("/", AspirateSecretLiterals.SecretsStateFile));
+        _fileSystem.File.Delete(SecretStoragePath);
         var provider = new Base64SecretProvider(_fileSystem);
-        provider.SecretStateExists().Should().BeFalse();
+        provider.SecretStateExists(SecretStoragePath).Should().BeFalse();
     }
 
     [Fact]
@@ -43,9 +43,9 @@ public class Base64SecretProviderTests
         var provider = new Base64SecretProvider(_fileSystem);
         var state = GetState(1);
         WriteStateFile(state);
-        provider.LoadState("/");
+        provider.LoadState(SecretStoragePath);
 
-        provider.SaveState();
+        provider.SaveState(SecretStoragePath);
 
         provider.State.Version.Should().Be(2);
     }
@@ -56,7 +56,7 @@ public class Base64SecretProviderTests
         var provider = new Base64SecretProvider(_fileSystem);
         var state = GetState();
         WriteStateFile(state);
-        provider.LoadState("/");
+        provider.LoadState(SecretStoragePath);
 
         provider.AddResource(TestResource);
         provider.AddSecret(TestResource, TestKey, DecryptedTestValue);
@@ -80,7 +80,7 @@ public class Base64SecretProviderTests
 
         WriteStateFile(state);
 
-        provider.LoadState("/");
+        provider.LoadState(SecretStoragePath);
 
         provider.RemoveSecret(TestResource, TestKey);
 
@@ -103,7 +103,7 @@ public class Base64SecretProviderTests
 
         WriteStateFile(state);
 
-        provider.LoadState("/");
+        provider.LoadState(SecretStoragePath);
 
         var secret = provider.GetSecret(TestResource, TestKey);
 
@@ -121,9 +121,17 @@ public class Base64SecretProviderTests
         return JsonSerializer.Serialize(state);
     }
 
-    private void WriteStateFile(string state)
+    private void WriteStateFile(string state) =>
+        _fileSystem.File.WriteAllText(SecretStoragePath, state);
+
+    private static string SecretStoragePath => $"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}";
+
+    private static MockFileSystem CreateMockFilesystem()
     {
-        var outputFile = _fileSystem.Path.Combine("/", AspirateSecretLiterals.SecretsStateFile);
-        _fileSystem.File.WriteAllText(outputFile, state);
+        var fileSystem = new MockFileSystem();
+        fileSystem.AddDirectory($"/some-path/{AspirateLiterals.DefaultArtifactsPath}");
+        fileSystem.Directory.SetCurrentDirectory($"/some-path");
+
+        return fileSystem;
     }
 }

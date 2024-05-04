@@ -24,7 +24,6 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public string? OutputFormat { get; set; }
     public string? RuntimeIdentifier { get; set; }
     public List<string>? ComposeBuilds { get; set; }
-    public string? SecretPassword { get; set; }
     public string? PrivateRegistryUrl { get; set; }
     public string? PrivateRegistryUsername { get; set; }
     public string? PrivateRegistryPassword { get; set; }

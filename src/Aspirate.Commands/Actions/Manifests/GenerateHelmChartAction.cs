@@ -1,11 +1,10 @@
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateHelmChartAction(
     IHelmChartCreator helmChartCreator,
     IKustomizeService kustomizeService,
     ISecretProvider secretProvider,
+    IFileSystem fileSystem,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
     public override async Task<bool> ExecuteAsync()
@@ -35,7 +34,7 @@ public sealed class GenerateHelmChartAction(
 
         try
         {
-            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState.DisableSecrets, CurrentState.OutputPath, secretFiles, secretProvider);
+            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState.DisableSecrets, fileSystem.GetSecretsStateFilePath(CurrentState), secretFiles, secretProvider);
             await helmChartCreator.CreateHelmChart(CurrentState.OutputPath, Path.Combine(CurrentState.OutputPath, "Chart"), "AspireProject");
         }
         catch (Exception e)

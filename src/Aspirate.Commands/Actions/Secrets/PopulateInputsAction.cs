@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Secrets;
-
 namespace Aspirate.Commands.Actions.Secrets;
 
 public class PopulateInputsAction(
@@ -132,7 +130,7 @@ public class PopulateInputsAction(
 
         if (manualInputs.Any())
         {
-            NonInteractiveValidationFailed("Cannot obtain non-generated values for inputs in non-interactive mode. Inputs are required according to the manifest.");
+            Logger.ValidationFailed("Cannot obtain non-generated values for inputs in non-interactive mode. Inputs are required according to the manifest.");
         }
     }
 }

@@ -20,7 +20,8 @@ public static class ServiceCollectionExtensions
             .AddKubeCtlSupport()
             .AddDaprCliSupport()
             .AddHelmSupport()
-            .AddStateManagement();
+            .AddStateManagement()
+            .AddSecretService();
 
     /// <summary>
     /// Adds the password generator implementation to the service collection.
@@ -77,6 +78,10 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddStateManagement(this IServiceCollection services) =>
         services
             .AddSingleton<IStateService, StateService>();
+
+    private static IServiceCollection AddSecretService(this IServiceCollection services) =>
+        services
+            .AddSingleton<ISecretService, SecretService>();
 
     /// <summary>
     /// Adds the shell execution service to the service collection.
