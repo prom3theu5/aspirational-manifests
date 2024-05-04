@@ -1,4 +1,3 @@
-using Aspirate.Shared.Enums;
 using Aspirate.Shared.Interfaces.Secrets;
 
 namespace Aspirate.Commands.Actions.Secrets;

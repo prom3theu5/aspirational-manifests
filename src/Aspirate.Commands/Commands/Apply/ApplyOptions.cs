@@ -1,8 +1,6 @@
-using Aspirate.Shared.Interfaces.Commands.Contracts;
-
 namespace Aspirate.Commands.Commands.Apply;
 
-public sealed class ApplyOptionses : BaseCommandOptions, IKubernetesOptions, ISecretOptions, IApplyOptions
+public sealed class ApplyOptions : BaseCommandOptions, IKubernetesOptions, ISecretOptions, IApplyOptions
 {
     public string? InputPath { get; set; }
     public string? KubeContext { get; set; }

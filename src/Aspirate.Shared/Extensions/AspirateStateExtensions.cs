@@ -1,6 +1,5 @@
 namespace Aspirate.Shared.Extensions;
 
-/// Provides extension methods for populating an AspirateState object from command options.
 public static class AspirateStateExtensions
 {
     public static void PopulateStateFromOptions<TOptions>(this AspirateState state, TOptions options)
@@ -22,5 +21,27 @@ public static class AspirateStateExtensions
 
             stateProperty?.SetValue(state, propertyValue);
         }
+    }
+
+    public static void ReplaceCurrentStateWithPreviousState(this AspirateState currentState, AspirateState previousState)
+    {
+        ArgumentNullException.ThrowIfNull(currentState);
+        ArgumentNullException.ThrowIfNull(previousState);
+
+        var properties = typeof(AspirateState).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => Attribute.IsDefined(p, typeof(RestorableStatePropertyAttribute)));
+
+        foreach (var property in properties)
+        {
+            var previousStatePropertyValue = property.GetValue(previousState);
+            if (previousStatePropertyValue is null)
+            {
+                continue;
+            }
+
+            property.SetValue(currentState, previousStatePropertyValue);
+        }
+
+        currentState.StateWasLoadedFromPrevious = true;
     }
 }

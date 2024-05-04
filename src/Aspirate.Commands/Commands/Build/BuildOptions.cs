@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Commands.Contracts;
-
 namespace Aspirate.Commands.Commands.Build;
 
 public sealed class BuildOptions : BaseCommandOptions, IBuildOptions, IContainerOptions, IAspireOptions

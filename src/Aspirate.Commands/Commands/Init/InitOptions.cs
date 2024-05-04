@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Commands.Contracts;
-
 namespace Aspirate.Commands.Commands.Init;
 
 public sealed class InitOptions : BaseCommandOptions, IInitOptions, IContainerOptions

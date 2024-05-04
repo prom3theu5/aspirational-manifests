@@ -4,6 +4,11 @@ public class IncludeAspireDashboardAction(IServiceProvider serviceProvider) : Ba
 {
     public override Task<bool> ExecuteAsync()
     {
+        if (PreviousStateWasRestored())
+        {
+            return Task.FromResult(true);
+        }
+
         Logger.WriteRuler("[purple]Handling Aspire Dashboard[/]");
 
         if (CurrentState.IncludeDashboard != null)

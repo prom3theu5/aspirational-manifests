@@ -1,4 +1,3 @@
-using Aspirate.Shared.Enums;
 using Aspirate.Shared.Interfaces.Commands;
 
 namespace Aspirate.Commands.Commands;

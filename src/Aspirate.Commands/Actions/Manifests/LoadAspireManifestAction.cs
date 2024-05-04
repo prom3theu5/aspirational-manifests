@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public class LoadAspireManifestAction(
