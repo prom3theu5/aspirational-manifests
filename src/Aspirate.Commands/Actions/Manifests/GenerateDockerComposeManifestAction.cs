@@ -116,8 +116,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         var ports = new List<Port>
         {
-            new() { Published = 18888, Target = 18888 },
-            new() { Published = 4317, Target = 18889 }
+            new() { Published = 18888, Target = 18888 }
         };
 
         var aspireDashboard = Builder.MakeService("aspire-dashboard")
