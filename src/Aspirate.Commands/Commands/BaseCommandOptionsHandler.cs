@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Commands;
-
 namespace Aspirate.Commands.Commands;
 
 [ExcludeFromCodeCoverage]
@@ -13,7 +11,7 @@ public abstract class BaseCommandOptionsHandler<TOptions> : ICommandOptionsHandl
     }
 
     public AspirateState CurrentState { get; set; }
-    protected IServiceProvider Services { get; }
+    public IServiceProvider Services { get; }
 
     protected ActionExecutor ActionExecutor { get; set; }
 

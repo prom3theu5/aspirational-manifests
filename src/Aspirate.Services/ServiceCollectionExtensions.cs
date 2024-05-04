@@ -19,7 +19,8 @@ public static class ServiceCollectionExtensions
             .AddContainerSupport()
             .AddKubeCtlSupport()
             .AddDaprCliSupport()
-            .AddHelmSupport();
+            .AddHelmSupport()
+            .AddStateManagement();
 
     /// <summary>
     /// Adds the password generator implementation to the service collection.
@@ -72,6 +73,10 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddDaprCliSupport(this IServiceCollection services) =>
         services
             .AddSingleton<IDaprCliService, DaprCliService>();
+
+    private static IServiceCollection AddStateManagement(this IServiceCollection services) =>
+        services
+            .AddSingleton<IStateService, StateService>();
 
     /// <summary>
     /// Adds the shell execution service to the service collection.

@@ -1,6 +1,3 @@
-using Aspirate.Secrets;
-using Aspirate.Shared.Interfaces.Commands;
-
 namespace Aspirate.Commands.Commands;
 
 [ExcludeFromCodeCoverage]
@@ -17,14 +14,22 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         Handler = CommandHandler.Create<TOptions, IServiceCollection>(ConstructCommand);
     }
 
-    private static Task<int> ConstructCommand(TOptions options, IServiceCollection services)
+    private static async Task<int> ConstructCommand(TOptions options, IServiceCollection services)
     {
         services.RegisterAspirateSecretProvider(options.SecretProvider);
 
         var handler = ActivatorUtilities.CreateInstance<TOptionsHandler>(services.BuildServiceProvider());
 
+        var stateService = handler.Services.GetRequiredService<IStateService>();
+
+        await stateService.RestoreState(handler.CurrentState);
+
         handler.CurrentState.PopulateStateFromOptions(options);
 
-        return handler.HandleAsync(options);
+        var exitCode = await handler.HandleAsync(options);
+
+        await stateService.SaveState(handler.CurrentState);
+
+        return exitCode;
     }
 }

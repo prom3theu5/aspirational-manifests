@@ -24,7 +24,6 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
 
     private Task<int> GenerateDockerComposeManifests() =>
         ActionExecutor
-            .QueueAction(nameof(LoadStateAction))
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
@@ -36,12 +35,10 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))
             .QueueAction(nameof(GenerateDockerComposeManifestAction))
-            .QueueAction(nameof(SaveStateAction))
             .ExecuteCommandsAsync();
 
     private Task<int> GenerateKustomizeManifests() =>
         ActionExecutor
-            .QueueAction(nameof(LoadStateAction))
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
@@ -58,6 +55,5 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(GenerateKustomizeManifestsAction))
             .QueueAction(nameof(GenerateFinalKustomizeManifestAction))
             .QueueAction(nameof(GenerateHelmChartAction))
-            .QueueAction(nameof(SaveStateAction))
             .ExecuteCommandsAsync();
 }

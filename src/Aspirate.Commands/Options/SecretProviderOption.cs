@@ -1,6 +1,4 @@
-﻿using Aspirate.Shared.Interfaces.Commands;
-
-namespace Aspirate.Commands.Options;
+﻿namespace Aspirate.Commands.Options;
 
 public sealed class SecretProviderOption : BaseOption<SecretProviderType>
 {
