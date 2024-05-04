@@ -4,8 +4,7 @@ namespace Aspirate.Shared.Extensions;
 
 public static class ResourceExtensions
 {
-    public static Dictionary<string, string?> MapResourceToEnvVars(this KeyValuePair<string, Resource> resource,
-        bool? withDashboard)
+    public static Dictionary<string, string?> MapResourceToEnvVars(this KeyValuePair<string, Resource> resource, bool? withDashboard)
     {
         var environment = new Dictionary<string, string?>();
 
@@ -21,7 +20,7 @@ public static class ResourceExtensions
 
         if (withDashboard.GetValueOrDefault())
         {
-            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:4317");
+            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:18889");
         }
 
         return environment;
