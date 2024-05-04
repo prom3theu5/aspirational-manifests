@@ -1,3 +1,6 @@
+using Aspirate.Cli;
+using Aspirate.Secrets;
+
 namespace Aspirate.Tests;
 
 public abstract class AspirateTestBase
@@ -58,7 +61,7 @@ public abstract class AspirateTestBase
     {
         var console = testConsole ?? new TestConsole();
         fileSystem ??= Substitute.For<IFileSystem>();
-        secretProvider ??= new Base64SecretProvider(fileSystem);
+        secretProvider ??= new SecretProvider(fileSystem);
 
         var services = new ServiceCollection();
         services.RegisterAspirateEssential();
@@ -68,8 +71,8 @@ public abstract class AspirateTestBase
         services.RemoveAll<IAnsiConsole>();
         services.RemoveAll<AspirateState>();
 
-        services.AddSingleton<IFileSystem>(fileSystem);
-        services.AddSingleton<ISecretProvider>(secretProvider);
+        services.AddSingleton(fileSystem);
+        services.AddSingleton(secretProvider);
         services.AddSingleton<IAnsiConsole>(console);
         services.AddSingleton(state);
         services.AddSingleton(Substitute.For<IShellExecutionService>());

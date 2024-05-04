@@ -13,7 +13,6 @@ global using Aspirate.Commands.Options;
 global using Aspirate.Processors.Resources.Dockerfile;
 global using Aspirate.Processors.Transformation;
 global using Aspirate.Secrets;
-global using Aspirate.Secrets.Providers.Password;
 global using Aspirate.Shared.Enums;
 global using Aspirate.Shared.Exceptions;
 global using Aspirate.Shared.Extensions;

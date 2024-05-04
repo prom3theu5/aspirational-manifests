@@ -1,3 +1,5 @@
+using Aspirate.Secrets;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public class SecretServiceTests : BaseServiceTests<ISecretService>
@@ -28,7 +30,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
 
         var fileSystem = new MockFileSystem();
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings();
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
@@ -44,7 +46,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         });
 
         // Assert
-        state.Secrets.Count.Should().Be(0);
+        state.SecretState.Secrets.Count.Should().Be(0);
     }
 
     [Fact]
@@ -58,7 +60,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         var fileSystem = new MockFileSystem();
         fileSystem.AddFile(SecretStoragePath, ValidState);
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings();
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
@@ -87,7 +89,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         var fileSystem = new MockFileSystem();
         fileSystem.AddFile(SecretStoragePath, ValidState);
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true, password: "password_for_secrets");
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
@@ -116,7 +118,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         var fileSystem = new MockFileSystem();
         fileSystem.AddFile(SecretStoragePath, ValidState);
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true);
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
@@ -143,7 +145,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         var fileSystem = new MockFileSystem();
         fileSystem.AddFile(SecretStoragePath, ValidState);
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true, password: "invalid_password");
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
@@ -169,7 +171,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         var console = new TestConsole();
         var fileSystem = new MockFileSystem();
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true);
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);

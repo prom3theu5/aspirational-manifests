@@ -1,3 +1,5 @@
+using Aspirate.Secrets;
+
 namespace Aspirate.Services.Implementations;
 
 public class KustomizeService(IFileSystem fileSystem, IShellExecutionService shellExecutionService, IAnsiConsole logger) : IKustomizeService
@@ -49,7 +51,7 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
         var secretPathInfo = new FileInfo(secretFilePath);
         var secretDirectory = secretPathInfo.Directory.FullName;
 
-        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+        if (secretProvider is SecretProvider passwordSecretProvider)
         {
             if (passwordSecretProvider.State?.Secrets is null || passwordSecretProvider.State.Secrets.Count == 0)
             {

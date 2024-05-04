@@ -1,4 +1,4 @@
-namespace Aspirate.Secrets.Providers.Password;
+namespace Aspirate.Secrets;
 
 public class AesGcmCrypter : IEncrypter, IDecrypter
 {

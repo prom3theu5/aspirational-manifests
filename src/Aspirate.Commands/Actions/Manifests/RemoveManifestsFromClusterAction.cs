@@ -76,7 +76,7 @@ public sealed class RemoveManifestsFromClusterAction(
             return;
         }
 
-        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+        if (secretProvider is SecretProvider passwordSecretProvider)
         {
             passwordSecretProvider.LoadState(CurrentState.InputPath);
 

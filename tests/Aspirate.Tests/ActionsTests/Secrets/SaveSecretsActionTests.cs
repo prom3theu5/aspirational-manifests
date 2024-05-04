@@ -1,3 +1,5 @@
+using Aspirate.Secrets;
+
 namespace Aspirate.Tests.ActionsTests.Secrets;
 
 public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
@@ -30,7 +32,7 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         var fileSystem = CreateMockFileSystem();
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
 
         var state = CreateAspirateStateWithConnectionStrings();
         var serviceProvider = CreateServiceProvider(state, console, secretProvider: secretProvider, fileSystem: fileSystem);
@@ -64,7 +66,7 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         var fileSystem = CreateMockFileSystem();
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
         secretProvider.SetPassword("password_for_secrets");
         secretProvider.SaveState(SecretStoragePath);
 
@@ -96,7 +98,7 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         var fileSystem = CreateMockFileSystem();
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
         fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
 
         var state = CreateAspirateStateWithConnectionStrings();
@@ -108,7 +110,7 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         // Assert
         await act.Should().NotThrowAsync();
-        console.Output.Should().Contain("Using existing secrets for provider");
+        console.Output.Should().Contain("Using existing secrets");
         secretProvider.State.Secrets.Count.Should().Be(2);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
@@ -136,7 +138,7 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         var fileSystem = CreateMockFileSystem();
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
         fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
 
         var state = CreateAspirateStateWithConnectionStrings();
@@ -179,7 +181,7 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         var fileSystem = CreateMockFileSystem();
 
-        var secretProvider = new PasswordSecretProvider(fileSystem);
+        var secretProvider = new SecretProvider(fileSystem);
         fileSystem.AddFile($"/some-path/{AspirateLiterals.DefaultArtifactsPath}/{AspirateLiterals.SecretFileName}", ValidState);
 
         var state = CreateAspirateStateWithConnectionStrings();

@@ -7,9 +7,6 @@ public class AspirateState :
     IContainerOptions,
     IAspireOptions,
     IKubernetesOptions,
-    ISecretOptions,
-    IPasswordSecretState,
-    IBase64SecretState,
     IPrivateRegistryCredentialsOptions,
     IApplyOptions,
     IDashboardOptions
@@ -79,10 +76,6 @@ public class AspirateState :
     public bool DisableSecrets { get; set; }
 
     [RestorableStateProperty]
-    [JsonPropertyName("secretProvider")]
-    public SecretProviderType SecretProvider { get; set; }
-
-    [RestorableStateProperty]
     [JsonPropertyName("skipBuild")]
     public bool SkipBuild { get; set; }
 
@@ -130,6 +123,10 @@ public class AspirateState :
     [JsonPropertyName("loadedAspireManifestResources")]
     public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = new();
 
+    [RestorableStateProperty]
+    [JsonPropertyName("secrets")]
+    public SecretState SecretState { get; set; } = new();
+
     [JsonIgnore]
     public Dictionary<string, Resource> FinalResources { get; } = new();
 
@@ -141,15 +138,6 @@ public class AspirateState :
 
     [JsonIgnore]
     public bool NonInteractive { get; set; }
-
-    [JsonIgnore]
-    public string? Salt { get; set; }
-
-    [JsonIgnore]
-    public int? Version { get; set; }
-
-    [JsonIgnore]
-    public string? Hash { get; set; }
 
     [JsonIgnore]
     public bool ActiveKubernetesContextIsSet => !string.IsNullOrEmpty(KubeContext);
@@ -174,9 +162,6 @@ public class AspirateState :
 
     [JsonIgnore]
     public bool HasSelectedSupportedComponents => !AllSelectedSupportedComponents.All(x => IsNotDeployable(x.Value));
-
-    [JsonIgnore]
-    public Dictionary<string, Dictionary<string, string>> Secrets { get; set; } = new();
 
     [JsonIgnore]
     public string? SecretPassword { get; set; }

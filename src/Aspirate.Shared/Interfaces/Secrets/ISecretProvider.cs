@@ -1,13 +1,9 @@
 namespace Aspirate.Shared.Interfaces.Secrets;
 public interface ISecretProvider
 {
-    SecretProviderType Type { get; }
-
-
+    SecretState? State { get; }
     IEncrypter? Encrypter { get; }
-
     IDecrypter? Decrypter { get; }
-
     void AddResource(string resourceName);
     bool ResourceExists(string resourceName);
     void RemoveResource(string resourceName);
@@ -19,4 +15,6 @@ public interface ISecretProvider
     void RemoveState(string path);
     bool SecretStateExists(string path);
     string? GetSecret(string resourceName, string key);
+    void SetPassword(string password);
+    bool CheckPassword(string password);
 }

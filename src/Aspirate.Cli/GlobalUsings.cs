@@ -8,11 +8,14 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
 
 global using Aspirate.Cli;
-global using Aspirate.Cli.Extensions;
 global using Aspirate.Cli.Middleware;
+global using Aspirate.Commands;
 global using Aspirate.Commands.Commands.Apply;
 global using Aspirate.Commands.Commands.Build;
 global using Aspirate.Commands.Commands.Destroy;
 global using Aspirate.Commands.Commands.Generate;
 global using Aspirate.Commands.Commands.Init;
+global using Aspirate.Processors;
+global using Aspirate.Secrets;
+global using Aspirate.Services;
 global using Spectre.Console;

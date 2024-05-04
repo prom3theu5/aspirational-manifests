@@ -5,7 +5,6 @@ public sealed class GenerateOptions : BaseCommandOptions,
     IContainerOptions,
     IAspireOptions,
     IGenerateOptions,
-    ISecretOptions,
     IPrivateRegistryCredentialsOptions,
     IDashboardOptions
 {

@@ -40,13 +40,10 @@ public class SecretService(
 
             secretProvider.LoadState(secretStatePath);
 
-            if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+            if (!CheckPassword(options))
             {
-                if (!CheckPassword(passwordSecretProvider, options))
-                {
-                    logger.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
-                    ActionCausesExitException.ExitNow();
-                }
+                logger.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
+                ActionCausesExitException.ExitNow();
             }
 
             if (!options.NonInteractive)
@@ -61,14 +58,14 @@ public class SecretService(
                 switch (secretsAction)
                 {
                     case UseExisting:
-                        logger.MarkupLine($"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/]");
+                        logger.MarkupLine($"Using [green]existing[/] secrets.");
                         return;
                     case Augment:
                         logger.MarkupLine(
-                            $"Using [green]existing[/] secrets for provider [blue]{secretProvider.Type}[/] and augmenting with new values.");
+                            $"Using [green]existing[/] secrets and augmenting with new values.");
                         break;
                     case Overwrite:
-                        logger.MarkupLine($"[yellow]Overwriting[/] secrets for provider [blue]{secretProvider.Type}[/]");
+                        logger.MarkupLine($"[yellow]Overwriting[/] secrets");
                         secretProvider.RemoveState(secretStatePath);
                         break;
                 }
@@ -128,7 +125,7 @@ public class SecretService(
 
         if (options.NonInteractive)
         {
-            if (secretProvider is PasswordSecretProvider && string.IsNullOrEmpty(options.SecretPassword))
+            if (string.IsNullOrEmpty(options.SecretPassword))
             {
                 logger.ValidationFailed("Secrets are protected by a password, but no password has been provided.");
             }
@@ -136,28 +133,20 @@ public class SecretService(
 
         secretProvider.LoadState(secretStatePath);
 
-        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+        if (!CheckPassword(options))
         {
-            if (!CheckPassword(passwordSecretProvider, options))
-            {
-                logger.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
-                ActionCausesExitException.ExitNow();
-            }
-
-            options.State.Secrets = passwordSecretProvider.State?.Secrets;
+            logger.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
+            ActionCausesExitException.ExitNow();
         }
 
-        if (secretProvider is Base64SecretProvider base64SecretProvider)
-        {
-            options.State.Secrets = base64SecretProvider.State?.Secrets;
-        }
+        options.State.SecretState = secretProvider.State;
 
         logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State populated successfully from [blue]{secretStatePath}[/]");
     }
 
-    private bool CheckPassword(PasswordSecretProvider passwordSecretProvider, SecretManagementOptions options)
+    private bool CheckPassword(SecretManagementOptions options)
     {
-        if (CliSecretPasswordSupplied(passwordSecretProvider, options, out var validPassword))
+        if (CliSecretPasswordSupplied(options, out var validPassword))
         {
             return validPassword;
         }
@@ -168,9 +157,9 @@ public class SecretService(
                 new TextPrompt<string>("Secrets are protected by a [green]password[/]. Please enter it now: ").PromptStyle("red")
                     .Secret());
 
-            if (passwordSecretProvider.CheckPassword(password))
+            if (secretProvider.CheckPassword(password))
             {
-                passwordSecretProvider.SetPassword(password);
+                secretProvider.SetPassword(password);
                 options.State.SecretPassword = password;
                 return true;
             }
@@ -181,7 +170,7 @@ public class SecretService(
         return false;
     }
 
-    private bool CliSecretPasswordSupplied(PasswordSecretProvider passwordSecretProvider, SecretManagementOptions options, out bool validPassword)
+    private bool CliSecretPasswordSupplied(SecretManagementOptions options, out bool validPassword)
     {
         if (string.IsNullOrEmpty(options.SecretPassword))
         {
@@ -189,9 +178,9 @@ public class SecretService(
             return false;
         }
 
-        if (passwordSecretProvider.CheckPassword(options.SecretPassword))
+        if (secretProvider.CheckPassword(options.SecretPassword))
         {
-            passwordSecretProvider.SetPassword(options.SecretPassword);
+            secretProvider.SetPassword(options.SecretPassword);
             {
                 validPassword = true;
                 options.State.SecretPassword = options.SecretPassword;
@@ -206,22 +195,19 @@ public class SecretService(
 
     private void HandleInitialisation(SecretManagementOptions options)
     {
-        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+        if (!CreatePassword(options))
         {
-            if (!CreatePassword(passwordSecretProvider, options))
-            {
-                logger.ValidationFailed("Aborting due to inability to create password.");
-            }
+            logger.ValidationFailed("Aborting due to inability to create password.");
         }
     }
 
-    private bool CreatePassword(PasswordSecretProvider passwordSecretProvider, SecretManagementOptions options)
+    private bool CreatePassword(SecretManagementOptions options)
     {
         logger.MarkupLine("Secrets are to be protected by a [green]password[/]");
 
         if (!string.IsNullOrEmpty(options.State.SecretPassword))
         {
-            passwordSecretProvider.SetPassword(options.State.SecretPassword);
+            secretProvider.SetPassword(options.State.SecretPassword);
             return true;
         }
 
@@ -240,7 +226,7 @@ public class SecretService(
 
             if (firstEntry.Equals(secondEntry, StringComparison.Ordinal))
             {
-                passwordSecretProvider.SetPassword(firstEntry);
+                secretProvider.SetPassword(firstEntry);
                 return true;
             }
 

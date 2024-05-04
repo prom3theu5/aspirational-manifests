@@ -1,9 +1,4 @@
-using Aspirate.Commands;
-using Aspirate.Processors;
-using Aspirate.Secrets;
-using Aspirate.Services;
-
-namespace Aspirate.Cli.Extensions;
+namespace Aspirate.Cli;
 
 internal static class ServiceCollectionExtensions
 {
@@ -15,6 +10,7 @@ internal static class ServiceCollectionExtensions
             .AddAspirateServices()
             .AddAspirateActions()
             .AddAspirateProcessors()
+            .AddAspirateSecretProvider()
             .AddPlaceholderTransformation();
 
     private static IServiceCollection AddSpectreConsole(this IServiceCollection services) =>

@@ -1,3 +1,6 @@
+using Aspirate.Cli;
+using Aspirate.Secrets;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public class ManifestFileParserServiceTest
@@ -249,9 +252,9 @@ public class ManifestFileParserServiceTest
         services.RegisterAspirateEssential();
         services.RemoveAll<IAnsiConsole>();
         services.RemoveAll<IFileSystem>();
-        services.AddSingleton<IAnsiConsole>(console);
-        services.AddSingleton<IFileSystem>(fileSystem);
-        services.AddSingleton<ISecretProvider, Base64SecretProvider>();
+        services.AddSingleton(console);
+        services.AddSingleton(fileSystem);
+        services.AddSingleton<ISecretProvider, SecretProvider>();
 
         return services.BuildServiceProvider();
     }

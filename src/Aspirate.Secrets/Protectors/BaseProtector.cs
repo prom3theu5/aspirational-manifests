@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Secrets.Protectors;
 
 public abstract class BaseProtector(ISecretProvider secretProvider, IAnsiConsole console) : ISecretProtectionStrategy
