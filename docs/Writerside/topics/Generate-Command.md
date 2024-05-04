@@ -18,7 +18,7 @@ To generate a docker compose deployment, run:
 aspirate generate --output-format compose
 ```
 
-Your docker-compose file will be at the path `%output-dir%/docker-compose.yml` directory by default.
+Your docker-compose file will be at the path `%output-dir%/docker-compose.yaml` directory by default.
 
 When using the `--output-format compose` flag, you can also build certain dockerfiles using the compose file.
 This will skip the build and push in Aspirate.

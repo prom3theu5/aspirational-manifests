@@ -9,7 +9,7 @@ on:
 
 jobs:
   call-workflow-test:
-    uses: ./.github/workflows/devcontainer-test.yml
+    uses: ./.github/workflows/devcontainer-test.yaml
 
   deploy:
     needs:

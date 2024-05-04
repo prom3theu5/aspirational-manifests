@@ -30,9 +30,9 @@ public class ContainerProcessor(
         var manifests = new List<string>
         {
             container.Volumes.Count > 0
-                ? $"{TemplateLiterals.StatefulSetType}.yml"
-                : $"{TemplateLiterals.DeploymentType}.yml",
-            $"{TemplateLiterals.ServiceType}.yml",
+                ? $"{TemplateLiterals.StatefulSetType}.yaml"
+                : $"{TemplateLiterals.DeploymentType}.yaml",
+            $"{TemplateLiterals.ServiceType}.yaml",
         };
 
         var data = new KubernetesDeploymentTemplateData()
@@ -100,5 +100,3 @@ public class ContainerProcessor(
         return response;
     }
 }
-
-

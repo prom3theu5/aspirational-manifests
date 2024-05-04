@@ -38,13 +38,13 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         HandleDapr(outputPath, manifests);
 
-        _console.MarkupLine($"[bold]Generating final manifest with name [blue]'kustomization.yml'[/][/]");
+        _console.MarkupLine($"[bold]Generating final manifest with name [blue]'kustomization.yaml'[/][/]");
 
         var templateData = templateDataBuilder.SetManifests(manifests);
 
         _manifestWriter.CreateComponentKustomizeManifest(outputPath, templateData, templatePath);
 
-        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/kustomization.yml[/]");
+        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/kustomization.yaml[/]");
     }
 
     private void HandlePrivateRegistry(string outputPath, bool? withPrivateRegistry, string? registryUrl, string? registryUsername, string? registryPassword, string? registryEmail, List<string> manifests)
@@ -56,8 +56,8 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         _console.MarkupLine("[bold]Generating private registry secret manifest.[/]");
         _manifestWriter.CreateImagePullSecret(registryUrl, registryUsername, registryPassword, registryEmail, TemplateLiterals.ImagePullSecretType, outputPath);
-        manifests.Add($"{TemplateLiterals.ImagePullSecretType}.yml");
-        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/{TemplateLiterals.ImagePullSecretType}.yml[/]");
+        manifests.Add($"{TemplateLiterals.ImagePullSecretType}.yaml");
+        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/{TemplateLiterals.ImagePullSecretType}.yaml[/]");
     }
 
     private void HandleNamespace(string outputPath, string? templatePath, string @namespace, KubernetesDeploymentTemplateData templateDataBuilder, List<string> manifests)
@@ -69,8 +69,8 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         _console.MarkupLine($"[bold]Generating namespace manifest with name [blue]'{@namespace}'[/][/]");
         _manifestWriter.CreateNamespace(outputPath, templateDataBuilder, templatePath);
-        manifests.Add($"{TemplateLiterals.NamespaceType}.yml");
-        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/namespace.yml[/]");
+        manifests.Add($"{TemplateLiterals.NamespaceType}.yaml");
+        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/namespace.yaml[/]");
     }
 
     private void HandleDashboard(bool? withDashboard, string outputPath, string? templatePath, KubernetesDeploymentTemplateData templateDataBuilder, List<string> manifests)
@@ -82,8 +82,8 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         _console.MarkupLine($"[bold]Generating Aspire Dashboard manifest[/]");
         _manifestWriter.CreateDashboard(outputPath, templateDataBuilder, templatePath);
-        manifests.Add($"{TemplateLiterals.DashboardType}.yml");
-        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/dashboard.yml[/]");
+        manifests.Add($"{TemplateLiterals.DashboardType}.yaml");
+        _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/dashboard.yaml[/]");
     }
 
     private void HandleDapr(string outputPath, List<string> manifests)
@@ -93,7 +93,7 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
             return;
         }
 
-        var daprFiles = _fileSystem.Directory.GetFiles(Path.Combine(outputPath, "dapr"), "*.yml", SearchOption.AllDirectories);
+        var daprFiles = _fileSystem.Directory.GetFiles(Path.Combine(outputPath, "dapr"), "*.yaml", SearchOption.AllDirectories);
         manifests.AddRange(daprFiles.Select(daprFile => daprFile.Replace(outputPath, string.Empty).TrimStart(Path.DirectorySeparatorChar)));
     }
 }

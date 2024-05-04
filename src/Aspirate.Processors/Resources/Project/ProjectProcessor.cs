@@ -17,8 +17,8 @@ public sealed class ProjectProcessor(
 
     private readonly IReadOnlyCollection<string> _manifests =
     [
-        $"{TemplateLiterals.DeploymentType}.yml",
-        $"{TemplateLiterals.ServiceType}.yml",
+        $"{TemplateLiterals.DeploymentType}.yaml",
+        $"{TemplateLiterals.ServiceType}.yaml",
     ];
 
     private readonly Dictionary<string, MsBuildContainerProperties> _containerDetailsCache = [];
@@ -117,5 +117,3 @@ public sealed class ProjectProcessor(
         return response;
     }
 }
-
-

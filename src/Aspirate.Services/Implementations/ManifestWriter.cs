@@ -36,7 +36,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     public void CreateDeployment<TTemplateData>(string outputPath, TTemplateData data, string? templatePath)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.DeploymentType, out var templateFile);
-        var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DeploymentType}.yml");
+        var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DeploymentType}.yaml");
 
         CreateFile(templateFile, deploymentOutputPath, data, templatePath);
     }
@@ -44,7 +44,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     public void CreateStatefulSet<TTemplateData>(string outputPath, TTemplateData data, string? templatePath)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.StatefulSetType, out var templateFile);
-        var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.StatefulSetType}.yml");
+        var deploymentOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.StatefulSetType}.yaml");
 
         CreateFile(templateFile, deploymentOutputPath, data, templatePath);
     }
@@ -59,7 +59,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         }
 
         _templateFileMapping.TryGetValue(TemplateLiterals.DaprComponentType, out var templateFile);
-        var daprFileOutputPath = Path.Combine(daprOutputPath, $"{name}.yml");
+        var daprFileOutputPath = Path.Combine(daprOutputPath, $"{name}.yaml");
 
         CreateFile(templateFile, daprFileOutputPath, data, templatePath);
     }
@@ -68,7 +68,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     public void CreateService<TTemplateData>(string outputPath, TTemplateData data, string? templatePath)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ServiceType, out var templateFile);
-        var serviceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ServiceType}.yml");
+        var serviceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ServiceType}.yaml");
 
         CreateFile(templateFile, serviceOutputPath, data, templatePath);
     }
@@ -80,7 +80,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         string? templatePath)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.ComponentKustomizeType, out var templateFile);
-        var kustomizeOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ComponentKustomizeType}.yml");
+        var kustomizeOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.ComponentKustomizeType}.yaml");
 
         CreateFile(templateFile, kustomizeOutputPath, data, templatePath);
     }
@@ -92,7 +92,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         string? templatePath)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.NamespaceType, out var templateFile);
-        var namespaceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.NamespaceType}.yml");
+        var namespaceOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.NamespaceType}.yaml");
 
         CreateFile(templateFile, namespaceOutputPath, data, templatePath);
     }
@@ -103,7 +103,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
         string? templatePath)
     {
         _templateFileMapping.TryGetValue(TemplateLiterals.DashboardType, out var templateFile);
-        var dashboardOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DashboardType}.yml");
+        var dashboardOutputPath = Path.Combine(outputPath, $"{TemplateLiterals.DashboardType}.yaml");
 
         CreateFile(templateFile, dashboardOutputPath, data, templatePath);
     }
@@ -137,7 +137,7 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
 
         string secretYaml = serializer.Serialize(secret);
 
-        fileSystem.File.WriteAllText(fileSystem.Path.Combine(outputPath, $"{TemplateLiterals.ImagePullSecretType}.yml"), secretYaml);
+        fileSystem.File.WriteAllText(fileSystem.Path.Combine(outputPath, $"{TemplateLiterals.ImagePullSecretType}.yaml"), secretYaml);
     }
 
     private void CreateFile<TTemplateData>(string inputFile, string outputPath, TTemplateData data, string? templatePath)

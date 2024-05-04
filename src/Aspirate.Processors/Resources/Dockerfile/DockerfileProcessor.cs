@@ -17,8 +17,8 @@ public class DockerfileProcessor(
 
     private readonly IReadOnlyCollection<string> _manifests =
     [
-        $"{TemplateLiterals.DeploymentType}.yml",
-        $"{TemplateLiterals.ServiceType}.yml",
+        $"{TemplateLiterals.DeploymentType}.yaml",
+        $"{TemplateLiterals.ServiceType}.yaml",
     ];
 
     private readonly Dictionary<string, string> _containerImageCache = [];
@@ -116,5 +116,3 @@ public class DockerfileProcessor(
         return response;
     }
 }
-
-
