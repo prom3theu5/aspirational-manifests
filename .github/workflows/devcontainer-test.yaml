@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - "ext/devcontainer/**"
-      - ".github/workflows/devcontainer-test.yml"
+      - ".github/workflows/devcontainer-test.yaml"
     branches: [main]
   workflow_call:
 

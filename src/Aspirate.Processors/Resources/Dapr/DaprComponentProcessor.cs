@@ -28,7 +28,7 @@ public class DaprComponentProcessor(
 
         _manifestWriter.CreateDaprManifest(options.OutputPath, templateData, daprComponentResource.Name, options.TemplatePath);
 
-        LogCompletion($"{options.OutputPath}/dapr/{daprComponentResource.Name}.yml");
+        LogCompletion($"{options.OutputPath}/dapr/{daprComponentResource.Name}.yaml");
 
         return Task.FromResult(true);
     }

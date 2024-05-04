@@ -19,7 +19,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             ActionCausesExitException.ExitNow();
         }
 
-        var outputFile = Path.Combine(AspirateLiterals.DefaultOutputPath, "docker-compose.yml");
+        var outputFile = Path.Combine(AspirateLiterals.DefaultOutputPath, "docker-compose.yaml");
 
         Logger.MarkupLine($"[bold]Generating docker compose file: [blue]'{outputFile}'[/][/]");
 
