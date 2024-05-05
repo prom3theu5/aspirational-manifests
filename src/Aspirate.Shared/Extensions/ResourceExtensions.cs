@@ -18,9 +18,10 @@ public static class ResourceExtensions
             environment.Add(entry.Key, entry.Value);
         }
 
-        if (withDashboard.GetValueOrDefault())
+        if (withDashboard == true)
         {
-            environment.Add("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:18889");
+            environment.TryAdd("OTEL_EXPORTER_OTLP_ENDPOINT", "http://aspire-dashboard:18889");
+            environment.TryAdd("OTEL_SERVICE_NAME", resource.Key);
         }
 
         return environment;

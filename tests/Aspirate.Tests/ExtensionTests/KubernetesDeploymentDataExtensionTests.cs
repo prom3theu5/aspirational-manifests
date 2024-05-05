@@ -39,7 +39,7 @@ public class KubernetesDeploymentDataExtensionTests
         // Arrange
         var data = new KubernetesDeploymentData()
             .SetName("test")
-            .SetEnv(new Dictionary<string, string> { { "key", "value" } });
+            .SetEnv(new Dictionary<string, string?> { { "key", "value" } });
 
         // Act
         var result = data.ToKubernetesConfigMap();
@@ -55,7 +55,7 @@ public class KubernetesDeploymentDataExtensionTests
         // Arrange
         var data = new KubernetesDeploymentData()
             .SetName("test")
-            .SetSecrets(new Dictionary<string, string> { { "key", "value" } });
+            .SetSecrets(new Dictionary<string, string?> { { "key", "value" } });
 
         // Act
         var result = data.ToKubernetesSecret();
@@ -121,8 +121,8 @@ public class KubernetesDeploymentDataExtensionTests
             .SetName("test")
             .SetContainerImage("test-image")
             .SetPorts(new List<Ports> { new Ports { Name = "test-port", InternalPort = 8080, ExternalPort = 8080 } })
-            .SetEnv(new Dictionary<string, string> { { "key", "envvalue" } })
-            .SetSecrets(new Dictionary<string, string> { { "key", "secretvalue" } });
+            .SetEnv(new Dictionary<string, string?> { { "key", "envvalue" } })
+            .SetSecrets(new Dictionary<string, string?> { { "key", "secretvalue" } });
 
         // Act
         var result = data.ToKubernetesObjects();
