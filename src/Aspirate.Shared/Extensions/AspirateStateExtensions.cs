@@ -21,6 +21,12 @@ public static class AspirateStateExtensions
 
             stateProperty?.SetValue(state, propertyValue);
         }
+
+        // Ensure we have a default output format.
+        if (string.IsNullOrEmpty(state.OutputFormat))
+        {
+            state.OutputFormat = OutputFormat.Kustomize.Value;
+        }
     }
 
     public static void ReplaceCurrentStateWithPreviousState(this AspirateState currentState, AspirateState previousState, bool restoreAllRestorable)
