@@ -7,8 +7,8 @@ public class KubernetesDeploymentData
 {
     public string? Name {get; private set;}
     public string? Namespace {get; private set;}
-    public Dictionary<string, string>? Env {get; private set;}
-    public Dictionary<string, string>? Secrets {get; private set;}
+    public Dictionary<string, string?>? Env {get; private set;}
+    public Dictionary<string, string?>? Secrets {get; private set;}
     public Dictionary<string, string>? Annotations {get; private set;}
     public List<Volume>? Volumes {get; private set;}
     public IReadOnlyCollection<string>? Manifests {get; private set;}
@@ -40,13 +40,13 @@ public class KubernetesDeploymentData
         return this;
     }
 
-    public KubernetesDeploymentData SetEnv(Dictionary<string, string> env)
+    public KubernetesDeploymentData SetEnv(Dictionary<string, string?> env)
     {
         Env = env.Where(x=>!string.IsNullOrEmpty(x.Value)).ToDictionary(x => x.Key, x => x.Value);
         return this;
     }
 
-    public KubernetesDeploymentData SetSecrets(Dictionary<string, string> secrets)
+    public KubernetesDeploymentData SetSecrets(Dictionary<string, string?> secrets)
     {
         Secrets = secrets;
         return this;

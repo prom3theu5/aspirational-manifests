@@ -20,10 +20,6 @@ configMapGenerator:
     {{#if isProject}}
     - ASPNETCORE_URLS=http://+:8080;
     {{/if}}
-    {{#if withDashboard}}
-    - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
-    {{/if}}
-
 
 {{/if}}
 {{#if hasAnySecrets}}

@@ -51,22 +51,13 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// </summary>
     /// <param name="resource">The resource whose environmental variables need to be filtered.</param>
     /// <param name="disableSecrets">if secrets are disabled, do not filter</param>
+    /// <param name="withDashboard">Should the dashboard be included.</param>
     /// <returns>A dictionary representing the filtered environmental variables.</returns>
-    protected Dictionary<string, string> GetFilteredEnvironmentalVariables(Resource resource, bool? disableSecrets = false)
+    protected Dictionary<string, string?> GetFilteredEnvironmentalVariables(KeyValuePair<string, Resource> resource, bool? disableSecrets, bool? withDashboard)
     {
-        if (resource is not IResourceWithEnvironmentalVariables resourceWithEnv)
-        {
-            return [];
-        }
+        var resourceWithEnv = resource.MapResourceToEnvVars(withDashboard);
 
-        if (disableSecrets == true)
-        {
-            return resourceWithEnv.Env;
-        }
-
-        var envVars = resourceWithEnv.Env;
-
-        return envVars == null ? [] : envVars.Where(e => !ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
+        return disableSecrets == true ? resourceWithEnv : resourceWithEnv.Where(e => !ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
 
     /// <summary>
@@ -74,22 +65,13 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     /// </summary>
     /// <param name="resource">The resource from which to retrieve the secret environmental variables.</param>
     /// <param name="disableSecrets">if secrets are disabled, do not filter</param>
+    /// <param name="withDashboard">Should the dashboard be included.</param>
     /// <returns>A dictionary representing the secret environmental variables.</returns>
-    protected Dictionary<string, string> GetSecretEnvironmentalVariables(Resource resource, bool? disableSecrets = false)
+    protected Dictionary<string, string?> GetSecretEnvironmentalVariables(KeyValuePair<string, Resource> resource, bool? disableSecrets, bool? withDashboard)
     {
-        if (resource is not IResourceWithEnvironmentalVariables resourceWithEnv)
-        {
-            return [];
-        }
+        var resourceWithEnv = resource.MapResourceToEnvVars(withDashboard);
 
-        if (disableSecrets == true)
-        {
-            return [];
-        }
-
-        var envVars = resourceWithEnv.Env;
-
-        return envVars == null ? [] : envVars.Where(e => ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
+        return resourceWithEnv.Where(e => ProtectorType.List.Any(p => e.Key.StartsWith(p))).ToDictionary(e => e.Key, e => e.Value);
     }
 
     /// <inheritdoc />
