@@ -36,7 +36,7 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
 
     public async Task WriteSecretsOutToTempFiles(AspirateState state, List<string> files, ISecretProvider secretProvider)
     {
-        if (state.DisableSecrets)
+        if (state.DisableSecrets == true)
         {
             return;
         }
@@ -71,9 +71,9 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
         }
     }
 
-    public void CleanupSecretEnvFiles(bool disableSecrets, IEnumerable<string> secretFiles)
+    public void CleanupSecretEnvFiles(bool? disableSecrets, IEnumerable<string> secretFiles)
     {
-        if (disableSecrets)
+        if (disableSecrets == true)
         {
             return;
         }

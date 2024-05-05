@@ -1,6 +1,3 @@
-using Aspirate.Processors;
-using Aspirate.Shared.Interfaces.Processors;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateFinalKustomizeManifestAction(
@@ -11,7 +8,7 @@ public sealed class GenerateFinalKustomizeManifestAction(
     {
         Logger.WriteRuler("[purple]Handling Final Manifest[/]");
 
-        if (CurrentState.SkipFinalKustomizeGeneration)
+        if (CurrentState.SkipFinalKustomizeGeneration == true)
         {
             Logger.MarkupLine("[blue]Skipping final manifest generation as requested.[/]");
             return Task.FromResult(true);
@@ -49,8 +46,15 @@ public sealed class GenerateFinalKustomizeManifestAction(
 
     private bool ShouldCreateFinalManifest()
     {
+        if (CurrentState.SkipFinalKustomizeGeneration == false)
+        {
+            return true;
+        }
+
         var shouldGenerateFinalKustomizeManifest = Logger.Confirm(
             "[bold]Would you like to generate the top level kustomize manifest to run against your kubernetes cluster?[/]");
+
+        CurrentState.SkipFinalKustomizeGeneration = !shouldGenerateFinalKustomizeManifest;
 
         if (!shouldGenerateFinalKustomizeManifest)
         {

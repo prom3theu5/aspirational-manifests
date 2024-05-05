@@ -93,7 +93,8 @@ public partial class KubeCtlService(IFileSystem filesystem, IAnsiConsole console
 
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(KubeCtlLiterals.KubeCtlDeleteArgument, string.Empty, quoteValue: false)
-            .AppendArgument(KubeCtlLiterals.KubeCtlKustomizeManifestsArgument, fullOutputPath, quoteValue: false);
+            .AppendArgument(KubeCtlLiterals.KubeCtlKustomizeManifestsArgument, fullOutputPath, quoteValue: false)
+            .AppendArgument(KubeCtlLiterals.KubeCtlNoWaitArgument, string.Empty, quoteValue: false);
 
         var executionOptions = new ShellCommandOptions
         {

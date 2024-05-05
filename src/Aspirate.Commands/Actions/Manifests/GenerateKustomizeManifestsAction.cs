@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Processors;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateKustomizeManifestsAction(

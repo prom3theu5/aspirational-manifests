@@ -116,6 +116,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
             NonInteractive = true,
             DisableSecrets = false,
             SecretPassword = string.Empty,
+            CommandUnlocksSecrets = true,
         });;
 
         // Assert
@@ -139,6 +140,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
             NonInteractive = true,
             DisableSecrets = false,
             SecretPassword = string.Empty,
+            CommandUnlocksSecrets = true,
         });;
 
         // Assert
@@ -168,6 +170,4 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         // Assert
         result.Should().NotThrow();
     }
-
-    private static string SecretStoragePath => $"/some-path/aspirate-output/{AspirateLiterals.SecretFileName}";
 }

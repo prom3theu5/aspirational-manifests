@@ -54,18 +54,6 @@ public class SecretProviderTests
     }
 
     [Fact]
-    public void SaveState_ShouldIncreaseVersion()
-    {
-        var provider = new SecretProvider(_fileSystem);
-        var state = GetState(Base64Salt, 1);
-        provider.LoadState(state);
-
-        provider.SetState(state);
-
-        provider.State.Version.Should().Be(2);
-    }
-
-    [Fact]
     public void AddSecret_ShouldAddEncryptedSecretToState()
     {
         var provider = new SecretProvider(_fileSystem);
@@ -125,12 +113,11 @@ public class SecretProviderTests
         secret.Should().Be(DecryptedTestValue);
     }
 
-    private static AspirateState GetState(string? salt = null, int? version = null, Dictionary<string, Dictionary<string, string>>? secrets = null)
+    private static AspirateState GetState(string? salt = null, Dictionary<string, Dictionary<string, string>>? secrets = null)
     {
         var state = new SecretState
         {
             Salt = salt,
-            Version = version ?? 0,
             Secrets = secrets ?? [],
         };
 

@@ -3,7 +3,7 @@
     "init": {
       "commandName": "Project",
       "commandLineArgs": "init",
-      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "init-non-interactive": {
@@ -14,7 +14,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate",
+      "commandLineArgs": "generate --disable-secrets --skip-build",
       "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },

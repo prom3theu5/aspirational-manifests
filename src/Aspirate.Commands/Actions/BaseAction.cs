@@ -9,6 +9,11 @@ public abstract class BaseAction(IServiceProvider serviceProvider) : IAction
     public abstract Task<bool> ExecuteAsync();
     protected virtual bool PreviousStateWasRestored(bool withConfirmation = true)
     {
+        if (CurrentState.NonInteractive)
+        {
+            return false;
+        }
+
         if (!CurrentState.StateWasLoadedFromPrevious)
         {
             return false;
@@ -18,7 +23,7 @@ public abstract class BaseAction(IServiceProvider serviceProvider) : IAction
         {
             return true;
         }
-        
+
         if (CurrentState.UseAllPreviousStateValues)
         {
             return true;

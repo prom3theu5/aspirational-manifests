@@ -13,8 +13,4 @@ public sealed class SecretState
     [JsonPropertyName("secrets")]
     [RestorableStateProperty]
     public Dictionary<string, Dictionary<string, string>> Secrets { get; set; } = [];
-
-    [JsonPropertyName("secretsVersion")]
-    [RestorableStateProperty]
-    public int? Version { get; set; } = 0;
 }

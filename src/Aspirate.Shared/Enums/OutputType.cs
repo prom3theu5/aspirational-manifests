@@ -6,6 +6,6 @@ public class OutputFormat : SmartEnum<OutputFormat, string>
     {
     }
 
-    public static OutputFormat Kustomize = new OutputFormat(nameof(Kustomize), "kustomize");
-    public static OutputFormat DockerCompose = new OutputFormat(nameof(DockerCompose), "compose");
+    public static OutputFormat Kustomize = new(nameof(Kustomize), "kustomize");
+    public static OutputFormat DockerCompose = new(nameof(DockerCompose), "compose");
 }

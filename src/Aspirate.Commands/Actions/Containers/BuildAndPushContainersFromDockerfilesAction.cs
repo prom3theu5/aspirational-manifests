@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Processors;
-
 namespace Aspirate.Commands.Actions.Containers;
 
 public sealed class BuildAndPushContainersFromDockerfilesAction(
@@ -20,7 +18,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
         CacheContainerDetails(dockerfileProcessor);
 
-        if (CurrentState.SkipBuild)
+        if (CurrentState.SkipBuild == true)
         {
             Logger.MarkupLine("[bold]Skipping build and push action as requested.[/]");
             return true;

@@ -31,14 +31,12 @@ public class IncludeAspireDashboardAction(IServiceProvider serviceProvider) : Ba
         var shouldIncludeAspireDashboard = Logger.Confirm(
             "[bold]Would you like to deploy the aspire dashboard and connect the OTLP endpoint?[/]");
 
+        CurrentState.IncludeDashboard = shouldIncludeAspireDashboard;
+
         if (!shouldIncludeAspireDashboard)
         {
             Logger.MarkupLine("[yellow](!)[/] Skipping Aspire Dashboard deployment");
-            CurrentState.IncludeDashboard = false;
-            return;
         }
-
-        CurrentState.IncludeDashboard = true;
     }
 
     public override void ValidateNonInteractiveState()

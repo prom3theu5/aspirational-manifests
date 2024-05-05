@@ -94,17 +94,12 @@ public class SecretProvider(IFileSystem fileSystem) : ISecretProvider
     public void AddResource(string resourceName) =>
         State?.Secrets.Add(resourceName, []);
 
-    public virtual void TransformStateForStorage() =>
-        State.Version++;
-
     public void SetState(AspirateState state)
     {
         if (State == null)
         {
             return;
         }
-
-        TransformStateForStorage();
 
         state.SecretState = State;
     }

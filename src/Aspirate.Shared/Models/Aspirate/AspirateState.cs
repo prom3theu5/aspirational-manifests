@@ -28,10 +28,6 @@ public class AspirateState :
     public string? Namespace { get; set; }
 
     [RestorableStateProperty]
-    [JsonPropertyName("aspireManifest")]
-    public string? AspireManifest { get; set; }
-
-    [RestorableStateProperty]
     [JsonPropertyName("containerRegistry")]
     public string? ContainerRegistry { get; set; }
 
@@ -73,19 +69,15 @@ public class AspirateState :
 
     [RestorableStateProperty]
     [JsonPropertyName("disableSecrets")]
-    public bool DisableSecrets { get; set; }
-
-    [RestorableStateProperty]
-    [JsonPropertyName("skipBuild")]
-    public bool SkipBuild { get; set; }
+    public bool? DisableSecrets { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("skipFinalKustomizeGeneration")]
-    public bool SkipFinalKustomizeGeneration { get; set; }
+    public bool? SkipFinalKustomizeGeneration { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("skipHelmGeneration")]
-    public bool SkipHelmGeneration { get; set; }
+    public bool? SkipHelmGeneration { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("privateRegistryUrl")]
@@ -105,23 +97,39 @@ public class AspirateState :
 
     [RestorableStateProperty]
     [JsonPropertyName("rollingRestart")]
-    public bool RollingRestart { get; set; }
+    public bool? RollingRestart { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("includeDashboard")]
     public bool? IncludeDashboard { get; set; }
 
     [RestorableStateProperty]
-    [JsonPropertyName("aspireComponentsToProcess")]
-    public List<string> AspireComponentsToProcess { get; set; } = new();
-
-    [RestorableStateProperty]
-    [JsonPropertyName("loadedAspireManifestResources")]
-    public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = new();
+    [JsonPropertyName("useCustomNamespace")]
+    public bool? UseCustomNamespace { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("secrets")]
     public SecretState? SecretState { get; set; }
+
+    [RestorableStateProperty]
+    [JsonPropertyName("processAllComponents")]
+    public bool? ProcessAllComponents { get; set; }
+
+    [RestorableStateProperty]
+    [JsonPropertyName("existingSecretsType")]
+    public ExistingSecretsType? ExistingSecretsType { get; set; }
+
+    [JsonIgnore]
+    public bool? SkipBuild { get; set; }
+
+    [JsonIgnore]
+    public string? AspireManifest { get; set; }
+
+    [JsonIgnore]
+    public List<string> AspireComponentsToProcess { get; set; } = new();
+
+    [JsonIgnore]
+    public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = new();
 
     [JsonIgnore]
     public string? PrivateRegistryPassword { get; set; }

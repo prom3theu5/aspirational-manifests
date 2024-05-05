@@ -7,7 +7,7 @@ public sealed class PrivateRegistryOption : BaseOption<bool?>
         "--private-registry",
     };
 
-    private PrivateRegistryOption() : base(_aliases, "ASPIRATE_PRIVATE_REGISTRY", false)
+    private PrivateRegistryOption() : base(_aliases, "ASPIRATE_PRIVATE_REGISTRY", null)
     {
         Name = nameof(IPrivateRegistryCredentialsOptions.WithPrivateRegistry);
         Description = "Enables Private registry imagePullSecret. You will need to supply username and password as well.";

@@ -1,10 +1,10 @@
 ﻿namespace Aspirate.Commands.Options
 {
-    public sealed class DisableSecretsOption : BaseOption<bool>
+    public sealed class DisableSecretsOption : BaseOption<bool?>
     {
         private static readonly string[] _aliases = { "--disable-secrets" };
 
-        private DisableSecretsOption() : base(_aliases, "ASPIRATE_DISABLE_SECRETS", false)
+        private DisableSecretsOption() : base(_aliases, "ASPIRATE_DISABLE_SECRETS", null)
         {
             Name = nameof(ICommandOptions.DisableSecrets);
             Description = "Disables Secret Support";

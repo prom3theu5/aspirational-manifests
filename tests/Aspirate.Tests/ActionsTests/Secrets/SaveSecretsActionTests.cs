@@ -49,7 +49,6 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         secretProvider.State.Secrets.Count.Should().Be(2);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
-        secretProvider.State.Version.GetValueOrDefault().Should().Be(1);
     }
 
     [Fact]
@@ -107,7 +106,6 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         secretProvider.State.Secrets.Count.Should().Be(2);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
-        secretProvider.State.Version.GetValueOrDefault().Should().Be(1);
     }
 
     [Fact]
@@ -144,7 +142,6 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
-        secretProvider.State.Version.GetValueOrDefault().Should().Be(1);
     }
 
     [Fact]
@@ -184,6 +181,5 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
         secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
-        secretProvider.State.Version.GetValueOrDefault().Should().Be(2);
     }
 }

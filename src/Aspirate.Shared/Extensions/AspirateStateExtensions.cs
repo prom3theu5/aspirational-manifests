@@ -23,25 +23,31 @@ public static class AspirateStateExtensions
         }
     }
 
-    public static void ReplaceCurrentStateWithPreviousState(this AspirateState currentState, AspirateState previousState)
+    public static void ReplaceCurrentStateWithPreviousState(this AspirateState currentState, AspirateState previousState, bool restoreAllRestorable)
     {
         ArgumentNullException.ThrowIfNull(currentState);
         ArgumentNullException.ThrowIfNull(previousState);
 
-        var properties = typeof(AspirateState).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => Attribute.IsDefined(p, typeof(RestorableStatePropertyAttribute)));
-
-        foreach (var property in properties)
+        if (restoreAllRestorable)
         {
-            var previousStatePropertyValue = property.GetValue(previousState);
-            if (previousStatePropertyValue is null)
+            var properties = typeof(AspirateState).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => Attribute.IsDefined(p, typeof(RestorableStatePropertyAttribute)));
+
+            foreach (var property in properties)
             {
-                continue;
+                var previousStatePropertyValue = property.GetValue(previousState);
+                if (previousStatePropertyValue is null)
+                {
+                    continue;
+                }
+
+                property.SetValue(currentState, previousStatePropertyValue);
             }
 
-            property.SetValue(currentState, previousStatePropertyValue);
+            currentState.StateWasLoadedFromPrevious = true;
+            return;
         }
 
-        currentState.StateWasLoadedFromPrevious = true;
+        currentState.SecretState = previousState.SecretState;
     }
 }

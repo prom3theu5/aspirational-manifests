@@ -12,9 +12,9 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public string? AspireManifest { get; set; }
     public string? OutputPath { get; set; }
     public string? Namespace { get; set; }
-    public bool SkipBuild { get; set; }
-    public bool SkipFinalKustomizeGeneration { get; set; }
-    public bool SkipHelmGeneration { get; set; }
+    public bool? SkipBuild { get; set; }
+    public bool? SkipFinalKustomizeGeneration { get; set; }
+    public bool? SkipHelmGeneration { get; set; }
     public string? ContainerBuilder { get; set; }
     public string? ContainerRegistry { get; set; }
     public string? ContainerRepositoryPrefix { get; set; }

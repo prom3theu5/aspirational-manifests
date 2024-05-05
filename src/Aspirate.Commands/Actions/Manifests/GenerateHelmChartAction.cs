@@ -11,7 +11,7 @@ public sealed class GenerateHelmChartAction(
     {
         Logger.WriteRuler("[purple]Handling Helm Support[/]");
 
-        if (CurrentState.SkipHelmGeneration)
+        if (CurrentState.SkipHelmGeneration == true)
         {
             Logger.MarkupLine("[blue]Skipping helm chart generation as requested.[/]");
             return true;
@@ -53,9 +53,16 @@ public sealed class GenerateHelmChartAction(
 
     private bool ShouldCreateHelmChart()
     {
+        if (CurrentState.SkipHelmGeneration == false)
+        {
+            return true;
+        }
+
         var shouldGenerateHelmChart = Logger.Confirm(
             "[bold]Would you like to generate a helm chart based on the generated kustomize manifests?[/]",
             false);
+
+        CurrentState.SkipHelmGeneration = !shouldGenerateHelmChart;
 
         if (!shouldGenerateHelmChart)
         {

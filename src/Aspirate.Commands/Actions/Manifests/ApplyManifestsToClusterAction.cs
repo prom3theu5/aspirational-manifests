@@ -115,7 +115,7 @@ public sealed class ApplyManifestsToClusterAction(
 
     private async Task HandleRollingRestart()
     {
-        if (!CurrentState.RollingRestart)
+        if (CurrentState.RollingRestart != true)
         {
             return;
         }

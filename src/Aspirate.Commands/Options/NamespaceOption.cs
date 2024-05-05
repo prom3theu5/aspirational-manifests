@@ -7,7 +7,7 @@ public sealed class NamespaceOption : BaseOption<string?>
         "--namespace",
     };
 
-    private NamespaceOption() : base(_aliases,  "ASPIRATE_NAMESPACE", string.Empty)
+    private NamespaceOption() : base(_aliases,  "ASPIRATE_NAMESPACE", null)
     {
         Name = nameof(IGenerateOptions.Namespace);
         Description = "The Namespace to use for deployments";

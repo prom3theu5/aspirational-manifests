@@ -1,5 +1,4 @@
 using Aspirate.Processors.Resources.Project;
-using Aspirate.Shared.Interfaces.Processors;
 
 namespace Aspirate.Commands.Actions.Containers;
 
@@ -10,7 +9,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
     {
         Logger.WriteRuler("[purple]Handling Projects[/]");
 
-        if (CurrentState.SkipBuild)
+        if (CurrentState.SkipBuild == true)
         {
             Logger.MarkupLine("[bold]Skipping build and push action as requested.[/]");
             return true;

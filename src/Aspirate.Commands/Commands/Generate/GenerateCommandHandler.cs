@@ -2,23 +2,22 @@ namespace Aspirate.Commands.Commands.Generate;
 
 public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<GenerateOptions>(serviceProvider)
 {
-    public override Task<int> HandleAsync(GenerateOptions optionses)
+    public override Task<int> HandleAsync(GenerateOptions options)
     {
-        if (!OutputFormat.TryFromValue(optionses.OutputFormat, out var outputFormat))
-        {
-            throw new ArgumentOutOfRangeException(nameof(optionses.OutputFormat), $"The output format '{optionses.OutputFormat}' is not supported.");
-        }
+        var outputFormatString = !string.IsNullOrEmpty(CurrentState.OutputFormat) ?
+            CurrentState.OutputFormat : !string.IsNullOrEmpty(options.OutputFormat) ?
+                options.OutputFormat : OutputFormat.Kustomize.Value;
 
-        if (outputFormat.Name == nameof(OutputFormat.DockerCompose))
+        if (!OutputFormat.TryFromValue(outputFormatString, out var outputFormat))
         {
-            CurrentState.DisableSecrets = true;
+            throw new ArgumentOutOfRangeException(nameof(outputFormatString), $"The output format '{outputFormatString}' is not supported.");
         }
 
         return outputFormat.Name switch
         {
             nameof(OutputFormat.Kustomize) => GenerateKustomizeManifests(),
             nameof(OutputFormat.DockerCompose) => GenerateDockerComposeManifests(),
-            _ => throw new ArgumentOutOfRangeException(nameof(optionses.OutputFormat), $"The output format '{optionses.OutputFormat}' is not supported."),
+            _ => throw new ArgumentOutOfRangeException(nameof(options.OutputFormat), $"The output format '{options.OutputFormat}' is not supported."),
         };
     }
 
@@ -44,6 +43,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(LoadAspireManifestAction))
             .QueueAction(nameof(IncludeAspireDashboardAction))
             .QueueAction(nameof(AskPrivateRegistryCredentialsAction))
+            .QueueAction(nameof(CustomNamespaceAction))
             .QueueAction(nameof(PopulateInputsAction))
             .QueueAction(nameof(SubstituteValuesAspireManifestAction))
             .QueueAction(nameof(ApplyDaprAnnotationsAction))

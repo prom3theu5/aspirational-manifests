@@ -4,5 +4,5 @@ public sealed class ApplyOptions : BaseCommandOptions, IKubernetesOptions, IAppl
 {
     public string? InputPath { get; set; }
     public string? KubeContext { get; set; }
-    public bool RollingRestart { get; set; }
+    public bool? RollingRestart { get; set; }
 }

@@ -29,8 +29,13 @@ public class KubernetesDeploymentData
         return this;
     }
 
-    public KubernetesDeploymentData SetNamespace(string ns)
+    public KubernetesDeploymentData SetNamespace(string? ns)
     {
+        if (string.IsNullOrEmpty(ns))
+        {
+            return this;
+        }
+
         Namespace = ns.ToLowerInvariant();
         return this;
     }

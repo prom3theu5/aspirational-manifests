@@ -66,7 +66,7 @@ public sealed class RemoveManifestsFromClusterAction(
 
     private void CreateEmptySecretFiles(List<string> files)
     {
-        if (CurrentState.DisableSecrets)
+        if (CurrentState.DisableSecrets == true)
         {
             return;
         }
@@ -157,7 +157,7 @@ public sealed class RemoveManifestsFromClusterAction(
 
     private void CleanupSecretEnvFiles(IEnumerable<string> secretFiles)
     {
-        if (CurrentState.DisableSecrets)
+        if (CurrentState.DisableSecrets == true)
         {
             return;
         }
