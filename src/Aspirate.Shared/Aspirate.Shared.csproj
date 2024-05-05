@@ -6,7 +6,9 @@
     </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" />
     <PackageReference Include="DockerComposeBuilder" />
+    <PackageReference Include="KubernetesClient" />
     <PackageReference Include="Handlebars.Net" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Spectre.Console" />

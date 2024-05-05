@@ -5,13 +5,13 @@ namespace Aspirate.Shared.Models.AspireManifests;
 /// </summary>
 [ExcludeFromCodeCoverage]
 [JsonPolymorphic]
-[JsonDerivedType(typeof(ProjectResource))]
-[JsonDerivedType(typeof(DockerfileResource))]
-[JsonDerivedType(typeof(ContainerResource))]
-[JsonDerivedType(typeof(DaprResource))]
-[JsonDerivedType(typeof(DaprComponentResource))]
-[JsonDerivedType(typeof(ParameterResource))]
-[JsonDerivedType(typeof(ValueResource))]
+[JsonDerivedType(typeof(ProjectResource), typeDiscriminator: "aspire.project")]
+[JsonDerivedType(typeof(DockerfileResource), typeDiscriminator: "aspire.dockerfile")]
+[JsonDerivedType(typeof(ContainerResource), typeDiscriminator: "aspire.container")]
+[JsonDerivedType(typeof(DaprResource), typeDiscriminator: "aspire.dapr")]
+[JsonDerivedType(typeof(DaprComponentResource), typeDiscriminator: "aspire.daprcomponent")]
+[JsonDerivedType(typeof(ParameterResource), typeDiscriminator: "aspire.parameter")]
+[JsonDerivedType(typeof(ValueResource), typeDiscriminator: "aspire.value")]
 public abstract class Resource : IResource
 {
     [JsonPropertyName("name")]

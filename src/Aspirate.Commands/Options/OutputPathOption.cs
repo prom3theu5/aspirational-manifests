@@ -1,6 +1,4 @@
-﻿using Aspirate.Shared.Interfaces.Commands.Contracts;
-
-namespace Aspirate.Commands.Options;
+﻿namespace Aspirate.Commands.Options;
 
 public sealed class OutputPathOption : BaseOption<string>
 {
@@ -10,7 +8,7 @@ public sealed class OutputPathOption : BaseOption<string>
         "--output-path",
     };
 
-    private OutputPathOption() : base(_aliases,  "ASPIRATE_OUTPUT_PATH", AspirateLiterals.DefaultOutputPath)
+    private OutputPathOption() : base(_aliases,  "ASPIRATE_OUTPUT_PATH", AspirateLiterals.DefaultArtifactsPath)
     {
         Name = nameof(IGenerateOptions.OutputPath);
         Description = "The output path for generated manifests";

@@ -1,5 +1,3 @@
-using Aspirate.Shared.Outputs;
-
 namespace Aspirate.Services.Implementations;
 
 public class KustomizeService(IFileSystem fileSystem, IShellExecutionService shellExecutionService, IAnsiConsole logger) : IKustomizeService
@@ -36,48 +34,46 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
         return result.Output;
     }
 
-    public async Task WriteSecretsOutToTempFiles(bool disableSecrets, string inputPath, List<string> files, ISecretProvider secretProvider)
+    public async Task WriteSecretsOutToTempFiles(AspirateState state, List<string> files, ISecretProvider secretProvider)
     {
-        if (disableSecrets)
+        if (state.DisableSecrets == true)
         {
             return;
         }
 
-        if (!secretProvider.SecretStateExists(inputPath))
+        if (!secretProvider.SecretStateExists(state))
         {
             return;
         }
 
-        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+
+        if (state.SecretState is null || state.SecretState.Secrets.Count == 0)
         {
-            if (passwordSecretProvider.State?.Secrets is null || passwordSecretProvider.State.Secrets.Count == 0)
+            return;
+        }
+
+        foreach (var resourceSecrets in secretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
+        {
+            var secretFile = fileSystem.Path.Combine(state.OutputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
+
+            files.Add(secretFile);
+
+            await using var streamWriter = fileSystem.File.CreateText(secretFile);
+
+            foreach (var key in resourceSecrets.Value.Keys)
             {
-                return;
+                var secretValue = secretProvider.GetSecret(resourceSecrets.Key, key);
+                await streamWriter.WriteLineAsync($"{key}={secretValue}");
             }
 
-            foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
-            {
-                var secretFile = fileSystem.Path.Combine(inputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
-
-                files.Add(secretFile);
-
-                await using var streamWriter = fileSystem.File.CreateText(secretFile);
-
-                foreach (var key in resourceSecrets.Value.Keys)
-                {
-                    var secretValue = secretProvider.GetSecret(resourceSecrets.Key, key);
-                    await streamWriter.WriteLineAsync($"{key}={secretValue}");
-                }
-
-                await streamWriter.FlushAsync();
-                streamWriter.Close();
-            }
+            await streamWriter.FlushAsync();
+            streamWriter.Close();
         }
     }
 
-    public void CleanupSecretEnvFiles(bool disableSecrets, IEnumerable<string> secretFiles)
+    public void CleanupSecretEnvFiles(bool? disableSecrets, IEnumerable<string> secretFiles)
     {
-        if (disableSecrets)
+        if (disableSecrets == true)
         {
             return;
         }

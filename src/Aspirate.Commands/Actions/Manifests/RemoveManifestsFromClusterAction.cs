@@ -1,6 +1,3 @@
-using Aspirate.Shared.Interfaces.Secrets;
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class RemoveManifestsFromClusterAction(
@@ -69,34 +66,32 @@ public sealed class RemoveManifestsFromClusterAction(
 
     private void CreateEmptySecretFiles(List<string> files)
     {
-        if (CurrentState.DisableSecrets)
+        if (CurrentState.DisableSecrets == true)
         {
             return;
         }
 
-        if (!secretProvider.SecretStateExists(CurrentState.InputPath))
+        if (!secretProvider.SecretStateExists(CurrentState))
         {
             return;
         }
 
-        if (secretProvider is PasswordSecretProvider passwordSecretProvider)
+        secretProvider.LoadState(CurrentState);
+
+        if (secretProvider.State?.Secrets is null || secretProvider.State.Secrets.Count == 0)
         {
-            passwordSecretProvider.LoadState(CurrentState.InputPath);
+            return;
+        }
 
-            if (passwordSecretProvider.State?.Secrets is null || passwordSecretProvider.State.Secrets.Count == 0)
-            {
-                return;
-            }
+        foreach (var resourceSecrets in secretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
+        {
+            var secretFile =
+                fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
 
-            foreach (var resourceSecrets in passwordSecretProvider.State.Secrets.Where(x=>x.Value.Keys.Count > 0))
-            {
-                var secretFile = fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
+            files.Add(secretFile);
 
-                files.Add(secretFile);
-
-                var stream = fileSystem.File.Create(secretFile);
-                stream.Close();
-            }
+            var stream = fileSystem.File.Create(secretFile);
+            stream.Close();
         }
     }
 
@@ -151,18 +146,18 @@ public sealed class RemoveManifestsFromClusterAction(
     {
         if (!CurrentState.ActiveKubernetesContextIsSet)
         {
-            NonInteractiveValidationFailed("Cannot remove manifests from a cluster without specifying the kubernetes context to use.");
+            Logger.ValidationFailed("Cannot remove manifests from a cluster without specifying the kubernetes context to use.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.InputPath))
         {
-            NonInteractiveValidationFailed("Cannot remove manifests from a cluster without specifying the input path to use for manifests.");
+            Logger.ValidationFailed("Cannot remove manifests from a cluster without specifying the input path to use for manifests.");
         }
     }
 
     private void CleanupSecretEnvFiles(IEnumerable<string> secretFiles)
     {
-        if (CurrentState.DisableSecrets)
+        if (CurrentState.DisableSecrets == true)
         {
             return;
         }

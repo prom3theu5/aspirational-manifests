@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Commands.Actions.Configuration;
 
 public class InitializeConfigurationAction(
@@ -231,22 +229,22 @@ public class InitializeConfigurationAction(
     {
         if (string.IsNullOrEmpty(CurrentState.ContainerBuilder))
         {
-            NonInteractiveValidationFailed("Container builder must be supplied when running in non-interactive mode.");
+            Logger.ValidationFailed("Container builder must be supplied when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.ProjectPath))
         {
-            NonInteractiveValidationFailed("Project path must be supplied when running in non-interactive mode.");
+            Logger.ValidationFailed("Project path must be supplied when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.ContainerRegistry))
         {
-            NonInteractiveValidationFailed("Container Registry must be supplied when running in non-interactive mode.");
+            Logger.ValidationFailed("Container Registry must be supplied when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.ContainerImageTag))
         {
-            NonInteractiveValidationFailed("Container image tag must be supplied when running in non-interactive mode.");
+            Logger.ValidationFailed("Container image tag must be supplied when running in non-interactive mode.");
         }
     }
 }

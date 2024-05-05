@@ -18,7 +18,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
         CacheContainerDetails(dockerfileProcessor);
 
-        if (CurrentState.SkipBuild)
+        if (CurrentState.SkipBuild == true)
         {
             Logger.MarkupLine("[bold]Skipping build and push action as requested.[/]");
             return true;
@@ -150,7 +150,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             {
                 if (!CurrentState.LoadedAspireManifestResources.ContainsKey(composeBuild))
                 {
-                    NonInteractiveValidationFailed($"The resource '{composeBuild}' is not found in the loaded manifest.");
+                    Logger.ValidationFailed($"The resource '{composeBuild}' is not found in the loaded manifest.");
                 }
             }
         }

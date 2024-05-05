@@ -1,6 +1,6 @@
 namespace Aspirate.Processors.Resources.Dapr;
 
-public sealed class DaprComponentTemplateData : KubernetesDeploymentTemplateData
+public sealed class DaprComponentTemplateData : KubernetesDeploymentData
 {
     public string Type { get; private set; } = default!;
     public string? Version { get; private set; }
@@ -21,7 +21,7 @@ public sealed class DaprComponentTemplateData : KubernetesDeploymentTemplateData
         return this;
     }
 
-    public KubernetesDeploymentTemplateData SetMetadata(Dictionary<string, string>? metadata)
+    public KubernetesDeploymentData SetMetadata(Dictionary<string, string>? metadata)
     {
         Metadata = metadata;
 

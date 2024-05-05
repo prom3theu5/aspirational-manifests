@@ -1,8 +1,6 @@
-﻿using Aspirate.Shared.Interfaces.Commands.Contracts;
+﻿namespace Aspirate.Commands.Options;
 
-namespace Aspirate.Commands.Options;
-
-public sealed class RollingRestartOption : BaseOption<bool>
+public sealed class RollingRestartOption : BaseOption<bool?>
 {
     private static readonly string[] _aliases =
     {
@@ -10,7 +8,7 @@ public sealed class RollingRestartOption : BaseOption<bool>
         "--rolling-restart",
     };
 
-    private RollingRestartOption() : base(_aliases, "ASPIRATE_ROLLING_RESTART", false)
+    private RollingRestartOption() : base(_aliases, "ASPIRATE_ROLLING_RESTART", null)
     {
         Name = nameof(IApplyOptions.RollingRestart);
         Description = "Indicates if a rolling restart should occur at the end of deploy. Defaults to 'false'.";

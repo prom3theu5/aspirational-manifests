@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Commands.Contracts;
-
 namespace Aspirate.Commands.Options;
 
 public sealed class PrivateRegistryPasswordOption : BaseOption<string?>

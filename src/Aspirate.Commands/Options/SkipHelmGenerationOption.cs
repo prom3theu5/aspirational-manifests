@@ -1,8 +1,6 @@
-using Aspirate.Shared.Interfaces.Commands.Contracts;
-
 namespace Aspirate.Commands.Options;
 
-public sealed class SkipHelmGenerationOption : BaseOption<bool>
+public sealed class SkipHelmGenerationOption : BaseOption<bool?>
 {
     private static readonly string[] _aliases =
     {
@@ -11,7 +9,7 @@ public sealed class SkipHelmGenerationOption : BaseOption<bool>
         "--skip-helm-generation"
     };
 
-    private SkipHelmGenerationOption() : base(_aliases, "ASPIRATE_SKIP_HELM_GENERATION", false)
+    private SkipHelmGenerationOption() : base(_aliases, "ASPIRATE_SKIP_HELM_GENERATION", null)
     {
         Name = nameof(IGenerateOptions.SkipHelmGeneration);
         Description = "Skips generation of a helm chart";

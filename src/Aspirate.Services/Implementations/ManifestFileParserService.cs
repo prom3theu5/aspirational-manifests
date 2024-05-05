@@ -1,3 +1,5 @@
+using Aspirate.Shared.Interfaces.Processors;
+
 namespace Aspirate.Services.Implementations;
 
 /// <inheritdoc />

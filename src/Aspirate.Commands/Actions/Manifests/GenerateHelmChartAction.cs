@@ -1,19 +1,17 @@
-using Aspirate.Shared.Interfaces.Secrets;
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateHelmChartAction(
     IHelmChartCreator helmChartCreator,
     IKustomizeService kustomizeService,
     ISecretProvider secretProvider,
+    IFileSystem fileSystem,
     IServiceProvider serviceProvider) : BaseAction(serviceProvider)
 {
     public override async Task<bool> ExecuteAsync()
     {
         Logger.WriteRuler("[purple]Handling Helm Support[/]");
 
-        if (CurrentState.SkipHelmGeneration)
+        if (CurrentState.SkipHelmGeneration == true)
         {
             Logger.MarkupLine("[blue]Skipping helm chart generation as requested.[/]");
             return true;
@@ -36,7 +34,7 @@ public sealed class GenerateHelmChartAction(
 
         try
         {
-            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState.DisableSecrets, CurrentState.OutputPath, secretFiles, secretProvider);
+            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState, secretFiles, secretProvider);
             await helmChartCreator.CreateHelmChart(CurrentState.OutputPath, Path.Combine(CurrentState.OutputPath, "Chart"), "AspireProject");
         }
         catch (Exception e)
@@ -55,9 +53,16 @@ public sealed class GenerateHelmChartAction(
 
     private bool ShouldCreateHelmChart()
     {
+        if (CurrentState.SkipHelmGeneration == false)
+        {
+            return true;
+        }
+
         var shouldGenerateHelmChart = Logger.Confirm(
             "[bold]Would you like to generate a helm chart based on the generated kustomize manifests?[/]",
             false);
+
+        CurrentState.SkipHelmGeneration = !shouldGenerateHelmChart;
 
         if (!shouldGenerateHelmChart)
         {

@@ -1,5 +1,3 @@
-using Aspirate.Shared.Outputs;
-
 namespace Aspirate.Services.Implementations;
 
 public class ShellExecutionService(IAnsiConsole console, IFileSystem fileSystem) : IShellExecutionService

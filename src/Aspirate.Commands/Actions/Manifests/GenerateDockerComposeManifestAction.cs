@@ -19,7 +19,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             ActionCausesExitException.ExitNow();
         }
 
-        var outputFile = Path.Combine(AspirateLiterals.DefaultOutputPath, "docker-compose.yaml");
+        var outputFile = Path.Combine(AspirateLiterals.DefaultArtifactsPath, "docker-compose.yaml");
 
         Logger.MarkupLine($"[bold]Generating docker compose file: [blue]'{outputFile}'[/][/]");
 
@@ -53,9 +53,9 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         var composeFileString = composeFile.Serialize();
 
-        if (!fileSystem.Directory.Exists(AspirateLiterals.DefaultOutputPath))
+        if (!fileSystem.Directory.Exists(AspirateLiterals.DefaultArtifactsPath))
         {
-            fileSystem.Directory.CreateDirectory(AspirateLiterals.DefaultOutputPath);
+            fileSystem.Directory.CreateDirectory(AspirateLiterals.DefaultArtifactsPath);
         }
 
         fileSystem.File.WriteAllText(outputFile, composeFileString);

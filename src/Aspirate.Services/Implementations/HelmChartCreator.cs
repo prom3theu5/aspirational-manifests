@@ -38,18 +38,23 @@ public class HelmChartCreator(IFileSystem fileSystem, IShellExecutionService she
             switch (resource)
             {
                 case V1ConfigMap configMap:
+                    configMap.Metadata.NamespaceProperty = null;
                     await WriteResourceFile(KubernetesYaml.Serialize(configMap), chartPath, configMap.Metadata.Name, configMap.Kind);
                     continue;
                 case V1Secret secret:
+                    secret.Metadata.NamespaceProperty = null;
                     await WriteResourceFile(KubernetesYaml.Serialize(secret), chartPath, secret.Metadata.Name, secret.Kind);
                     continue;
                 case V1Deployment deployment:
+                    deployment.Metadata.NamespaceProperty = null;
                     await HandleDeployment(deployment, chartPath, valuesImages);
                     continue;
                 case V1StatefulSet statefulSet:
+                    statefulSet.Metadata.NamespaceProperty = null;
                     await HandleStatefulSet(statefulSet, chartPath, valuesImages);
                     continue;
                 case V1Service service:
+                    service.Metadata.NamespaceProperty = null;
                     await WriteResourceFile(KubernetesYaml.Serialize(service), chartPath, service.Metadata.Name, service.Kind);
                     continue;
             }

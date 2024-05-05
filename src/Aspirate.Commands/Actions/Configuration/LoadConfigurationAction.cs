@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Commands.Actions.Configuration;
 
 public class LoadConfigurationAction(
@@ -8,6 +6,11 @@ public class LoadConfigurationAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        if (PreviousStateWasRestored(false))
+        {
+            return Task.FromResult(true);
+        }
+
         Logger.WriteRuler("[purple]Handling Configuration[/]");
 
         var aspirateSettings = configurationService.LoadConfigurationFile(CurrentState.ProjectPath);

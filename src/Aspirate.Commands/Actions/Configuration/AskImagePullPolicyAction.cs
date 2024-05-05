@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Commands.Actions.Configuration;
 
 public class AskImagePullPolicyAction(
@@ -8,6 +6,11 @@ public class AskImagePullPolicyAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        if (PreviousStateWasRestored())
+        {
+            return Task.FromResult(true);
+        }
+
         Logger.WriteRuler("[purple]Handle Image Pull Policy[/]");
 
         if (CurrentState.NonInteractive)
@@ -43,7 +46,7 @@ public class AskImagePullPolicyAction(
     {
         if (string.IsNullOrEmpty(CurrentState.ImagePullPolicy))
         {
-            NonInteractiveValidationFailed("Image pull policy is required when running in non-interactive mode.");
+            Logger.ValidationFailed("Image pull policy is required when running in non-interactive mode.");
         }
     }
 }

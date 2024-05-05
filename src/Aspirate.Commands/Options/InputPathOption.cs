@@ -1,6 +1,4 @@
-﻿using Aspirate.Shared.Interfaces.Commands.Contracts;
-
-namespace Aspirate.Commands.Options;
+﻿namespace Aspirate.Commands.Options;
 
 public sealed class InputPathOption : BaseOption<string>
 {
@@ -10,7 +8,7 @@ public sealed class InputPathOption : BaseOption<string>
         "--input-path"
     };
 
-    private InputPathOption() : base(_aliases, "ASPIRATE_INPUT_PATH", AspirateLiterals.DefaultOutputPath)
+    private InputPathOption() : base(_aliases, "ASPIRATE_INPUT_PATH", AspirateLiterals.DefaultArtifactsPath)
     {
         Name = nameof(IKubernetesOptions.InputPath);
         Description = "The path for the kustomize manifests directory";

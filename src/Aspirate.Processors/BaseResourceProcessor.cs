@@ -101,6 +101,14 @@ public abstract class BaseResourceProcessor : IResourceProcessor
     }
 
     /// <inheritdoc />
+    public virtual List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
+    {
+        LogCreateKubernetesObjectsNotOverridden(GetType().Name);
+
+        return [];
+    }
+
+    /// <inheritdoc />
     public virtual ComposeService CreateComposeEntry(CreateComposeEntryOptions options)
     {
         LogCreateComposeNotOverridden(GetType().Name);
@@ -120,6 +128,9 @@ public abstract class BaseResourceProcessor : IResourceProcessor
 
     private void LogCreateComposeNotOverridden(string processor) =>
         _console.MarkupLine($"[bold yellow]Processor {processor} has not been configured. CreateComposeEntry must be overridden.[/]");
+
+    private void LogCreateKubernetesObjectsNotOverridden(string processor) =>
+        _console.MarkupLine($"[bold yellow]Processor {processor} has not been configured. CreateKubernetesObjects must be overridden.[/]");
 
     private void LogCompletionMessage(string outputPath) => _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}[/]");
 }

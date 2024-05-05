@@ -8,4 +8,10 @@ public static class AnsiConsoleExtensions
         console.WriteLine();
         console.Write(rule);
     }
+
+    public static void ValidationFailed(this IAnsiConsole console, string message)
+    {
+        console.MarkupLine($"[red](!)[/] {message}");
+        ActionCausesExitException.ExitNow();
+    }
 }

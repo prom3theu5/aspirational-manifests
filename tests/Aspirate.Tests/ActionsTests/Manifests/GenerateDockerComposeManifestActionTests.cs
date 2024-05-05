@@ -1,3 +1,5 @@
+using Aspirate.Shared.Enums;
+
 namespace Aspirate.Tests.ActionsTests.Manifests;
 
 

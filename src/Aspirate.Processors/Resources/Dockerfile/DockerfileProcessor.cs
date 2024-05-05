@@ -40,7 +40,19 @@ public class DockerfileProcessor(
             throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
         }
 
-        var data = new KubernetesDeploymentTemplateData()
+        var data = PopulateKubernetesDeploymentData(options, containerImage, dockerFile);
+
+        _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
+        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, options.TemplatePath);
+
+        LogCompletion(resourceOutputPath);
+
+        return Task.FromResult(true);
+    }
+
+    private KubernetesDeploymentData PopulateKubernetesDeploymentData(BaseKubernetesCreateOptions options, string containerImage, DockerfileResource? dockerFile) =>
+        new KubernetesDeploymentData()
             .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
             .SetName(options.Resource.Key)
             .SetContainerImage(containerImage)
@@ -54,15 +66,6 @@ public class DockerfileProcessor(
             .SetManifests(_manifests)
             .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
             .Validate();
-
-        _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
-        _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
-        _manifestWriter.CreateComponentKustomizeManifest(resourceOutputPath, data, options.TemplatePath);
-
-        LogCompletion(resourceOutputPath);
-
-        return Task.FromResult(true);
-    }
 
     public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive)
     {
@@ -114,5 +117,19 @@ public class DockerfileProcessor(
         response.Service = newService.Build();
 
         return response;
+    }
+
+    public override List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
+    {
+        var dockerFile = options.Resource.Value as DockerfileResource;
+
+        if (!_containerImageCache.TryGetValue(options.Resource.Key, out var containerImage))
+        {
+            throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
+        }
+
+        var data = PopulateKubernetesDeploymentData(options, containerImage, dockerFile);
+
+        return data.ToKubernetesObjects();
     }
 }

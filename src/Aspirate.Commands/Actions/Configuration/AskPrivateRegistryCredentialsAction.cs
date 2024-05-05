@@ -1,5 +1,3 @@
-using Aspirate.Shared.Interfaces.Services;
-
 namespace Aspirate.Commands.Actions.Configuration;
 
 public class AskPrivateRegistryCredentialsAction(
@@ -8,6 +6,11 @@ public class AskPrivateRegistryCredentialsAction(
 {
     public override Task<bool> ExecuteAsync()
     {
+        if (PreviousStateWasRestored())
+        {
+            return Task.FromResult(true);
+        }
+
         Logger.WriteRuler("[purple]Handling private registry credentials[/]");
 
         if (CurrentState.NonInteractive)
@@ -69,22 +72,22 @@ public class AskPrivateRegistryCredentialsAction(
 
         if (string.IsNullOrEmpty(CurrentState.PrivateRegistryUrl))
         {
-            NonInteractiveValidationFailed("Registry url is required when running in non-interactive mode.");
+            Logger.ValidationFailed("Registry url is required when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.PrivateRegistryUsername))
         {
-            NonInteractiveValidationFailed("Registry username is required when running in non-interactive mode.");
+            Logger.ValidationFailed("Registry username is required when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.PrivateRegistryPassword))
         {
-            NonInteractiveValidationFailed("Registry password is required when running in non-interactive mode.");
+            Logger.ValidationFailed("Registry password is required when running in non-interactive mode.");
         }
 
         if (string.IsNullOrEmpty(CurrentState.PrivateRegistryEmail))
         {
-            NonInteractiveValidationFailed("Registry email is required when running in non-interactive mode.");
+            Logger.ValidationFailed("Registry email is required when running in non-interactive mode.");
         }
     }
 }

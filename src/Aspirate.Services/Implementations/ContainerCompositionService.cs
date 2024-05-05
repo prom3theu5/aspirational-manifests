@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using Aspirate.Shared.Outputs;
 
 namespace Aspirate.Services.Implementations;
 
