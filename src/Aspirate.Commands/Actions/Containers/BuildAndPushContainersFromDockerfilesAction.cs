@@ -59,7 +59,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             {
                 Registry = CurrentState.ContainerRegistry,
                 Prefix = CurrentState.ContainerRepositoryPrefix,
-                Tag = CurrentState.ContainerImageTag,
+                Tags = CurrentState.ContainerImageTags,
             });
         }
     }
@@ -121,7 +121,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
                 ImageName = resource.Key,
                 Registry = CurrentState.ContainerRegistry,
                 Prefix = CurrentState.ContainerRepositoryPrefix,
-                Tag = CurrentState.ContainerImageTag
+                Tags = CurrentState.ContainerImageTags
             }, CurrentState.NonInteractive);
         }
     }

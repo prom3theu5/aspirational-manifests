@@ -29,7 +29,7 @@ public abstract class AspirateTestBase
         {
             NonInteractive = nonInteractive,
             ContainerRegistry = containerRegistry,
-            ContainerImageTag = containerImageTag,
+            ContainerImageTags = [containerImageTag],
             ContainerBuilder = containerBuilder,
             ContainerRepositoryPrefix = containerPrefix,
             TemplatePath = templatePath,

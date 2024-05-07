@@ -21,7 +21,7 @@ public class DockerfileProcessor(
         $"{TemplateLiterals.ServiceType}.yaml",
     ];
 
-    private readonly Dictionary<string, string> _containerImageCache = [];
+    private readonly Dictionary<string, List<string>> _containerImageCache = [];
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
@@ -35,12 +35,12 @@ public class DockerfileProcessor(
 
         var dockerFile = options.Resource.Value as DockerfileResource;
 
-        if (!_containerImageCache.TryGetValue(options.Resource.Key, out var containerImage))
+        if (!_containerImageCache.TryGetValue(options.Resource.Key, out var containerImages))
         {
             throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
         }
 
-        var data = PopulateKubernetesDeploymentData(options, containerImage, dockerFile);
+        var data = PopulateKubernetesDeploymentData(options, containerImages.First(), dockerFile);
 
         _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
         _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
@@ -78,7 +78,7 @@ public class DockerfileProcessor(
 
     public void PopulateContainerImageCacheWithImage(KeyValuePair<string, Resource> resource, ContainerOptions options)
     {
-        _containerImageCache.Add(resource.Key, options.ToImageName(resource.Key));
+        _containerImageCache.Add(resource.Key, options.ToImageNames(resource.Key));
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Setting container details for Dockerfile [blue]{resource.Key}[/]");
     }
@@ -111,7 +111,7 @@ public class DockerfileProcessor(
                 throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
             }
 
-            newService = newService.WithImage(containerImage.ToLowerInvariant());
+            newService = newService.WithImage(containerImage[0].ToLowerInvariant());
         }
 
         response.Service = newService.Build();
@@ -128,7 +128,7 @@ public class DockerfileProcessor(
             throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
         }
 
-        var data = PopulateKubernetesDeploymentData(options, containerImage, dockerFile);
+        var data = PopulateKubernetesDeploymentData(options, containerImage[0], dockerFile);
 
         return data.ToKubernetesObjects();
     }

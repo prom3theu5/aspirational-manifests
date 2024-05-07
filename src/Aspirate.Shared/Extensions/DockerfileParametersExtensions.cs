@@ -4,30 +4,39 @@ public static class DockerfileParametersExtensions
 {
     private static readonly StringBuilder _tagBuilder = new();
 
-    public static string ToImageName(this ContainerOptions options, string resourceKey)
+    public static List<string> ToImageNames(this ContainerOptions options, string resourceKey)
     {
-        _tagBuilder.Clear();
+        var images = new List<string>();
+        options.Tags.Remove("latest");
+        options.Tags.Insert(0, "latest");
 
-        if (!string.IsNullOrEmpty(options.Registry))
+        foreach (var tag in options.Tags)
         {
-            _tagBuilder.Append($"{options.Registry}/");
+            _tagBuilder.Clear();
+
+            if (!string.IsNullOrEmpty(options.Registry))
+            {
+                _tagBuilder.Append($"{options.Registry}/");
+            }
+
+            if (!string.IsNullOrEmpty(options.Prefix))
+            {
+                _tagBuilder.Append($"{options.Prefix}/");
+            }
+
+            if (string.IsNullOrEmpty(options.ImageName))
+            {
+                options.ImageName = resourceKey;
+            }
+
+            _tagBuilder.Append(options.ImageName);
+
+            AppendTag(tag);
+
+            images.Add(_tagBuilder.ToString());
         }
 
-        if (!string.IsNullOrEmpty(options.Prefix))
-        {
-            _tagBuilder.Append($"{options.Prefix}/");
-        }
-
-        if (string.IsNullOrEmpty(options.ImageName))
-        {
-            options.ImageName = resourceKey;
-        }
-
-        _tagBuilder.Append(options.ImageName);
-
-        AppendTag(options.Tag);
-
-        return _tagBuilder.ToString();
+        return images;
     }
 
     private static void AppendTag(string? tag)

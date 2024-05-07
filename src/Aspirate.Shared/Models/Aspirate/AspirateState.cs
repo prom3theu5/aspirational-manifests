@@ -32,8 +32,8 @@ public class AspirateState :
     public string? ContainerRegistry { get; set; }
 
     [RestorableStateProperty]
-    [JsonPropertyName("containerImageTag")]
-    public string? ContainerImageTag { get; set; }
+    [JsonPropertyName("containerImageTags")]
+    public List<string>? ContainerImageTags { get; set; } = ["latest"];
 
     [RestorableStateProperty]
     [JsonPropertyName("runtimeIdentifier")]

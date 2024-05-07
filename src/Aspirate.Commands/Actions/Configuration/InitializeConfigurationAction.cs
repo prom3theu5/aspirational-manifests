@@ -111,10 +111,10 @@ public class InitializeConfigurationAction(
 
     private void HandleContainerTag(AspirateSettings aspirateConfiguration)
     {
-        if (!string.IsNullOrEmpty(CurrentState.ContainerImageTag))
+        if (CurrentState.ContainerImageTags?.Count > 0)
         {
-            aspirateConfiguration.ContainerSettings.Tag = CurrentState.ContainerImageTag;
-            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tag}'[/].");
+            aspirateConfiguration.ContainerSettings.Tags = CurrentState.ContainerImageTags;
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{string.Join(';', aspirateConfiguration.ContainerSettings.Tags)}'[/].");
             return;
         }
 
@@ -126,9 +126,9 @@ public class InitializeConfigurationAction(
             return;
         }
 
-        var containerTag = Logger.Prompt(new TextPrompt<string>("Please enter the container tag to use as a fall-back value:").PromptStyle("blue"));
-        aspirateConfiguration.ContainerSettings.Tag = containerTag;
-        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tag}'[/].");
+        var containerTag = Logger.Prompt(new TextPrompt<string>("Please enter the container tags to use as a fall-back value, you can enter multiple values split via semi-colon ';' :").PromptStyle("blue"));
+        aspirateConfiguration.ContainerSettings.Tags = containerTag.Split(';').ToList();
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container fallback tag'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Tags}'[/].");
     }
 
     private void HandleTemplateDirectory(AspirateSettings aspirateConfiguration)
@@ -242,7 +242,7 @@ public class InitializeConfigurationAction(
             Logger.ValidationFailed("Container Registry must be supplied when running in non-interactive mode.");
         }
 
-        if (string.IsNullOrEmpty(CurrentState.ContainerImageTag))
+        if (CurrentState.ContainerImageTags?.Count == 0)
         {
             Logger.ValidationFailed("Container image tag must be supplied when running in non-interactive mode.");
         }

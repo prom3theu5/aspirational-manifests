@@ -1,1 +1,4 @@
-﻿test-image:test-tag
+﻿[
+  test-image:latest,
+  test-image:test-tag
+]

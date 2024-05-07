@@ -6,5 +6,5 @@ public class ContainerOptions
     public string ImageName { get; set; } = default!;
     public string Registry { get; set; } = default!;
     public string? Prefix { get; set; }
-    public string? Tag { get; set; }
+    public List<string>? Tags { get; set; } = ["latest"];
 }

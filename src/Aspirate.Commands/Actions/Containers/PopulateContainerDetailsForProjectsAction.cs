@@ -34,7 +34,7 @@ public sealed class PopulateContainerDetailsForProjectsAction(
             {
                 Registry = CurrentState.ContainerRegistry,
                 Prefix = CurrentState.ContainerRepositoryPrefix,
-                Tag = CurrentState.ContainerImageTag,
+                Tags = CurrentState.ContainerImageTags,
             });
         }
     }

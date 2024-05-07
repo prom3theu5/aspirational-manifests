@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
@@ -49,27 +47,31 @@ public sealed class ContainerCompositionService(
 
         var fullDockerfilePath = filesystem.GetFullPath(dockerfileResource.Path);
 
-        var fullImage = options.ToImageName(dockerfileResource.Name);
+        var fullImages = options.ToImageNames(dockerfileResource.Name);
 
-        var result = await BuildContainer(dockerfileResource, options.ContainerBuilder, nonInteractive, fullImage, fullDockerfilePath);
+        var result = await BuildContainer(dockerfileResource, options.ContainerBuilder, nonInteractive, fullImages, fullDockerfilePath);
 
         CheckSuccess(result);
 
-        result = await PushContainer(options.ContainerBuilder, options.Registry, fullImage, nonInteractive);
+        result = await PushContainer(options.ContainerBuilder, options.Registry, fullImages, nonInteractive);
 
         CheckSuccess(result);
 
         return true;
     }
 
-    private async Task<ShellCommandResult> PushContainer(string builder, string? registry, string fullImage, bool? nonInteractive)
+    private async Task<ShellCommandResult> PushContainer(string builder, string? registry, List<string> fullImages, bool? nonInteractive)
     {
         if (!string.IsNullOrEmpty(registry))
         {
             var pushArgumentBuilder = ArgumentsBuilder
                 .Create()
-                .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false)
-                .AppendArgument(fullImage.ToLower(), string.Empty, quoteValue: false);
+                .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false);
+
+            foreach (var fullImage in fullImages)
+            {
+                pushArgumentBuilder.AppendArgument(fullImage.ToLower(), string.Empty, quoteValue: false, allowDuplicates: true);
+            }
 
             return await shellExecutionService.ExecuteCommand(
                 new()
@@ -84,13 +86,16 @@ public sealed class ContainerCompositionService(
         return new ShellCommandResult(true, string.Empty, string.Empty, 0);
     }
 
-    private Task<ShellCommandResult> BuildContainer(DockerfileResource dockerfileResource, string builder, bool? nonInteractive, string tag, string fullDockerfilePath)
+    private Task<ShellCommandResult> BuildContainer(DockerfileResource dockerfileResource, string builder, bool? nonInteractive, List<string> tags, string fullDockerfilePath)
     {
         var buildArgumentBuilder = ArgumentsBuilder
             .Create()
-            .AppendArgument(DockerLiterals.BuildCommand, string.Empty, quoteValue: false)
-            .AppendArgument(DockerLiterals.TagArgument, tag.ToLower());
+            .AppendArgument(DockerLiterals.BuildCommand, string.Empty, quoteValue: false);
 
+        foreach (var tag in tags)
+        {
+            buildArgumentBuilder.AppendArgument(DockerLiterals.TagArgument, tag.ToLower(), allowDuplicates: true);
+        }
 
         if (dockerfileResource.Env is not null)
         {
@@ -213,6 +218,13 @@ public sealed class ContainerCompositionService(
         if (!string.IsNullOrEmpty(containerDetails.ContainerImageName))
         {
             argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageNameArgument, containerDetails.ContainerImageName);
+        }
+
+        if (containerDetails.ContainerImageTag is not null && containerDetails.ContainerImageTag.Contains(';'))
+        {
+            argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageTagArguments,
+                $"\\\"{containerDetails.ContainerImageTag}\\\"");
+            return;
         }
 
         argumentsBuilder.AppendArgument(DotNetSdkLiterals.ContainerImageTagArgument, containerDetails.ContainerImageTag);

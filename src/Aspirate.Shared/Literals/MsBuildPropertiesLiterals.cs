@@ -10,5 +10,6 @@ public static class MsBuildPropertiesLiterals
     public const string ContainerRepositoryArgument = "ContainerRepository";
     public const string ContainerImageNameArgument = "ContainerImageName";
     public const string ContainerImageTagArgument = "ContainerImageTag";
+    public const string ContainerImageTagArguments = "ContainerImageTags";
     public const string ErrorOnDuplicatePublishOutputFilesArgument = "ErrorOnDuplicatePublishOutputFiles";
 }

@@ -40,10 +40,7 @@ public class LoadConfigurationAction(
             CurrentState.ContainerRepositoryPrefix = aspirateSettings.ContainerSettings?.RepositoryPrefix ?? null;
         }
 
-        if (string.IsNullOrEmpty(CurrentState.ContainerImageTag))
-        {
-            CurrentState.ContainerImageTag = aspirateSettings.ContainerSettings?.Tag ?? null;
-        }
+        CurrentState.ContainerImageTags ??= aspirateSettings.ContainerSettings?.Tags ?? null;
 
         Logger.MarkupLine($"[bold]Successfully loaded existing aspirate bootstrap settings from [blue]'{CurrentState.ProjectPath}'[/].[/]");
 

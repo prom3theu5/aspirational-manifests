@@ -10,6 +10,6 @@ public sealed class InitOptions : BaseCommandOptions, IInitOptions, IContainerOp
 
     public string? ContainerRepositoryPrefix { get; set; }
 
-    public string? ContainerImageTag { get; set; }
+    public List<string>? ContainerImageTags { get; set; }
     public string? TemplatePath { get; set; }
 }

@@ -1,8 +1,11 @@
 ﻿{
+  TemplatePath: /tests,
   ContainerSettings: {
     Registry: localhost:5001,
     RepositoryPrefix: prefix,
-    Tag: tests,
+    Tags: [
+      null
+    ],
     Builder: docker
   }
 }
