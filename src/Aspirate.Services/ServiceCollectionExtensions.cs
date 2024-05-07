@@ -21,7 +21,8 @@ public static class ServiceCollectionExtensions
             .AddDaprCliSupport()
             .AddHelmSupport()
             .AddStateManagement()
-            .AddSecretService();
+            .AddSecretService()
+            .AddVersionChecks();
 
     /// <summary>
     /// Adds the password generator implementation to the service collection.
@@ -82,6 +83,10 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddSecretService(this IServiceCollection services) =>
         services
             .AddSingleton<ISecretService, SecretService>();
+
+    private static IServiceCollection AddVersionChecks(this IServiceCollection services) =>
+        services
+            .AddSingleton<IVersionCheckService, VersionCheckService>();
 
     /// <summary>
     /// Adds the shell execution service to the service collection.

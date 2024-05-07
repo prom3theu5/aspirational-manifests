@@ -27,6 +27,9 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
         var stateService = handler.Services.GetRequiredService<IStateService>();
         var secretService = handler.Services.GetRequiredService<ISecretService>();
+        var versionCheckService = handler.Services.GetRequiredService<IVersionCheckService>();
+
+        await versionCheckService.CheckVersion();
 
         var stateOptions = GetStateManagementOptions(options, handler);
 
