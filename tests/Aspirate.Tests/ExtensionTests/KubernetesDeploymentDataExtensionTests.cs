@@ -62,7 +62,7 @@ public class KubernetesDeploymentDataExtensionTests
 
         // Assert
         result.StringData.Should().ContainKey("key");
-        result.StringData["key"].Should().Be("value");
+        result.StringData["key"].Should().Be("dmFsdWU=");
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class KubernetesDeploymentDataExtensionTests
 
         var secret = result.OfType<V1Secret>().First();
         secret.StringData.Should().ContainKey("key");
-        secret.StringData["key"].Should().Be("secretvalue");
+        secret.StringData["key"].Should().Be("c2VjcmV0dmFsdWU=");
     }
 
     [Fact]
