@@ -141,7 +141,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
             DisableSecrets = false,
             SecretPassword = string.Empty,
             CommandUnlocksSecrets = true,
-        });;
+        });
 
         // Assert
         result.Should().Throw<ActionCausesExitException>();

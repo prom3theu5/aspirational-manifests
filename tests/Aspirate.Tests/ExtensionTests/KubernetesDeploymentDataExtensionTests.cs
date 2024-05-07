@@ -26,10 +26,10 @@ public class KubernetesDeploymentDataExtensionTests
             .SetNamespace("namespace");
 
         // Act
-        var result = data.ToKubernetesObjectMetaData("suffix");
+        var result = data.ToKubernetesObjectMetaData();
 
         // Assert
-        result.Name.Should().Be("test-suffix");
+        result.Name.Should().Be("test");
         result.NamespaceProperty.Should().Be("namespace");
     }
 

@@ -1,16 +1,9 @@
 namespace Aspirate.Services.Implementations;
 
-public class HelmChartCreator(IFileSystem fileSystem, IShellExecutionService shellExecutionService, IKustomizeService kustomizeService, IAnsiConsole logger) : IHelmChartCreator
+public class HelmChartCreator(IFileSystem fileSystem, IAnsiConsole logger) : IHelmChartCreator
 {
-    public async Task CreateHelmChart(string kustomizePath, string chartPath, string chartName)
+    public async Task CreateHelmChart(List<object> kubernetesObjects, string chartPath, string chartName, bool includeDashboard)
     {
-        if (!fileSystem.Directory.Exists(kustomizePath))
-        {
-            throw new DirectoryNotFoundException($"Kustomize path {kustomizePath} does not exist.");
-        }
-
-        _ = kustomizeService.IsKustomizeAvailable();
-
         if (fileSystem.Directory.Exists(chartPath))
         {
             fileSystem.Directory.Delete(chartPath, true);
@@ -19,19 +12,27 @@ public class HelmChartCreator(IFileSystem fileSystem, IShellExecutionService she
         fileSystem.Directory.CreateDirectory(chartPath);
         fileSystem.Directory.CreateDirectory(fileSystem.Path.Combine(chartPath, "templates"));
 
-        var manifest = await kustomizeService.RenderManifestUsingKustomize(kustomizePath);
+        if (includeDashboard)
+        {
+            CreateDashboardObjects(kubernetesObjects);
+        }
 
-        await ProcessManifest(manifest, chartPath);
+        await ProcessObjects(kubernetesObjects, chartPath);
+
         await CreateChartFile(chartPath, chartName);
 
         logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating helm chart at [blue]{chartPath}[/]");
     }
 
-    private static async Task ProcessManifest(string manifest, string chartPath)
+    private static void CreateDashboardObjects(List<object> kubernetesObjects)
+    {
+        var dashboardObjects = GetDashboardKubernetesObjects();
+        kubernetesObjects.AddRange(dashboardObjects);
+    }
+
+    private static async Task ProcessObjects(List<object> resources, string chartPath)
     {
         var valuesImages = new Dictionary<string, string>();
-
-        var resources = KubernetesYaml.LoadAllFromString(manifest);
 
         foreach (var resource in resources)
         {
@@ -145,5 +146,22 @@ public class HelmChartCreator(IFileSystem fileSystem, IShellExecutionService she
         var valuesFile = $"{chartPath}/values.yaml";
         var valuesYaml = serializer.Serialize(values);
         await File.AppendAllTextAsync(valuesFile, valuesYaml);
+    }
+
+    private static List<object> GetDashboardKubernetesObjects()
+    {
+        var labels = new Dictionary<string, string>
+        {
+            ["app"] = "aspire-dashboard",
+        };
+
+        var deployment = AspireDashboard.GetDeployment(labels);
+        var service = AspireDashboard.GetService(labels);
+
+        return
+        [
+            deployment,
+            service
+        ];
     }
 }

@@ -161,7 +161,7 @@ public class SecretService(
             return validPassword;
         }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 3; i > 0; i--)
         {
             var password = logger.Prompt(
                 new TextPrompt<string>("Secrets are protected by a [green]password[/]. Please enter it now: ").PromptStyle("red")
@@ -174,10 +174,20 @@ public class SecretService(
                 return true;
             }
 
-            logger.MarkupLine($"[red]Incorrect password[/]. Please try again. You have [yellow]{3 - i} attempt{(i > 1 ? "s" : "")}[/] remaining.");
+            LogPasswordError(i, "Incorrect Password");
         }
 
         return false;
+    }
+
+    private void LogPasswordError(int i, string caption)
+    {
+        var attemptsRemaining = i - 1;
+
+        logger.MarkupLine(
+            attemptsRemaining != 0
+                ? $"[red]{caption}[/]. Please try again. You have [yellow]{attemptsRemaining} attempt{(attemptsRemaining > 1 ? "s" : "")}[/] remaining."
+                : $"[red]{caption}[/]. You have [yellow]no attempts[/] remaining.");
     }
 
     private bool CliSecretPasswordSupplied(SecretManagementOptions options, out bool validPassword)
@@ -240,7 +250,7 @@ public class SecretService(
                 return true;
             }
 
-            logger.MarkupLine($"[red]Passwords do not match[/]. Please try again. You have [yellow]{i - 1} attempt{(i > 1 ? "s" : "")}[/] remaining.");
+            LogPasswordError(i, "Passwords do not match.");
         }
 
         return false;

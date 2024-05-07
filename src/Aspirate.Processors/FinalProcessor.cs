@@ -34,9 +34,8 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
 
         HandleNamespace(outputPath, templatePath, @namespace, templateDataBuilder, manifests);
         HandlePrivateRegistry(outputPath, withPrivateRegistry, registryUrl, registryUsername, registryPassword, registryEmail, manifests);
-        HandleDashboard(withDashboard, outputPath, templatePath, templateDataBuilder, manifests);
-
         HandleDapr(outputPath, manifests);
+        HandleDashboard(withDashboard, outputPath, templatePath, templateDataBuilder, manifests);
 
         _console.MarkupLine($"[bold]Generating final manifest with name [blue]'kustomization.yaml'[/][/]");
 
@@ -79,6 +78,8 @@ public sealed class FinalProcessor(IFileSystem fileSystem, IAnsiConsole console,
         {
             return;
         }
+
+        templateDataBuilder = templateDataBuilder.SetContainerImage(AspireLiterals.DashboardImage);
 
         _console.MarkupLine($"[bold]Generating Aspire Dashboard manifest[/]");
         _manifestWriter.CreateDashboard(outputPath, templateDataBuilder, templatePath);

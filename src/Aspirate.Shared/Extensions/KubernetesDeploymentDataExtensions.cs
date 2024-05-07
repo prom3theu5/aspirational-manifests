@@ -8,13 +8,13 @@ public static class KubernetesDeploymentDataExtensions
             ["app"] = data.Name,
         };
 
-    public static V1ObjectMeta ToKubernetesObjectMetaData(this KubernetesDeploymentData data, string suffix, Dictionary<string, string>? labels = null)
+    public static V1ObjectMeta ToKubernetesObjectMetaData(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null)
     {
         labels ??= data.ToKubernetesLabels();
 
         return new V1ObjectMeta
         {
-            Name = $"{data.Name.ToLowerInvariant()}-{suffix.ToLowerInvariant()}",
+            Name = $"{data.Name.ToLowerInvariant()}",
             NamespaceProperty = data.Namespace,
             Annotations = data.Annotations,
             Labels = labels,
@@ -24,7 +24,7 @@ public static class KubernetesDeploymentDataExtensions
     public static V1ConfigMap ToKubernetesConfigMap(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null)
     {
         labels ??= data.ToKubernetesLabels();
-        var metadata = data.ToKubernetesObjectMetaData("env", labels);
+        var metadata = data.ToKubernetesObjectMetaData(labels);
 
         return new V1ConfigMap
         {
@@ -38,7 +38,12 @@ public static class KubernetesDeploymentDataExtensions
     public static V1Secret ToKubernetesSecret(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null)
     {
         labels ??= data.ToKubernetesLabels();
-        var metadata = data.ToKubernetesObjectMetaData("secrets", labels);
+        var metadata = data.ToKubernetesObjectMetaData(labels);
+
+        foreach (var secret in data.Secrets.Where(secret => !string.IsNullOrEmpty(secret.Value)))
+        {
+            data.Secrets[secret.Key] = Convert.ToBase64String(Encoding.UTF8.GetBytes(secret.Value));
+        }
 
         return new V1Secret
         {
@@ -119,7 +124,7 @@ public static class KubernetesDeploymentDataExtensions
     {
         labels ??= data.ToKubernetesLabels();
         container ??= data.ToKubernetesContainer(useConfigMap, useSecrets);
-        var metadata = data.ToKubernetesObjectMetaData("deployment", labels);
+        var metadata = data.ToKubernetesObjectMetaData(labels);
 
         var deployment = new V1Deployment
         {
@@ -165,7 +170,7 @@ public static class KubernetesDeploymentDataExtensions
     public static V1StatefulSet ToKubernetesStatefulSet(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null, bool useConfigMap = true, bool useSecrets = true)
     {
         labels ??= data.ToKubernetesLabels();
-        var metadata = data.ToKubernetesObjectMetaData("statefulset", labels);
+        var metadata = data.ToKubernetesObjectMetaData(labels);
 
         var statefulSet = new V1StatefulSet
         {
@@ -212,7 +217,7 @@ public static class KubernetesDeploymentDataExtensions
     public static V1Service ToKubernetesService(this KubernetesDeploymentData data)
     {
         var labels = data.ToKubernetesLabels();
-        var metadata = data.ToKubernetesObjectMetaData("service", labels);
+        var metadata = data.ToKubernetesObjectMetaData(labels);
 
         return new V1Service
         {
@@ -281,7 +286,7 @@ public static class KubernetesDeploymentDataExtensions
         {
             container.EnvFrom.Add(new V1EnvFromSource
             {
-                ConfigMapRef = new V1ConfigMapEnvSource { Name = $"{data.Name.ToLowerInvariant()}-env", },
+                ConfigMapRef = new V1ConfigMapEnvSource { Name = data.Name.ToLowerInvariant(), },
             });
         }
 
@@ -289,7 +294,7 @@ public static class KubernetesDeploymentDataExtensions
         {
             container.EnvFrom.Add(new V1EnvFromSource
             {
-                SecretRef = new V1SecretEnvSource { Name = $"{data.Name.ToLowerInvariant()}-secrets", },
+                SecretRef = new V1SecretEnvSource { Name = data.Name.ToLowerInvariant(), },
             });
         }
     }
