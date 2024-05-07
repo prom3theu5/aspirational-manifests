@@ -36,17 +36,15 @@ public static class PathExtensions
             fileSystem.Path.GetFullPath(path);
     }
 
-    public static string? GetSecretsStateFilePath(this IFileSystem fileSystem, AspirateState state)
+    public static string AspirateAppDataFolder(this IFileSystem fileSystem)
     {
-        if (string.IsNullOrEmpty(state.ProjectPath))
+        var appDataFolder = fileSystem.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AspirateLiterals.AppDataFolder);
+
+        if (!Directory.Exists(appDataFolder))
         {
-            return null;
+            fileSystem.Directory.CreateDirectory(appDataFolder);
         }
 
-        var subPath = !string.IsNullOrEmpty(state.OutputPath) ?
-            state.OutputPath : (!string.IsNullOrEmpty(state.InputPath) ?
-                state.InputPath : AspirateLiterals.DefaultArtifactsPath);
-
-        return fileSystem.Path.Combine(state.ProjectPath, subPath, AspirateLiterals.SecretFileName);
+        return appDataFolder;
     }
 }

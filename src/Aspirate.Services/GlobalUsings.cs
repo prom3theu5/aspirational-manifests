@@ -1,4 +1,5 @@
 global using System.IO.Abstractions;
+global using System.Reflection;
 global using System.Runtime.InteropServices;
 global using System.Security.Cryptography;
 global using System.Text;
@@ -29,6 +30,10 @@ global using HandlebarsDotNet;
 global using k8s;
 global using k8s.Models;
 global using Microsoft.Extensions.DependencyInjection;
+global using NuGet.Common;
+global using NuGet.Protocol;
+global using NuGet.Protocol.Core.Types;
+global using NuGet.Versioning;
 global using Spectre.Console;
 global using YamlDotNet.Serialization;
 global using YamlDotNet.Serialization.NamingConventions;

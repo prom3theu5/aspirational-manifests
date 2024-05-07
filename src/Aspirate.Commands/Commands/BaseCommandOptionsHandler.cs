@@ -12,8 +12,6 @@ public abstract class BaseCommandOptionsHandler<TOptions> : ICommandOptionsHandl
 
     public AspirateState CurrentState { get; set; }
     public IServiceProvider Services { get; }
-
     protected ActionExecutor ActionExecutor { get; set; }
-
     public abstract Task<int> HandleAsync(TOptions options);
 }
