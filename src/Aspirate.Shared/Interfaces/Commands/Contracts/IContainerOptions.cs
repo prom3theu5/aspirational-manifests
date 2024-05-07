@@ -6,6 +6,5 @@ public interface IContainerOptions
 
     string? ContainerRegistry { get; set; }
     string? ContainerRepositoryPrefix { get; set; }
-
-    string? ContainerImageTag { get; set; }
+    List<string>? ContainerImageTags { get; set; }
 }

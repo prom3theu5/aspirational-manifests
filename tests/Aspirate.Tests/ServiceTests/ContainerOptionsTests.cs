@@ -15,7 +15,7 @@ public class ContainerOptionsTests
 
 
         // Act
-        var fullImageName = containerParameters.ToImageName(testOptions.Options.ImageName);
+        var fullImageName = containerParameters.ToImageNames(testOptions.Options.ImageName);
 
 
         // Assert
@@ -50,7 +50,7 @@ public class ContainerOptionsTests
              Registry = testRegistry,
              Prefix = testRepositoryPrefix,
              ImageName = testImage,
-             Tag = testTag,
+             Tags = [testTag],
          };
 
      public record TestContainerOptions(string Value, ContainerOptions Options);

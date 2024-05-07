@@ -1,1 +1,4 @@
-﻿test-registry/test-repository/test-image:test-tag
+﻿[
+  test-registry/test-repository/test-image:latest,
+  test-registry/test-repository/test-image:test-tag
+]

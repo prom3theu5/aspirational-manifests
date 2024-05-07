@@ -28,7 +28,7 @@ public class AspirateConfigurationServiceTest
             ContainerSettings = new()
             {
                 Registry = "SomeRegistry",
-                Tag = "SomeTag",
+                Tags = ["SomeTag"],
             },
         };
 

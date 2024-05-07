@@ -30,6 +30,7 @@ public static class DotNetSdkLiterals
     public const string ContainerRepositoryArgument = $"-p:{MsBuildPropertiesLiterals.ContainerRepositoryArgument}";
     public const string ContainerImageNameArgument = $"-p:{MsBuildPropertiesLiterals.ContainerImageNameArgument}";
     public const string ContainerImageTagArgument = $"-p:{MsBuildPropertiesLiterals.ContainerImageTagArgument}";
+    public const string ContainerImageTagArguments = $"-p:{MsBuildPropertiesLiterals.ContainerImageTagArguments}";
     public const string ErrorOnDuplicatePublishOutputFilesArgument = $"-p:{MsBuildPropertiesLiterals.ErrorOnDuplicatePublishOutputFilesArgument}";
 
     public const string ContainerPublishProfile = "DefaultContainer";

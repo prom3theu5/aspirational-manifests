@@ -27,7 +27,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         // Fallback to latest tag if tag not specified.
-        HandleTag(msBuildProperties, options.Tag);
+        HandleTags(msBuildProperties, options.Tags);
 
         msBuildProperties.Properties.FullContainerImage = GetFullImage(msBuildProperties.Properties, options.Prefix);
 
@@ -50,7 +50,7 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
     }
 
     private static void HandleTag(MsBuildContainerProperties containerDetails) =>
-        _imageBuilder.Append($":{containerDetails.ContainerImageTag}");
+        _imageBuilder.Append($":{containerDetails.ContainerImageTag.Split(";").First()}");
 
     private static void HandleImage(MsBuildContainerProperties containerDetails)
     {
@@ -107,16 +107,15 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         if (!string.IsNullOrEmpty(containerRegistry))
         {
             details.ContainerRegistry = containerRegistry;
-            return;
         }
         //
         // console.MarkupLine($"[red bold]Required MSBuild property [blue]'ContainerRegistry'[/] not set in project [blue]'{project.Path}'. Cannot continue[/].[/]");
         // throw new ActionCausesExitException(1);
     }
 
-    private static void HandleTag(
+    private static void HandleTags(
         MsBuildProperties<MsBuildContainerProperties> msBuildProperties,
-        string containerImageTag)
+        List<string>? containerImageTag)
     {
         if (!string.IsNullOrEmpty(msBuildProperties.Properties.ContainerImageTag))
         {
@@ -124,9 +123,14 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
         }
 
         // Use our custom fall-back value if it exists
-        if (!string.IsNullOrEmpty(containerImageTag))
+        if (containerImageTag is not null)
         {
-            msBuildProperties.Properties.ContainerImageTag = containerImageTag;
+            if (!containerImageTag.Contains("latest", StringComparer.OrdinalIgnoreCase))
+            {
+                containerImageTag.Insert(0, "latest");
+            }
+
+            msBuildProperties.Properties.ContainerImageTag = string.Join(';', containerImageTag);
             return;
         }
 

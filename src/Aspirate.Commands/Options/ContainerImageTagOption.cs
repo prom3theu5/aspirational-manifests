@@ -1,6 +1,6 @@
 ﻿namespace Aspirate.Commands.Options;
 
-public sealed class ContainerImageTagOption : BaseOption<string?>
+public sealed class ContainerImageTagOption : BaseOption<List<string>?>
 {
     private static readonly string[] _aliases =
     {
@@ -10,9 +10,9 @@ public sealed class ContainerImageTagOption : BaseOption<string?>
 
     private ContainerImageTagOption() : base(_aliases, "ASPIRATE_CONTAINER_IMAGE_TAG", null)
     {
-        Name = nameof(IContainerOptions.ContainerImageTag);
-        Description = "The Container Image Tag to use as the fall-back value for all containers";
-        Arity = ArgumentArity.ExactlyOne;
+        Name = nameof(IContainerOptions.ContainerImageTags);
+        Description = "The Container Image Tags to use for all containers. Can include multiple times.";
+        Arity = ArgumentArity.ZeroOrMore;
         IsRequired = false;
     }
 

@@ -14,7 +14,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --skip-build --output-format compose",
+      "commandLineArgs": "generate --output-format helm",
       "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
@@ -26,7 +26,7 @@
     },
     "build": {
       "commandName": "Project",
-      "commandLineArgs": "build",
+      "commandLineArgs": "build -ct hamburger -ct fries -ct mountaindew -ct icecream -ct pizza -ct hotdog -ct taco -ct burrito -ct sandwich -ct salad -ct soup -ct sushi -ct ramen -ct curry",
       "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
