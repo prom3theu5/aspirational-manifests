@@ -10,10 +10,10 @@ public sealed class GenerateKustomizeManifestsAction(
 
         var outputFormat = OutputFormat.FromValue(CurrentState.OutputFormat);
 
-        if (outputFormat == OutputFormat.DockerCompose)
+        if (outputFormat != OutputFormat.Kustomize)
         {
             Logger.MarkupLine($"[red](!)[/] The output format '{CurrentState.OutputFormat}' is not supported for this action.");
-            Logger.MarkupLine("[red](!)[/] Please use the output format 'compose' instead.");
+            Logger.MarkupLine("[red](!)[/] Please use the output format 'kustomize' instead.");
             ActionCausesExitException.ExitNow();
         }
 

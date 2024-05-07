@@ -11,10 +11,13 @@ public sealed class GenerateHelmChartAction(
     {
         Logger.WriteRuler("[purple]Handling Helm Support[/]");
 
-        if (CurrentState.SkipHelmGeneration == true)
+        var outputFormat = OutputFormat.FromValue(CurrentState.OutputFormat);
+
+        if (outputFormat != OutputFormat.Helm)
         {
-            Logger.MarkupLine("[blue]Skipping helm chart generation as requested.[/]");
-            return true;
+            Logger.MarkupLine($"[red](!)[/] The output format '{CurrentState.OutputFormat}' is not supported for this action.");
+            Logger.MarkupLine("[red](!)[/] Please use the output format 'helm' instead.");
+            ActionCausesExitException.ExitNow();
         }
 
         if (NoSupportedComponentsExitAction())
@@ -22,55 +25,42 @@ public sealed class GenerateHelmChartAction(
             return true;
         }
 
-        if (!CurrentState.NonInteractive)
-        {
-            if (!ShouldCreateHelmChart())
-            {
-                return true;
-            }
-        }
-
-        var secretFiles = new List<string>();
-
-        try
-        {
-            await kustomizeService.WriteSecretsOutToTempFiles(CurrentState, secretFiles, secretProvider);
-            await helmChartCreator.CreateHelmChart(CurrentState.OutputPath, Path.Combine(CurrentState.OutputPath, "Chart"), "AspireProject");
-        }
-        catch (Exception e)
-        {
-            Logger.MarkupLine("[red](!)[/] Failed to generate helm chart.");
-            Logger.MarkupLine($"[red](!)[/] Error: {e.Message}");
-            return false;
-        }
-        finally
-        {
-            kustomizeService.CleanupSecretEnvFiles(CurrentState.DisableSecrets, secretFiles);
-        }
+        var kubeObjects = ConvertResourcesToKubeObjects(CurrentState.AllSelectedSupportedComponents);
+        await helmChartCreator.CreateHelmChart(kubeObjects, Path.Combine(CurrentState.OutputPath, "Chart"), "AspireProject", CurrentState.IncludeDashboard.GetValueOrDefault());
 
         return true;
     }
 
-    private bool ShouldCreateHelmChart()
+    private List<object> ConvertResourcesToKubeObjects(List<KeyValuePair<string, Resource>> supportedResources)
     {
-        if (CurrentState.SkipHelmGeneration == false)
+        var kubernetesObjects = new List<object>();
+
+        foreach (var resource in supportedResources)
         {
-            return true;
+            kubernetesObjects.AddRange(ProcessIndividualResourceManifests(resource));
         }
 
-        var shouldGenerateHelmChart = Logger.Confirm(
-            "[bold]Would you like to generate a helm chart based on the generated kustomize manifests?[/]",
-            false);
+        return kubernetesObjects;
+    }
 
-        CurrentState.SkipHelmGeneration = !shouldGenerateHelmChart;
+    private List<object> ProcessIndividualResourceManifests(KeyValuePair<string, Resource> resource)
+    {
+        var handler = Services.GetKeyedService<IResourceProcessor>(resource.Value.Type);
 
-        if (!shouldGenerateHelmChart)
+        if (handler is null)
         {
-            Logger.MarkupLine("[blue]Skipping helm chart generation as requested.[/]");
-            return false;
+            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its type is unsupported.[/]");
+            return [];
         }
 
-        return true;
+        return handler.CreateKubernetesObjects(new()
+        {
+            Resource = resource,
+            ImagePullPolicy =  CurrentState.ImagePullPolicy,
+            DisableSecrets =  CurrentState.DisableSecrets,
+            WithPrivateRegistry = CurrentState.WithPrivateRegistry,
+            WithDashboard = CurrentState.IncludeDashboard,
+        });
     }
 
     private bool NoSupportedComponentsExitAction()

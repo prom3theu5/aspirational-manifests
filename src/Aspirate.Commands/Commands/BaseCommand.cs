@@ -55,9 +55,21 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
             }
         }
 
+        var isKubernetes = outputFormat.Equals(OutputFormat.Kustomize) || outputFormat.Equals(OutputFormat.Helm);
+        var isCompose = outputFormat.Equals(OutputFormat.DockerCompose);
+
+        if (isCompose)
+        {
+            handler.CurrentState.DisableSecrets = true;
+        }
+
+        var shouldDisableSecrets = handler.CurrentState.DisableSecrets ?? ((isKubernetes) ? options.DisableSecrets : true);
+
+        handler.CurrentState.DisableSecrets = shouldDisableSecrets;
+
         secretService.LoadSecrets(new SecretManagementOptions
         {
-            DisableSecrets = handler.CurrentState.DisableSecrets ?? (outputFormat.Equals(OutputFormat.Kustomize) ? options.DisableSecrets : true),
+            DisableSecrets = handler.CurrentState.DisableSecrets,
             NonInteractive = options.NonInteractive,
             SecretPassword = options.SecretPassword,
             CommandUnlocksSecrets = CommandUnlocksSecrets,

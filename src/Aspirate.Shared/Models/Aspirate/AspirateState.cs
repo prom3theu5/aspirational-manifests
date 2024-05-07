@@ -76,10 +76,6 @@ public class AspirateState :
     public bool? SkipFinalKustomizeGeneration { get; set; }
 
     [RestorableStateProperty]
-    [JsonPropertyName("skipHelmGeneration")]
-    public bool? SkipHelmGeneration { get; set; }
-
-    [RestorableStateProperty]
     [JsonPropertyName("privateRegistryUrl")]
     public string? PrivateRegistryUrl { get; set; }
 

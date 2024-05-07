@@ -51,6 +51,8 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             .WithVolumes(volumes.ToArray())
             .Build();
 
+        composeFile.Version = null;
+
         var composeFileString = composeFile.Serialize();
 
         if (!fileSystem.Directory.Exists(AspirateLiterals.DefaultArtifactsPath))
@@ -120,7 +122,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         };
 
         var aspireDashboard = Builder.MakeService("aspire-dashboard")
-            .WithImage("mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.6")
+            .WithImage(AspireLiterals.DashboardImage)
             .WithEnvironment(environment)
             .WithContainerName("aspire-dashboard")
             .WithRestartPolicy(ERestartMode.UnlessStopped)

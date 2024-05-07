@@ -11,7 +11,6 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(OutputPathOption.Instance);
        AddOption(SkipBuildOption.Instance);
        AddOption(SkipFinalKustomizeGenerationOption.Instance);
-       AddOption(SkipHelmGenerationOption.Instance);
        AddOption(ContainerBuilderOption.Instance);
        AddOption(ContainerImageTagOption.Instance);
        AddOption(ContainerRegistryOption.Instance);
