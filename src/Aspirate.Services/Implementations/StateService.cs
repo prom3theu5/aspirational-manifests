@@ -30,51 +30,85 @@ public class StateService(IFileSystem fs, IAnsiConsole logger, ISecretProvider s
     {
         logger.WriteRuler("[purple]Handling Aspirate State[/]");
 
+        if (ShouldCancelAsStateFileDoesNotExist(out var stateFile))
+        {
+            return;
+        }
+
+        if (await IsNonInteractiveMode(options, stateFile))
+        {
+            return;
+        }
+
         if (options.DisableState == true)
         {
-            logger.MarkupLine("State has been [red]disabled[/] for this run.");
+            await OnlyRestoreSecrets(options, stateFile);
             return;
         }
 
-        var stateFile = fs.Path.Combine(fs.Directory.GetCurrentDirectory(), AspirateLiterals.StateFileName);
-
-        if (options.NonInteractive == true)
-        {
-            await RestoreState(options, stateFile, true);
-            logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] State loaded successfully from [blue]{stateFile}[/]");
-            return;
-        }
-
-        if (!fs.File.Exists(stateFile))
+        if (await ShouldUseAllPreviousState(options, stateFile))
         {
             return;
         }
 
+        await OnlyRestoreSecrets(options, stateFile);
+    }
+
+    private Task<bool> IsNonInteractiveMode(StateManagementOptions options, string stateFile) =>
+        options switch
+        {
+            { NonInteractive: true, DisableState: true } => OnlyRestoreSecrets(options, stateFile),
+            { NonInteractive: true, DisableState: false or null } => RestoreAllState(options, stateFile),
+            _ => Task.FromResult(false)
+        };
+
+    private bool ShouldCancelAsStateFileDoesNotExist(out string stateFile)
+    {
+        stateFile = fs.Path.Combine(fs.Directory.GetCurrentDirectory(), AspirateLiterals.StateFileName);
+
+        return !fs.File.Exists(stateFile);
+    }
+
+    private async Task<bool> ShouldUseAllPreviousState(StateManagementOptions options, string stateFile)
+    {
         logger.MarkupLine($"[bold]Loading state from [blue]{stateFile}[/].[/]");
 
         var shouldUseAllPreviousState = logger.Confirm("Would you like to use all previous state values, and [blue]skip[/] re-prompting where possible ?");
 
-        if (shouldUseAllPreviousState)
+        if (!shouldUseAllPreviousState)
         {
-            logger.MarkupLine("[bold]Using all previous state values, and skipping re-prompting.[/]");
-            await RestoreState(options, stateFile, true);
-            options.State.UseAllPreviousStateValues = true;
-        }
-        else
-        {
-            logger.MarkupLine("[bold]Re-prompting for all state values not specified on command line.[/]");
-            await RestoreState(options, stateFile, false);
-            options.State.UseAllPreviousStateValues = false;
+            return false;
         }
 
-        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] State loaded successfully from [blue]{stateFile}[/]");
+        await RestoreAllState(options, stateFile);
+        return true;
+    }
+
+    private async Task<bool> RestoreAllState(StateManagementOptions options, string stateFile)
+    {
+        await RestoreState(options, stateFile, true);
+        LogAllStateReloaded(stateFile);
+        return true;
+    }
+
+    private async Task<bool> OnlyRestoreSecrets(StateManagementOptions options, string stateFile)
+    {
+        await RestoreState(options, stateFile, false);
+        LogDisabledStateMessage();
+        return true;
     }
 
     private async Task RestoreState(StateManagementOptions options, string stateFile, bool shouldUseAllPreviousStateValues)
     {
         var stateAsJson = await fs.File.ReadAllTextAsync(stateFile);
         var previousState = JsonSerializer.Deserialize<AspirateState>(stateAsJson, _jsonSerializerOptions);
-
         options.State.ReplaceCurrentStateWithPreviousState(previousState, shouldUseAllPreviousStateValues);
+        options.State.UseAllPreviousStateValues = shouldUseAllPreviousStateValues;
     }
+
+    private void LogDisabledStateMessage() =>
+        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] State has been disabled for this run. Only secrets will be populated.");
+
+    private void LogAllStateReloaded(string stateFile) =>
+        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] State loaded successfully from [blue]{stateFile}[/]. Will run without re-prompting for values.");
 }

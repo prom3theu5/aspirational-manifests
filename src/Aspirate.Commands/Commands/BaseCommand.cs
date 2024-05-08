@@ -13,6 +13,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
     {
         AddOption(NonInteractiveOption.Instance);
         AddOption(DisableSecretsOption.Instance);
+        AddOption(DisableStateOption.Instance);
         Handler = CommandHandler.Create<TOptions, IServiceCollection>(ConstructCommand);
     }
 
