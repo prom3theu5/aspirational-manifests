@@ -15,7 +15,7 @@ public class StateService(IFileSystem fs, IAnsiConsole logger, ISecretProvider s
 
     public async Task SaveState(StateManagementOptions options)
     {
-        if (options.DisableState == true)
+        if (options.DisableState == true && options.State.SecretState?.Secrets.Any() == false)
         {
             return;
         }
