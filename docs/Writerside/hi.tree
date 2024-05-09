@@ -15,6 +15,7 @@
         <toc-element topic="Init-Command.md"/>
         <toc-element topic="Build-Command.md"/>
         <toc-element topic="Generate-Command.md"/>
+        <toc-element topic="Run-Command.md"/>
         <toc-element topic="Apply-Manifests.md"/>
         <toc-element topic="Removing-Manifests-from-a-Cluster.md"/>
         <toc-element topic="Non-Interactive-Invocation.md"/>

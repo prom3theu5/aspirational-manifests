@@ -1,6 +1,6 @@
-# Secrets File Contents
+# Secrets Contents
 
-An example of the contents of a secret file when using the default `Password` provider is shown below:
+An example of the contents of secrets within the state file are shown below:
 
 ```json
 {
@@ -20,14 +20,11 @@ An example of the contents of a secret file when using the default `Password` pr
     "catalogdbapp": {
       "ConnectionStrings__catalogdb": "2hO/L8lfSH6BG5J1YKAxbgV8Jkg33lnuKqrPD5/kCk\u002BJZRhJz33KFWZnLIEL2P2Z52M3Nf3K55RUctdzR4rVtovBFtFJLqO4cCDXc2\u002BEleXzyn48vdEOJ37tmU1V0VLGPzFYsGjHV3DQ"
     }
-  },
-  "secretsVersion": 1
+  }
 }
 ```
 
 The `salt` and `hash` properties are used to encrypt the secrets in the `secrets` property.
-
-The `secretsVersion` property is used to track the version of the secret file format. Each time the format changes, this value will be incremented.
 
 Each individual secret is encrypted using the `AesGcm` algorithm, using the `salt` and `hash` properties as the key.
 

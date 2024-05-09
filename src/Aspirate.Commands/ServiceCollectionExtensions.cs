@@ -43,7 +43,9 @@ public static class ServiceCollectionExtensions
             .RegisterAction<AskPrivateRegistryCredentialsAction>()
             .RegisterAction<IncludeAspireDashboardAction>()
             .RegisterAction<GenerateHelmChartAction>()
-            .RegisterAction<CustomNamespaceAction>();
+            .RegisterAction<CustomNamespaceAction>()
+            .RegisterAction<RunKubernetesObjectsAction>()
+            .RegisterAction<StopDeployedKubernetesInstanceAction>();
 
     /// <summary>
     /// Registers an implementation of <see cref="IAction"/> with the specified <typeparamref name="TImplementation"/> type.

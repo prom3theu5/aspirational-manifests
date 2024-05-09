@@ -25,5 +25,4 @@ The `init` command allows you to bootstrap certain settings for an aspire projec
 | --container-image-tag         | -ct   | `ASPIRATE_CONTAINER_IMAGE_TAG`         | The Container Image Tag to use as the fall-back value for all containers.         |
 | --template-path               | -tp   | `ASPIRATE_TEMPLATE_PATH`               | The path to the templates directory.                                              |
 | --non-interactive             |       | `ASPIRATE_NON_INTERACTIVE`             | Disables interactive mode for the command                                         |
-| --secret-provider             |       | `ASPIRATE_SECRET_PROVIDER`             | The secret provider to use. Defaults to `Password`. Can be `Password` or `Base64` |
 | --disable-secrets             |       | `ASPIRATE_DISABLE_SECRETS`             | Disables secrets management features.                                             |

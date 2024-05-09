@@ -131,6 +131,6 @@ public sealed class ProjectProcessor(
 
         var data = PopulateKubernetesDeploymentData(options, containerDetails, project);
 
-        return data.ToKubernetesObjects();
+        return data.ToKubernetesObjects(options.EncodeSecrets);
     }
 }

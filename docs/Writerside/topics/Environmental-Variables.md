@@ -13,7 +13,7 @@ aspirate generate
 
 All environmental variables are prefixed with `ASPIRATE_`.
 
-The following environmental variables are available:
+The following is a selection of environmental variables are available (Each of the command pages lists all possible env vars for a command): 
 
 | Name                                       | Description                                                                 | Default Value     |
 |--------------------------------------------|-----------------------------------------------------------------------------|-------------------|
@@ -29,7 +29,6 @@ The following environmental variables are available:
 | `ASPIRATE_OUTPUT_PATH`                     | The path to the output directory.                                           | `%output-dir%`    |
 | `ASPIRATE_PROJECT_PATH`                    | The path to the project directory.                                          | `.`               |
 | `ASPIRATE_SECRET_PASSWORD`                 | The password to use for secrets decryption.                                 |                   |
-| `ASPIRATE_SECRET_PROVIDER`                 | The secret provider to use.                                                 | `Password`        |
 | `ASPIRATE_SKIP_BUILD`                      | Skips the build process.                                                    | `false`           |
 | `ASPIRATE_SKIP_FINAL_KUSTOMIZE_GENERATION` | Skips the final kustomize generation process.                               | `false`           |
 | `ASPIRATE_TEMPLATE_PATH`                   | The path to the template directory.                                         | ``                |

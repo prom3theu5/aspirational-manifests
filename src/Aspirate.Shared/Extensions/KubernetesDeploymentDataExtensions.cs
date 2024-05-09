@@ -35,14 +35,21 @@ public static class KubernetesDeploymentDataExtensions
         };
     }
 
-    public static V1Secret ToKubernetesSecret(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null)
+    public static V1Secret ToKubernetesSecret(this KubernetesDeploymentData data, bool? encodeSecrets = true, Dictionary<string, string>? labels = null)
     {
         labels ??= data.ToKubernetesLabels();
         var metadata = data.ToKubernetesObjectMetaData(labels);
 
         foreach (var secret in data.Secrets.Where(secret => !string.IsNullOrEmpty(secret.Value)))
         {
-            data.Secrets[secret.Key] = Convert.ToBase64String(Encoding.UTF8.GetBytes(secret.Value));
+            if (encodeSecrets == true)
+            {
+                data.Secrets[secret.Key] = Convert.ToBase64String(Encoding.UTF8.GetBytes(secret.Value));
+                continue;
+            }
+
+            data.Secrets[secret.Key] = secret.Value;
+
         }
 
         return new V1Secret
@@ -62,7 +69,7 @@ public static class KubernetesDeploymentDataExtensions
             Name = data.Name,
             Image = data.ContainerImage,
             ImagePullPolicy = data.ImagePullPolicy,
-            Args = data.Args?.ToArray() ?? []
+            Args = data.Args.ToArray(),
         };
 
         if (!string.IsNullOrEmpty(data.Entrypoint))
@@ -72,21 +79,21 @@ public static class KubernetesDeploymentDataExtensions
 
         if (data.HasPorts)
         {
-            container.Ports = data.Ports?.Select(x => new V1ContainerPort
+            container.Ports = data.Ports.Select(x => new V1ContainerPort
             {
                 ContainerPort = x.InternalPort,
                 Name = x.Name
             }).ToList();
         }
 
-        if (data.Env is not null)
+        if (data.HasAnyEnv)
         {
             SetContainerEnvironment(data, useConfigMap, useSecrets, container);
         }
 
         if (data.HasVolumes)
         {
-            container.VolumeMounts = data.Volumes?.Select(x => new V1VolumeMount
+            container.VolumeMounts = data.Volumes.Select(x => new V1VolumeMount
             {
                 Name = x.Name,
                 MountPath = x.Target,
@@ -97,7 +104,7 @@ public static class KubernetesDeploymentDataExtensions
     }
 
     public static IList<V1PersistentVolumeClaim> ToKubernetesPersistentVolumeClaimTemplates(this KubernetesDeploymentData data) =>
-        data.Volumes?.Select(x => new V1PersistentVolumeClaim
+        data.Volumes.Select(x => new V1PersistentVolumeClaim
         {
             Metadata = new V1ObjectMeta
             {
@@ -227,7 +234,7 @@ public static class KubernetesDeploymentDataExtensions
             Spec = new V1ServiceSpec
             {
                 Selector = labels,
-                Ports = data.Ports?.Select(x => new V1ServicePort
+                Ports = data.Ports.Select(x => new V1ServicePort
                 {
                     Port = x.InternalPort,
                     TargetPort = x.ExternalPort,
@@ -238,18 +245,18 @@ public static class KubernetesDeploymentDataExtensions
         };
     }
 
-    public static List<object> ToKubernetesObjects(this KubernetesDeploymentData data)
+    public static List<object> ToKubernetesObjects(this KubernetesDeploymentData data, bool? encodeSecrets = true)
     {
         var objects = new List<object>();
 
-        if (data.Env is not null)
+        if (data.HasAnyEnv)
         {
             objects.Add(data.ToKubernetesConfigMap());
         }
 
-        if (data.Secrets is not null)
+        if (data.HasAnySecrets)
         {
-            objects.Add(data.ToKubernetesSecret());
+            objects.Add(data.ToKubernetesSecret(encodeSecrets));
         }
 
         switch (data.HasVolumes)
@@ -282,7 +289,7 @@ public static class KubernetesDeploymentDataExtensions
 
         container.EnvFrom = new List<V1EnvFromSource>();
 
-        if (useConfigMap)
+        if (useConfigMap && data.HasAnyEnv)
         {
             container.EnvFrom.Add(new V1EnvFromSource
             {
@@ -290,7 +297,7 @@ public static class KubernetesDeploymentDataExtensions
             });
         }
 
-        if (useSecrets)
+        if (useSecrets && data.HasAnySecrets)
         {
             container.EnvFrom.Add(new V1EnvFromSource
             {

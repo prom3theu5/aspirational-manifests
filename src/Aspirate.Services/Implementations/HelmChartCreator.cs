@@ -1,6 +1,6 @@
 namespace Aspirate.Services.Implementations;
 
-public class HelmChartCreator(IFileSystem fileSystem, IAnsiConsole logger) : IHelmChartCreator
+public class HelmChartCreator(IFileSystem fileSystem, IKubernetesService kubernetesService, IAnsiConsole logger) : IHelmChartCreator
 {
     public async Task CreateHelmChart(List<object> kubernetesObjects, string chartPath, string chartName, bool includeDashboard)
     {
@@ -24,9 +24,9 @@ public class HelmChartCreator(IFileSystem fileSystem, IAnsiConsole logger) : IHe
         logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating helm chart at [blue]{chartPath}[/]");
     }
 
-    private static void CreateDashboardObjects(List<object> kubernetesObjects)
+    private void CreateDashboardObjects(List<object> kubernetesObjects)
     {
-        var dashboardObjects = GetDashboardKubernetesObjects();
+        var dashboardObjects = kubernetesService.CreateDashboardKubernetesObjects();
         kubernetesObjects.AddRange(dashboardObjects);
     }
 
@@ -146,22 +146,5 @@ public class HelmChartCreator(IFileSystem fileSystem, IAnsiConsole logger) : IHe
         var valuesFile = $"{chartPath}/values.yaml";
         var valuesYaml = serializer.Serialize(values);
         await File.AppendAllTextAsync(valuesFile, valuesYaml);
-    }
-
-    private static List<object> GetDashboardKubernetesObjects()
-    {
-        var labels = new Dictionary<string, string>
-        {
-            ["app"] = "aspire-dashboard",
-        };
-
-        var deployment = AspireDashboard.GetDeployment(labels);
-        var service = AspireDashboard.GetService(labels);
-
-        return
-        [
-            deployment,
-            service
-        ];
     }
 }

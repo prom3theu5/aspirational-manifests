@@ -29,6 +29,7 @@ global using Aspirate.Shared.Outputs;
 global using DockerComposeBuilder.Emitters;
 global using DockerComposeBuilder.Model;
 global using DockerComposeBuilder.Model.Services;
+global using k8s;
 global using k8s.Models;
 global using Spectre.Console;
 global using YamlDotNet.Serialization;

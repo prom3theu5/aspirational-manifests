@@ -24,6 +24,18 @@
       "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
       "hotReloadEnabled": false
     },
+    "run": {
+      "commandName": "Project",
+      "commandLineArgs": "run --skip-build",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-aspire/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
+    "stop": {
+      "commandName": "Project",
+      "commandLineArgs": "stop",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-aspire/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
     "build": {
       "commandName": "Project",
       "commandLineArgs": "build -ct hamburger -ct fries -ct mountaindew -ct icecream -ct pizza -ct hotdog -ct taco -ct burrito -ct sandwich -ct salad -ct soup -ct sushi -ct ramen -ct curry",
