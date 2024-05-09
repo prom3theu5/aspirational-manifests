@@ -24,5 +24,5 @@ If you already have existing secrets, you will then be presented with a menu all
 > 
 > You will be prompted to enter a new password to encrypt the secrets with. This treats the secret state as being empty, and will generate new secrets for all protectable values in the aspire manifest.
 
-After secrets have been generated, they will be encrypted and stored in the `%secrets-file%` file in the `%output-dir%` directory.
+After secrets have been generated, they will be encrypted and stored in the `aspirate-state.json` file.
 The `generate` command will then move on to manifest generation.
