@@ -7,6 +7,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 {
     protected abstract bool CommandUnlocksSecrets { get; }
     protected virtual bool CommandSkipsStateAndSecrets => false;
+    protected virtual bool CommandAlwaysRequiresState => false;
 
     protected BaseCommand(string name, string description)
         : base(name, description)
@@ -32,7 +33,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
         await versionCheckService.CheckVersion();
 
-        var stateOptions = GetStateManagementOptions(options, handler);
+        var stateOptions = GetStateManagementOptions(options, handler, CommandAlwaysRequiresState);
 
         await stateService.RestoreState(stateOptions);
 
@@ -81,11 +82,12 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         });
     }
 
-    private static StateManagementOptions GetStateManagementOptions(TOptions options, TOptionsHandler handler) =>
+    private static StateManagementOptions GetStateManagementOptions(TOptions options, TOptionsHandler handler, bool requiresState) =>
         new()
         {
             NonInteractive = options.NonInteractive,
             DisableState = options.DisableState,
-            State = handler.CurrentState
+            State = handler.CurrentState,
+            RequiresState = requiresState,
         };
 }

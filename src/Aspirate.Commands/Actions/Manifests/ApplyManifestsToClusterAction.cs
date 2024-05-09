@@ -1,6 +1,7 @@
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class ApplyManifestsToClusterAction(
+    IKubernetesService kubernetesClientService,
     IKubeCtlService kubeCtlService,
     ISecretProvider secretProvider,
     IFileSystem fileSystem,
@@ -16,7 +17,7 @@ public sealed class ApplyManifestsToClusterAction(
 
         try
         {
-            await InteractivelySelectKubernetesCluster();
+            await kubernetesClientService.InteractivelySelectKubernetesCluster(CurrentState);
 
             await HandleDapr();
 
@@ -36,31 +37,6 @@ public sealed class ApplyManifestsToClusterAction(
         finally
         {
             kustomizeService.CleanupSecretEnvFiles(CurrentState.DisableSecrets, secretFiles);
-        }
-    }
-
-    private async Task InteractivelySelectKubernetesCluster()
-    {
-        if (CurrentState.ActiveKubernetesContextIsSet)
-        {
-            return;
-        }
-
-        var shouldDeploy = Logger.Confirm(
-            "[bold]Would you like to deploy the generated manifests to a kubernetes cluster defined in your kubeconfig file?[/]");
-
-        if (!shouldDeploy)
-        {
-            Logger.MarkupLine("[yellow]Skipping deployment of manifests to cluster.[/]");
-            ActionCausesExitException.ExitNow();
-        }
-
-        CurrentState.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
-
-        if (string.IsNullOrEmpty(CurrentState.KubeContext))
-        {
-            Logger.MarkupLine("[red]Failed to set active kubernetes context.[/]");
-            ActionCausesExitException.ExitNow();
         }
     }
 

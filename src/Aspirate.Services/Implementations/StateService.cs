@@ -30,8 +30,20 @@ public class StateService(IFileSystem fs, IAnsiConsole logger, ISecretProvider s
     {
         logger.WriteRuler("[purple]Handling Aspirate State[/]");
 
-        if (ShouldCancelAsStateFileDoesNotExist(out var stateFile))
+        if (options is { DisableState: true, RequiresState: true })
         {
+            logger.MarkupLine("[bold]State is disabled, but is required for this command. Exiting.[/]");
+            ActionCausesExitException.ExitNow();
+        }
+
+        if (ShouldCancelAsStateFileDoesNotExist(options, out var stateFile))
+        {
+            return;
+        }
+
+        if (options.RequiresState == true)
+        {
+            await RestoreAllState(options, stateFile);
             return;
         }
 
@@ -62,11 +74,19 @@ public class StateService(IFileSystem fs, IAnsiConsole logger, ISecretProvider s
             _ => Task.FromResult(false)
         };
 
-    private bool ShouldCancelAsStateFileDoesNotExist(out string stateFile)
+    private bool ShouldCancelAsStateFileDoesNotExist(StateManagementOptions options, out string stateFile)
     {
         stateFile = fs.Path.Combine(fs.Directory.GetCurrentDirectory(), AspirateLiterals.StateFileName);
 
-        return !fs.File.Exists(stateFile);
+        var doesNotExist =  !fs.File.Exists(stateFile);
+
+        if (doesNotExist && options.RequiresState == true)
+        {
+            logger.MarkupLine("[bold]State file does not exist, but is required for this command. Exiting.[/]");
+            ActionCausesExitException.ExitNow();
+        }
+
+        return doesNotExist;
     }
 
     private async Task<bool> ShouldUseAllPreviousState(StateManagementOptions options, string stateFile)

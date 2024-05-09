@@ -17,9 +17,8 @@ public static class ServiceCollectionExtensions
             .AddAspireManifestSupport()
             .AddAspirateConfigurationSupport()
             .AddContainerSupport()
-            .AddKubeCtlSupport()
             .AddDaprCliSupport()
-            .AddHelmSupport()
+            .AddKubernetesSupport()
             .AddStateManagement()
             .AddSecretService()
             .AddVersionChecks();
@@ -44,9 +43,11 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IManifestFileParserService, ManifestFileParserService>()
             .AddSingleton<IManifestWriter, ManifestWriter>();
 
-    private static IServiceCollection AddHelmSupport(this IServiceCollection services) =>
+    private static IServiceCollection AddKubernetesSupport(this IServiceCollection services) =>
         services
+            .AddSingleton<IKubeCtlService, KubeCtlService>()
             .AddSingleton<IKustomizeService, KustomizeService>()
+            .AddSingleton<IKubernetesService, KubernetesService>()
             .AddSingleton<IHelmChartCreator, HelmChartCreator>();
 
     /// <summary>
@@ -57,15 +58,6 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddAspirateConfigurationSupport(this IServiceCollection services) =>
         services
             .AddSingleton<IAspirateConfigurationService, AspirateConfigurationService>();
-
-    /// <summary>
-    /// Adds support for KubeCtl to the specified service collection.
-    /// </summary>
-    /// <param name="services">The service collection to add support for KubeCtl to.</param>
-    /// <returns>The updated service collection.</returns>
-    private static IServiceCollection AddKubeCtlSupport(this IServiceCollection services) =>
-        services
-            .AddSingleton<IKubeCtlService, KubeCtlService>();
 
     /// <summary>
     /// Adds Dapr CLI support to the specified service collection.

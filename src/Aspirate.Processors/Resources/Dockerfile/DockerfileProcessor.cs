@@ -130,6 +130,6 @@ public class DockerfileProcessor(
 
         var data = PopulateKubernetesDeploymentData(options, containerImage[0], dockerFile);
 
-        return data.ToKubernetesObjects();
+        return data.ToKubernetesObjects(options.EncodeSecrets);
     }
 }

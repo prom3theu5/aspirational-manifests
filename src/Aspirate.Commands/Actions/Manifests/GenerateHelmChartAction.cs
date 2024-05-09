@@ -2,6 +2,7 @@ namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class GenerateHelmChartAction(
     IHelmChartCreator helmChartCreator,
+    IKubernetesService kubernetesClientService,
     IKustomizeService kustomizeService,
     ISecretProvider secretProvider,
     IFileSystem fileSystem,
@@ -25,42 +26,10 @@ public sealed class GenerateHelmChartAction(
             return true;
         }
 
-        var kubeObjects = ConvertResourcesToKubeObjects(CurrentState.AllSelectedSupportedComponents);
+        var kubeObjects = kubernetesClientService.ConvertResourcesToKubeObjects(CurrentState.AllSelectedSupportedComponents, CurrentState, true);
         await helmChartCreator.CreateHelmChart(kubeObjects, Path.Combine(CurrentState.OutputPath, "Chart"), "AspireProject", CurrentState.IncludeDashboard.GetValueOrDefault());
 
         return true;
-    }
-
-    private List<object> ConvertResourcesToKubeObjects(List<KeyValuePair<string, Resource>> supportedResources)
-    {
-        var kubernetesObjects = new List<object>();
-
-        foreach (var resource in supportedResources)
-        {
-            kubernetesObjects.AddRange(ProcessIndividualResourceManifests(resource));
-        }
-
-        return kubernetesObjects;
-    }
-
-    private List<object> ProcessIndividualResourceManifests(KeyValuePair<string, Resource> resource)
-    {
-        var handler = Services.GetKeyedService<IResourceProcessor>(resource.Value.Type);
-
-        if (handler is null)
-        {
-            Logger.MarkupLine($"[yellow]Skipping resource '{resource.Key}' as its type is unsupported.[/]");
-            return [];
-        }
-
-        return handler.CreateKubernetesObjects(new()
-        {
-            Resource = resource,
-            ImagePullPolicy =  CurrentState.ImagePullPolicy,
-            DisableSecrets =  CurrentState.DisableSecrets,
-            WithPrivateRegistry = CurrentState.WithPrivateRegistry,
-            WithDashboard = CurrentState.IncludeDashboard,
-        });
     }
 
     private bool NoSupportedComponentsExitAction()

@@ -9,7 +9,8 @@ public class AspirateState :
     IKubernetesOptions,
     IPrivateRegistryCredentialsOptions,
     IApplyOptions,
-    IDashboardOptions
+    IDashboardOptions,
+    IRunOptions
 {
     [RestorableStateProperty]
     [JsonPropertyName("projectPath")]
@@ -22,6 +23,10 @@ public class AspirateState :
     [RestorableStateProperty]
     [JsonPropertyName("outputPath")]
     public string? OutputPath { get; set; }
+
+    [RestorableStateProperty]
+    [JsonPropertyName("allowClearNamespace")]
+    public bool? AllowClearNamespace { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("namespace")]
@@ -114,6 +119,10 @@ public class AspirateState :
     [RestorableStateProperty]
     [JsonPropertyName("existingSecretsType")]
     public ExistingSecretsType? ExistingSecretsType { get; set; }
+
+    [RestorableStateProperty]
+    [JsonPropertyName("isRunning")]
+    public bool? IsRunning { get; set; }
 
     [JsonIgnore]
     public bool? SkipBuild { get; set; }

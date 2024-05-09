@@ -108,6 +108,6 @@ public class ContainerProcessor(
         var container = options.Resource.Value as ContainerResource;
         var data = PopulateKubernetesDeploymentData(options, container, []);
 
-        return data.ToKubernetesObjects();
+        return data.ToKubernetesObjects(options.EncodeSecrets);
     }
 }
