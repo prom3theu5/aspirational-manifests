@@ -10,7 +10,7 @@ resources:
 generatorOptions:
   disableNameSuffixHash: true
 
-{{#if isService}}
+{{#if hasAnyEnv}}
 configMapGenerator:
 - name: {{name}}-env
   literals:
@@ -20,8 +20,8 @@ configMapGenerator:
     {{#if isProject}}
     - ASPNETCORE_URLS=http://+:8080;
     {{/if}}
-
 {{/if}}
+
 {{#if hasAnySecrets}}
 secretGenerator:
 - name: {{name}}-secrets

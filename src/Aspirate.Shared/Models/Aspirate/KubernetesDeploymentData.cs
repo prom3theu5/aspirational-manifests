@@ -7,20 +7,20 @@ public class KubernetesDeploymentData
 {
     public string? Name {get; private set;}
     public string? Namespace {get; private set;}
-    public Dictionary<string, string?>? Env {get; private set;}
-    public Dictionary<string, string?>? Secrets {get; private set;}
-    public Dictionary<string, string>? Annotations {get; private set;}
-    public List<Volume>? Volumes {get; private set;}
-    public IReadOnlyCollection<string>? Manifests {get; private set;}
-    public IReadOnlyCollection<string>? Args {get; private set;}
-    public bool? IsService { get; private set; } = true;
+    public Dictionary<string, string?> Env { get; private set; } = [];
+    public Dictionary<string, string?> Secrets { get; private set; } = [];
+    public Dictionary<string, string> Annotations { get; private set; } = [];
+    public IReadOnlyCollection<Volume> Volumes { get; private set; } = [];
+    public IReadOnlyCollection<Ports> Ports { get; private set; } = [];
+    public IReadOnlyCollection<string> Manifests { get; private set; } = [];
+    public IReadOnlyCollection<string> Args { get; private set; } = [];
+    public bool? SecretsDisabled { get; private set; } = false;
     public bool? IsProject {get; private set;}
     public bool? WithPrivateRegistry { get; private set; } = false;
     public bool? WithDashboard { get; private set; } = false;
     public string? ContainerImage {get; private set;}
     public string? Entrypoint {get; private set;}
     public string? ImagePullPolicy {get; private set;}
-    public List<Ports>? Ports {get; private set;}
     public string? ServiceType { get; private set; } = "ClusterIP";
 
     public KubernetesDeploymentData SetName(string name)
@@ -64,15 +64,9 @@ public class KubernetesDeploymentData
         return this;
     }
 
-    public KubernetesDeploymentData SetIsService(bool service)
-    {
-        IsService = service;
-        return this;
-    }
-
     public KubernetesDeploymentData SetArgs(IReadOnlyCollection<string>? args)
     {
-        Args = args;
+        Args = args ?? [];
         return this;
     }
 
@@ -134,6 +128,7 @@ public class KubernetesDeploymentData
     {
         if (disableSecrets == true)
         {
+            SecretsDisabled = true;
             return this;
         }
 
@@ -159,11 +154,12 @@ public class KubernetesDeploymentData
         return this;
     }
 
-    public bool HasPorts => Ports?.Any() == true;
-    public bool HasVolumes => Volumes?.Any() == true;
-    public bool HasAnySecrets => Secrets?.Any() == true;
-    public bool HasAnyAnnotations => Annotations?.Any() == true;
-    public bool HasArgs => Args?.Any() == true;
+    public bool HasPorts => Ports.Count > 0;
+    public bool HasVolumes => Volumes.Count > 0;
+    public bool HasAnySecrets => Secrets.Count > 0 && SecretsDisabled != true;
+    public bool HasAnyAnnotations => Annotations.Count > 0;
+    public bool HasArgs => Args.Count > 0;
+    public bool HasAnyEnv => Env.Count > 0;
     public bool WithNamespace => !string.IsNullOrWhiteSpace(Namespace);
 
     public KubernetesDeploymentData Validate()
