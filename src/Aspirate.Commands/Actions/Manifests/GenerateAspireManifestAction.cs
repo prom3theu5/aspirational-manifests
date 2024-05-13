@@ -15,9 +15,9 @@ public sealed class GenerateAspireManifestAction(
             return true;
         }
 
-        Logger.MarkupLine("[bold]Generating Aspire Manifest for supplied App Host:[/]");
+        Logger.MarkupLine("[bold]Generating Aspire Manifest for supplied App Host[/]");
 
-        var result = await manifestCompositionService.BuildManifestForProject(CurrentState.ProjectPath);
+        var result = await manifestCompositionService.BuildManifestForProject(CurrentState.ProjectPath, CurrentState.LaunchProfile);
 
         if (result.Success)
         {

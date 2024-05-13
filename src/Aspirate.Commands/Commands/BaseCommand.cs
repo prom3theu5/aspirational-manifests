@@ -15,6 +15,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         AddOption(NonInteractiveOption.Instance);
         AddOption(DisableSecretsOption.Instance);
         AddOption(DisableStateOption.Instance);
+        AddOption(LaunchProfileOption.Instance);
         Handler = CommandHandler.Create<TOptions, IServiceCollection>(ConstructCommand);
     }
 
