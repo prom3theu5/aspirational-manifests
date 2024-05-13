@@ -19,9 +19,9 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             ActionCausesExitException.ExitNow();
         }
 
-        var outputFile = Path.Combine(AspirateLiterals.DefaultArtifactsPath, "docker-compose.yaml");
+        var outputPath = GetOutputPath();
 
-        Logger.MarkupLine($"[bold]Generating docker compose file: [blue]'{outputFile}'[/][/]");
+        Logger.MarkupLine($"[bold]Generating docker compose file: [blue]'{outputPath}/docker-compose.yaml'[/][/]");
 
         var services = new List<Service>();
 
@@ -35,14 +35,14 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             AddAspireDashboardToCompose(services);
         }
 
-        WriteFile(services, outputFile);
+        WriteFile(services, outputPath);
 
-        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputFile}[/]");
+        Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Generating [blue]{outputPath}/docker-compose.yaml[/]");
 
         return Task.FromResult(true);
     }
 
-    private void WriteFile(List<Service> services, string outputFile)
+    private void WriteFile(List<Service> services, string outputPath)
     {
         var volumes = CreateVolumes(services);
 
@@ -55,12 +55,17 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         var composeFileString = composeFile.Serialize();
 
-        if (!fileSystem.Directory.Exists(AspirateLiterals.DefaultArtifactsPath))
+        WriteComposeOutputToOutputPath(outputPath, composeFileString);
+    }
+
+    private void WriteComposeOutputToOutputPath(string outputPath, string composeFileString)
+    {
+        if (!fileSystem.Directory.Exists(outputPath))
         {
-            fileSystem.Directory.CreateDirectory(AspirateLiterals.DefaultArtifactsPath);
+            fileSystem.Directory.CreateDirectory(outputPath);
         }
 
-        fileSystem.File.WriteAllText(outputFile, composeFileString);
+        fileSystem.File.WriteAllText(fileSystem.Path.Combine(outputPath, "docker-compose.yaml"), composeFileString);
     }
 
     private static List<Volume> CreateVolumes(List<Service> services)
@@ -131,4 +136,9 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         services.Insert(0, aspireDashboard);
     }
+
+    private string GetOutputPath() =>
+        !string.IsNullOrEmpty(CurrentState.OutputPath) ?
+            fileSystem.GetFullPath(CurrentState.OutputPath) :
+            fileSystem.GetFullPath(AspirateLiterals.DefaultArtifactsPath);
 }
