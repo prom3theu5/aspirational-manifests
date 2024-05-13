@@ -18,6 +18,7 @@ public static class DotNetSdkLiterals
     public const string OutputPathArgument = "--output-path";
     public const string SelfContainedArgument = "--self-contained";
     public const string NoLogoArgument = "--nologo";
+    public const string LaunchProfileArgument = "--launch-profile";
     public const string RuntimeIdentifierArgument = "-r";
     public const string OsArgument = "--os";
     public const string ArchArgument = "--arch";

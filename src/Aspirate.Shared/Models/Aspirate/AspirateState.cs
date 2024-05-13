@@ -25,6 +25,10 @@ public class AspirateState :
     public string? OutputPath { get; set; }
 
     [RestorableStateProperty]
+    [JsonPropertyName("launchProfile")]
+    public string? LaunchProfile { get; set; }
+
+    [RestorableStateProperty]
     [JsonPropertyName("allowClearNamespace")]
     public bool? AllowClearNamespace { get; set; }
 
