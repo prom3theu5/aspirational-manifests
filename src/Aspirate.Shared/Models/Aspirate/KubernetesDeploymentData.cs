@@ -52,9 +52,9 @@ public class KubernetesDeploymentData
         return this;
     }
 
-    public KubernetesDeploymentData SetAnnotations(Dictionary<string, string> annotations)
+    public KubernetesDeploymentData SetAnnotations(Dictionary<string, string>? annotations)
     {
-        Annotations = annotations;
+        Annotations = annotations ?? [];
         return this;
     }
 
