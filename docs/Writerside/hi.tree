@@ -19,7 +19,6 @@
         <toc-element topic="Apply-Manifests.md"/>
         <toc-element topic="Removing-Manifests-from-a-Cluster.md"/>
         <toc-element topic="Non-Interactive-Invocation.md"/>
-        <toc-element topic="Environmental-Variables.md"/>
     </toc-element>
     <toc-element topic="Secret-Management.md">
         <toc-element topic="Managing-Secrets.md"/>

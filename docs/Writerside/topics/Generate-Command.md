@@ -15,7 +15,6 @@ Your manifests will be in the `%output-dir%` directory by default.
 ## Compose
 
 The output format of the manifest can also be changed to compose to generate a lightweight deployment (docker/podman compose).
-Secrets are not yet supported in docker compose mode.
 To generate a docker compose deployment, run:
 
 ```bash
@@ -76,4 +75,5 @@ a Helm chart is what's classed as an "Ejected Deployment" and is not managed by 
 | --private-registry-email      |       | `ASPIRATE_PRIVATE_REGISTRY_EMAIL`          | The email for the private registry. This is purely optional and will default to `aspirate@aspirate.com`.                                                                       |
 | --include-dashboard           |       | `ASPIRATE_INCLUDE_DASHBOARD`               | Boolean flag to specify if the Aspire dashboard should also be included in deployments.                                                                                        |
 | --compose-build               |       |                                            | Can be included one or more times to set certain dockerfile resource building to be handled by the compose file. This will skip build and push in aspirate.                    |
-| --launch-profile              | -lp   | 'ASPIRATE_LAUNCH_PROFILE'                  | The launch profile to use when building the Aspire Manifest.                                                                                                                   |
+| --launch-profile              | -lp   | `ASPIRATE_LAUNCH_PROFILE`                  | The launch profile to use when building the Aspire Manifest.                                                                                                                   |
+| --replace-secrets             |       | `ASPIRATE_REPLACE_SECRETS`                 | The secret state will be completely reinitialised, prompting for a new password. All input values and secrets will be re generated / prompted, and stored in the state.        |
