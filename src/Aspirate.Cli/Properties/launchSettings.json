@@ -14,8 +14,8 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --output-format helm",
-      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
+      "commandLineArgs": "generate --skip-build --output-format compose",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-test/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "generate-non-interactive": {
@@ -51,7 +51,7 @@
     "apply": {
       "commandName": "Project",
       "commandLineArgs": "apply",
-      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-test/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "apply-non-interactive": {

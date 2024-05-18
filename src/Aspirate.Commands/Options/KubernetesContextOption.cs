@@ -3,10 +3,10 @@
 public sealed class KubernetesContextOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-k",
         "--kube-context"
-    };
+    ];
 
     private KubernetesContextOption() : base(_aliases, "ASPIRATE_KUBERNETES_CONTEXT", null)
     {

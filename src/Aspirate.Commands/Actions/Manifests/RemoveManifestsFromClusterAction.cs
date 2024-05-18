@@ -85,8 +85,14 @@ public sealed class RemoveManifestsFromClusterAction(
 
         foreach (var resourceSecrets in secretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
         {
-            var secretFile =
-                fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
+            var resourcePath = fileSystem.Path.Combine(CurrentState.InputPath, resourceSecrets.Key);
+
+            if (!fileSystem.Directory.Exists(resourcePath))
+            {
+                continue;
+            }
+
+            var secretFile = fileSystem.Path.Combine(resourcePath, $".{resourceSecrets.Key}.secrets");
 
             files.Add(secretFile);
 

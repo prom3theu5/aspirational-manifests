@@ -2,7 +2,7 @@
 {
     public sealed class DisableStateOption : BaseOption<bool?>
     {
-        private static readonly string[] _aliases = { "--disable-state", "--no-state" };
+        private static readonly string[] _aliases = ["--disable-state", "--no-state"];
 
         private DisableStateOption() : base(_aliases, "ASPIRATE_DISABLE_STATE", null)
         {

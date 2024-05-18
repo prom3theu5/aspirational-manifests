@@ -20,7 +20,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         """;
 
     [Fact]
-    public void LoadState_NotExists_Success()
+    public void LoadState_NotExistsInitialises_Success()
     {
         // Arrange
         var console = new TestConsole();
@@ -31,6 +31,8 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         var service = GetSystemUnderTest(serviceProvider);
 
         // Act
+        state.SecretPassword = "test-password";
+
         service.LoadSecrets(new SecretManagementOptions
         {
             State = state,
@@ -40,7 +42,7 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
         });
 
         // Assert
-        state.SecretState.Should().BeNull();
+        state.SecretState.Should().NotBeNull();
     }
 
     [Fact]
@@ -145,29 +147,5 @@ public class SecretServiceTests : BaseServiceTests<ISecretService>
 
         // Assert
         result.Should().Throw<ActionCausesExitException>();
-    }
-
-    [Fact]
-    public void LoadState_NoState_Success()
-    {
-        // Arrange
-        var console = new TestConsole();
-
-        var state = CreateAspirateStateWithConnectionStrings(nonInteractive: true);
-        state.SecretState = null;
-        var serviceProvider = CreateServiceProvider(state, console);
-        var service = GetSystemUnderTest(serviceProvider);
-
-        // Act
-        var result = () => service.LoadSecrets(new SecretManagementOptions
-        {
-            State = state,
-            NonInteractive = true,
-            DisableSecrets = false,
-            SecretPassword = string.Empty,
-        });;
-
-        // Assert
-        result.Should().NotThrow();
     }
 }

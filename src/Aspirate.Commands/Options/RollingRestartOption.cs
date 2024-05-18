@@ -3,10 +3,10 @@
 public sealed class RollingRestartOption : BaseOption<bool?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-r",
-        "--rolling-restart",
-    };
+        "--rolling-restart"
+    ];
 
     private RollingRestartOption() : base(_aliases, "ASPIRATE_ROLLING_RESTART", null)
     {

@@ -42,11 +42,11 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         // Assert
         result.Should().BeTrue();
-        secretProvider.State.Secrets.Count.Should().Be(2);
+        secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
         secretProvider.LoadState(state);
-        secretProvider.State.Secrets.Count.Should().Be(2);
+        secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
     }
@@ -102,8 +102,8 @@ public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>
 
         // Assert
         await act.Should().NotThrowAsync();
-        console.Output.Should().Contain("Using existing secrets");
-        secretProvider.State.Secrets.Count.Should().Be(2);
+        console.Output.Should().Contain("Secret State has been saved");
+        secretProvider.State.Secrets.Count.Should().Be(4);
         secretProvider.State.Secrets["postgrescontainer"].Count.Should().Be(1);
         secretProvider.State.Secrets["postgrescontainer2"].Count.Should().Be(1);
     }

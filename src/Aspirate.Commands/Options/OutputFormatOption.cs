@@ -2,7 +2,7 @@
 
 public sealed class OutputFormatOption : BaseOption<string?>
 {
-    private static readonly string[] _aliases = { "--output-format" };
+    private static readonly string[] _aliases = ["--output-format"];
 
     private OutputFormatOption() : base(_aliases, "ASPIRATE_OUTPUT_FORMAT", null)
     {

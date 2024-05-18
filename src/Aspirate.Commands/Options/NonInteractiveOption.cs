@@ -3,9 +3,9 @@
 public sealed class NonInteractiveOption : BaseOption<bool?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "--non-interactive"
-    };
+    ];
 
     private NonInteractiveOption() : base(_aliases, "ASPIRATE_NON_INTERACTIVE", null)
     {

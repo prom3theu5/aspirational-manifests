@@ -3,9 +3,9 @@
 public sealed class SecretPasswordOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "--secret-password"
-    };
+    ];
 
     private SecretPasswordOption() : base(_aliases, "ASPIRATE_SECRET_PASSWORD", null)
     {

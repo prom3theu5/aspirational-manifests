@@ -3,11 +3,11 @@
     public sealed class SkipFinalKustomizeGenerationOption : BaseOption<bool?>
     {
         private static readonly string[] _aliases =
-        {
+        [
             "-sf",
             "--skip-final",
             "--skip-final-kustomize-generation"
-        };
+        ];
 
         private SkipFinalKustomizeGenerationOption() : base(_aliases, "ASPIRATE_SKIP_FINAL_KUSTOMIZE_GENERATION", null)
         {

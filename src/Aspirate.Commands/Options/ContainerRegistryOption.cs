@@ -3,10 +3,10 @@
 public sealed class ContainerRegistryOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-cr",
         "--container-registry"
-    };
+    ];
 
     private ContainerRegistryOption() : base(_aliases, "ASPIRATE_CONTAINER_REGISTRY", null)
     {

@@ -3,9 +3,9 @@
 public sealed class PrivateRegistryUsernameOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
-        "--private-registry-username",
-    };
+    [
+        "--private-registry-username"
+    ];
 
     private PrivateRegistryUsernameOption() : base(_aliases, "ASPIRATE_PRIVATE_REGISTRY_USERNAME", null)
     {

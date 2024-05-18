@@ -2,7 +2,7 @@
 
 public sealed class SkipBuildOption : BaseOption<bool?>
 {
-    private static readonly string[] _aliases = { "--skip-build" };
+    private static readonly string[] _aliases = ["--skip-build"];
 
     private SkipBuildOption() : base(_aliases, "ASPIRATE_SKIP_BUILD", null)
     {

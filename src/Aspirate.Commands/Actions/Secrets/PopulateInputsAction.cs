@@ -1,8 +1,9 @@
 namespace Aspirate.Commands.Actions.Secrets;
 
-public class PopulateInputsAction(
+public sealed class PopulateInputsAction(
     IPasswordGenerator passwordGenerator,
-    IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
+    IServiceProvider serviceProvider,
+    ISecretProvider secretProvider) : BaseAction(serviceProvider)
 {
     public override Task<bool> ExecuteAsync()
     {
@@ -17,11 +18,6 @@ public class PopulateInputsAction(
 
         ApplyGeneratedValues(parameterResources);
 
-        if (CurrentState.NonInteractive)
-        {
-            return Task.FromResult(true);
-        }
-
         ApplyManualValues(parameterResources);
 
         Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
@@ -31,8 +27,6 @@ public class PopulateInputsAction(
 
     private void ApplyManualValues(KeyValuePair<string, Resource>[] parameterResources)
     {
-        Logger.MarkupLine("You will now be prompted to enter values for any [green]secrets[/] that are [blue]not generated[/] automatically.");
-
         foreach (var component in parameterResources)
         {
             var componentWithInput = component.Value as ParameterResource;
@@ -45,8 +39,6 @@ public class PopulateInputsAction(
 
     private void ApplyGeneratedValues(KeyValuePair<string, Resource>[] parameterResources)
     {
-        Logger.MarkupLine("Applying values for all [blue]automatically generated[/] [green]secrets[/].");
-
         foreach (var component in parameterResources)
         {
             var componentWithInput = component.Value as ParameterResource;
@@ -72,21 +64,19 @@ public class PopulateInputsAction(
 
     private void HandleSetInput(KeyValuePair<string, ParameterInput> input, ParameterResource parameterResource)
     {
-        Logger.WriteLine();
-
-        var firstPrompt = new TextPrompt<string>($"Enter a value for resource [blue]{parameterResource.Name}'s[/] Input Value [blue]'{input.Key}'[/]: ");
-        var secondPrompt = new TextPrompt<string>("Please repeat the value: ");
-
-        if (input.Value.Secret)
+        if (AssignExistingSecret(input, parameterResource))
         {
-            firstPrompt.PromptStyle("red").Secret();
-            secondPrompt.PromptStyle("red").Secret();
+            return;
         }
-        else
+
+        if (CurrentState.NonInteractive)
         {
-            firstPrompt.PromptStyle("yellow");
-            secondPrompt.PromptStyle("yellow");
+            Logger.ValidationFailed("Cannot obtain non-generated values for inputs in non-interactive mode. Inputs are required according to the manifest.");
+            ActionCausesExitException.ExitNow();
         }
+
+        var firstPrompt = new TextPrompt<string>($"Enter a value for resource [blue]{parameterResource.Name}'s[/] Input Value [blue]'{input.Key}'[/]: ").PromptStyle("yellow");
+        var secondPrompt = new TextPrompt<string>("Please repeat the value: ").PromptStyle("yellow");
 
         var firstInput = Logger.Prompt(firstPrompt);
         var secondInput = Logger.Prompt(secondPrompt);
@@ -94,11 +84,43 @@ public class PopulateInputsAction(
         if (firstInput.Equals(secondInput, StringComparison.Ordinal))
         {
             parameterResource.Value = firstInput;
+            AddParameterInputToSecretStore(input, parameterResource, firstInput);
+            Logger.MarkupLine($"Successfully [green]assigned[/] a value for [blue]{parameterResource.Name}'s[/] Input Value [blue]'{input.Key}'[/]");
             return;
         }
 
         Logger.MarkupLine("[red]The values do not match. Please try again.[/]");
         HandleSetInput(input, parameterResource);
+    }
+
+    private bool AssignExistingSecret(KeyValuePair<string, ParameterInput> input, ParameterResource parameterResource)
+    {
+        if (CurrentState.ReplaceSecrets == true || CurrentState.DisableSecrets == true || !secretProvider.SecretStateExists(CurrentState) || !secretProvider.ResourceExists(parameterResource.Name) ||
+            !secretProvider.SecretExists(parameterResource.Name, input.Key))
+        {
+            return false;
+        }
+
+        parameterResource.Value = secretProvider.GetSecret(parameterResource.Name, input.Key);
+        Logger.MarkupLine(
+            $"[green]Secret[/] for [blue]{parameterResource.Name}'s[/] Input Value [blue]'{input.Key}'[/] loaded from secret state.");
+
+        return true;
+    }
+
+    private void AddParameterInputToSecretStore(KeyValuePair<string, ParameterInput> input, ParameterResource parameterResource, string valueToStore)
+    {
+        if (CurrentState.DisableSecrets == true)
+        {
+            return;
+        }
+
+        if (!secretProvider.ResourceExists(parameterResource.Name))
+        {
+            secretProvider.AddResource(parameterResource.Name);
+        }
+
+        secretProvider.AddSecret(parameterResource.Name, input.Key, valueToStore);
     }
 
     private void AssignGeneratedValues(ref IEnumerable<KeyValuePair<string, ParameterInput>>? generatedInputs, ParameterResource parameterResource)
@@ -110,27 +132,15 @@ public class PopulateInputsAction(
 
         foreach (var input in generatedInputs)
         {
-            Logger.WriteLine();
+            if (AssignExistingSecret(input, parameterResource))
+            {
+                continue;
+            }
             var minimumLength = input.Value.Default?.Generate?.MinLength ?? 22;
             parameterResource.Value = passwordGenerator.Generate(minimumLength);
+            AddParameterInputToSecretStore(input, parameterResource, parameterResource.Value);
 
             Logger.MarkupLine($"Successfully [green]generated[/] a value for [blue]{parameterResource.Name}'s[/] Input Value [blue]'{input.Key}'[/]");
-        }
-    }
-
-    public override void ValidateNonInteractiveState()
-    {
-        var componentsWithInputs = CurrentState.AllSelectedSupportedComponents.Where(x => x.Value is ParameterResource).ToArray();
-
-        var manualInputs = componentsWithInputs
-            .Select(x => (ParameterResource) x.Value)
-            .Where(x => x.Inputs is not null)
-            .SelectMany(x => x.Inputs)
-            .Where(x => x.Value.Default is null);
-
-        if (manualInputs.Any())
-        {
-            Logger.ValidationFailed("Cannot obtain non-generated values for inputs in non-interactive mode. Inputs are required according to the manifest.");
         }
     }
 }

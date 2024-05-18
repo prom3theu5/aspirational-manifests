@@ -2,7 +2,7 @@
 {
     public sealed class AllowClearNamespaceOption : BaseOption<bool?>
     {
-        private static readonly string[] _aliases = { "--clear-namespace" };
+        private static readonly string[] _aliases = ["--clear-namespace"];
 
         private AllowClearNamespaceOption() : base(_aliases, "ASPIRATE_ALLOW_CLEAR_NAMESPACE", null)
         {

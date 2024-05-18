@@ -2,7 +2,7 @@
 {
     public sealed class DisableSecretsOption : BaseOption<bool?>
     {
-        private static readonly string[] _aliases = { "--disable-secrets" };
+        private static readonly string[] _aliases = ["--disable-secrets"];
 
         private DisableSecretsOption() : base(_aliases, "ASPIRATE_DISABLE_SECRETS", null)
         {

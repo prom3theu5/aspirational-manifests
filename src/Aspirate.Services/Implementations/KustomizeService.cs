@@ -54,7 +54,14 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
 
         foreach (var resourceSecrets in secretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
         {
-            var secretFile = fileSystem.Path.Combine(state.OutputPath, resourceSecrets.Key, $".{resourceSecrets.Key}.secrets");
+            var resourcePath = fileSystem.Path.Combine(state.OutputPath, resourceSecrets.Key);
+
+            if (!fileSystem.Directory.Exists(resourcePath))
+            {
+                continue;
+            }
+
+            var secretFile = fileSystem.Path.Combine(resourcePath, $".{resourceSecrets.Key}.secrets");
 
             files.Add(secretFile);
 

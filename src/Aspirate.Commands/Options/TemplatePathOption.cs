@@ -3,10 +3,10 @@
 public sealed class TemplatePathOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-tp",
         "--template-path"
-    };
+    ];
 
     private TemplatePathOption() : base(_aliases, "ASPIRATE_TEMPLATE_PATH", null)
     {

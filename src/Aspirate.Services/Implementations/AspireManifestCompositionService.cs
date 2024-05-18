@@ -41,7 +41,7 @@ public class AspireManifestCompositionService(IFileSystem fileSystem, IAnsiConso
 
         if (!string.IsNullOrEmpty(newManifestFile.Error))
         {
-            console.MarkupLine($"[red]Error: {newManifestFile.Error}[/]");
+            console.MarkupLine($"[red]Error: {newManifestFile.Error.EscapeMarkup()}[/]");
             console.MarkupLine($"[red]Could not build the manifest for the supplied details. Exiting rather than building default manifest file.[/]");
             ActionCausesExitException.ExitNow();
         }

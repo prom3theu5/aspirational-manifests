@@ -3,10 +3,10 @@
 public sealed class ProjectPathOption : BaseOption<string>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-p",
-        "--project-path",
-    };
+        "--project-path"
+    ];
 
     private ProjectPathOption() : base(_aliases, "ASPIRATE_PROJECT_PATH", AspirateLiterals.DefaultAspireProjectPath)
     {
