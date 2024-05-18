@@ -10,7 +10,8 @@ public class AspirateState :
     IPrivateRegistryCredentialsOptions,
     IApplyOptions,
     IDashboardOptions,
-    IRunOptions
+    IRunOptions,
+    ISecretState
 {
     [RestorableStateProperty]
     [JsonPropertyName("projectPath")]
@@ -121,10 +122,6 @@ public class AspirateState :
     public bool? ProcessAllComponents { get; set; }
 
     [RestorableStateProperty]
-    [JsonPropertyName("existingSecretsType")]
-    public ExistingSecretsType? ExistingSecretsType { get; set; }
-
-    [RestorableStateProperty]
     [JsonPropertyName("isRunning")]
     public bool? IsRunning { get; set; }
 
@@ -135,7 +132,7 @@ public class AspirateState :
     public string? AspireManifest { get; set; }
 
     [JsonIgnore]
-    public List<string> AspireComponentsToProcess { get; set; } = new();
+    public List<string> AspireComponentsToProcess { get; set; } = [];
 
     [JsonIgnore]
     public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = new();
@@ -187,4 +184,7 @@ public class AspirateState :
 
     public static bool IsNotDeployable(Resource resource) =>
         (resource is DaprResource or ParameterResource or ValueResource);
+
+    [JsonIgnore]
+    public bool? ReplaceSecrets { get; set; }
 }

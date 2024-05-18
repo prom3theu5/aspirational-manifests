@@ -3,9 +3,9 @@ namespace Aspirate.Commands.Options;
 public sealed class PrivateRegistryPasswordOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
-        "--private-registry-password",
-    };
+    [
+        "--private-registry-password"
+    ];
 
     private PrivateRegistryPasswordOption() : base(_aliases, "ASPIRATE_PRIVATE_REGISTRY_PASSWORD", null)
     {

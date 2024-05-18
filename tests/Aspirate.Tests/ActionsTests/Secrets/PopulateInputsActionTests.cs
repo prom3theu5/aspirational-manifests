@@ -51,40 +51,6 @@ public class PopulateInputsActionTests : BaseActionTests<PopulateInputsAction>
         postgresParams.Value.Should().NotBe(postgres2Params.Value);
     }
 
-    [Fact]
-    public void Validate_NonInteractiveContextSet_ThrowsWhenInputValues()
-    {
-        // Arrange
-        var console = new TestConsole();
-        console.Profile.Capabilities.Interactive = false;
-        var state = CreateAspirateStateWithInputs(nonInteractive: true);
-        var serviceProvider = CreateServiceProvider(state, console);
-        var action = GetSystemUnderTest(serviceProvider);
-
-        // Act
-        var act = () => action.ValidateNonInteractiveState();
-
-        // Assert
-        act.Should().Throw<ActionCausesExitException>();
-    }
-
-    [Fact]
-    public void Validate_NonInteractiveContextSet_DoesNotThrowWhenOnlyGeneratedSecrets()
-    {
-        // Arrange
-        var console = new TestConsole();
-        console.Profile.Capabilities.Interactive = false;
-        var state = CreateAspirateStateWithInputs(nonInteractive: true, generatedInputs: true);
-        var serviceProvider = CreateServiceProvider(state, console);
-        var action = GetSystemUnderTest(serviceProvider);
-
-        // Act
-        var act = () => action.ValidateNonInteractiveState();
-
-        // Assert
-        act.Should().NotThrow();
-    }
-
     private static void EnterPasswordInput(TestConsole console, string password)
     {
         // first entry

@@ -25,39 +25,12 @@ public class SecretService(
 
         if (secretProvider.SecretStateExists(options.State))
         {
-            logger.MarkupLine("Aspirate Secrets [blue]already exist[/] for manifest.");
-
             secretProvider.LoadState(options.State);
 
             if (!CheckPassword(options))
             {
                 logger.MarkupLine("[red]Aborting due to inability to unlock secrets.[/]");
                 ActionCausesExitException.ExitNow();
-            }
-
-            if (!options.NonInteractive == true)
-            {
-                if (options.State.ExistingSecretsType is not null)
-                {
-                    if (HandleSecretAction(options, options.State.ExistingSecretsType.Name))
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    var secretsAction = logger.Prompt(
-                        new SelectionPrompt<string>()
-                            .Title("Select the action for the existing secrets...")
-                            .HighlightStyle("blue")
-                            .PageSize(3)
-                            .AddChoices(ExistingSecretsType.Existing.Name, ExistingSecretsType.Augment.Name, ExistingSecretsType.Overwrite.Name));
-
-                    if (HandleSecretAction(options, secretsAction))
-                    {
-                        return;
-                    }
-                }
             }
         }
 
@@ -89,26 +62,23 @@ public class SecretService(
         logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Secret State has been saved.");
     }
 
-    private bool HandleSecretAction(SecretManagementOptions options, string secretsAction)
+    public void ReInitialiseSecrets(SecretManagementOptions options)
     {
-        if (secretsAction.Equals(ExistingSecretsType.Existing.Name, StringComparison.Ordinal))
+        if (options.DisableSecrets == true)
         {
-            logger.MarkupLine("Using [green]existing[/] secrets.");
-            options.State.ExistingSecretsType = ExistingSecretsType.Existing;
-            return true;
+            logger.MarkupLine("[green]Secrets are disabled[/].");
+            return;
         }
 
-        if (secretsAction.Equals(ExistingSecretsType.Augment.Name, StringComparison.Ordinal))
-        {
-            options.State.ExistingSecretsType = ExistingSecretsType.Augment;
-            logger.MarkupLine("Using [green]existing[/] secrets and augmenting with new values.");
-            return false;
-        }
-
-        logger.MarkupLine("[yellow]Overwriting[/] secrets");
-        options.State.ExistingSecretsType = ExistingSecretsType.Overwrite;
         secretProvider.RemoveState(options.State);
-        return false;
+
+        HandleInitialisation(options);
+
+        secretProvider.SetState(options.State);
+
+        options.State.SecretState = secretProvider.State;
+
+        logger.MarkupLine("[green]Secret State has been initialised![/].");
     }
 
     public void LoadSecrets(SecretManagementOptions options)
@@ -121,9 +91,15 @@ public class SecretService(
             return;
         }
 
+        if (options.State.ReplaceSecrets == true)
+        {
+            ReInitialiseSecrets(options);
+            return;
+        }
+
         if (!secretProvider.SecretStateExists(options.State))
         {
-            logger.MarkupLine("[green]No existing secrets state found[/].");
+            ReInitialiseSecrets(options);
             return;
         }
 
@@ -247,6 +223,8 @@ public class SecretService(
             if (firstEntry.Equals(secondEntry, StringComparison.Ordinal))
             {
                 secretProvider.SetPassword(firstEntry);
+                options.SecretPassword = firstEntry;
+                options.State.SecretPassword = firstEntry;
                 return true;
             }
 

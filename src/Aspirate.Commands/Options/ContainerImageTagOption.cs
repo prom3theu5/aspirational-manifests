@@ -3,10 +3,10 @@
 public sealed class ContainerImageTagOption : BaseOption<List<string>?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-ct",
         "--container-image-tag"
-    };
+    ];
 
     private ContainerImageTagOption() : base(_aliases, "ASPIRATE_CONTAINER_IMAGE_TAG", null)
     {

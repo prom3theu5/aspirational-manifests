@@ -2,7 +2,7 @@
 
 public sealed class ImagePullPolicyOption : BaseOption<string?>
 {
-    private static readonly string[] _aliases = { "--image-pull-policy" };
+    private static readonly string[] _aliases = ["--image-pull-policy"];
 
     private ImagePullPolicyOption() : base(_aliases, "ASPIRATE_IMAGE_PULL_POLICY", null)
     {

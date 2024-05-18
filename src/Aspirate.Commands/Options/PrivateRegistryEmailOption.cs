@@ -3,9 +3,9 @@ namespace Aspirate.Commands.Options;
 public sealed class PrivateRegistryEmailOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
-        "--private-registry-email",
-    };
+    [
+        "--private-registry-email"
+    ];
 
     private PrivateRegistryEmailOption() : base(_aliases, "ASPIRATE_PRIVATE_REGISTRY_EMAIL", "aspir8@aka.ms")
     {

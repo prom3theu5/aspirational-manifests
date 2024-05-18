@@ -3,10 +3,10 @@
 public sealed class OutputPathOption : BaseOption<string>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-o",
-        "--output-path",
-    };
+        "--output-path"
+    ];
 
     private OutputPathOption() : base(_aliases,  "ASPIRATE_OUTPUT_PATH", AspirateLiterals.DefaultArtifactsPath)
     {

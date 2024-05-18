@@ -2,7 +2,7 @@
 
 public sealed class ContainerBuilderOption : BaseOption<string>
 {
-    private static readonly string[] _aliases = { "--container-builder" };
+    private static readonly string[] _aliases = ["--container-builder"];
 
     private ContainerBuilderOption() : base(_aliases, "ASPIRATE_CONTAINER_BUILDER", "docker")
     {

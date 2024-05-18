@@ -49,30 +49,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         return exitCode;
     }
 
-    private void LoadSecrets(TOptions options, ISecretService secretService, TOptionsHandler handler)
-    {
-        var outputFormat = !string.IsNullOrEmpty(handler.CurrentState.OutputFormat) ? OutputFormat.FromValue(handler.CurrentState.OutputFormat) : OutputFormat.Kustomize;
-
-        if (options is IGenerateOptions generateOptions)
-        {
-            if (OutputFormat.TryFromValue(generateOptions.OutputFormat, out var format))
-            {
-                outputFormat = format;
-            }
-        }
-
-        var isKubernetes = outputFormat.Equals(OutputFormat.Kustomize) || outputFormat.Equals(OutputFormat.Helm);
-        var isCompose = outputFormat.Equals(OutputFormat.DockerCompose);
-
-        if (isCompose)
-        {
-            handler.CurrentState.DisableSecrets = true;
-        }
-
-        var shouldDisableSecrets = handler.CurrentState.DisableSecrets ?? ((isKubernetes) ? options.DisableSecrets : true);
-
-        handler.CurrentState.DisableSecrets = shouldDisableSecrets;
-
+    private void LoadSecrets(TOptions options, ISecretService secretService, TOptionsHandler handler) =>
         secretService.LoadSecrets(new SecretManagementOptions
         {
             DisableSecrets = handler.CurrentState.DisableSecrets,
@@ -81,7 +58,6 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
             CommandUnlocksSecrets = CommandUnlocksSecrets,
             State = handler.CurrentState,
         });
-    }
 
     private static StateManagementOptions GetStateManagementOptions(TOptions options, TOptionsHandler handler, bool requiresState) =>
         new()

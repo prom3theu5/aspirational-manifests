@@ -3,10 +3,10 @@
 public sealed class InputPathOption : BaseOption<string>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-i",
         "--input-path"
-    };
+    ];
 
     private InputPathOption() : base(_aliases, "ASPIRATE_INPUT_PATH", AspirateLiterals.DefaultArtifactsPath)
     {

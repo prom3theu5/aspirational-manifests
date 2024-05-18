@@ -3,10 +3,10 @@
 public sealed class LaunchProfileOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
+    [
         "-lp",
         "--launch-profile"
-    };
+    ];
 
     private LaunchProfileOption() : base(_aliases, "ASPIRATE_LAUNCH_PROFILE", null)
     {

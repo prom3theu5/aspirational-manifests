@@ -3,9 +3,9 @@
 public sealed class NamespaceOption : BaseOption<string?>
 {
     private static readonly string[] _aliases =
-    {
-        "--namespace",
-    };
+    [
+        "--namespace"
+    ];
 
     private NamespaceOption() : base(_aliases,  "ASPIRATE_NAMESPACE", null)
     {
