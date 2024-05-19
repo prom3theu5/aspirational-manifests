@@ -25,4 +25,5 @@ public abstract class BaseCreateOptions
     /// </remarks>
     public bool? WithPrivateRegistry { get; set; }
 
+    public AspirateState? CurrentState { get; set; }
 }
