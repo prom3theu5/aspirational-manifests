@@ -85,7 +85,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
     private void ProcessIndividualComponent(KeyValuePair<string, Resource> resource, List<Service> services)
     {
-        if (AspirateState.IsNotDeployable(resource.Value))
+        if (CurrentState.IsNotDeployable(resource.Value))
         {
             return;
         }
@@ -103,6 +103,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
             Resource = resource,
             WithDashboard = CurrentState.IncludeDashboard,
             ComposeBuilds = CurrentState.ComposeBuilds?.Any(x=> x == resource.Key) ?? false,
+            CurrentState = CurrentState
         });
 
         if (response.IsProject)

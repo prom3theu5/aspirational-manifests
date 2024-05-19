@@ -64,7 +64,7 @@ public sealed class GenerateKustomizeManifestsAction(
             WithDashboard = CurrentState.IncludeDashboard
         });
 
-        if (success && !AspirateState.IsNotDeployable(resource.Value) && resource.Value is not DaprComponentResource)
+        if (success && !CurrentState.IsNotDeployable(resource.Value) && resource.Value is not DaprComponentResource)
         {
             CurrentState.AppendToFinalResources(resource.Key, resource.Value);
         }

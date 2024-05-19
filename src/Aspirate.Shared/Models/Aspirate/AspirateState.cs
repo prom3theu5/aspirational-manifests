@@ -182,8 +182,15 @@ public class AspirateState :
     public void AppendToFinalResources(string key, Resource resource) =>
         FinalResources.Add(key, resource);
 
-    public static bool IsNotDeployable(Resource resource) =>
-        (resource is DaprResource or ParameterResource or ValueResource);
+    public bool IsNotDeployable(Resource resource)
+    {
+        if (OutputFormat.Equals("compose", StringComparison.OrdinalIgnoreCase))
+        {
+            return (resource is ParameterResource or ValueResource);
+        }
+
+        return (resource is DaprResource or ParameterResource or ValueResource);
+    }
 
     [JsonIgnore]
     public bool? ReplaceSecrets { get; set; }
