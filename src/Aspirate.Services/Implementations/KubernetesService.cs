@@ -155,7 +155,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
                     break;
                 case V1Service service:
                     service.Metadata.NamespaceProperty = options.NamespaceName;
-                    if (service.Spec.Ports.Any(x => x.Port is 8080 or 18888))
+                    if (service.Spec.Ports.Where(ExposableAsNodePort).Any())
                     {
                         service.Spec.Type = "NodePort";
                     }
@@ -186,7 +186,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
             var serviceName = service.Metadata.Name;
             var serviceType = service.Spec.Type;
             var clusterIP = service.Spec.ClusterIP;
-            var ports = service.Spec.Ports.Where(p => p.Port is 8080 or 18888);
+            var ports = service.Spec.Ports.Where(ExposableAsNodePort);
 
             foreach (var port in ports)
             {
@@ -386,4 +386,8 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
                 options.Client.NetworkingV1.ReadNamespacedIngressAsync(ingress.Metadata.Name, options.NamespaceName));
         }
     }
+
+    private Func<V1ServicePort, bool> ExposableAsNodePort =>
+        servicePort =>
+            servicePort.Name.Equals("http", StringComparison.OrdinalIgnoreCase) || servicePort.Port is 80 or 8080 or 18888;
 }
