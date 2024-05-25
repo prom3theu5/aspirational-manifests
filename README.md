@@ -28,10 +28,10 @@ Documentation: https://prom3theu5.github.io/aspirational-manifests/
 ## To Install as a global tool
 
 ```bash
-dotnet tool install -g aspirate --prerelease
+dotnet tool install -g aspirate
 ```
 
-> NOTE: While Aspirate is in development the package will be versioned as a preview and the `--prelease` option will get the latest preview.
+> NOTE: Add the `--prelease` option, to install the latest preview version.
 
 ## Producing Manifests
 
