@@ -46,19 +46,6 @@ public static class AspireDashboard
                                 {
                                     new() { Name = "DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS", Value = "true" }
                                 },
-                                LivenessProbe =
-                                    new V1Probe
-                                    {
-                                        InitialDelaySeconds = 30,
-                                        PeriodSeconds = 10,
-                                        HttpGet = new V1HTTPGetAction { Path = "/", Port = 18888 }
-                                    },
-                                ReadinessProbe = new V1Probe
-                                {
-                                    InitialDelaySeconds = 30,
-                                    PeriodSeconds = 10,
-                                    HttpGet = new V1HTTPGetAction { Path = "/", Port = 18888 }
-                                }
                             }
                         }
                     }
