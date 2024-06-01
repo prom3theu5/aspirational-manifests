@@ -117,7 +117,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         {
             await dockerfileProcessor.BuildAndPushContainerForDockerfile(resource, new()
             {
-                ContainerBuilder = CurrentState.ContainerBuilder,
+                ContainerBuilder = CurrentState.ContainerBuilder.ToLower(),
                 ImageName = resource.Key,
                 Registry = CurrentState.ContainerRegistry,
                 Prefix = CurrentState.ContainerRepositoryPrefix,

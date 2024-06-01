@@ -41,6 +41,7 @@ public class InitializeConfigurationAction(
     {
         if (!string.IsNullOrEmpty(CurrentState.ContainerBuilder))
         {
+            CurrentState.ContainerBuilder = CurrentState.ContainerBuilder.ToLower();
             aspirateConfiguration.ContainerSettings.Builder = CurrentState.ContainerBuilder;
             Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container builder'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Builder}'[/].");
             return;

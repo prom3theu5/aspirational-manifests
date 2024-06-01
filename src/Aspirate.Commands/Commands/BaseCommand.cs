@@ -25,6 +25,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
         if (CommandSkipsStateAndSecrets)
         {
+            handler.CurrentState.PopulateStateFromOptions(options);
             return await handler.HandleAsync(options);
         }
 
