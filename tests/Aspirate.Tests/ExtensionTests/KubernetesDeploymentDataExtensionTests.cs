@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Aspirate.Tests.ExtensionTests;
 
 public class KubernetesDeploymentDataExtensionTests
@@ -61,8 +63,8 @@ public class KubernetesDeploymentDataExtensionTests
         var result = data.ToKubernetesSecret();
 
         // Assert
-        result.StringData.Should().ContainKey("key");
-        result.StringData["key"].Should().Be("dmFsdWU=");
+        result.Data.Should().ContainKey("key");
+        result.Data["key"].Should().NotBeEmpty().And.BeEquivalentTo("dmFsdWU="u8.ToArray());
     }
 
     [Fact]
@@ -147,8 +149,8 @@ public class KubernetesDeploymentDataExtensionTests
         configMap.Data["key"].Should().Be("envvalue");
 
         var secret = result.OfType<V1Secret>().First();
-        secret.StringData.Should().ContainKey("key");
-        secret.StringData["key"].Should().Be("c2VjcmV0dmFsdWU=");
+        secret.Data.Should().ContainKey("key");
+        secret.Data["key"].Should().NotBeEmpty().And.BeEquivalentTo("c2VjcmV0dmFsdWU="u8.ToArray());
     }
 
     [Fact]
