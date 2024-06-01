@@ -24,7 +24,7 @@ public sealed class ContainerBuilderOption : BaseOption<string>
             throw new ArgumentException("--container-builder cannot be null.");
         }
 
-        if (!ContainerBuilder.TryFromValue(value, out _))
+        if (!ContainerBuilder.TryFromValue(value.ToLower(), out _))
         {
             var errorBuilder = new StringBuilder();
             errorBuilder.Append("--container-builder must be one of: '");

@@ -28,7 +28,7 @@ public sealed class BuildAndPushContainersFromProjectsAction(
         {
             await projectProcessor.BuildAndPushProjectContainer(resource, new()
             {
-                ContainerBuilder = CurrentState.ContainerBuilder,
+                ContainerBuilder = CurrentState.ContainerBuilder.ToLower(),
                 Prefix = CurrentState.ContainerRepositoryPrefix,
             }, CurrentState.NonInteractive, CurrentState.RuntimeIdentifier);
         }

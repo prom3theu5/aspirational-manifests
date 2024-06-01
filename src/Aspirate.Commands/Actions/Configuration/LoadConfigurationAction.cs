@@ -32,7 +32,7 @@ public class LoadConfigurationAction(
 
         if (string.IsNullOrEmpty(CurrentState.ContainerBuilder))
         {
-            CurrentState.ContainerBuilder = aspirateSettings.ContainerSettings?.Builder ?? null;
+            CurrentState.ContainerBuilder = aspirateSettings.ContainerSettings?.Builder.ToLower() ?? null;
         }
 
         if (string.IsNullOrEmpty(CurrentState.ContainerRepositoryPrefix))

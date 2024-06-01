@@ -27,6 +27,12 @@ public static class AspirateStateExtensions
         {
             state.OutputFormat = OutputFormat.Kustomize.Value;
         }
+
+        // Ensure we have a default container builder.
+        if (string.IsNullOrEmpty(state.ContainerBuilder))
+        {
+            state.OutputFormat = ContainerBuilder.Docker.Value;
+        }
     }
 
     public static void ReplaceCurrentStateWithPreviousState(this AspirateState currentState, AspirateState previousState, bool restoreAllRestorable)
