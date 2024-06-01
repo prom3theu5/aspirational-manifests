@@ -40,16 +40,12 @@ public static class KubernetesDeploymentDataExtensions
         labels ??= data.ToKubernetesLabels();
         var metadata = data.ToKubernetesObjectMetaData(labels);
 
+        var secrets = new Dictionary<string, byte[]>();
+
         foreach (var secret in data.Secrets.Where(secret => !string.IsNullOrEmpty(secret.Value)))
         {
-            if (encodeSecrets == true)
-            {
-                data.Secrets[secret.Key] = Convert.ToBase64String(Encoding.UTF8.GetBytes(secret.Value));
-                continue;
-            }
-
-            data.Secrets[secret.Key] = secret.Value;
-
+            var secretValueBytes = Encoding.UTF8.GetBytes(secret.Value);
+            secrets[secret.Key] = encodeSecrets == true ? Encoding.UTF8.GetBytes(Convert.ToBase64String(secretValueBytes)) : secretValueBytes;
         }
 
         return new V1Secret
@@ -58,7 +54,7 @@ public static class KubernetesDeploymentDataExtensions
             Kind = "Secret",
             Metadata = metadata,
             Type = "Opaque",
-            StringData = data.Secrets,
+            Data = secrets,
         };
     }
 
