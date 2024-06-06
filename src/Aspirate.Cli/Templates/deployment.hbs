@@ -51,7 +51,8 @@ spec:
         {{#if hasPorts}}
         ports:
         {{#each ports}}
-        - containerPort: {{internalPort}}
+        - name: {{name}}
+          containerPort: {{internalPort}}
         {{/each}}
         {{/if}}
         {{#if hasAnyEnv}}
