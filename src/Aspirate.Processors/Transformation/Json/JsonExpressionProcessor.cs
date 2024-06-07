@@ -14,8 +14,12 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         {
             var pointers = _unresolvedExpressionPointers.ToList();
             _unresolvedExpressionPointers.Clear();
-            foreach (var node in pointers.Select(pointer =>
-                         pointer.Remove(0, 1).Split("/").Aggregate(rootNode, (current, path) => current[path])))
+            var list = pointers
+                .Select(pointer => pointer
+                    .Remove(0, 1)
+                    .Split("/")
+                    .Aggregate(rootNode, (current, path) => int.TryParse(path, out var index) ? current[index] : current[path]));
+            foreach (var node in list)
             {
                 HandleJsonValue(rootNode, node);
             }
