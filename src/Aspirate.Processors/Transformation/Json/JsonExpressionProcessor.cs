@@ -1,14 +1,38 @@
+using Json.More;
+
 namespace Aspirate.Processors.Transformation.Json;
 
 public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingProcessor) : IJsonExpressionProcessor
 {
+    private readonly ICollection<string> _unresolvedExpressionPointers = [];
+
+    public void ResolveJsonExpressions(JsonNode? jsonNode, JsonNode rootNode)
+    {
+        _unresolvedExpressionPointers.Clear();
+        ResolveJsonExpressionsRecursive(jsonNode, rootNode);
+        do
+        {
+            var pointers = _unresolvedExpressionPointers.ToList();
+            _unresolvedExpressionPointers.Clear();
+            var list = pointers
+                .Select(pointer => pointer
+                    .Remove(0, 1)
+                    .Split("/")
+                    .Aggregate(rootNode, (current, path) => int.TryParse(path, out var index) ? current[index] : current[path]));
+            foreach (var node in list)
+            {
+                HandleJsonValue(rootNode, node);
+            }
+        } while (_unresolvedExpressionPointers.Count > 0);
+    }
+
     [GeneratedRegex(@"\{([\w\.-]+)\}")]
     private static partial Regex PlaceholderPatternRegex();
 
     public static IJsonExpressionProcessor CreateDefaultExpressionProcessor() =>
         new JsonExpressionProcessor(BindingProcessor.CreateDefaultExpressionProcessor());
 
-    public void ResolveJsonExpressions(JsonNode? jsonNode, JsonNode rootNode)
+    private void ResolveJsonExpressionsRecursive(JsonNode? jsonNode, JsonNode rootNode)
     {
         if (jsonNode is null)
         {
@@ -39,21 +63,21 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         {
             if (item is JsonValue jsonValue)
             {
-                ResolveJsonExpressions(jsonValue, rootNode);
+                ResolveJsonExpressionsRecursive(jsonValue, rootNode);
                 continue;
             }
 
-            ResolveJsonExpressions(item, rootNode);
+            ResolveJsonExpressionsRecursive(item, rootNode);
         }
     }
 
     private void HandleJsonArray(JsonNode rootNode, JsonArray jsonArray)
     {
-        foreach (var item in jsonArray)
+        foreach (var item in jsonArray.Where(item => item is JsonArray))
         {
             if (item is JsonArray)
             {
-                ResolveJsonExpressions(item, rootNode);
+                ResolveJsonExpressionsRecursive(item, rootNode);
             }
         }
     }
@@ -62,7 +86,8 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
 
     private void ReplaceWithResolvedExpression(JsonNode rootNode, JsonNode jsonValue)
     {
-        string input = jsonValue.ToString();
+        var input = jsonValue.ToString();
+        var inputBefore = input;
 
         if (string.IsNullOrEmpty(input))
         {
@@ -75,10 +100,10 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         }
 
         var matches = PlaceholderPatternRegex().Matches(input);
-        for (int i = 0; i < matches.Count; i++)
+        for (var i = 0; i < matches.Count; i++)
         {
             var match = matches[i];
-            string jsonPath = match.Groups[1].Value;
+            var jsonPath = match.Groups[1].Value;
             var pathParts = jsonPath.Split('.');
             if (pathParts.Length == 1)
             {
@@ -111,6 +136,13 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             input = input.Replace($"{{{jsonPath}}}", value.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
+        var pointer = jsonValue.GetPointerFromRoot();
         jsonValue.ReplaceWith(input);
+
+        if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) &&
+            input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
+        {
+            _unresolvedExpressionPointers.Add(pointer);
+        }
     }
 }
