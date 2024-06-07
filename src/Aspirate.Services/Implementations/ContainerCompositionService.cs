@@ -1,3 +1,5 @@
+using System;
+
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
@@ -192,7 +194,7 @@ public sealed class ContainerCompositionService(
 
         argumentsBuilder
             .AppendArgument(DotNetSdkLiterals.PublishArgument, fullProjectPath)
-            .AppendArgument(DotNetSdkLiterals.PublishProfileArgument, DotNetSdkLiterals.ContainerPublishProfile)
+            .AppendArgument(DotNetSdkLiterals.ContainerTargetArgument, string.Empty, quoteValue: false)
             .AppendArgument(DotNetSdkLiterals.PublishSingleFileArgument, msbuildProperties.Properties.PublishSingleFile)
             .AppendArgument(DotNetSdkLiterals.PublishTrimmedArgument, msbuildProperties.Properties.PublishTrimmed)
             .AppendArgument(DotNetSdkLiterals.SelfContainedArgument, DotNetSdkLiterals.DefaultSelfContained)

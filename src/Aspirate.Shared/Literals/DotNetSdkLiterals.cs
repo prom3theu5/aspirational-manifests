@@ -20,6 +20,7 @@ public static class DotNetSdkLiterals
     public const string NoLogoArgument = "--nologo";
     public const string LaunchProfileArgument = "--launch-profile";
     public const string RuntimeIdentifierArgument = "-r";
+    public const string ContainerTargetArgument = "-t:PublishContainer";
     public const string OsArgument = "--os";
     public const string ArchArgument = "--arch";
     public const string GetPropertyArgument = "--getProperty";
@@ -34,7 +35,6 @@ public static class DotNetSdkLiterals
     public const string ContainerImageTagArguments = $"-p:{MsBuildPropertiesLiterals.ContainerImageTagArguments}";
     public const string ErrorOnDuplicatePublishOutputFilesArgument = $"-p:{MsBuildPropertiesLiterals.ErrorOnDuplicatePublishOutputFilesArgument}";
 
-    public const string ContainerPublishProfile = "DefaultContainer";
     public const string DefaultSingleFile = "true";
     public const string DefaultSelfContained = "true";
     public const string DefaultPublishTrimmed = "false";
