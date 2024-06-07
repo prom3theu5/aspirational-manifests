@@ -1,16 +1,25 @@
+using Json.More;
+
 namespace Aspirate.Processors.Transformation.Json;
 
 public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingProcessor) : IJsonExpressionProcessor
 {
-    private readonly ICollection<JsonValue> _unresolvedValues = [];
+    private readonly ICollection<string> _unresolvedExpressionPointers = [];
 
     public void ResolveJsonExpressions(JsonNode? jsonNode, JsonNode rootNode)
     {
+        _unresolvedExpressionPointers.Clear();
+        ResolveJsonExpressionsRecursive(jsonNode, rootNode);
         do
         {
-            _unresolvedValues.Clear();
-            ResolveJsonExpressionsRecursive(jsonNode, rootNode);
-        } while (_unresolvedValues.Count > 0);
+            var pointers = _unresolvedExpressionPointers.ToList();
+            _unresolvedExpressionPointers.Clear();
+            foreach (var node in pointers.Select(pointer =>
+                         pointer.Remove(0, 1).Split("/").Aggregate(rootNode, (current, path) => current[path])))
+            {
+                HandleJsonValue(rootNode, node);
+            }
+        } while (_unresolvedExpressionPointers.Count > 0);
     }
 
     [GeneratedRegex(@"\{([\w\.-]+)\}")]
@@ -123,12 +132,13 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             input = input.Replace($"{{{jsonPath}}}", value.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
+        var pointer = jsonValue.GetPointerFromRoot();
         jsonValue.ReplaceWith(input);
 
         if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) &&
             input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
         {
-            _unresolvedValues.Add(jsonValue as JsonValue);
+            _unresolvedExpressionPointers.Add(pointer);
         }
     }
 }
