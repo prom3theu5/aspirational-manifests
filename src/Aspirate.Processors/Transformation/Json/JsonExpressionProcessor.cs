@@ -19,7 +19,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
     public static IJsonExpressionProcessor CreateDefaultExpressionProcessor() =>
         new JsonExpressionProcessor(BindingProcessor.CreateDefaultExpressionProcessor());
 
-    public void ResolveJsonExpressionsRecursive(JsonNode? jsonNode, JsonNode rootNode)
+    private void ResolveJsonExpressionsRecursive(JsonNode? jsonNode, JsonNode rootNode)
     {
         if (jsonNode is null)
         {
@@ -62,7 +62,10 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
     {
         foreach (var item in jsonArray.Where(item => item is JsonArray))
         {
-            ResolveJsonExpressionsRecursive(item, rootNode);
+            if (item is JsonArray)
+            {
+                ResolveJsonExpressionsRecursive(item, rootNode);
+            }
         }
     }
 
