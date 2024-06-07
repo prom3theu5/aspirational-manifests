@@ -125,7 +125,8 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
 
         jsonValue.ReplaceWith(input);
 
-        if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) && input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) &&
+            input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
         {
             _unresolvedValues.Add(jsonValue as JsonValue);
         }
