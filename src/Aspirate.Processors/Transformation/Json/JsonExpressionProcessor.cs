@@ -2,15 +2,15 @@ namespace Aspirate.Processors.Transformation.Json;
 
 public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingProcessor) : IJsonExpressionProcessor
 {
-    private readonly ICollection<JsonValue> _unresolvedValues = [];
+    private bool _hasUnresolvedValues;
 
     public void ResolveJsonExpressions(JsonNode? jsonNode, JsonNode rootNode)
     {
         do
         {
-            _unresolvedValues.Clear();
+            _hasUnresolvedValues = false;
             ResolveJsonExpressionsRecursive(jsonNode, rootNode);
-        } while (_unresolvedValues.Count > 0);
+        } while (_hasUnresolvedValues);
     }
 
     [GeneratedRegex(@"\{([\w\.-]+)\}")]
@@ -128,7 +128,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) &&
             input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
         {
-            _unresolvedValues.Add(jsonValue as JsonValue);
+            _hasUnresolvedValues = true;
         }
     }
 }
