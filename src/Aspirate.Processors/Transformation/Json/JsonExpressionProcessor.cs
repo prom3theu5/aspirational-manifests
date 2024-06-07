@@ -2,13 +2,24 @@ namespace Aspirate.Processors.Transformation.Json;
 
 public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingProcessor) : IJsonExpressionProcessor
 {
+    private readonly ICollection<JsonValue> _unresolvedValues = [];
+
+    public void ResolveJsonExpressions(JsonNode? jsonNode, JsonNode rootNode)
+    {
+        do
+        {
+            _unresolvedValues.Clear();
+            ResolveJsonExpressionsRecursive(jsonNode, rootNode);
+        } while (_unresolvedValues.Count > 0);
+    }
+
     [GeneratedRegex(@"\{([\w\.-]+)\}")]
     private static partial Regex PlaceholderPatternRegex();
 
     public static IJsonExpressionProcessor CreateDefaultExpressionProcessor() =>
         new JsonExpressionProcessor(BindingProcessor.CreateDefaultExpressionProcessor());
 
-    public void ResolveJsonExpressions(JsonNode? jsonNode, JsonNode rootNode)
+    public void ResolveJsonExpressionsRecursive(JsonNode? jsonNode, JsonNode rootNode)
     {
         if (jsonNode is null)
         {
@@ -39,22 +50,19 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         {
             if (item is JsonValue jsonValue)
             {
-                ResolveJsonExpressions(jsonValue, rootNode);
+                ResolveJsonExpressionsRecursive(jsonValue, rootNode);
                 continue;
             }
 
-            ResolveJsonExpressions(item, rootNode);
+            ResolveJsonExpressionsRecursive(item, rootNode);
         }
     }
 
     private void HandleJsonArray(JsonNode rootNode, JsonArray jsonArray)
     {
-        foreach (var item in jsonArray)
+        foreach (var item in jsonArray.Where(item => item is JsonArray))
         {
-            if (item is JsonArray)
-            {
-                ResolveJsonExpressions(item, rootNode);
-            }
+            ResolveJsonExpressionsRecursive(item, rootNode);
         }
     }
 
@@ -62,7 +70,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
 
     private void ReplaceWithResolvedExpression(JsonNode rootNode, JsonNode jsonValue)
     {
-        string input = jsonValue.ToString();
+        var input = jsonValue.ToString();
 
         if (string.IsNullOrEmpty(input))
         {
@@ -75,10 +83,10 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         }
 
         var matches = PlaceholderPatternRegex().Matches(input);
-        for (int i = 0; i < matches.Count; i++)
+        for (var i = 0; i < matches.Count; i++)
         {
             var match = matches[i];
-            string jsonPath = match.Groups[1].Value;
+            var jsonPath = match.Groups[1].Value;
             var pathParts = jsonPath.Split('.');
             if (pathParts.Length == 1)
             {
@@ -112,5 +120,10 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         }
 
         jsonValue.ReplaceWith(input);
+
+        if (input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
+        {
+            _unresolvedValues.Add(jsonValue as JsonValue);
+        }
     }
 }
