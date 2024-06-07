@@ -74,6 +74,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
     private void ReplaceWithResolvedExpression(JsonNode rootNode, JsonNode jsonValue)
     {
         var input = jsonValue.ToString();
+        var inputBefore = input;
 
         if (string.IsNullOrEmpty(input))
         {
@@ -124,7 +125,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
 
         jsonValue.ReplaceWith(input);
 
-        if (input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) && input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
         {
             _unresolvedValues.Add(jsonValue as JsonValue);
         }

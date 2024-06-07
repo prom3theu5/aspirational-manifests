@@ -38,4 +38,63 @@ public class ContainerProcessorTests
         // Assert
         resource.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password");
     }
+
+    [Fact]
+    public void ReplacePlaceholders_ReplacesPlaceholdersInConnectionStringWithNestedExpressions()
+    {
+        // Arrange
+        var transformer = ResourceExpressionProcessor.CreateDefaultExpressionProcessor();
+
+        var resource = new ContainerResource
+        {
+            Type = AspireComponentLiterals.Container,
+            ConnectionString = "{postgres-config.connectionString}",
+            Image = "postgres:latest",
+        };
+
+        var configResource = new ParameterResource { ConnectionString = "Host=postgrescontainer;Port=5432;Username=postgres;Password={postgres-password.value}" };
+
+        var inputResource = new ParameterResource { Value = "secret_password" };
+
+        var resources = new Dictionary<string, Resource>
+        {
+            { "postgrescontainer", resource },
+            { "postgres-config", configResource },
+            { "postgres-password", inputResource },
+        };
+
+        // Act
+        transformer.ProcessEvaluations(resources);
+
+        // Assert
+        resource.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password=secret_password");
+    }
+
+    [Fact]
+    public void ReplacePlaceholders_SkipUnresolvableExpressions()
+    {
+        // Arrange
+        var transformer = ResourceExpressionProcessor.CreateDefaultExpressionProcessor();
+
+        var resource = new ContainerResource
+        {
+            Type = AspireComponentLiterals.Container,
+            ConnectionString = "{postgres-config.connectionString}",
+            Image = "postgres:latest",
+        };
+
+        var configResource = new ParameterResource { ConnectionString = "Host=postgrescontainer;Port=5432;Username=postgres;Password={postgres-password.value}" };
+
+        var resources = new Dictionary<string, Resource>
+        {
+            { "postgrescontainer", resource },
+            { "postgres-config", configResource },
+        };
+
+        // Act
+        transformer.ProcessEvaluations(resources);
+
+        // Assert
+        resource.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username=postgres;Password={postgres-password.value}");
+    }
 }
