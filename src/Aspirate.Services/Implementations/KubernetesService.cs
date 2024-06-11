@@ -139,19 +139,19 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
                     break;
                 case V1ConfigMap configMap:
                     configMap.Metadata.NamespaceProperty = options.NamespaceName;
-                    await options.Client.CoreV1.CreateNamespacedConfigMapAsync(configMap, options.NamespaceName);
+                    await options.Client.CoreV1.CreateNamespacedConfigMapAsync(configMap, options.NamespaceName, fieldManager: "aspir8", pretty: true, fieldValidation: "Strict");
                     break;
                 case V1Secret secret:
                     secret.Metadata.NamespaceProperty = options.NamespaceName;
-                    await options.Client.CoreV1.CreateNamespacedSecretAsync(secret, options.NamespaceName);
+                    await options.Client.CoreV1.CreateNamespacedSecretAsync(secret, options.NamespaceName, fieldManager: "aspir8", pretty: true, fieldValidation: "Strict");
                     break;
                 case V1Deployment deployment:
                     deployment.Metadata.NamespaceProperty = options.NamespaceName;
-                    await options.Client.AppsV1.CreateNamespacedDeploymentAsync(deployment, options.NamespaceName);
+                    await options.Client.AppsV1.CreateNamespacedDeploymentAsync(deployment, options.NamespaceName, fieldManager: "aspir8", pretty: true, fieldValidation: "Strict");
                     break;
                 case V1StatefulSet statefulSet:
                     statefulSet.Metadata.NamespaceProperty = options.NamespaceName;
-                    await options.Client.AppsV1.CreateNamespacedStatefulSetAsync(statefulSet, options.NamespaceName);
+                    await options.Client.AppsV1.CreateNamespacedStatefulSetAsync(statefulSet, options.NamespaceName, fieldManager: "aspir8", pretty: true, fieldValidation: "Strict");
                     break;
                 case V1Service service:
                     service.Metadata.NamespaceProperty = options.NamespaceName;
@@ -159,7 +159,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
                     {
                         service.Spec.Type = "NodePort";
                     }
-                    await options.Client.CoreV1.CreateNamespacedServiceAsync(service, options.NamespaceName);
+                    await options.Client.CoreV1.CreateNamespacedServiceAsync(service, options.NamespaceName, fieldManager: "aspir8", pretty: true, fieldValidation: "Strict");
                     break;
             }
         }
@@ -246,7 +246,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
         }
         catch (HttpOperationException e) when (e.Response.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            await options.Client.CoreV1.CreateNamespaceAsync(@namespace);
+            await options.Client.CoreV1.CreateNamespaceAsync(@namespace, fieldManager: "aspir8", pretty: true, fieldValidation: "Strict");
         }
         catch (Exception e)
         {

@@ -33,6 +33,7 @@ public partial class KubeCtlService(IFileSystem filesystem, IAnsiConsole console
 
         var argumentsBuilder = ArgumentsBuilder.Create()
             .AppendArgument(KubeCtlLiterals.KubeCtlApplyArgument, string.Empty, quoteValue: false)
+            .AppendArgument(KubeCtlLiterals.KubeCtlServerSideArgument, string.Empty, quoteValue: false)
             .AppendArgument(KubeCtlLiterals.KubeCtlKustomizeManifestsArgument, fullOutputPath, quoteValue: false);
 
         var executionOptions = new ShellCommandOptions
