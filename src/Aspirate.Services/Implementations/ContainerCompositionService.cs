@@ -1,4 +1,3 @@
-using System;
 
 namespace Aspirate.Services.Implementations;
 
@@ -26,7 +25,7 @@ public sealed class ContainerCompositionService(
             containerDetails.ContainerRepository = $"{options.Prefix}/{containerDetails.ContainerRepository}";
         }
 
-        await AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
+        AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
         await shellExecutionService.ExecuteCommand(new()
@@ -171,33 +170,13 @@ public sealed class ContainerCompositionService(
             "[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.Would you like to retry the build explicitly allowing them?[/]");
     }
 
-    private async Task AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
+    private static void AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
     {
         var defaultRuntimeIdentifier = GetRuntimeIdentifier();
-
-        var propertiesJson = await projectPropertyService.GetProjectPropertiesAsync(
-            fullProjectPath,
-            MsBuildPropertiesLiterals.PublishSingleFileArgument,
-            MsBuildPropertiesLiterals.PublishTrimmedArgument);
-
-        var msbuildProperties = JsonSerializer.Deserialize<MsBuildProperties<MsBuildPublishingProperties>>(propertiesJson ?? "{}");
-
-        if (string.IsNullOrEmpty(msbuildProperties.Properties.PublishSingleFile))
-        {
-            msbuildProperties.Properties.PublishSingleFile = DotNetSdkLiterals.DefaultSingleFile;
-        }
-
-        if (string.IsNullOrEmpty(msbuildProperties.Properties.PublishTrimmed))
-        {
-            msbuildProperties.Properties.PublishTrimmed = DotNetSdkLiterals.DefaultPublishTrimmed;
-        }
 
         argumentsBuilder
             .AppendArgument(DotNetSdkLiterals.PublishArgument, fullProjectPath)
             .AppendArgument(DotNetSdkLiterals.ContainerTargetArgument, string.Empty, quoteValue: false)
-            .AppendArgument(DotNetSdkLiterals.PublishSingleFileArgument, msbuildProperties.Properties.PublishSingleFile)
-            .AppendArgument(DotNetSdkLiterals.PublishTrimmedArgument, msbuildProperties.Properties.PublishTrimmed)
-            .AppendArgument(DotNetSdkLiterals.SelfContainedArgument, DotNetSdkLiterals.DefaultSelfContained)
             .AppendArgument(DotNetSdkLiterals.VerbosityArgument, DotNetSdkLiterals.DefaultVerbosity)
             .AppendArgument(DotNetSdkLiterals.NoLogoArgument, string.Empty, quoteValue: false);
 
