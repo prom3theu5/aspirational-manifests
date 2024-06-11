@@ -15,6 +15,7 @@ public static class KubeCtlLiterals
     public const string KubeCtlRolloutArgument = "rollout";
     public const string KubeCtlNamespaceArgument = "-n";
     public const string KubeCtlNoWaitArgument = "--wait=false";
+    public const string KubeCtlServerSideArgument = "--server-side";
     public const string KubeCtlFileArgument = "-f";
 
     public const string KubeCtlContextsProperty = "contexts";
