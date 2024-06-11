@@ -1,5 +1,3 @@
-using Aspirate.Shared.Outputs;
-
 namespace Aspirate.Tests.ServiceTests;
 
 public class ProjectPropertyServiceTest

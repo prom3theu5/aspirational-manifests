@@ -1,5 +1,3 @@
-using Aspirate.Shared.Outputs;
-
 namespace Aspirate.Tests.ActionsTests.Manifests;
 
 public class RemoveManifestsToClusterActionTests : BaseActionTests<RemoveManifestsFromClusterAction>
