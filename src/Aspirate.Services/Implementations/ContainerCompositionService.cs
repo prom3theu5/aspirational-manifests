@@ -65,23 +65,32 @@ public sealed class ContainerCompositionService(
     {
         if (!string.IsNullOrEmpty(registry))
         {
-            var pushArgumentBuilder = ArgumentsBuilder
-                .Create()
-                .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false);
+            ShellCommandResult? result = null;
 
             foreach (var fullImage in fullImages)
             {
+                var pushArgumentBuilder = ArgumentsBuilder
+                    .Create()
+                    .AppendArgument(DockerLiterals.PushCommand, string.Empty, quoteValue: false);
+
                 pushArgumentBuilder.AppendArgument(fullImage.ToLower(), string.Empty, quoteValue: false, allowDuplicates: true);
+
+                result = await shellExecutionService.ExecuteCommand(
+                    new()
+                    {
+                        Command = builder,
+                        ArgumentsBuilder = pushArgumentBuilder,
+                        NonInteractive = nonInteractive.GetValueOrDefault(),
+                        ShowOutput = true,
+                    });
+
+                if (!result.Success)
+                {
+                    break;
+                }
             }
 
-            return await shellExecutionService.ExecuteCommand(
-                new()
-                {
-                    Command = builder,
-                    ArgumentsBuilder = pushArgumentBuilder,
-                    NonInteractive = nonInteractive.GetValueOrDefault(),
-                    ShowOutput = true,
-                });
+            return result;
         }
 
         return new ShellCommandResult(true, string.Empty, string.Empty, 0);
