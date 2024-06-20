@@ -1,4 +1,3 @@
 ﻿[
-  test-registry/test-repository/test-image:latest,
   test-registry/test-repository/test-image:latest
 ]

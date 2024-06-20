@@ -1,4 +1,3 @@
 ﻿[
-  test-image:latest,
   test-image:test-tag
 ]
