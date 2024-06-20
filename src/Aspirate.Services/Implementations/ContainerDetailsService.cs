@@ -122,14 +122,8 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
             return;
         }
 
-        // Use our custom fall-back value if it exists
         if (containerImageTag is not null)
         {
-            if (!containerImageTag.Contains("latest", StringComparer.OrdinalIgnoreCase))
-            {
-                containerImageTag.Insert(0, "latest");
-            }
-
             msBuildProperties.Properties.ContainerImageTag = string.Join(';', containerImageTag);
             return;
         }

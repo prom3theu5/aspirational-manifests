@@ -7,8 +7,6 @@ public static class DockerfileParametersExtensions
     public static List<string> ToImageNames(this ContainerOptions options, string resourceKey)
     {
         var images = new List<string>();
-        options.Tags.Remove("latest");
-        options.Tags.Insert(0, "latest");
 
         foreach (var tag in options.Tags)
         {
