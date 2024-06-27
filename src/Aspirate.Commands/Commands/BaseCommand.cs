@@ -56,7 +56,7 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
             DisableSecrets = handler.CurrentState.DisableSecrets,
             NonInteractive = options.NonInteractive,
             SecretPassword = options.SecretPassword,
-            CommandUnlocksSecrets = CommandUnlocksSecrets,
+            CommandUnlocksSecrets = CommandUnlocksSecrets || handler.CurrentState.UseSecrets == true,
             State = handler.CurrentState,
         });
 

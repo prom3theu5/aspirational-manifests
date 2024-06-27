@@ -7,6 +7,8 @@ public sealed class BuildCommandHandler(IServiceProvider serviceProvider) : Base
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
+            .QueueAction(nameof(PopulateInputsAction))
+            .QueueAction(nameof(SubstituteValuesAspireManifestAction))
             .QueueAction(nameof(PopulateContainerDetailsForProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))

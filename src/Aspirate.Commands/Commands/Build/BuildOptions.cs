@@ -12,4 +12,5 @@ public sealed class BuildOptions : BaseCommandOptions, IBuildOptions, IContainer
     public List<string>? ContainerImageTags { get; set; }
     public string? RuntimeIdentifier { get; set; }
     public List<string>? ComposeBuilds { get; set; }
+    public bool? UseSecrets { get; set; }
 }
