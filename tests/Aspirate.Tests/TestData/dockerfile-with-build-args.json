@@ -1,0 +1,30 @@
+{
+  "resources": {
+    "npmToken": {
+      "type": "parameter.v0",
+      "value": "{npmToken.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string",
+          "secret": true,
+          "default": {
+            "generate": {
+              "minLength": 22
+            }
+          }
+        }
+      }
+    },
+    "client": {
+      "type": "dockerfile.v0",
+      "path": "../aspirate-buildargs-bug.Client/Dockerfile",
+      "context": "../aspirate-buildargs-bug.Client",
+      "buildArgs": {
+        "NPM_TOKEN": "{npmToken.value}"
+      },
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}
