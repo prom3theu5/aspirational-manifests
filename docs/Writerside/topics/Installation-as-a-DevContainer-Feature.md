@@ -53,7 +53,7 @@ features": {
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/dotnet:2": {},
+    "ghcr.io/devcontainers/features/dotnet:2": { "workloads": "aspire" },
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/azure/azure-dev/azd:0": { "version": "latest" },
@@ -68,7 +68,6 @@ features": {
         "eamodio.gitlens",
       ]
     }
-  },
-  "onCreateCommand": "dotnet workload install aspire"
+  }
 }
 ```
