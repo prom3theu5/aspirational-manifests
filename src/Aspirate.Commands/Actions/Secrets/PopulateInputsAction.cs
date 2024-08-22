@@ -1,5 +1,4 @@
 namespace Aspirate.Commands.Actions.Secrets;
-
 public sealed class PopulateInputsAction(
     IPasswordGenerator passwordGenerator,
     IServiceProvider serviceProvider,

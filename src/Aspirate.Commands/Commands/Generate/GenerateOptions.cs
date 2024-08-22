@@ -30,4 +30,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public bool? WithPrivateRegistry { get; set; }
     public bool? IncludeDashboard { get; set; }
     public bool? ReplaceSecrets { get; set; }
+    public bool? UseEnvVariablesAsParameterValues { get; set; }
+
+    public override bool RequiresSecrets => (!UseEnvVariablesAsParameterValues) ?? true;
 }

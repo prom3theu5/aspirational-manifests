@@ -40,9 +40,10 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
         await stateService.RestoreState(stateOptions);
 
         handler.CurrentState.PopulateStateFromOptions(options);
-
-        LoadSecrets(options, secretService, handler);
-
+        if (options.RequiresSecrets)
+        {
+            LoadSecrets(options, secretService, handler);
+        }
         var exitCode = await handler.HandleAsync(options);
 
         await stateService.SaveState(stateOptions);

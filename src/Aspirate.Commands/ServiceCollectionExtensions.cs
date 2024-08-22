@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands;
+namespace Aspirate.Commands;
 
 /// <summary>
 /// Extension methods for IServiceCollection to register services for AspirateState and AspirateActions.
@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
             .RegisterAction<SubstituteValuesAspireManifestAction>()
             .RegisterAction<ApplyDaprAnnotationsAction>()
             .RegisterAction<PopulateInputsAction>()
+            .RegisterAction<PopulateInputsWithEnvVariablesAction>()
             .RegisterAction<SaveSecretsAction>()
             .RegisterAction<AskPrivateRegistryCredentialsAction>()
             .RegisterAction<IncludeAspireDashboardAction>()
