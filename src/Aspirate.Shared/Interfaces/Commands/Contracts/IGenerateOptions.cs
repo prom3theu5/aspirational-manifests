@@ -8,4 +8,5 @@ public interface IGenerateOptions
     bool? SkipFinalKustomizeGeneration { get; set; }
     string? ImagePullPolicy { get; set; }
     string? OutputFormat { get; set; }
+    bool? UseEnvVariablesAsParameterValues { get; set; }
 }

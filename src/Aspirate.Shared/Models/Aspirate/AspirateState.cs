@@ -135,13 +135,13 @@ public class AspirateState :
     public List<string> AspireComponentsToProcess { get; set; } = [];
 
     [JsonIgnore]
-    public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = new();
+    public Dictionary<string, Resource> LoadedAspireManifestResources { get; set; } = [];
 
     [JsonIgnore]
     public string? PrivateRegistryPassword { get; set; }
 
     [JsonIgnore]
-    public Dictionary<string, Resource> FinalResources { get; } = new();
+    public Dictionary<string, Resource> FinalResources { get; } = [];
 
     [JsonIgnore]
     public bool StateWasLoadedFromPrevious { get; set; }
@@ -179,6 +179,9 @@ public class AspirateState :
     [JsonIgnore]
     public string? SecretPassword { get; set; }
 
+    [JsonIgnore]
+    public bool? UseEnvVariablesAsParameterValues { get; set; }
+
     public void AppendToFinalResources(string key, Resource resource) =>
         FinalResources.Add(key, resource);
 
@@ -186,10 +189,10 @@ public class AspirateState :
     {
         if (OutputFormat.Equals("compose", StringComparison.OrdinalIgnoreCase))
         {
-            return (resource is ParameterResource or ValueResource);
+            return resource is ParameterResource or ValueResource;
         }
 
-        return (resource is DaprResource or ParameterResource or ValueResource);
+        return resource is DaprResource or ParameterResource or ValueResource;
     }
 
     [JsonIgnore]

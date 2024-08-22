@@ -12,32 +12,47 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
         return outputFormat.Name switch
         {
             nameof(OutputFormat.Kustomize) => GenerateKustomizeManifests(),
-            nameof(OutputFormat.DockerCompose) => GenerateDockerComposeManifests(),
+            nameof(OutputFormat.DockerCompose) => GenerateDockerComposeManifests(options.UseEnvVariablesAsParameterValues ?? false),
             nameof(OutputFormat.Helm) => GenerateHelmManifests(),
             _ => throw new ArgumentOutOfRangeException(nameof(options.OutputFormat), $"The output format '{options.OutputFormat}' is not supported."),
         };
     }
 
-    private ActionExecutor BaseGenerateActionSequence() =>
-        ActionExecutor
+    private ActionExecutor BaseGenerateActionSequence(bool useEnvVariablesAsParameterValues = false)
+    {
+        var result = ActionExecutor
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
-            .QueueAction(nameof(IncludeAspireDashboardAction))
-            .QueueAction(nameof(PopulateInputsAction))
+            .QueueAction(nameof(IncludeAspireDashboardAction));
+        if (!useEnvVariablesAsParameterValues)
+        {
+            result.QueueAction(nameof(PopulateInputsAction));
+        }
+        else
+        {
+            result.QueueAction(nameof(PopulateInputsWithEnvVariablesAction));
+        }
+        result
             .QueueAction(nameof(SubstituteValuesAspireManifestAction))
             .QueueAction(nameof(ApplyDaprAnnotationsAction))
             .QueueAction(nameof(PopulateContainerDetailsForProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
-            .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))
-            .QueueAction(nameof(SaveSecretsAction));
+            .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction));
+        if (!useEnvVariablesAsParameterValues)
+        {
+            result.QueueAction(nameof(SaveSecretsAction));
+        }
+
+        return result;
+    }
 
     private ActionExecutor BaseKubernetesActionSequence() =>
         BaseGenerateActionSequence()
             .QueueAction(nameof(AskImagePullPolicyAction));
 
-    private Task<int> GenerateDockerComposeManifests() =>
-        BaseGenerateActionSequence()
+    private Task<int> GenerateDockerComposeManifests(bool useEnvVariablesAsParameterValues) =>
+        BaseGenerateActionSequence(useEnvVariablesAsParameterValues)
             .QueueAction(nameof(GenerateDockerComposeManifestAction))
             .ExecuteCommandsAsync();
 

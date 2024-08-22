@@ -8,4 +8,5 @@ public abstract class BaseCommandOptions : ICommandOptions
     public bool? DisableState { get; set; }
     public string? SecretPassword { get; set; }
     public string? LaunchProfile { get; set; }
+    public virtual bool RequiresSecrets => true;
 }

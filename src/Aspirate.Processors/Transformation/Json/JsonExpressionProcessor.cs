@@ -26,7 +26,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         } while (_unresolvedExpressionPointers.Count > 0);
     }
 
-    [GeneratedRegex(@"\{([\w\.-]+)\}")]
+    [GeneratedRegex(@"(\$|)\{([\w\.-]+)\}")]
     private static partial Regex PlaceholderPatternRegex();
 
     public static IJsonExpressionProcessor CreateDefaultExpressionProcessor() =>
@@ -103,7 +103,12 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         for (var i = 0; i < matches.Count; i++)
         {
             var match = matches[i];
-            var jsonPath = match.Groups[1].Value;
+            if (!string.IsNullOrEmpty(match.Groups[1].Value))
+            {
+                continue;
+            }
+
+            var jsonPath = match.Groups[2].Value;
             var pathParts = jsonPath.Split('.');
             if (pathParts.Length == 1)
             {
