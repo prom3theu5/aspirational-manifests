@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services
             .RegisterProcessor<ProjectProcessor>(AspireComponentLiterals.Project)
             .RegisterProcessor<DockerfileProcessor>(AspireComponentLiterals.Dockerfile)
+            .RegisterProcessor<ContainerV1Processor>(AspireComponentLiterals.ContainerV1)
             .RegisterProcessor<ContainerProcessor>(AspireComponentLiterals.Container)
             .RegisterProcessor<DaprProcessor>(AspireComponentLiterals.DaprSystem)
             .RegisterProcessor<DaprComponentProcessor>(AspireComponentLiterals.DaprComponent)

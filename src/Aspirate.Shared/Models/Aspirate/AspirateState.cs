@@ -164,7 +164,7 @@ public class AspirateState :
     [JsonIgnore]
     public List<KeyValuePair<string, Resource>> SelectedDockerfileComponents =>
         LoadedAspireManifestResources
-            .Where(x => x.Value is DockerfileResource && AspireComponentsToProcess.Contains(x.Key))
+            .Where(x => (x.Value is DockerfileResource || x.Value is ContainerResourceV1) && AspireComponentsToProcess.Contains(x.Key))
             .ToList();
 
     [JsonIgnore]

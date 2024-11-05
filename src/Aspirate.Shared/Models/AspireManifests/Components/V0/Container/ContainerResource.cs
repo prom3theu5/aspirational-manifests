@@ -9,7 +9,7 @@ public class ContainerResource : Resource,
     IResourceWithVolumes
 {
     [JsonPropertyName("image")]
-    public required string Image { get; set; }
+    public string? Image { get; set; }
 
     [JsonPropertyName("bindings")]
     public Dictionary<string, Binding>? Bindings { get; set; }

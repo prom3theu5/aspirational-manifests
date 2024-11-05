@@ -3,7 +3,7 @@ namespace Aspirate.Processors.Resources.Dockerfile;
 /// <summary>
 /// A project component for version 0 of Aspire.
 /// </summary>
-public class DockerfileProcessor(
+public class ContainerV1Processor(
     IFileSystem fileSystem,
     IAnsiConsole console,
     ISecretProvider secretProvider,
@@ -13,7 +13,7 @@ public class DockerfileProcessor(
     : BaseResourceProcessor(fileSystem, console, manifestWriter), IDockerBuildProcessor
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireComponentLiterals.Dockerfile;
+    public override string ResourceType => AspireComponentLiterals.ContainerV1;
 
     private readonly IReadOnlyCollection<string> _manifests =
     [
@@ -25,7 +25,7 @@ public class DockerfileProcessor(
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<DockerfileResource>(ref reader);
+        JsonSerializer.Deserialize<ContainerResourceV1>(ref reader);
 
     public override Task<bool> CreateManifests(CreateManifestsOptions options)
     {
@@ -33,14 +33,14 @@ public class DockerfileProcessor(
 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var dockerFile = options.Resource.Value as DockerfileResource;
+        var cv1 = options.Resource.Value as ContainerResourceV1;
 
         if (!_containerImageCache.TryGetValue(options.Resource.Key, out var containerImages))
         {
             throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
         }
 
-        var data = PopulateKubernetesDeploymentData(options, containerImages.First(), dockerFile);
+        var data = PopulateKubernetesDeploymentData(options, containerImages.First(), cv1);
 
         _manifestWriter.CreateDeployment(resourceOutputPath, data, options.TemplatePath);
         _manifestWriter.CreateService(resourceOutputPath, data, options.TemplatePath);
@@ -51,15 +51,15 @@ public class DockerfileProcessor(
         return Task.FromResult(true);
     }
 
-    private KubernetesDeploymentData PopulateKubernetesDeploymentData(BaseKubernetesCreateOptions options, string containerImage, DockerfileResource? dockerFile) =>
+    private KubernetesDeploymentData PopulateKubernetesDeploymentData(BaseKubernetesCreateOptions options, string containerImage, ContainerResourceV1? cv1) =>
         new KubernetesDeploymentData()
             .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
             .SetName(options.Resource.Key)
             .SetContainerImage(containerImage)
             .SetImagePullPolicy(options.ImagePullPolicy)
-            .SetArgs(dockerFile.Args)
+            //.SetArgs(dockerFile.Args)
             .SetEnv(GetFilteredEnvironmentalVariables(options.Resource, options.DisableSecrets, options.WithDashboard))
-            .SetAnnotations(dockerFile.Annotations)
+            //.SetAnnotations(dockerFile.Annotations)
             .SetSecrets(GetSecretEnvironmentalVariables(options.Resource, options.DisableSecrets, options.WithDashboard))
             .SetSecretsFromSecretState(options.Resource, secretProvider, options.DisableSecrets)
             .SetPorts(options.Resource.MapBindingsToPorts())
@@ -69,9 +69,20 @@ public class DockerfileProcessor(
 
     public async Task BuildAndPushContainerForDockerfile(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive)
     {
-        var dockerfile = resource.Value as DockerfileResource;
-        if (dockerfile == null)
+        var cv1 = resource.Value as ContainerResourceV1;
+        if (cv1 == null)
             return;
+
+        DockerfileResource dockerfile = new()
+        {
+            Path = cv1.Build.Dockerfile,
+            Context = cv1.Build.Context,
+            Bindings = cv1.Bindings,
+            Annotations = cv1.Annotations,
+            Env = cv1.Env,
+            //BuildArgs = cv1.BuildArgs,
+            Args = cv1.Args
+        };
 
         await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfile, options, nonInteractive);
 
@@ -80,8 +91,8 @@ public class DockerfileProcessor(
 
     public void PopulateContainerImageCacheWithImage(KeyValuePair<string, Resource> resource, ContainerOptions options)
     {
-        var dockerfile = resource.Value as DockerfileResource;
-        if (dockerfile == null)
+        var cv1 = resource.Value as ContainerResourceV1;
+        if (cv1 == null)
             return;
 
         _containerImageCache.Add(resource.Key, options.ToImageNames(resource.Key));
@@ -93,7 +104,7 @@ public class DockerfileProcessor(
     {
         var response = new ComposeService();
 
-        var dockerfile = options.Resource.Value as DockerfileResource;
+        var cv1 = options.Resource.Value as ContainerResourceV1;
 
         var newService = Builder.MakeService(options.Resource.Key)
             .WithEnvironment(options.Resource.MapResourceToEnvVars(options.WithDashboard))
@@ -105,8 +116,8 @@ public class DockerfileProcessor(
         {
             newService = newService.WithBuild(builder =>
             {
-                builder.WithContext(dockerfile.Context)
-                    .WithDockerfile(_fileSystem.GetFullPath(dockerfile.Path))
+                builder.WithContext(cv1.Build.Context)
+                    .WithDockerfile(_fileSystem.GetFullPath(cv1.Build.Dockerfile))
                     .Build();
             });
         }
@@ -127,14 +138,14 @@ public class DockerfileProcessor(
 
     public override List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
     {
-        var dockerFile = options.Resource.Value as DockerfileResource;
+        var cv1 = options.Resource.Value as ContainerResourceV1;
 
         if (!_containerImageCache.TryGetValue(options.Resource.Key, out var containerImage))
         {
             throw new InvalidOperationException($"Container Image for dockerfile {options.Resource.Key} not found.");
         }
 
-        var data = PopulateKubernetesDeploymentData(options, containerImage[0], dockerFile);
+        var data = PopulateKubernetesDeploymentData(options, containerImage[0], cv1);
 
         return data.ToKubernetesObjects(options.EncodeSecrets);
     }
