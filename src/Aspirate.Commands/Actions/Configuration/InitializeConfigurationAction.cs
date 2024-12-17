@@ -30,11 +30,33 @@ public class InitializeConfigurationAction(
 
         HandleContainerTag(aspirateConfiguration);
 
+        HandleContainerBuildArgs(aspirateConfiguration);
+
+        HandleContainerBuildContext(aspirateConfiguration);
+
         HandleTemplateDirectory(aspirateConfiguration);
 
         AddTemplatesToTemplateDirectoryIfRequired(aspirateConfiguration);
 
         return aspirateConfiguration;
+    }
+
+    private void HandleContainerBuildContext(AspirateSettings aspirateConfiguration)
+    {
+        if (!string.IsNullOrEmpty(CurrentState.ContainerBuildContext))
+        {
+            aspirateConfiguration.ContainerSettings.Context = CurrentState.ContainerBuildContext;
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container Build Context'[/] to [blue]'{aspirateConfiguration.ContainerSettings.Context}'[/].");
+        }
+    }
+
+    private void HandleContainerBuildArgs(AspirateSettings aspirateConfiguration)
+    {
+        if (CurrentState.ContainerBuildArgs?.Count > 0)
+        {
+            aspirateConfiguration.ContainerSettings.BuildArgs = CurrentState.ContainerBuildArgs;
+            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Set [blue]'Container Build Args'[/] to [blue]'{string.Join(' ', aspirateConfiguration.ContainerSettings.BuildArgs)}'[/].");
+        }
     }
 
     private void HandleContainerBuilder(AspirateSettings aspirateConfiguration)
