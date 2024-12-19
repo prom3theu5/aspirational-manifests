@@ -47,7 +47,7 @@ public class ApplyDaprAnnotationsAction(IServiceProvider serviceProvider, IAnsiC
 
     private static void HandleContainerPort(Resource serviceForSidecar)
     {
-        if (serviceForSidecar is not ContainerResource container)
+        if (serviceForSidecar is not ContainerV0Resource container)
         {
             return;
         }

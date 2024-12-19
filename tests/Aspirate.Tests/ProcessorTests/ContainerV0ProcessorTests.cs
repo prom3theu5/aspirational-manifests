@@ -1,6 +1,6 @@
 namespace Aspirate.Tests.ProcessorTests;
 
-public class ContainerProcessorTests
+public class ContainerV0ProcessorTests
 {
     [Fact]
     public void ReplacePlaceholders_ReplacesPlaceholdersInConnectionString()
@@ -10,7 +10,7 @@ public class ContainerProcessorTests
 
         var resource = new ContainerResource
         {
-            Type = AspireComponentLiterals.Container,
+            Type = AspireComponentLiterals.ContainerV0,
             ConnectionString = "Host={postgrescontainer.bindings.tcp.host};Port={postgrescontainer.bindings.tcp.targetPort};Username=postgres;Password={postgres-password.value}",
             Bindings = new()
             {
@@ -47,7 +47,7 @@ public class ContainerProcessorTests
 
         var resource = new ContainerResource
         {
-            Type = AspireComponentLiterals.Container,
+            Type = AspireComponentLiterals.ContainerV0,
             ConnectionString = "{postgres-config.connectionString}",
             Image = "postgres:latest",
         };
@@ -78,7 +78,7 @@ public class ContainerProcessorTests
 
         var resource = new ContainerResource
         {
-            Type = AspireComponentLiterals.Container,
+            Type = AspireComponentLiterals.ContainerV0,
             ConnectionString = "{postgres-config.connectionString}",
             Image = "postgres:latest",
         };

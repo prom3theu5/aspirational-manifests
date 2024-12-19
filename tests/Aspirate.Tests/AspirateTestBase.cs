@@ -134,7 +134,7 @@ public abstract class AspirateTestBase
         var postgres = new ContainerResource
         {
             Name = resourceName,
-            Type = AspireComponentLiterals.Container,
+            Type = AspireComponentLiterals.ContainerV0,
             Image = "postgres:latest",
             ConnectionString = $"Host={{{resourceName}.bindings.tcp.host}};Port={{{resourceName}.bindings.tcp.port}};Username=postgres;Password={{{resourceName}.inputs.password}}",
             Bindings = new()

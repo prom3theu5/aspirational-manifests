@@ -1,3 +1,5 @@
+using Aspirate.Shared.Models.AspireManifests.Components.V1.Container;
+
 namespace Aspirate.Shared.Models.AspireManifests;
 
 /// <summary>
@@ -7,7 +9,8 @@ namespace Aspirate.Shared.Models.AspireManifests;
 [JsonPolymorphic]
 [JsonDerivedType(typeof(ProjectResource), typeDiscriminator: "aspire.project")]
 [JsonDerivedType(typeof(DockerfileResource), typeDiscriminator: "aspire.dockerfile")]
-[JsonDerivedType(typeof(ContainerResource), typeDiscriminator: "aspire.container")]
+[JsonDerivedType(typeof(ContainerV0Resource), typeDiscriminator: "aspire.container")]
+[JsonDerivedType(typeof(ContainerV1Resource), typeDiscriminator: "aspire.container.v1")]
 [JsonDerivedType(typeof(DaprResource), typeDiscriminator: "aspire.dapr")]
 [JsonDerivedType(typeof(DaprComponentResource), typeDiscriminator: "aspire.daprcomponent")]
 [JsonDerivedType(typeof(ParameterResource), typeDiscriminator: "aspire.parameter")]

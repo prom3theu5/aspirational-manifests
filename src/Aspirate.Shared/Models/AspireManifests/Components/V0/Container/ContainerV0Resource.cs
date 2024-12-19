@@ -1,6 +1,6 @@
 ﻿namespace Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
 
-public class ContainerResource : Resource,
+public class ContainerV0Resource : Resource,
     IResourceWithBinding,
     IResourceWithConnectionString,
     IResourceWithArgs,

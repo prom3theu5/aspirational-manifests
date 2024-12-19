@@ -7,7 +7,9 @@ public static class AspireComponentLiterals
 
     public const string Dockerfile = "dockerfile.v0";
 
-    public const string Container = "container.v0";
+    public const string ContainerV0 = "container.v0";
+
+    public const string ContainerV1 = "container.v1";
 
     public const string DaprSystem = "dapr.v0";
     public const string DaprComponent = "dapr.component.v0";

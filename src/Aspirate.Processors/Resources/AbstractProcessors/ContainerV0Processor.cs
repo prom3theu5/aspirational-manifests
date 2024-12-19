@@ -3,7 +3,7 @@ namespace Aspirate.Processors.Resources.AbstractProcessors;
 /// <summary>
 /// A project component for version 0 of Aspire.
 /// </summary>
-public class ContainerProcessor(
+public class ContainerV0Processor(
     IFileSystem fileSystem,
     IAnsiConsole console,
     ISecretProvider secretProvider,
@@ -13,11 +13,11 @@ public class ContainerProcessor(
         : BaseResourceProcessor(fileSystem, console, manifestWriter)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireComponentLiterals.Container;
+    public override string ResourceType => AspireComponentLiterals.ContainerV0;
 
     /// <inheritdoc />
     public override Resource? Deserialize(ref Utf8JsonReader reader) =>
-        JsonSerializer.Deserialize<ContainerResource>(ref reader);
+        JsonSerializer.Deserialize<ContainerV0Resource>(ref reader);
 
     public override Task<bool> CreateManifests(CreateManifestsOptions options)
     {
@@ -25,7 +25,7 @@ public class ContainerProcessor(
 
         _manifestWriter.EnsureOutputDirectoryExistsAndIsClean(resourceOutputPath);
 
-        var container = options.Resource.Value as ContainerResource;
+        var container = options.Resource.Value as ContainerV0Resource;
 
         var manifests = new List<string>
         {
@@ -54,7 +54,7 @@ public class ContainerProcessor(
         return Task.FromResult(true);
     }
 
-    private KubernetesDeploymentData PopulateKubernetesDeploymentData(BaseKubernetesCreateOptions options, ContainerResource? container, List<string> manifests) =>
+    private KubernetesDeploymentData PopulateKubernetesDeploymentData(BaseKubernetesCreateOptions options, ContainerV0Resource? container, List<string> manifests) =>
         new KubernetesDeploymentData()
             .SetWithDashboard(options.WithDashboard.GetValueOrDefault())
             .SetName(options.Resource.Key)
@@ -76,7 +76,7 @@ public class ContainerProcessor(
     {
         var response = new ComposeService();
 
-        var container = options.Resource.Value as ContainerResource;
+        var container = options.Resource.Value as ContainerV0Resource;
 
         var service = Builder.MakeService(options.Resource.Key)
             .WithImage(container.Image.ToLowerInvariant());
@@ -105,7 +105,7 @@ public class ContainerProcessor(
 
     public override List<object> CreateKubernetesObjects(CreateKubernetesObjectsOptions options)
     {
-        var container = options.Resource.Value as ContainerResource;
+        var container = options.Resource.Value as ContainerV0Resource;
         var data = PopulateKubernetesDeploymentData(options, container, []);
 
         return data.ToKubernetesObjects(options.EncodeSecrets);

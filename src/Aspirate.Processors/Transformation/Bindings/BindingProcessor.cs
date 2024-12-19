@@ -24,16 +24,26 @@ public sealed class BindingProcessor : IBindingProcessor
 
     private static string? ParseBinding(string resourceName, string bindingName, string bindingProperty, JsonNode? rootNode)
     {
-        var bindingEntry = rootNode[resourceName][Literals.Bindings][bindingName].Deserialize<Binding>();
-
-        return bindingProperty switch
+        try
         {
-            Literals.Host => resourceName,  // return the name of the resource for 'host'
-            Literals.Port => bindingEntry.Port.GetValueOrDefault() != 0 ? bindingEntry.Port.ToString() : bindingEntry.TargetPort.ToString(),
-            Literals.TargetPort => bindingEntry.TargetPort.ToString(),
-            Literals.Url => HandleUrlBinding(resourceName, bindingName, bindingEntry),
-            _ => throw new InvalidOperationException($"Unknown property {bindingProperty}.")
-        };
+            var bindingEntry = rootNode[resourceName][Literals.Bindings][bindingName].Deserialize<Binding>();
+
+            return bindingProperty switch
+            {
+                Literals.Host => resourceName,  // return the name of the resource for 'host'
+                Literals.Port => bindingEntry.Port.GetValueOrDefault() != 0 ? bindingEntry.Port.ToString() : bindingEntry.TargetPort.ToString(),
+                Literals.TargetPort => bindingEntry.TargetPort.ToString(),
+                Literals.Url => HandleUrlBinding(resourceName, bindingName, bindingEntry),
+                Literals.Scheme => bindingEntry.Scheme,
+                _ => throw new InvalidOperationException($"Unknown property {bindingProperty}.")
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+
+            throw;
+        }
     }
 
     private static string HandleUrlBinding(string resourceName, string bindingName, Binding binding) =>

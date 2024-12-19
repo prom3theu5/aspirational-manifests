@@ -1,5 +1,0 @@
-﻿{
-  ContainerImageName: test-image,
-  ContainerImageTag: latest,
-  FullContainerImage: test-image:latest
-}
