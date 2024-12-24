@@ -11,4 +11,5 @@ public static class Literals
     public const string ConnectionString = "connectionString";
     public const string Host = "host";
     public const string Url = "url";
+    public const string Scheme = "scheme";
 }
