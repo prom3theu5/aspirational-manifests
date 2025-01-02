@@ -28,5 +28,6 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(IncludeDashboardOption.Instance);
        AddOption(ComposeBuildsOption.Instance);
        AddOption(ReplaceSecretsOption.Instance);
+       AddOption(ParameterResourceValueOption.Instance);
     }
 }
