@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
+namespace Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
 
 public class ContainerResource : Resource,
     IResourceWithBinding,
@@ -6,7 +6,8 @@ public class ContainerResource : Resource,
     IResourceWithArgs,
     IResourceWithAnnotations,
     IResourceWithEnvironmentalVariables,
-    IResourceWithVolumes
+    IResourceWithVolumes,
+    IResourceWithBindMounts
 {
     [JsonPropertyName("image")]
     public required string Image { get; set; }
@@ -28,6 +29,9 @@ public class ContainerResource : Resource,
 
     [JsonPropertyName("volumes")]
     public List<Volume>? Volumes { get; set; } = [];
+
+    [JsonPropertyName("bindMounts")]
+    public List<BindMount>? BindMounts { get; set; } = [];
 
     [JsonPropertyName("entrypoint")]
     public string? Entrypoint { get; set; }
