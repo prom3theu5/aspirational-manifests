@@ -16,13 +16,37 @@ public sealed class PopulateInputsAction(
             return Task.FromResult(true);
         }
 
-        ApplyGeneratedValues(parameterResources);
+        var parametersOverride = CurrentState.Parameters?.Select(s =>
+            {
+                var parts = s.Split('=', 2);
+                return new KeyValuePair<string, string>(parts[0], parts[1]);
+            })
+            .ToDictionary();
 
-        ApplyManualValues(parameterResources);
+        var nonOverriddenParameterResources = parameterResources.Where(x => !parametersOverride.ContainsKey(x.Key)).ToArray();
+
+        ApplyGeneratedValues(nonOverriddenParameterResources);
+
+        ApplyOverriddenValues(parameterResources, parametersOverride);
+
+        ApplyManualValues(nonOverriddenParameterResources);
 
         Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Input values have all been assigned.");
 
         return Task.FromResult(true);
+    }
+
+    private void ApplyOverriddenValues(KeyValuePair<string, Resource>[] parameterResources, Dictionary<string, string> overriddenValues)
+    {
+        foreach (var parameterResource in parameterResources)
+        {
+            if (overriddenValues.TryGetValue(parameterResource.Key, out var value))
+            {
+                var componentWithInput = parameterResource.Value as ParameterResource;
+                componentWithInput.Value = value;
+                Logger.MarkupLine($"[green]Overridden[/] value for [blue]{componentWithInput.Name}[/]");
+            }
+        }
     }
 
     private void ApplyManualValues(KeyValuePair<string, Resource>[] parameterResources)
