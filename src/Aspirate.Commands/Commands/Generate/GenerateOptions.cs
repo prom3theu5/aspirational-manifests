@@ -21,6 +21,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public List<string>? ContainerImageTags { get; set; }
     public string? ImagePullPolicy { get; set; }
     public string? OutputFormat { get; set; }
+    public List<string>? Parameters { get; set; }
     public string? RuntimeIdentifier { get; set; }
     public List<string>? ComposeBuilds { get; set; }
     public string? PrivateRegistryUrl { get; set; }

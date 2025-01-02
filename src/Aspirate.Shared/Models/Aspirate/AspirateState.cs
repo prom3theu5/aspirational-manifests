@@ -78,6 +78,10 @@ public class AspirateState :
     public string? OutputFormat { get; set; }
 
     [RestorableStateProperty]
+    [JsonPropertyName("parameters")]
+    public List<string>? Parameters { get; set; }
+
+    [RestorableStateProperty]
     [JsonPropertyName("disableSecrets")]
     public bool? DisableSecrets { get; set; }
 
