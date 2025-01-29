@@ -25,10 +25,6 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             }
         } while (_unresolvedExpressionPointers.Count > 0);
     }
-
-    [GeneratedRegex(@"\{([\w\.-]+)\}")]
-    private static partial Regex PlaceholderPatternRegex();
-
     public static IJsonExpressionProcessor CreateDefaultExpressionProcessor() =>
         new JsonExpressionProcessor(BindingProcessor.CreateDefaultExpressionProcessor());
 
@@ -99,7 +95,8 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             return;
         }
 
-        var matches = PlaceholderPatternRegex().Matches(input);
+        var regex = new Regex(@"\{([\w\.-]+)\}");
+        var matches = regex.Matches(input);
         for (var i = 0; i < matches.Count; i++)
         {
             var match = matches[i];

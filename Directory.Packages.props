@@ -1,22 +1,22 @@
 <Project>
   <ItemGroup>
-    <PackageVersion Include="Ardalis.SmartEnum" Version="8.0.0" />
-    <PackageVersion Include="Ardalis.SmartEnum.SystemTextJson" Version="8.0.0" />
-    <PackageVersion Include="Aspire.Hosting" Version="8.0.0-preview.5.24201.12" />
-    <PackageVersion Include="Aspire.Hosting.Testing" Version="8.0.0-preview.5.24201.12" />
+    <PackageVersion Include="Ardalis.SmartEnum" Version="8.1.0" />
+    <PackageVersion Include="Ardalis.SmartEnum.SystemTextJson" Version="8.1.0" />
+    <PackageVersion Include="Aspire.Hosting" Version="9.0.0" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="9.0.0" />
     <PackageVersion Include="CliWrap" Version="3.6.6" />
-    <PackageVersion Include="DockerComposeBuilder" Version="0.2.4" />
+    <PackageVersion Include="DockerComposeBuilder" Version="0.4.3" />
     <PackageVersion Include="Handlebars.Net" Version="2.1.6" />
     <PackageVersion Include="JsonPath.Net" Version="1.0.1.2" />
-    <PackageVersion Include="KubernetesClient" Version="13.0.37" />
+    <PackageVersion Include="KubernetesClient" Version="16.0.2" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="NuGet.Protocol" Version="6.9.1" />
-    <PackageVersion Include="Spectre.Console" Version="0.48.0" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.12.1" />
+    <PackageVersion Include="Spectre.Console" Version="0.49.1" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="YamlDotNet" Version="15.1.2" />

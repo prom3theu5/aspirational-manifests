@@ -1,4 +1,3 @@
-
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
