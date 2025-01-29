@@ -2,6 +2,8 @@ namespace Aspirate.Services.Implementations;
 
 public partial class KubeCtlService(IFileSystem filesystem, IAnsiConsole console, IShellExecutionService shellExecutionService) : IKubeCtlService
 {
+
+    private static readonly Regex NamespaceMatcher = new("name: (.*)", RegexOptions.Compiled);
     public async Task<string?> SelectKubernetesContextForDeployment()
     {
         var contexts = await GatherContexts();
@@ -173,11 +175,11 @@ public partial class KubeCtlService(IFileSystem filesystem, IAnsiConsole console
         }
 
         var namespaceContent = await filesystem.File.ReadAllTextAsync(namespaceFile);
-        var regex = new Regex("name: (.*)");
-        var namespaceMatch = regex.Match(namespaceContent);
+        var namespaceMatch = NamespaceMatcher.Match(namespaceContent);
 
         return namespaceMatch.Success ? namespaceMatch.Groups[1].Value : KubeCtlLiterals.KubeCtlDefaultNamespace;
     }
+
 
     private static List<string?> ParseResponseAsContextList(string jsonString)
     {

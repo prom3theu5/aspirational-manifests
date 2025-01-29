@@ -51,6 +51,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         }
     }
 
+
     private void HandleJsonObject(JsonNode rootNode, JsonObject jsonObject)
     {
         var keys = new List<string>(((IDictionary<string, JsonNode?>)jsonObject).Keys);
@@ -80,6 +81,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
 
     private void HandleJsonValue(JsonNode rootNode, JsonNode jsonValue) => ReplaceWithResolvedExpression(rootNode, jsonValue);
 
+    private static readonly Regex PlaceholderPatternRegex = new(@"{([\w.-]+)}", RegexOptions.Compiled);
     private void ReplaceWithResolvedExpression(JsonNode rootNode, JsonNode jsonValue)
     {
         var input = jsonValue.ToString();
@@ -95,8 +97,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             return;
         }
 
-        var regex = new Regex(@"\{([\w\.-]+)\}");
-        var matches = regex.Matches(input);
+        var matches = PlaceholderPatternRegex.Matches(input);
         for (var i = 0; i < matches.Count; i++)
         {
             var match = matches[i];
