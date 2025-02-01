@@ -7,9 +7,9 @@
     <PackageVersion Include="CliWrap" Version="3.6.6" />
     <PackageVersion Include="DockerComposeBuilder" Version="0.4.3" />
     <PackageVersion Include="Handlebars.Net" Version="2.1.6" />
-    <PackageVersion Include="JsonPath.Net" Version="1.0.1.2" />
+    <PackageVersion Include="JsonPath.Net" Version="2.1.0" />
     <PackageVersion Include="KubernetesClient" Version="16.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
