@@ -1,6 +1,6 @@
 {
   "id": "aspirate.vnext",
-  "version": "0.1.0",
+  "version": "9.0.1",
   "name": "Aspir8 Aspirate to Kubernetes",
   "documentationURL": "https://vdboots.github.io/aspirational-manifests/",
   "description": "Installs Aspir8.",
