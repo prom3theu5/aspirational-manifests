@@ -30,7 +30,7 @@ Documentation: https://vdboots.github.io/aspirational-manifests/
 ## To Install as a global tool
 
 ```bash
-dotnet tool install -g aspirate
+dotnet tool install -g aspirate.vnext --prerelease
 ```
 
 > NOTE: Add the `--prelease` option, to install the latest preview version.
