@@ -1,11 +1,13 @@
 ![nuget-icon](https://github.com/prom3theu5/aspirational-manifests/assets/1518610/5f4402e9-6f2c-4ca4-b457-206fb8233155)
 # Aspirate (Aspir8)
 
+## note: this project is forked from prom3theu5 and if maintainer continues to maintain the project, this fork will be deleted.
+
 ### Handle deployment yaml generation for a .NET Aspire AppHost
 
-<https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
+<https://github.com/vdboots/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
 
-Documentation: https://prom3theu5.github.io/aspirational-manifests/
+Documentation: https://vdboots.github.io/aspirational-manifests/
 
 # Table of Contents
 1. [Installation as a global tool](#to-install-as-a-global-tool)
@@ -28,7 +30,7 @@ Documentation: https://prom3theu5.github.io/aspirational-manifests/
 ## To Install as a global tool
 
 ```bash
-dotnet tool install -g aspirate
+dotnet tool install -g aspirate.vnext --prerelease
 ```
 
 > NOTE: Add the `--prelease` option, to install the latest preview version.
@@ -140,7 +142,7 @@ When using this flag, all configuration arguments must be passed on the command 
 Aspirate can be uninstalled as a global tool by running:
 
 ```bash
-dotnet tool uninstall -g aspirate
+dotnet tool uninstall -g aspirate.vnext
 ```
 
 ## Configuring the Windows Terminal For Unicode and Emoji Support
@@ -174,8 +176,8 @@ Aspirate can be used in a devcontainer by installing the feature:
 
 ```json
 features": {
-  "ghcr.io/prom3theu5/aspirational-manifests/aspirate:latest": {}
+  "ghcr.io/vdboots/aspirational-manifests/aspirate:latest": {}
 }
 ```
 
-An Example of a devcontainer can be found on the documentation page: [Here](https://prom3theu5.github.io/aspirational-manifests/installation-as-a-devcontainer-feature.html#example-dev-container-configuration)
+An Example of a devcontainer can be found on the documentation page: [Here](https://vdboots.github.io/aspirational-manifests/installation-as-a-devcontainer-feature.html#example-dev-container-configuration)
