@@ -1,8 +1,8 @@
 {
-  "id": "aspirate",
+  "id": "aspirate.vnext",
   "version": "0.1.0",
   "name": "Aspir8 Aspirate to Kubernetes",
-  "documentationURL": "https://prom3theu5.github.io/aspirational-manifests/",
+  "documentationURL": "https://vdboots.github.io/aspirational-manifests/",
   "description": "Installs Aspir8.",
   "installsAfter": [
     "ghcr.io/devcontainers/features/dotnet"
