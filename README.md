@@ -1,11 +1,13 @@
 ![nuget-icon](https://github.com/prom3theu5/aspirational-manifests/assets/1518610/5f4402e9-6f2c-4ca4-b457-206fb8233155)
 # Aspirate (Aspir8)
 
+## note: this project is forked from prom3theu5 and if maintainer continues to maintain the project, this fork will be deleted.
+
 ### Handle deployment yaml generation for a .NET Aspire AppHost
 
-<https://github.com/prom3theu5/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
+<https://github.com/vdboots/aspirational-manifests/assets/1518610/319c4e1e-d47f-40e3-a8c3-ddf124b003a2>
 
-Documentation: https://prom3theu5.github.io/aspirational-manifests/
+Documentation: https://vdboots.github.io/aspirational-manifests/
 
 # Table of Contents
 1. [Installation as a global tool](#to-install-as-a-global-tool)
@@ -174,7 +176,7 @@ Aspirate can be used in a devcontainer by installing the feature:
 
 ```json
 features": {
-  "ghcr.io/prom3theu5/aspirational-manifests/aspirate:latest": {}
+  "ghcr.io/vdboots/aspirational-manifests/aspirate:latest": {}
 }
 ```
 
