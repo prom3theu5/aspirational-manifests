@@ -122,7 +122,7 @@ public class VersionCheckService(IFileSystem fs, IAnsiConsole logger) : IVersion
             var resource = await repository.GetResourceAsync<PackageMetadataResource>();
 
             var metadata = await resource.GetMetadataAsync(
-                "aspirate",
+                "aspirate.vnext",
                 includePrerelease: true,
                 includeUnlisted: false,
                 new SourceCacheContext(),
