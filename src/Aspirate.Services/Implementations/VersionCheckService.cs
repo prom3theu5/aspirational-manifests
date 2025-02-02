@@ -122,7 +122,7 @@ public class VersionCheckService(IFileSystem fs, IAnsiConsole logger) : IVersion
             var resource = await repository.GetResourceAsync<PackageMetadataResource>();
 
             var metadata = await resource.GetMetadataAsync(
-                "aspirate",
+                "aspirate.vnext",
                 includePrerelease: true,
                 includeUnlisted: false,
                 new SourceCacheContext(),
@@ -144,12 +144,16 @@ public class VersionCheckService(IFileSystem fs, IAnsiConsole logger) : IVersion
                 logger.MarkupLine($"[bold][yellow]A new version of Aspirate is available: [blue]{latestVersion}[/].[/][/]");
                 logger.MarkupLine($"[bold][yellow]You are currently using: [blue]{currentVersion}[/].[/][/]");
                 logger.MarkupLine(
-                    $"[italic][yellow]You can update with: [blue]dotnet tool install -g aspirate --prerelease[/].[/][/]");
+                    $"[italic][yellow]You can update with: [blue]dotnet tool install -g aspirate.vnext --prerelease[/].[/][/]");
             }
+        }
+        catch (HttpRequestException)
+        {
+            logger.MarkupLine($"[red]Network error: Unable to reach api.nuget.org. Please check your internet connection. Continuing without connection [/]");
         }
         catch (Exception e)
         {
-            logger.ValidationFailed(e.Message);
+             logger.ValidationFailed(e.Message);
         }
     }
 
