@@ -9,6 +9,7 @@ env:
   CAKE_SETTINGS_SKIPVERIFICATION: true
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "*"
