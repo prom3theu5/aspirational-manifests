@@ -11,7 +11,7 @@ Installs [Aspir8](https://github.com/prom3theu5/aspirational-manifests)
 ```json
 "features": {
   "ghcr.io/devcontainers/features/dotnet:2": {}
-  "ghcr.io/prom3theu5/aspirational-manifests/aspirate:latest": {}
+  "ghcr.io/vdboots/aspirational-manifests/aspirate:latest": {}
 }
 ```
 
@@ -19,6 +19,6 @@ Installs [Aspir8](https://github.com/prom3theu5/aspirational-manifests)
 
 ```json
 "features": {
-  "ghcr.io/prom3theu5/aspirational-manifests/aspirate:latest": {}
+  "ghcr.io/vdboots/aspirational-manifests/aspirate:latest": {}
 }
 ```
