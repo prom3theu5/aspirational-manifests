@@ -142,7 +142,7 @@ When using this flag, all configuration arguments must be passed on the command 
 Aspirate can be uninstalled as a global tool by running:
 
 ```bash
-dotnet tool uninstall -g aspirate
+dotnet tool uninstall -g aspirate.vnext
 ```
 
 ## Configuring the Windows Terminal For Unicode and Emoji Support
@@ -180,4 +180,4 @@ features": {
 }
 ```
 
-An Example of a devcontainer can be found on the documentation page: [Here](https://prom3theu5.github.io/aspirational-manifests/installation-as-a-devcontainer-feature.html#example-dev-container-configuration)
+An Example of a devcontainer can be found on the documentation page: [Here](https://vdboots.github.io/aspirational-manifests/installation-as-a-devcontainer-feature.html#example-dev-container-configuration)
