@@ -2,4 +2,4 @@
 
 echo "(*) Installing Aspir8"
 
-dotnet tool update aspirate --prerelease --tool-path /usr/local/bin
+dotnet tool update aspirate.vnext --prerelease --tool-path /usr/local/bin
