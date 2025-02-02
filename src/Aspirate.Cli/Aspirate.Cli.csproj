@@ -6,16 +6,19 @@
     <AssemblyName>aspirate</AssemblyName>
     <PackAsTool>true</PackAsTool>
     <ToolName>aspirate</ToolName>
-    <Version>0.1.0-preview</Version>
+    <Version>9.0.0-preview</Version>
+    <PackageId>aspirate.vnext</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup>
     <Title>Aspirate</Title>
-    <Authors>David Sekula / Prom3theu5</Authors>
-    <Description>Automatic kustomize manifest generation for applications powered by the Microsoft .Net Aspire Cloud framework.</Description>
-    <PackageProjectUrl>https://github.com/prom3theu5/aspirational-manifests</PackageProjectUrl>
+    <Authors>Vincent Boots</Authors>
+    <Description>Automatic kustomize manifest generation for applications powered by the Microsoft .Net Aspire Cloud framework.
+fork from: https://github.com/prom3theu5/aspirational-manifests</Description>
+    <PackageProjectUrl>https://github.com/vdboots/aspirational-manifests</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/prom3theu5/aspirational-manifests.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/vdboots/aspirational-manifests.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>aspire;kubernetes;aspirate;kustomize;manifests</PackageTags>
     <PackageReleaseNotes>Initial Release</PackageReleaseNotes>

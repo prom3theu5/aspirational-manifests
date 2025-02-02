@@ -9,11 +9,11 @@
 %product% is shipped to nuget as a .NET Core Global Tool, which means you can install it with a single command:
 
 ```bash
-dotnet tool install -g aspirate --prerelease
+dotnet tool install -g aspirate.vnext --prerelease
 ```
 
 Alternatively, if you already have %product% installed, you can update it to the latest version using the following command:
 
 ```bash
-dotnet tool update -g aspirate --prerelease
+dotnet tool update -g aspirate.vnext --prerelease
 ```
