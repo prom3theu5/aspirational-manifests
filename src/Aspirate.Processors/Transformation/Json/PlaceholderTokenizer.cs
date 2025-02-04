@@ -1,11 +1,27 @@
+
 namespace Aspirate.Processors.Transformation.Json;
 
 public static class PlaceholderTokenizer
 {
+    public class PlaceholderTokenComparer : IEqualityComparer<PlaceholderToken>
+    {
+        public bool Equals(PlaceholderToken x, PlaceholderToken y) =>
+            x.Lexeme == y.Lexeme && x.TokenType == y.TokenType;
+
+        public int GetHashCode([DisallowNull] PlaceholderToken obj)
+        {
+            var hc = new HashCode();
+            hc.Add(obj.Lexeme);
+            hc.Add(obj.TokenType);
+
+            return hc.ToHashCode();
+        }
+    }
+
     public enum PlaceholderTokenType
     {
         Text,
-        PlaceHolder,
+        Placeholder,
     }
 
     public readonly struct PlaceholderToken(
@@ -46,15 +62,13 @@ public static class PlaceholderTokenizer
             int length,
             int nextTokenIndex)
         {
-            if (length == 0 && tokenType == PlaceholderTokenType.Text)
+            if (length != 0 || tokenType != PlaceholderTokenType.Text)
             {
-                return;
+                tokens.Add(
+                    new PlaceholderToken(
+                        tokenType,
+                        input.Slice(currentTokenIndex, length).ToString()));
             }
-
-            tokens.Add(
-                new PlaceholderToken(
-                    tokenType,
-                    input.Slice(currentTokenIndex, length).ToString()));
 
             currentTokenIndex = nextTokenIndex;
         }
@@ -84,6 +98,15 @@ public static class PlaceholderTokenizer
 
                     if (currentChar == '{')
                     {
+                        // This is an escaped placeholder. Take the lexeme up to the
+                        // first curlybrace, skip the current character, then return
+                        // to text state.
+                        TryAddToken(
+                            ref input,
+                            PlaceholderTokenType.Text,
+                            i - currentTokenIndex,
+                            i + 1);
+
                         // This curly brace is escaped, we're still in text.
                         state = PlaceholderTokenizerState.InText;
                     }
@@ -121,7 +144,7 @@ public static class PlaceholderTokenizer
                         // Our placeholder token is complete.
                         TryAddToken(
                             ref input,
-                            PlaceholderTokenType.PlaceHolder,
+                            PlaceholderTokenType.Placeholder,
                             i - currentTokenIndex,
                             i + 1);
 
@@ -148,8 +171,8 @@ public static class PlaceholderTokenizer
                         TryAddToken(
                             ref input,
                             PlaceholderTokenType.Text,
-                            i - currentTokenIndex - 1,
-                            i);
+                            i - currentTokenIndex,
+                            i + 1);
                     }
 
                     state = PlaceholderTokenizerState.InText;
@@ -165,11 +188,25 @@ public static class PlaceholderTokenizer
         {
             // There is a dangling token. To ensure parity with the original
             // implementation, we're going to treat it as text.
+
+            if (state == PlaceholderTokenizerState.InPlaceholder)
+            {
+                // We were actually in a placeholder token, so we need to move
+                // back a single character to ensure we catch the opening brace.
+                currentTokenIndex--;
+            }
+
             TryAddToken(
                 ref input,
                 PlaceholderTokenType.Text,
                 input.Length - currentTokenIndex,
                 0);
+        }
+        else if (state == PlaceholderTokenizerState.InEscapedPlaceholderEnd)
+        {
+            // Handle the edge case here where we are cut short before we can
+            // check if we're in an escaped closing brace.
+            tokens.Add(new PlaceholderToken(PlaceholderTokenType.Text, "}"));
         }
 
         return tokens;
