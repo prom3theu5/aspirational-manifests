@@ -158,14 +158,11 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
 
         var pointer = jsonValue.GetPointerFromRoot();
 
+        // If input is different, retokenize and see if any placeholders are present.
         if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) &&
-            input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
+            JsonInterpolation.Tokenize(input).Any(x => x.IsPlaceholder()))
         {
             _unresolvedExpressionPointers.Add(pointer);
-        }
-        else
-        {
-            input = JsonInterpolation.Unescape(input);
         }
 
         jsonValue.ReplaceWith(input);

@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services
             .AddSingleton<IResourceExpressionProcessor, ResourceExpressionProcessor>()
             .AddSingleton<IJsonExpressionProcessor, JsonExpressionProcessor>()
+            .AddSingleton<IJsonInterpolationUnescapeProcessor, JsonInterpolationUnescapeProcessor>()
             .AddSingleton<IBindingProcessor, BindingProcessor>();
 
 

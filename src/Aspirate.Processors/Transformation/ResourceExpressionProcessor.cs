@@ -1,9 +1,14 @@
 namespace Aspirate.Processors.Transformation;
 
-public sealed class ResourceExpressionProcessor(IJsonExpressionProcessor jsonExpressionProcessor) : IResourceExpressionProcessor
+public sealed class ResourceExpressionProcessor(
+    IJsonExpressionProcessor jsonExpressionProcessor,
+    IJsonInterpolationUnescapeProcessor jsonInterpolationUnescapeProcessor)
+    : IResourceExpressionProcessor
 {
     public static IResourceExpressionProcessor CreateDefaultExpressionProcessor() =>
-        new ResourceExpressionProcessor(JsonExpressionProcessor.CreateDefaultExpressionProcessor());
+        new ResourceExpressionProcessor(
+            JsonExpressionProcessor.CreateDefaultExpressionProcessor(),
+            JsonInterpolationUnescapeProcessor.CreateDefaultInterpolationUnescapeProcessor());
 
     public void ProcessEvaluations(Dictionary<string, Resource> resources)
     {
@@ -16,6 +21,7 @@ public sealed class ResourceExpressionProcessor(IJsonExpressionProcessor jsonExp
         var rootNode = jsonDocument.Root;
 
         jsonExpressionProcessor.ResolveJsonExpressions(rootNode, rootNode);
+        jsonInterpolationUnescapeProcessor.UnescapeJsonExpression(rootNode);
 
         HandleSubstitutions(resources, rootNode);
     }
