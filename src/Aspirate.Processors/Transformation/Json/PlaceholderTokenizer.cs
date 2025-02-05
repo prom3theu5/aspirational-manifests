@@ -36,6 +36,10 @@ public static class PlaceholderTokenizer
 #pragma warning restore IDE1006 // Naming Styles
 
         public override string ToString() => $"{TokenType}: '{Lexeme}'";
+
+        public bool IsText() => TokenType == PlaceholderTokenType.Text;
+
+        public bool IsPlaceholder() => TokenType == PlaceholderTokenType.Placeholder;
     }
 
     private enum PlaceholderTokenizerState

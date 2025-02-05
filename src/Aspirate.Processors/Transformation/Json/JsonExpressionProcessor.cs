@@ -1,3 +1,4 @@
+using System.Text;
 using Json.More;
 
 namespace Aspirate.Processors.Transformation.Json;
@@ -99,42 +100,61 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             return;
         }
 
-        var matches = PlaceholderPatternRegex().Matches(input);
-        for (var i = 0; i < matches.Count; i++)
+        var tokens = PlaceholderTokenizer.Tokenize(input);
+        var transformedInput = new StringBuilder();
+
+        foreach (var token in tokens)
         {
-            var match = matches[i];
-            var jsonPath = match.Groups[1].Value;
-            var pathParts = jsonPath.Split('.');
-            if (pathParts.Length == 1)
+            if (token.IsText())
             {
-                input = input.Replace($"{{{jsonPath}}}", rootNode[pathParts[0]].ToString(), StringComparison.OrdinalIgnoreCase);
-                continue;
+                transformedInput.Append(token.Lexeme);
             }
-
-            if (pathParts is [_, Literals.Bindings, ..])
+            else
             {
-                input = bindingProcessor.HandleBindingReplacement(rootNode, pathParts, input, jsonPath);
-                continue;
+                var jsonPath = token.Lexeme;
+                var pathParts = jsonPath.Split('.');
+
+                if (pathParts.Length == 1)
+                {
+                    transformedInput.Append(rootNode[pathParts[0]].ToString());
+                    continue;
+                }
+                else if (pathParts is [_, Literals.Bindings, ..])
+                {
+                    transformedInput.Append(bindingProcessor.ParseBinding(pathParts, rootNode));
+                    continue;
+                }
+
+                var selectionPath = pathParts.AsJsonPath();
+                var path = JsonPath.Parse(selectionPath);
+                var result = path.Evaluate(rootNode);
+
+                void AppendPlaceholderTokenAsText()
+                {
+                    transformedInput.Append('{');
+                    transformedInput.Append(jsonPath);
+                    transformedInput.Append('}');
+                }
+
+                if (result.Matches.Count == 0)
+                {
+                    AppendPlaceholderTokenAsText();
+                    continue;
+                }
+
+                var value = result.Matches.FirstOrDefault()?.Value;
+
+                if (value is null)
+                {
+                    AppendPlaceholderTokenAsText();
+                    continue;
+                }
+
+                transformedInput.Append(value.ToString());
             }
-
-            var selectionPath = pathParts.AsJsonPath();
-            var path = JsonPath.Parse(selectionPath);
-            var result = path.Evaluate(rootNode);
-
-            if (result.Matches.Count == 0)
-            {
-                continue;
-            }
-
-            var value = result.Matches.FirstOrDefault()?.Value;
-
-            if (value is null)
-            {
-                continue;
-            }
-
-            input = input.Replace($"{{{jsonPath}}}", value.ToString(), StringComparison.OrdinalIgnoreCase);
         }
+
+        input = transformedInput.ToString();
 
         var pointer = jsonValue.GetPointerFromRoot();
         jsonValue.ReplaceWith(input);

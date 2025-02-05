@@ -11,15 +11,13 @@ public sealed class BindingProcessor : IBindingProcessor
     public void ResetServicePort() =>
         _servicePort = DefaultServicePort;
 
-    public string HandleBindingReplacement(JsonNode rootNode, IReadOnlyList<string> pathParts, string input, string jsonPath)
+    public string? ParseBinding(IReadOnlyList<string> pathParts, JsonNode? rootNode)
     {
         var resourceName = pathParts[0];
         var bindingName = pathParts[2];
         var bindingProperty = pathParts[3];
 
-        var replacement = ParseBinding(resourceName, bindingName, bindingProperty, rootNode);
-
-        return input.Replace($"{{{jsonPath}}}", replacement, StringComparison.OrdinalIgnoreCase);
+        return ParseBinding(resourceName, bindingName, bindingProperty, rootNode);
     }
 
     private static string? ParseBinding(string resourceName, string bindingName, string bindingProperty, JsonNode? rootNode)
