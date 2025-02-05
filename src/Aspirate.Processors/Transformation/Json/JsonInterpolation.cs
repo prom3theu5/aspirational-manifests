@@ -1,14 +1,16 @@
 
+using System.Text;
+
 namespace Aspirate.Processors.Transformation.Json;
 
-public static class PlaceholderTokenizer
+public static class JsonInterpolation
 {
-    public class PlaceholderTokenComparer : IEqualityComparer<PlaceholderToken>
+    public class JsonInterpolationTokenComparer : IEqualityComparer<JsonInterpolationToken>
     {
-        public bool Equals(PlaceholderToken x, PlaceholderToken y) =>
+        public bool Equals(JsonInterpolationToken x, JsonInterpolationToken y) =>
             x.Lexeme == y.Lexeme && x.TokenType == y.TokenType;
 
-        public int GetHashCode([DisallowNull] PlaceholderToken obj)
+        public int GetHashCode([DisallowNull] JsonInterpolationToken obj)
         {
             var hc = new HashCode();
             hc.Add(obj.Lexeme);
@@ -18,58 +20,57 @@ public static class PlaceholderTokenizer
         }
     }
 
-    public enum PlaceholderTokenType
+    public enum JsonInterpolationTokenType
     {
         Text,
         Placeholder,
     }
 
-    public readonly struct PlaceholderToken(
-        PlaceholderTokenType tokenType,
+    public readonly struct JsonInterpolationToken(
+        JsonInterpolationTokenType tokenType,
         string lexeme)
     {
         // Suppressing this naming style convention as these are public fields.
 #pragma warning disable IDE1006 // Naming Styles
-        public readonly PlaceholderTokenType TokenType = tokenType;
+        public readonly JsonInterpolationTokenType TokenType = tokenType;
 
         public readonly string Lexeme = lexeme;
 #pragma warning restore IDE1006 // Naming Styles
 
         public override string ToString() => $"{TokenType}: '{Lexeme}'";
 
-        public bool IsText() => TokenType == PlaceholderTokenType.Text;
+        public bool IsText() => TokenType == JsonInterpolationTokenType.Text;
 
-        public bool IsPlaceholder() => TokenType == PlaceholderTokenType.Placeholder;
+        public bool IsPlaceholder() => TokenType == JsonInterpolationTokenType.Placeholder;
     }
 
-    private enum PlaceholderTokenizerState
+    private enum TokenizerState
     {
         InText,
         InPlaceholderStart,
         InPlaceholder,
-        InEscapedPlaceholderEnd,
     }
 
-    public static List<PlaceholderToken> Tokenize(string input) => Tokenize(input.AsSpan());
+    public static List<JsonInterpolationToken> Tokenize(string input) => Tokenize(input.AsSpan());
 
-    public static List<PlaceholderToken> Tokenize(ReadOnlySpan<char> input)
+    public static List<JsonInterpolationToken> Tokenize(ReadOnlySpan<char> input)
     {
-        var state = PlaceholderTokenizerState.InText;
+        var state = TokenizerState.InText;
         var currentTokenIndex = 0;
 
         // Estimate the number of tokens.
-        var tokens = new List<PlaceholderToken>(input.Length / 2);
+        var tokens = new List<JsonInterpolationToken>(input.Length / 2);
 
         void TryAddToken(
             ref ReadOnlySpan<char> input,
-            PlaceholderTokenType tokenType,
+            JsonInterpolationTokenType tokenType,
             int length,
             int nextTokenIndex)
         {
-            if (length != 0 || tokenType != PlaceholderTokenType.Text)
+            if (length != 0 || tokenType != JsonInterpolationTokenType.Text)
             {
                 tokens.Add(
-                    new PlaceholderToken(
+                    new JsonInterpolationToken(
                         tokenType,
                         input.Slice(currentTokenIndex, length).ToString()));
             }
@@ -83,53 +84,39 @@ public static class PlaceholderTokenizer
 
             switch (state)
             {
-                case PlaceholderTokenizerState.InText:
+                case TokenizerState.InText:
 
                     if (currentChar == '{')
                     {
                         // We are in a potential placeholder token start.
-                        state = PlaceholderTokenizerState.InPlaceholderStart;
-                    }
-                    else if (currentChar == '}')
-                    {
-                        // We are in what can only be an escaped placeholder token end.
-                        state = PlaceholderTokenizerState.InEscapedPlaceholderEnd;
+                        state = TokenizerState.InPlaceholderStart;
                     }
 
                     break;
 
-                case PlaceholderTokenizerState.InPlaceholderStart:
+                case TokenizerState.InPlaceholderStart:
 
                     if (currentChar == '{')
                     {
-                        // This is an escaped placeholder. Take the lexeme up to the
-                        // first curlybrace, skip the current character, then return
-                        // to text state.
-                        TryAddToken(
-                            ref input,
-                            PlaceholderTokenType.Text,
-                            i - currentTokenIndex,
-                            i + 1);
-
                         // This curly brace is escaped, we're still in text.
-                        state = PlaceholderTokenizerState.InText;
+                        state = TokenizerState.InText;
                     }
                     else
                     {
                         // We are in a placeholder token, slice the previous text.
                         TryAddToken(
                             ref input,
-                            PlaceholderTokenType.Text,
+                            JsonInterpolationTokenType.Text,
                             i - currentTokenIndex - 1,
                             i);
 
                         // Advance to toke in placeholder token state.
-                        state = PlaceholderTokenizerState.InPlaceholder;
+                        state = TokenizerState.InPlaceholder;
                     }
 
                     break;
 
-                case PlaceholderTokenizerState.InPlaceholder:
+                case TokenizerState.InPlaceholder:
 
                     // We are going for parity with the regular expression used in the
                     // previous implementation: ([\w\.-]+)
@@ -148,38 +135,20 @@ public static class PlaceholderTokenizer
                         // Our placeholder token is complete.
                         TryAddToken(
                             ref input,
-                            PlaceholderTokenType.Placeholder,
+                            JsonInterpolationTokenType.Placeholder,
                             i - currentTokenIndex,
                             i + 1);
 
                         // The next token is probably text.
-                        state = PlaceholderTokenizerState.InText;
+                        state = TokenizerState.InText;
                     }
                     else
                     {
                         // Our placeholder token has unsupported characters. As per
                         // the original implementation, we are going to treat the
                         // current lexme as text.
-                        state = PlaceholderTokenizerState.InText;
+                        state = TokenizerState.InText;
                     }
-
-                    break;
-
-                case PlaceholderTokenizerState.InEscapedPlaceholderEnd:
-                    // The name of this state is something of a misnomer. While we
-                    // do in fact handle escaped close braces here, we will also
-                    // accept unescaped, unbalanced close braces. This is done to
-                    // ensure parity with the previous implementation.
-                    if (currentChar == '}')
-                    {
-                        TryAddToken(
-                            ref input,
-                            PlaceholderTokenType.Text,
-                            i - currentTokenIndex,
-                            i + 1);
-                    }
-
-                    state = PlaceholderTokenizerState.InText;
 
                     break;
 
@@ -193,7 +162,7 @@ public static class PlaceholderTokenizer
             // There is a dangling token. To ensure parity with the original
             // implementation, we're going to treat it as text.
 
-            if (state == PlaceholderTokenizerState.InPlaceholder)
+            if (state == TokenizerState.InPlaceholder)
             {
                 // We were actually in a placeholder token, so we need to move
                 // back a single character to ensure we catch the opening brace.
@@ -202,17 +171,79 @@ public static class PlaceholderTokenizer
 
             TryAddToken(
                 ref input,
-                PlaceholderTokenType.Text,
+                JsonInterpolationTokenType.Text,
                 input.Length - currentTokenIndex,
                 0);
         }
-        else if (state == PlaceholderTokenizerState.InEscapedPlaceholderEnd)
-        {
-            // Handle the edge case here where we are cut short before we can
-            // check if we're in an escaped closing brace.
-            tokens.Add(new PlaceholderToken(PlaceholderTokenType.Text, "}"));
-        }
 
         return tokens;
+    }
+
+    private enum UnescapeState
+    {
+        InText,
+        InOpenBrace,
+        InCloseBrace,
+    }
+
+    public static string Unescape(string value)
+    {
+        var state = UnescapeState.InText;
+        var unescaped = new StringBuilder();
+        var span = value.AsSpan();
+        var currentTokenIndex = 0;
+
+        void Append(ref ReadOnlySpan<char> span, int length, int nextTokenIndex)
+        {
+            if (length > 0)
+            {
+                unescaped.Append(span.Slice(currentTokenIndex, length));
+            }
+
+            currentTokenIndex = nextTokenIndex;
+        }
+
+        for (var i = 0; i < span.Length; i++)
+        {
+            var currentChar = span[i];
+
+            void HandleEscapedChar(ref ReadOnlySpan<char> span, char c)
+            {
+                if (currentChar == c)
+                {
+                    Append(ref span, i - currentTokenIndex, i + 1);
+                }
+
+                state = UnescapeState.InText;
+            }
+
+            switch (state)
+            {
+                case UnescapeState.InText:
+                    switch (currentChar)
+                    {
+                        case '{':
+                            state = UnescapeState.InOpenBrace;
+                            break;
+
+                        case '}':
+                            state = UnescapeState.InCloseBrace;
+                            break;
+                    }
+                    break;
+
+                case UnescapeState.InOpenBrace:
+                    HandleEscapedChar(ref span, '{');
+                    break;
+
+                case UnescapeState.InCloseBrace:
+                    HandleEscapedChar(ref span, '}');
+                    break;
+            }
+        }
+
+        Append(ref span, span.Length - currentTokenIndex, 0);
+
+        return unescaped.ToString();
     }
 }

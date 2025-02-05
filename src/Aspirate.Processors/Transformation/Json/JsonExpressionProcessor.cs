@@ -100,7 +100,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             return;
         }
 
-        var tokens = PlaceholderTokenizer.Tokenize(input);
+        var tokens = JsonInterpolation.Tokenize(input);
         var transformedInput = new StringBuilder();
 
         foreach (var token in tokens)
@@ -157,12 +157,17 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         input = transformedInput.ToString();
 
         var pointer = jsonValue.GetPointerFromRoot();
-        jsonValue.ReplaceWith(input);
 
         if (!string.Equals(inputBefore, input, StringComparison.OrdinalIgnoreCase) &&
             input.Contains('{', StringComparison.OrdinalIgnoreCase) && input.Contains('}', StringComparison.OrdinalIgnoreCase))
         {
             _unresolvedExpressionPointers.Add(pointer);
         }
+        else
+        {
+            input = JsonInterpolation.Unescape(input);
+        }
+
+        jsonValue.ReplaceWith(input);
     }
 }
