@@ -114,9 +114,26 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
                 var jsonPath = token.Lexeme;
                 var pathParts = jsonPath.Split('.');
 
+                void AppendPlaceholderTokenAsText()
+                {
+                    transformedInput.Append('{');
+                    transformedInput.Append(jsonPath);
+                    transformedInput.Append('}');
+                }
+
                 if (pathParts.Length == 1)
                 {
-                    transformedInput.Append(rootNode[pathParts[0]].ToString());
+                    var resolvedNode = rootNode[pathParts[0]];
+
+                    if (resolvedNode != null)
+                    {
+                        transformedInput.Append(resolvedNode.ToString());
+                    }
+                    else
+                    {
+                        AppendPlaceholderTokenAsText();
+                    }
+
                     continue;
                 }
                 else if (pathParts is [_, Literals.Bindings, ..])
@@ -128,13 +145,6 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
                 var selectionPath = pathParts.AsJsonPath();
                 var path = JsonPath.Parse(selectionPath);
                 var result = path.Evaluate(rootNode);
-
-                void AppendPlaceholderTokenAsText()
-                {
-                    transformedInput.Append('{');
-                    transformedInput.Append(jsonPath);
-                    transformedInput.Append('}');
-                }
 
                 if (result.Matches.Count == 0)
                 {

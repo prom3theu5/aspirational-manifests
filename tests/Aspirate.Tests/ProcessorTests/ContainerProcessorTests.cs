@@ -135,8 +135,10 @@ public class ContainerProcessorTests
         resource.ConnectionString.Should().Be("Host=postgrescontainer;Port=5432;Username={0};Password=secret_password");
     }
 
-    [Fact]
-    public void ReplacePlaceholders_SkipEscapesInNestedExpressions()
+    [Theory]
+    [InlineData("{{0}}")]
+    [InlineData("{0}")]
+    public void ReplacePlaceholders_SkipFormatStringLikePlaceholderInNestedExpressions(string value)
     {
         // Arrange
         var transformer = ResourceExpressionProcessor.CreateDefaultExpressionProcessor();
@@ -150,7 +152,7 @@ public class ContainerProcessorTests
 
         var configResource = new ParameterResource { ConnectionString = "Host=postgrescontainer;Port=5432;Username=postgres;Password={postgres-password.value}" };
 
-        var inputResource = new ParameterResource { Value = "{{0}}" };
+        var inputResource = new ParameterResource { Value = value };
 
         var resources = new Dictionary<string, Resource>
         {
