@@ -51,7 +51,8 @@ public static class JsonInterpolation
         InPlaceholder,
     }
 
-    public static List<JsonInterpolationToken> Tokenize(string input) => Tokenize(input.AsSpan());
+    public static List<JsonInterpolationToken> Tokenize(string input) =>
+        input is null ? [] : Tokenize(input.AsSpan());
 
     public static List<JsonInterpolationToken> Tokenize(ReadOnlySpan<char> input)
     {
@@ -188,6 +189,11 @@ public static class JsonInterpolation
 
     public static string Unescape(string value)
     {
+        if (value is null)
+        {
+            return string.Empty;
+        }
+
         var state = UnescapeState.InText;
         var unescaped = new StringBuilder();
         var span = value.AsSpan();
