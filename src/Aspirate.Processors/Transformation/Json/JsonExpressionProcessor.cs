@@ -25,10 +25,6 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             }
         } while (_unresolvedExpressionPointers.Count > 0);
     }
-
-    [GeneratedRegex(@"\{([\w\.-]+)\}")]
-    private static partial Regex PlaceholderPatternRegex();
-
     public static IJsonExpressionProcessor CreateDefaultExpressionProcessor() =>
         new JsonExpressionProcessor(BindingProcessor.CreateDefaultExpressionProcessor());
 
@@ -54,6 +50,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
                 throw new InvalidOperationException($"Unexpected node type: {jsonNode.GetType().Name}");
         }
     }
+
 
     private void HandleJsonObject(JsonNode rootNode, JsonObject jsonObject)
     {
@@ -84,6 +81,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
 
     private void HandleJsonValue(JsonNode rootNode, JsonNode jsonValue) => ReplaceWithResolvedExpression(rootNode, jsonValue);
 
+    private static readonly Regex PlaceholderPatternRegex = new(@"{([\w.-]+)}", RegexOptions.Compiled);
     private void ReplaceWithResolvedExpression(JsonNode rootNode, JsonNode jsonValue)
     {
         var input = jsonValue.ToString();
@@ -99,7 +97,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
             return;
         }
 
-        var matches = PlaceholderPatternRegex().Matches(input);
+        var matches = PlaceholderPatternRegex.Matches(input);
         for (var i = 0; i < matches.Count; i++)
         {
             var match = matches[i];

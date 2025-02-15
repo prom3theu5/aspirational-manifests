@@ -9,5 +9,5 @@ public static class AspireLiterals
 
     public const string ManifestPublisherArgument = "manifest";
 
-    public const string DashboardImage = "mcr.microsoft.com/dotnet/aspire-dashboard:8.0";
+    public const string DashboardImage = "mcr.microsoft.com/dotnet/aspire-dashboard:9.0";
 }
