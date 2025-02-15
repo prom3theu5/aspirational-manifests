@@ -10,7 +10,10 @@ public sealed class RunCommand : BaseCommand<RunOptions, RunCommandHandler>
        AddOption(AspireManifestOption.Instance);
        AddOption(SkipBuildOption.Instance);
        AddOption(ContainerBuilderOption.Instance);
+       AddOption(ContainerBuildContextOption.Instance);
        AddOption(ContainerImageTagOption.Instance);
+       AddOption(ContainerBuildArgsOption.Instance);
+       AddOption(PreferDockerfileOption.Instance);
        AddOption(ContainerRegistryOption.Instance);
        AddOption(ContainerRepositoryPrefixOption.Instance);
        AddOption(ImagePullPolicyOption.Instance);

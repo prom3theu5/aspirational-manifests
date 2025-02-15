@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Aspirate.Processors.Resources.Project;
 
 /// <summary>
@@ -68,7 +70,7 @@ public sealed class ProjectProcessor(
             .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
             .Validate();
 
-    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive, string? runtimeIdentifier)
+    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive, string? runtimeIdentifier, bool preferDockerfile)
     {
         var project = resource.Value as ProjectResource;
 
@@ -77,7 +79,29 @@ public sealed class ProjectProcessor(
             throw new InvalidOperationException($"Container details for project {resource.Key} not found.");
         }
 
-        await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, options, nonInteractive, runtimeIdentifier);
+        var dockerfileFile = !string.IsNullOrEmpty(containerDetails.DockerfileFile) ? containerDetails.DockerfileFile : Path.Combine(Path.GetDirectoryName(project.Path), "Dockerfile");
+
+        if (preferDockerfile && File.Exists(dockerfileFile))
+        {
+            _console.MarkupLine($"[bold yellow]Using custom Dockerfile to build project {resource.Key}.[/]");
+
+            var dockerfileResource = new DockerfileResource()
+            {
+                Path = dockerfileFile,
+                Name = !string.IsNullOrEmpty(containerDetails.ContainerRepository) ? containerDetails.ContainerRepository : project.Name,
+                Context = !string.IsNullOrEmpty(containerDetails.DockerfileContext) ? containerDetails.DockerfileContext : options.BuildContext,
+                Annotations = project.Annotations,
+                Bindings = project.Bindings,
+                Env = project.Env,
+                BuildArgs = options.BuildArgs
+            };
+
+            await containerCompositionService.BuildAndPushContainerForDockerfile(dockerfileResource, options, nonInteractive);
+        }
+        else
+        {
+            await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, options, nonInteractive, runtimeIdentifier);
+        }
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");
     }

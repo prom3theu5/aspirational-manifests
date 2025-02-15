@@ -15,6 +15,12 @@ public sealed class MsBuildContainerProperties : BaseMsBuildProperties
     [JsonPropertyName(MsBuildPropertiesLiterals.ContainerImageTagArgument)]
     public string? ContainerImageTag { get; set; }
 
+    [JsonPropertyName(MsBuildPropertiesLiterals.DockerfileFileArgument)]
+    public string? DockerfileFile { get; set; }
+
+    [JsonPropertyName(MsBuildPropertiesLiterals.DockerfileContextArgument)]
+    public string? DockerfileContext { get; set; }
+
     [JsonIgnore]
     public string? FullContainerImage { get; set; }
 }

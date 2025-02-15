@@ -1,0 +1,9 @@
+﻿{
+  ContainerRegistry: test-registry,
+  ContainerRepository: test-repository,
+  ContainerImageName: test-image,
+  ContainerImageTag: test-tag,
+  DockerfileFile: test-dockerfile,
+  DockerfileContext: test-context,
+  FullContainerImage: test-registry/test-repository/test-image:test-tag
+}

@@ -35,27 +35,29 @@ public class ContainerOptionsTests
             new object[]
             {
                 new TestContainerOptions(
-                    "FullParameters", CreateContainerParameters("test-registry", "test-repository", "test-image", "test-tag")),
+                    "FullParameters", CreateContainerParameters("test-registry", "test-repository", "test-image", "test-tag", "test-arg", "test-context")),
             },
             new object[]
             {
                 new TestContainerOptions(
-                    "RegistryAndPrefixAndImage", CreateContainerParameters("test-registry", "test-repository", "test-image", null)),
+                    "RegistryAndPrefixAndImage", CreateContainerParameters("test-registry", "test-repository", "test-image", null, null, null)),
             },
             new object[]
             {
                 new TestContainerOptions(
-                    "ImageAndTag", CreateContainerParameters(null, null, "test-image", "test-tag")),
+                    "ImageAndTag", CreateContainerParameters(null, null, "test-image", "test-tag", null, null)),
             },
         };
 
-     private static ContainerOptions CreateContainerParameters(string? testRegistry, string? testRepositoryPrefix, string? testImage, string? testTag) =>
+     private static ContainerOptions CreateContainerParameters(string? testRegistry, string? testRepositoryPrefix, string? testImage, string? testTag, string? testBuildArg, string? testBuildContext) =>
          new()
          {
              Registry = testRegistry,
              Prefix = testRepositoryPrefix,
              ImageName = testImage,
              Tags = [testTag],
+             BuildArgs = testBuildArg is null ? null : new() { {testBuildArg, testBuildArg} },
+             BuildContext = testBuildContext,
          };
 
      public record TestContainerOptions(string Value, ContainerOptions Options);

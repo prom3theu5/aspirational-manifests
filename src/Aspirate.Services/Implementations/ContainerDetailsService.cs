@@ -13,7 +13,9 @@ public class ContainerDetailsService(IProjectPropertyService propertyService, IA
             ContainerBuilderLiterals.ContainerRegistry,
             ContainerBuilderLiterals.ContainerRepository,
             ContainerBuilderLiterals.ContainerImageName,
-            ContainerBuilderLiterals.ContainerImageTag);
+            ContainerBuilderLiterals.ContainerImageTag,
+            ContainerBuilderLiterals.DockerfileFile,
+            ContainerBuilderLiterals.DockerfileContext);
 
         var msBuildProperties = JsonSerializer.Deserialize<MsBuildProperties<MsBuildContainerProperties>>(containerPropertiesJson ?? "{}");
 

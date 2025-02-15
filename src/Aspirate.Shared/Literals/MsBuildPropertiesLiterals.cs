@@ -12,4 +12,6 @@ public static class MsBuildPropertiesLiterals
     public const string ContainerImageTagArgument = "ContainerImageTag";
     public const string ContainerImageTagArguments = "ContainerImageTags";
     public const string ErrorOnDuplicatePublishOutputFilesArgument = "ErrorOnDuplicatePublishOutputFiles";
+    public const string DockerfileFileArgument = "DockerfileFile";
+    public const string DockerfileContextArgument = "DockerfileContext";
 }
