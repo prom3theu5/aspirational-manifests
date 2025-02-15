@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
+
 namespace Aspirate.Tests.DockerComposeTests;
 
 public class DockerComposeBuilderTests

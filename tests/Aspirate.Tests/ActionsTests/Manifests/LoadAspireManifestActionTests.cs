@@ -1,3 +1,8 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Xunit;
+
 namespace Aspirate.Tests.ActionsTests.Manifests;
 
 public class LoadAspireManifestActionTests : BaseActionTests<LoadAspireManifestAction>
