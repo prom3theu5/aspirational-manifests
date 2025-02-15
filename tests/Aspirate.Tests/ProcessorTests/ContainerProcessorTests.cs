@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Xunit;
+
 namespace Aspirate.Tests.ProcessorTests;
 
 public class ContainerProcessorTests

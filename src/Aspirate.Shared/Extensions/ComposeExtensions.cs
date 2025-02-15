@@ -1,3 +1,5 @@
+using DockerComposeBuilder.Converters;
+
 namespace Aspirate.Shared.Extensions;
 
 public static class ComposeExtensions
