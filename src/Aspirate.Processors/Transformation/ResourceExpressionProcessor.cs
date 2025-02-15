@@ -29,6 +29,15 @@ public sealed class ResourceExpressionProcessor(IJsonExpressionProcessor jsonExp
                 case IResourceWithConnectionString resourceWithConnectionString when !string.IsNullOrEmpty(resourceWithConnectionString.ConnectionString):
                     resourceWithConnectionString.ConnectionString = rootNode[key]![Literals.ConnectionString]!.ToString();
                     break;
+                case DockerfileResource dockerfileResource:
+                    {
+                        foreach (var buildArg in dockerfileResource.BuildArgs?.Keys ?? new(new ()))
+                        {
+                            dockerfileResource.BuildArgs[buildArg] = rootNode[key]![Literals.BuildArgs]![buildArg].ToString();
+                        }
+
+                        break;
+                    }
                 case ValueResource valueResource:
                     {
                         foreach (var resourceValue in valueResource.Values.ToList())

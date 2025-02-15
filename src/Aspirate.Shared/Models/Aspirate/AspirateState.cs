@@ -127,6 +127,9 @@ public class AspirateState :
 
     [JsonIgnore]
     public bool? SkipBuild { get; set; }
+    
+    [JsonIgnore]
+    public bool? UseSecrets { get; set; }
 
     [JsonIgnore]
     public string? AspireManifest { get; set; }

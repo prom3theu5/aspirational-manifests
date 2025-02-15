@@ -182,6 +182,40 @@ public class ManifestFileParserServiceTest
     }
 
     [Fact]
+    public async Task EndToEndDockerfile_ParsesSuccessfully()
+    {
+        // Arrange
+        var fileSystem = new MockFileSystem();
+        var manifestFile = "dockerfile-with-build-args.json";
+        var testData = Path.Combine(AppContext.BaseDirectory, "TestData", manifestFile);
+        fileSystem.AddFile(manifestFile, new MockFileData(await File.ReadAllTextAsync(testData)));
+        var serviceProvider = CreateServiceProvider(fileSystem);
+
+        var service = serviceProvider.GetRequiredService<IManifestFileParserService>();
+        var inputPopulator = serviceProvider.GetRequiredKeyedService<IAction>(nameof(PopulateInputsAction));
+        var valueSubstitutor = serviceProvider.GetRequiredKeyedService<IAction>(nameof(SubstituteValuesAspireManifestAction));
+        var cachePopulator =
+            serviceProvider.GetRequiredKeyedService<IAction>(nameof(BuildAndPushContainersFromDockerfilesAction));
+
+        // Act
+        var results = await PerformEndToEndTests(manifestFile, 2, serviceProvider, service, inputPopulator, valueSubstitutor);
+        var state = serviceProvider.GetRequiredService<AspirateState>();
+        state.AspireComponentsToProcess = state.LoadedAspireManifestResources
+            .Where(x => x.Value.Type == AspireComponentLiterals.Dockerfile).Select(x => x.Key).ToList();
+        state.ContainerBuilder = "docker";
+        await cachePopulator.ExecuteAsync();
+
+        //Assert
+        var clientResource = results["client"] as DockerfileResource;
+        clientResource.BuildArgs["NPM_TOKEN"].Length.Should().Be(22);
+        var shellExecutor = serviceProvider.GetRequiredService<IShellExecutionService>();
+        await shellExecutor.Received(1).ExecuteCommand(Arg.Is<ShellCommandOptions>(x =>
+            x.Command == "docker" &&
+            x.ArgumentsBuilder.RenderArguments(' ').Contains($"NPM_TOKEN=\"{clientResource.BuildArgs["NPM_TOKEN"]}\"")
+        ));
+    }
+
+    [Fact]
     public async Task EndToEndNodeJs_ParsesSuccessfully()
     {
         // Arrange
@@ -257,8 +291,10 @@ public class ManifestFileParserServiceTest
         services.RegisterAspirateEssential();
         services.RemoveAll<IAnsiConsole>();
         services.RemoveAll<IFileSystem>();
+        services.RemoveAll<IShellExecutionService>();
         services.AddSingleton(console);
         services.AddSingleton(fileSystem);
+        services.AddSingleton(GetMockShellExecutionService());
         services.AddSingleton<ISecretProvider, SecretProvider>();
 
         return services.BuildServiceProvider();
@@ -273,5 +309,17 @@ public class ManifestFileParserServiceTest
         // confirmation entry
         console.Input.PushTextWithEnter(password);
         console.Input.PushKey(ConsoleKey.Enter);
+    }
+
+    private static IShellExecutionService GetMockShellExecutionService()
+    {
+        var mock = Substitute.For<IShellExecutionService>();
+        mock.IsCommandAvailable(Arg.Any<string>()).Returns(new CommandAvailableResult()
+        {
+            FullPath = "",
+            IsAvailable = true,
+        });
+        mock.ExecuteCommand(Arg.Any<ShellCommandOptions>()).Returns(new ShellCommandResult(true,"","",0));
+        return mock;
     }
 }
