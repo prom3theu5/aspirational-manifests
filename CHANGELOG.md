@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.0.1](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.0...v9.0.1) (2025-02-15)
+
+
+### 🔥 Bug Fixes
+
+* docs workflow remove deprecated actions ([#290](https://github.com/prom3theu5/aspirational-manifests/issues/290)) ([e9d0de5](https://github.com/prom3theu5/aspirational-manifests/commit/e9d0de5831c991449a01999334501cb94c5427c2))
+* nullability on build args in container building for projects. Cannot call ToDictionary on null. ([#292](https://github.com/prom3theu5/aspirational-manifests/issues/292)) ([01e0ab7](https://github.com/prom3theu5/aspirational-manifests/commit/01e0ab7b6682d860fbea7e7e813def94e5277ebc))
+
 ## [9.0.0](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.0...v9.0.0) (2025-02-15)
 
 
