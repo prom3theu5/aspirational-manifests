@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.0.2](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.1...v9.0.2) (2025-02-16)
+
+
+### ⚙️ Chores
+
+* release 9.0.2 ([#293](https://github.com/prom3theu5/aspirational-manifests/issues/293)) ([7b0641a](https://github.com/prom3theu5/aspirational-manifests/commit/7b0641acd1223ce8d6b79de330f66ee86f9b1d5e))
+
 ## [9.0.1](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.0...v9.0.1) (2025-02-15)
 
 
