@@ -1,3 +1,7 @@
+using System;
+using System.Threading.Tasks;
+using Xunit;
+
 namespace Aspirate.Tests.ActionsTests.Secrets;
 
 public class SaveSecretsActionTests : BaseActionTests<SaveSecretsAction>

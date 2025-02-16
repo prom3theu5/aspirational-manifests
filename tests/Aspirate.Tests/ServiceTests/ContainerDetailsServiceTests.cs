@@ -1,3 +1,8 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using VerifyTests;
+using Xunit;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public class ContainerDetailsServiceTests
@@ -43,6 +48,11 @@ public class ContainerDetailsServiceTests
             {
                 new TestContainerProperties(
                     "FullResponse", CreateContainerProperties("test-registry", "test-repository", "test-image", "test-tag")),
+            },
+            new object[]
+            {
+                new TestContainerProperties(
+                    "FullResponseWithDockerfileAndContext", CreateContainerProperties("test-registry", "test-repository", "test-image", "test-tag", "test-context", "test-dockerfile")),
             },
             new object[]
             {
@@ -103,12 +113,19 @@ public class ContainerDetailsServiceTests
     private static MsBuildProperties<MsBuildContainerProperties> CreateContainerProperties(string? registry = null,
         string? repo = null,
         string? image = null,
-        string? tag = null) =>
+        string? tag = null,
+        string? dockerfileContext = null,
+        string? dockerfileFile = null) =>
         new()
         {
             Properties = new()
             {
-                ContainerRegistry = registry, ContainerRepository = repo, ContainerImageName = image, ContainerImageTag = tag,
+                ContainerRegistry = registry,
+                ContainerRepository = repo,
+                ContainerImageName = image,
+                ContainerImageTag = tag,
+                DockerfileContext = dockerfileContext,
+                DockerfileFile = dockerfileFile,
             },
         };
 

@@ -23,6 +23,8 @@ The `init` command allows you to bootstrap certain settings for an aspire projec
 | --container-registry          | -cr   | `ASPIRATE_CONTAINER_REGISTRY`          | The Container Registry to use as the fall-back value for all containers.          |
 | --container-repository-prefix | -crp  | `ASPIRATE_CONTAINER_REPOSITORY_PREFIX` | The Container Repository Prefix to use as the fall-back value for all containers. |
 | --container-image-tag         | -ct   | `ASPIRATE_CONTAINER_IMAGE_TAG`         | The Container Image Tag to use as the fall-back value for all containers.         |
+| --container-build-context     | -cbc  | `ASPIRATE_CONTAINER_BUILD_CONTEXT`     | The Container Build Context to use when Dockerfile is used to build projects.     |
+| --container-build-arg         | -cba  | `ASPIRATE_CONTAINER_BUILD_ARGS`        | The Container Build Arguments to use for all containers. In `key=value` format.   |
 | --template-path               | -tp   | `ASPIRATE_TEMPLATE_PATH`               | The path to the templates directory.                                              |
 | --non-interactive             |       | `ASPIRATE_NON_INTERACTIVE`             | Disables interactive mode for the command                                         |
 | --disable-secrets             |       | `ASPIRATE_DISABLE_SECRETS`             | Disables secrets management features.                                             |

@@ -9,6 +9,8 @@ public sealed class InitCommand : BaseCommand<InitOptions, InitCommandHandler>
     {
         AddOption(ProjectPathOption.Instance);
         AddOption(ContainerBuilderOption.Instance);
+        AddOption(ContainerBuildArgsOption.Instance);
+        AddOption(ContainerBuildContextOption.Instance);
         AddOption(ContainerRegistryOption.Instance);
         AddOption(ContainerRepositoryPrefixOption.Instance);
         AddOption(ContainerImageTagOption.Instance);

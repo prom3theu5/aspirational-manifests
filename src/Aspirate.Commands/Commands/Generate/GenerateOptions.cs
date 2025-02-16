@@ -16,13 +16,17 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public bool? SkipBuild { get; set; }
     public bool? SkipFinalKustomizeGeneration { get; set; }
     public string? ContainerBuilder { get; set; }
+    public List<string>? ContainerBuildArgs { get; set; }
+    public string? ContainerBuildContext { get; set; }
     public string? ContainerRegistry { get; set; }
     public string? ContainerRepositoryPrefix { get; set; }
     public List<string>? ContainerImageTags { get; set; }
     public string? ImagePullPolicy { get; set; }
     public string? OutputFormat { get; set; }
+    public List<string>? Parameters { get; set; }
     public string? RuntimeIdentifier { get; set; }
     public List<string>? ComposeBuilds { get; set; }
+    public bool PreferDockerfile { get; set; }
     public string? PrivateRegistryUrl { get; set; }
     public string? PrivateRegistryUsername { get; set; }
     public string? PrivateRegistryPassword { get; set; }

@@ -10,7 +10,7 @@ public interface IShellExecutionService
     /// </summary>
     /// <param name="options">The options for the shell command.</param>
     /// <returns>
-    /// A <see cref="Task{ShellCommandResult}"/> representing the asynchronous operation.
+    /// A <see cref="Task"/> representing the asynchronous operation.
     /// The task will contain the result of the command execution, encapsulated in a <see cref="ShellCommandResult"/> object.
     /// </returns>
     Task<ShellCommandResult> ExecuteCommand(ShellCommandOptions options);

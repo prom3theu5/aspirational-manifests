@@ -12,7 +12,10 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(SkipBuildOption.Instance);
        AddOption(SkipFinalKustomizeGenerationOption.Instance);
        AddOption(ContainerBuilderOption.Instance);
+       AddOption(ContainerBuildContextOption.Instance);
        AddOption(ContainerImageTagOption.Instance);
+       AddOption(ContainerBuildArgsOption.Instance);
+       AddOption(PreferDockerfileOption.Instance);
        AddOption(ContainerRegistryOption.Instance);
        AddOption(ContainerRepositoryPrefixOption.Instance);
        AddOption(ImagePullPolicyOption.Instance);
@@ -28,5 +31,6 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(IncludeDashboardOption.Instance);
        AddOption(ComposeBuildsOption.Instance);
        AddOption(ReplaceSecretsOption.Instance);
+       AddOption(ParameterResourceValueOption.Instance);
     }
 }

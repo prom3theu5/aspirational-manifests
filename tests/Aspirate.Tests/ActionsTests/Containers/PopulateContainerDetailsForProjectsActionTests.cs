@@ -1,3 +1,8 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Xunit;
+
 namespace Aspirate.Tests.ActionsTests.Containers;
 
 public class PopulateContainerDetailsForProjectsActionTests : BaseActionTests<PopulateContainerDetailsForProjectsAction>

@@ -1,3 +1,5 @@
+using System;
+
 namespace Aspirate.Tests.ActionsTests;
 
 public abstract class BaseActionTests<TSystemUnderTest> : AspirateTestBase

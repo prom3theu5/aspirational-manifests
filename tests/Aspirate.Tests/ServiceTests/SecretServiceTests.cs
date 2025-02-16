@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public class SecretServiceTests : BaseServiceTests<ISecretService>

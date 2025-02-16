@@ -147,6 +147,11 @@ public class VersionCheckService(IFileSystem fs, IAnsiConsole logger) : IVersion
                     $"[italic][yellow]You can update with: [blue]dotnet tool install -g aspirate --prerelease[/].[/][/]");
             }
         }
+        catch (HttpRequestException)
+        {
+            logger.MarkupLine($"[red]Network error: Unable to reach api.nuget.org. Please check your internet connection.[/]");
+            return;
+        }
         catch (Exception e)
         {
             logger.ValidationFailed(e.Message);

@@ -31,7 +31,7 @@ Documentation: https://prom3theu5.github.io/aspirational-manifests/
 dotnet tool install -g aspirate
 ```
 
-> NOTE: Add the `--prelease` option, to install the latest preview version.
+> NOTE: Add the `--prerelease` option, to install the latest preview version.
 
 ## Producing Manifests
 

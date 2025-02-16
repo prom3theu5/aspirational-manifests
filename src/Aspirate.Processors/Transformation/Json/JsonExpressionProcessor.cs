@@ -53,6 +53,7 @@ public sealed partial class JsonExpressionProcessor(IBindingProcessor bindingPro
         }
     }
 
+
     private void HandleJsonObject(JsonNode rootNode, JsonObject jsonObject)
     {
         var keys = new List<string>(((IDictionary<string, JsonNode?>)jsonObject).Keys);

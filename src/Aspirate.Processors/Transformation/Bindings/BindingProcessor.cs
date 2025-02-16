@@ -30,6 +30,7 @@ public sealed class BindingProcessor : IBindingProcessor
             Literals.Port => bindingEntry.Port.GetValueOrDefault() != 0 ? bindingEntry.Port.ToString() : bindingEntry.TargetPort.ToString(),
             Literals.TargetPort => bindingEntry.TargetPort.ToString(),
             Literals.Url => HandleUrlBinding(resourceName, bindingName, bindingEntry),
+            Literals.Scheme => bindingEntry.Scheme,
             _ => throw new InvalidOperationException($"Unknown property {bindingProperty}.")
         };
     }

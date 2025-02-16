@@ -30,7 +30,11 @@ public sealed class BuildAndPushContainersFromProjectsAction(
             {
                 ContainerBuilder = CurrentState.ContainerBuilder.ToLower(),
                 Prefix = CurrentState.ContainerRepositoryPrefix,
-            }, CurrentState.NonInteractive, CurrentState.RuntimeIdentifier);
+                Registry = CurrentState.ContainerRegistry,
+                BuildArgs = CurrentState.ContainerBuildArgs?.ToDictionary(arg => arg.Split('=')[0], arg => arg.Split('=')[1]),
+                BuildContext = CurrentState.ContainerBuildContext,
+                Tags = CurrentState.ContainerImageTags
+            }, CurrentState.NonInteractive, CurrentState.RuntimeIdentifier, CurrentState.PreferDockerfile);
         }
 
         Logger.MarkupLine("[bold]Building and push completed for all selected project components.[/]");

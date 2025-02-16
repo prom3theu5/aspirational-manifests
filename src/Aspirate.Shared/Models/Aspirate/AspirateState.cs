@@ -38,12 +38,20 @@ public class AspirateState :
     public string? Namespace { get; set; }
 
     [RestorableStateProperty]
+    [JsonPropertyName("containerBuildContext")]
+    public string? ContainerBuildContext { get; set; }
+
+    [RestorableStateProperty]
     [JsonPropertyName("containerRegistry")]
     public string? ContainerRegistry { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("containerImageTags")]
     public List<string>? ContainerImageTags { get; set; } = ["latest"];
+
+    [RestorableStateProperty]
+    [JsonPropertyName("containerBuildArgs")]
+    public List<string>? ContainerBuildArgs { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("runtimeIdentifier")]
@@ -76,6 +84,10 @@ public class AspirateState :
     [RestorableStateProperty]
     [JsonPropertyName("outputFormat")]
     public string? OutputFormat { get; set; }
+
+    [RestorableStateProperty]
+    [JsonPropertyName("parameters")]
+    public List<string>? Parameters { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("disableSecrets")]
@@ -127,6 +139,9 @@ public class AspirateState :
 
     [JsonIgnore]
     public bool? SkipBuild { get; set; }
+
+    [JsonIgnore]
+    public bool PreferDockerfile { get; set; }
 
     [JsonIgnore]
     public string? AspireManifest { get; set; }

@@ -1,3 +1,5 @@
+using System;
+
 namespace Aspirate.Tests.ServiceTests;
 
 public abstract class BaseServiceTests<TSystemUnderTest> : AspirateTestBase

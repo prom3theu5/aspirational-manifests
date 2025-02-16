@@ -20,6 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{52460A37-4C1
 		renovate.json = renovate.json
 		build.cake = build.cake
 		dotnet-tools.json = dotnet-tools.json
+		.release-please-manifest.json = .release-please-manifest.json
+		release-please-config.json = release-please-config.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Shared", "src\Aspirate.Shared\Aspirate.Shared.csproj", "{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}"
@@ -42,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "actions", "actions", "{5644
 		.github\workflows\pull-requests.yaml = .github\workflows\pull-requests.yaml
 		.github\workflows\main.yaml = .github\workflows\main.yaml
 		.github\workflows\docs.yaml = .github\workflows\docs.yaml
+		.github\workflows\conventional-commits.yaml = .github\workflows\conventional-commits.yaml
+		.github\workflows\release-please.yaml = .github\workflows\release-please.yaml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Secrets", "src\Aspirate.Secrets\Aspirate.Secrets.csproj", "{5801EDCE-B1D1-474C-8F2B-BB2927372867}"
