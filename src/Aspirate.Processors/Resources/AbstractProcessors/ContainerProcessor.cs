@@ -96,7 +96,7 @@ public class ContainerProcessor(
         }
 
         response.Service = newService.WithRestartPolicy(ERestartMode.UnlessStopped)
-            .WithVolumes(options.Resource.MapComposeVolumes())
+            .WithVolumes(options.Resource.MapComposeVolumes(options.CurrentState?.OutputPath ?? Path.Combine(Environment.CurrentDirectory, AspirateLiterals.DefaultArtifactsPath)))
             .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();
 

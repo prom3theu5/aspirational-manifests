@@ -47,19 +47,21 @@ public static class ResourceExtensions
         return containerVolumes;
     }
 
-    public static string[] MapComposeVolumes(this KeyValuePair<string, Resource> resource)
+    public static string[] MapComposeVolumes(this KeyValuePair<string, Resource> resource, string outputPath)
     {
         var composeVolumes = new List<string>();
 
-        if (resource.Value is not IResourceWithVolumes resourceWithVolumes)
+        if (resource.Value is IResourceWithVolumes resourceWithVolumes)
         {
-            return[];
+            KuberizeVolumeNames(resourceWithVolumes.Volumes, resource);
+
+            composeVolumes.AddRange(resourceWithVolumes.Volumes.Where(x => !string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
         }
 
-
-        KuberizeVolumeNames(resourceWithVolumes.Volumes, resource);
-
-        composeVolumes.AddRange(resourceWithVolumes.Volumes.Where(x=>!string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
+        if (resource.Value is IResourceWithBindMounts resourceWithBindMounts)
+        {
+            composeVolumes.AddRange(resourceWithBindMounts.BindMounts.Select(volume => $"./{Path.GetRelativePath(outputPath, volume.Source).Replace(Path.DirectorySeparatorChar, '/')}:{volume.Target}"));
+        }
 
         return composeVolumes.ToArray();
     }
