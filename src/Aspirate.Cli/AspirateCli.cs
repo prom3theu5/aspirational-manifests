@@ -1,3 +1,6 @@
+using System.CommandLine.Help;
+using Aspirate.Commands.Options;
+
 namespace Aspirate.Cli;
 
 internal class AspirateCli : RootCommand
@@ -14,6 +17,24 @@ internal class AspirateCli : RootCommand
         AnsiConsole.MarkupLine("[bold lime]Handle deployments of a .NET Aspire AppHost[/]");
         AnsiConsole.WriteLine();
     }
+
+    internal static void UseDefaultMasking(HelpContext helpContext)
+    {
+        var secretBaseOptions = helpContext.Command.Options
+            .OfType<IBaseOption>()
+            .Where(x => x.IsSecret)
+            .ToArray();
+
+        foreach (var secretBaseOption in secretBaseOptions)
+        {
+            AddDefaultMaskingForOption(helpContext, secretBaseOption);
+        }
+    }
+
+    private static void AddDefaultMaskingForOption(HelpContext helpContext, IBaseOption baseOption) =>
+        helpContext.HelpBuilder.CustomizeSymbol(
+            (Symbol)baseOption,
+            defaultValue: _ => new MaskedValue(baseOption.GetOptionDefault()?.ToString()).ToString());
 
     private static bool ShouldSkipLogo()
     {

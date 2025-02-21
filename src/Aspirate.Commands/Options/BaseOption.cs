@@ -3,13 +3,17 @@ namespace Aspirate.Commands.Options;
 public abstract class BaseOption<T>(
     string[] aliases,
     string envName,
-    T defaultValue) : Option<T>(aliases,
-    getDefaultValue: GetOptionDefault(envName,
-        defaultValue))
+    T defaultValue) :
+        Option<T>(
+            aliases,
+            getDefaultValue: GetOptionDefault(envName, defaultValue)),
+        IBaseOption
 {
     public abstract bool IsSecret { get; }
 
     public T GetOptionDefault() => GetOptionDefault(envName, defaultValue)();
+
+    object? IBaseOption.GetOptionDefault() => GetOptionDefault();
 
     private static Func<TReturnValue> GetOptionDefault<TReturnValue>(string envVarName, TReturnValue defaultValue) =>
         () =>
@@ -22,7 +26,7 @@ public abstract class BaseOption<T>(
 
             try
             {
-                return (TReturnValue) Convert.ChangeType(envValue, typeof(TReturnValue));
+                return (TReturnValue)Convert.ChangeType(envValue, typeof(TReturnValue));
             }
             catch (Exception)
             {
