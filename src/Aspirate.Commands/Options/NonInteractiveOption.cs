@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class NonInteractiveOption : BaseOption<bool?>
 {
@@ -16,4 +16,6 @@ public sealed class NonInteractiveOption : BaseOption<bool?>
     }
 
     public static NonInteractiveOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

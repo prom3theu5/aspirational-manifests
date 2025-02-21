@@ -16,4 +16,6 @@ public sealed class PrivateRegistryPasswordOption : BaseOption<string?>
     }
 
     public static PrivateRegistryPasswordOption Instance { get; } = new();
+
+    public override bool IsSecret => true;
 }
