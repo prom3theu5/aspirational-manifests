@@ -18,7 +18,7 @@ internal class AspirateCli : RootCommand
         AnsiConsole.WriteLine();
     }
 
-    internal static void UseDefaultMasking(HelpContext helpContext)
+    public static void UseDefaultMasking(HelpContext helpContext)
     {
         var secretBaseOptions = helpContext.Command.Options
             .OfType<IBaseOption>()

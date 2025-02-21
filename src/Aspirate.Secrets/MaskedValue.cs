@@ -13,8 +13,8 @@ public class MaskedValue(
             return string.Empty;
         }
 
-        // We're going for best effort here--if secret is exceedingly small,
-        // we are not going to show any of it unmasked.
+        // We're going for best effort here--if the secret is exceedingly
+        // small, we are not going to show any of it unmasked.
         var unmaskedTotalLength = unmaskedHeadLength + unmaskedTailLength;
 
         if (value.Length < unmaskedTotalLength * 3)
