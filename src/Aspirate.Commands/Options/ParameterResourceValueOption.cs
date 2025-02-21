@@ -17,4 +17,6 @@ public sealed class ParameterResourceValueOption : BaseOption<List<string>?>
     }
 
     public static ParameterResourceValueOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

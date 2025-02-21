@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class OutputPathOption : BaseOption<string>
 {
@@ -8,7 +8,7 @@ public sealed class OutputPathOption : BaseOption<string>
         "--output-path"
     ];
 
-    private OutputPathOption() : base(_aliases,  "ASPIRATE_OUTPUT_PATH", AspirateLiterals.DefaultArtifactsPath)
+    private OutputPathOption() : base(_aliases, "ASPIRATE_OUTPUT_PATH", AspirateLiterals.DefaultArtifactsPath)
     {
         Name = nameof(IGenerateOptions.OutputPath);
         Description = "The output path for generated manifests";
@@ -17,4 +17,6 @@ public sealed class OutputPathOption : BaseOption<string>
     }
 
     public static OutputPathOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

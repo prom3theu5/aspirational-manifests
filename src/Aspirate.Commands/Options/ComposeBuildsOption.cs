@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class ComposeBuildsOption : BaseOption<List<string>?>
 {
@@ -13,4 +13,6 @@ public sealed class ComposeBuildsOption : BaseOption<List<string>?>
     }
 
     public static ComposeBuildsOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

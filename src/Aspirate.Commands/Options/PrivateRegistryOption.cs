@@ -16,4 +16,6 @@ public sealed class PrivateRegistryOption : BaseOption<bool?>
     }
 
     public static PrivateRegistryOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class RollingRestartOption : BaseOption<bool?>
 {
@@ -17,4 +17,6 @@ public sealed class RollingRestartOption : BaseOption<bool?>
     }
 
     public static RollingRestartOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

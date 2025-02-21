@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class ContainerBuilderOption : BaseOption<string>
 {
@@ -10,10 +10,12 @@ public sealed class ContainerBuilderOption : BaseOption<string>
         Description = "The Container Builder: can be 'docker' or 'podman'. The default is 'docker'";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;
-        this.AddValidator(ValidateFormat);
+        AddValidator(ValidateFormat);
     }
 
     public static ContainerBuilderOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 
     private static void ValidateFormat(OptionResult optionResult)
     {

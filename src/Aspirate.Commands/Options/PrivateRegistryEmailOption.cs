@@ -16,4 +16,6 @@ public sealed class PrivateRegistryEmailOption : BaseOption<string?>
     }
 
     public static PrivateRegistryEmailOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

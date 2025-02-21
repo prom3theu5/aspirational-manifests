@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class ImagePullPolicyOption : BaseOption<string?>
 {
@@ -10,10 +10,12 @@ public sealed class ImagePullPolicyOption : BaseOption<string?>
         Description = "The Image pull policy to use when generating manifests";
         Arity = ArgumentArity.ExactlyOne;
         IsRequired = false;
-        this.AddValidator(ValidateFormat);
+        AddValidator(ValidateFormat);
     }
 
     public static ImagePullPolicyOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 
     private static void ValidateFormat(OptionResult optionResult)
     {

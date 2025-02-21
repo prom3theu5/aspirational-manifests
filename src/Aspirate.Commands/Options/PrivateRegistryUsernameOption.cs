@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class PrivateRegistryUsernameOption : BaseOption<string?>
 {
@@ -16,4 +16,6 @@ public sealed class PrivateRegistryUsernameOption : BaseOption<string?>
     }
 
     public static PrivateRegistryUsernameOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

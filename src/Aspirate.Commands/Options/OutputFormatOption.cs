@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class OutputFormatOption : BaseOption<string?>
 {
@@ -10,10 +10,12 @@ public sealed class OutputFormatOption : BaseOption<string?>
         Description = "The output format of the generated manifests. Supported values are 'kustomize', 'compose', and 'helm'.";
         Arity = ArgumentArity.ZeroOrOne;
         IsRequired = false;
-        this.AddValidator(ValidateFormat);
+        AddValidator(ValidateFormat);
     }
 
     public static OutputFormatOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 
     private static void ValidateFormat(OptionResult optionResult)
     {
