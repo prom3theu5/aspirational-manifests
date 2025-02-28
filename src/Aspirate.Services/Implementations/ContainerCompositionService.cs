@@ -12,7 +12,9 @@ public sealed class ContainerCompositionService(
         ContainerOptions options,
         bool nonInteractive = false,
         string? runtimeIdentifier = null,
-        bool verifyImageAge = false)
+        bool verifyImageAge = false,
+        string? privateRegistryUsername = null,
+        string? privateRegistryPassword = null)
     {
         await CheckIfBuilderIsRunning(options.ContainerBuilder);
 
@@ -43,7 +45,7 @@ public sealed class ContainerCompositionService(
         {
             if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
             {
-                await VerifyRegistryImageAgeAsync(containerDetails, publishStartTime);
+                await VerifyRegistryImageAgeAsync(containerDetails, publishStartTime, privateRegistryUsername, privateRegistryPassword);
             }
             else
             {
@@ -229,10 +231,10 @@ public sealed class ContainerCompositionService(
         }
     }
 
-    private async Task VerifyRegistryImageAgeAsync(MsBuildContainerProperties containerDetails, DateTime publishStartTime)
+    private async Task VerifyRegistryImageAgeAsync(MsBuildContainerProperties containerDetails, DateTime publishStartTime, string? privateRegistryUsername, string? privateRegistryPassword)
     {
         console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/] on registry [blue]{containerDetails.ContainerRegistry}[/]");
-        var registryClient = await ContainerRegistryV2Client.ConnectAsync(containerDetails.ContainerRegistry);
+        var registryClient = await ContainerRegistryV2Client.ConnectAsync(containerDetails.ContainerRegistry, privateRegistryUsername, privateRegistryPassword);
         var registryCatalog = await registryClient.GetCatalogAsync();
 
         if (!registryCatalog.Repositories.Contains(containerDetails.ContainerRepository))
