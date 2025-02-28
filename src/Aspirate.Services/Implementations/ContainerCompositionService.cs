@@ -1,4 +1,7 @@
 using Aspirate.Shared.Models.AspireManifests;
+using DockerComposeBuilder.Builders.Services;
+using static System.Net.Mime.MediaTypeNames;
+using static IdentityModel.ClaimComparer;
 
 namespace Aspirate.Services.Implementations;
 
@@ -43,7 +46,14 @@ public sealed class ContainerCompositionService(
 
         if (verifyImageAge)
         {
-            await VerifyImageAgeAsync(containerDetails, publishStartTime);
+            if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
+            {
+                await VerifyRegistryImageAgeAsync(containerDetails, publishStartTime);
+            }
+            else
+            {
+                await VerifyLocalImageAgeAsync(containerDetails, options, nonInteractive, publishStartTime);
+            }
         }
 
         return true;
@@ -188,7 +198,43 @@ public sealed class ContainerCompositionService(
             "[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.Would you like to retry the build explicitly allowing them?[/]");
     }
 
-    private async Task VerifyImageAgeAsync(MsBuildContainerProperties containerDetails, DateTime publishStartTime)
+    private async Task VerifyLocalImageAgeAsync(MsBuildContainerProperties containerDetails, ContainerOptions options, bool? nonInteractive, DateTime publishStartTime)
+    {
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+
+        await CheckIfBuilderIsRunning(options.ContainerBuilder);
+
+        console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/]");
+
+        var inspectCreatedArgumentBuilder = ArgumentsBuilder
+            .Create()
+            .AppendArgument(DockerLiterals.InspectCommand, string.Empty, quoteValue: false)
+            .AppendArgument(DockerLiterals.FormatArgument, "{{ .Created }}", quoteValue: true)
+            .AppendArgument($"{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}", string.Empty, quoteValue: false);
+
+        var inspectCreatedResult = await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = options.ContainerBuilder,
+            ArgumentsBuilder = inspectCreatedArgumentBuilder,
+            NonInteractive = nonInteractive.GetValueOrDefault(),
+            ShowOutput = false,
+        });
+
+        if (inspectCreatedResult.Success)
+        {
+            return;
+        }
+
+        var created = DateTimeOffset.Parse(inspectCreatedResult.Output.Trim());
+
+        if (created < publishStartTime)
+        {
+            console.MarkupLine($"[red bold]Local image [blue]'{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}'[/] is out of date[/]");
+            ActionCausesExitException.ExitNow(5016);
+        }
+    }
+
+    private async Task VerifyRegistryImageAgeAsync(MsBuildContainerProperties containerDetails, DateTime publishStartTime)
     {
         console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/] on registry [blue]{containerDetails.ContainerRegistry}[/]");
         var registryClient = await ContainerRegistryV2Client.ConnectAsync(containerDetails.ContainerRegistry);
