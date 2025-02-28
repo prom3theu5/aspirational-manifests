@@ -1,8 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests;
-using DockerComposeBuilder.Builders.Services;
-using static System.Net.Mime.MediaTypeNames;
-using static IdentityModel.ClaimComparer;
-
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
