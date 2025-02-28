@@ -237,6 +237,7 @@ public static class KubernetesDeploymentDataExtensions
                     Name = x.Name
                 }).ToList(),
                 Type = data.ServiceType,
+                ClusterIP = data.HasPorts ? null : "None",
             },
         };
     }
