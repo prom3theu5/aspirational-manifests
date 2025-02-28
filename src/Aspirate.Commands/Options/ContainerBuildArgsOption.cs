@@ -17,4 +17,6 @@ public sealed class ContainerBuildArgsOption : BaseOption<List<string>?>
     }
 
     public static ContainerBuildArgsOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

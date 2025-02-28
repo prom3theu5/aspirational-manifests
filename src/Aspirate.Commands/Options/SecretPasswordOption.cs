@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class SecretPasswordOption : BaseOption<string?>
 {
@@ -16,4 +16,6 @@ public sealed class SecretPasswordOption : BaseOption<string?>
     }
 
     public static SecretPasswordOption Instance { get; } = new();
+
+    public override bool IsSecret => true;
 }

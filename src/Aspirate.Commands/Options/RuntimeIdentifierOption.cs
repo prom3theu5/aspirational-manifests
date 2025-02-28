@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class RuntimeIdentifierOption : BaseOption<string?>
 {
@@ -13,4 +13,6 @@ public sealed class RuntimeIdentifierOption : BaseOption<string?>
     }
 
     public static RuntimeIdentifierOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }
