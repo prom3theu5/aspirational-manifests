@@ -1,6 +1,6 @@
 namespace Aspirate.Shared.Models.ContainerRegistry;
 
-public class RegistryTagsV2(string name, IReadOnlyCollection<string> tags)
+public class RegistryTagListV2(string name, IReadOnlyCollection<string> tags)
 {
     [JsonPropertyName("name")]
     public string Name { get; } = name;

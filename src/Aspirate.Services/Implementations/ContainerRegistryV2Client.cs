@@ -12,9 +12,12 @@ public class ContainerRegistryV2Client
         ImageV1MediaType = "application/vnd.docker.container.image.v1+json",
         ManifestV2MediaType = "application/vnd.docker.distribution.manifest.v2+json";
 
-    private ContainerRegistryV2Client(HttpClient httpClient)
+    public bool IsTls { get; }
+
+    private ContainerRegistryV2Client(HttpClient httpClient, bool isTls)
     {
         _httpClient = httpClient;
+        IsTls = isTls;
     }
 
     private static Uri CreateV2Uri(string containerRegistry, bool isTls) =>
@@ -22,13 +25,42 @@ public class ContainerRegistryV2Client
 
     public static async Task<ContainerRegistryV2Client> ConnectAsync(
         string containerRegistry,
-#pragma warning disable IDE0060 // Remove unused parameter
-        string? containerUsername = null,
-        string? containerPassword = null)
-#pragma warning restore IDE0060 // Remove unused parameter
+        string? username = null,
+        string? password = null)
     {
         using var client = new HttpClient();
         var exceptions = new List<Exception>();
+
+        string? basicAuthEncodedValue = null;
+
+        if (username != null)
+        {
+            var basicAuthValue = new StringBuilder(username);
+
+            if (password != null)
+            {
+                basicAuthValue.Append(":");
+                basicAuthValue.Append(password);
+            }
+
+            basicAuthEncodedValue = Convert.ToBase64String(
+                Encoding
+                    .GetEncoding("ISO-8859-1")
+                    .GetBytes(basicAuthValue.ToString()));
+        }
+
+        void TryAddAuth(HttpClient client)
+        {
+            if (basicAuthEncodedValue != null)
+            {
+                client.DefaultRequestHeaders.Authorization = new(
+                    "Basic",
+                    basicAuthEncodedValue);
+            }
+
+        }
+
+        TryAddAuth(client);
 
         foreach (var isTls in new[] { true, false })
         {
@@ -44,7 +76,9 @@ public class ContainerRegistryV2Client
                         BaseAddress = uri
                     };
 
-                    return new(containerClient);
+                    TryAddAuth(containerClient);
+
+                    return new(containerClient, isTls);
                 }
             }
             catch (Exception e)
@@ -76,8 +110,8 @@ public class ContainerRegistryV2Client
     public async Task<RegistryCatalogV2> GetCatalogAsync() =>
         await GetAsync<RegistryCatalogV2>("_catalog");
 
-    public async Task<RegistryTagsV2> GetTagsAsync(string repository) =>
-        await GetAsync<RegistryTagsV2>($"{repository}/tags/list");
+    public async Task<RegistryTagListV2> GetTagsAsync(string repository) =>
+        await GetAsync<RegistryTagListV2>($"{repository}/tags/list");
 
     public async Task<ImageManifestListV2> GetManifestAsync(string repository, string tag) =>
         await GetAsync<ImageManifestListV2>($"{repository}/manifests/{tag}", ManifestV2MediaType);

@@ -1,3 +1,5 @@
+using Aspirate.Shared.Models.AspireManifests;
+
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
@@ -27,6 +29,8 @@ public sealed class ContainerCompositionService(
         AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
+        var publishStartTime = DateTime.UtcNow;
+
         await shellExecutionService.ExecuteCommand(new()
         {
             Command = DotNetSdkLiterals.DotNetCommand,
@@ -35,6 +39,8 @@ public sealed class ContainerCompositionService(
             OnFailed = HandleBuildErrors,
             ShowOutput = true,
         });
+
+        await VerifyImageAgeAsync(containerDetails, publishStartTime);
 
         return true;
     }
@@ -176,6 +182,41 @@ public sealed class ContainerCompositionService(
 
         return console.Confirm(
             "[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.Would you like to retry the build explicitly allowing them?[/]");
+    }
+
+    private async Task VerifyImageAgeAsync(MsBuildContainerProperties containerDetails, DateTime publishStartTime)
+    {
+        console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/] on registry [blue]{containerDetails.ContainerRegistry}[/]");
+        var registryClient = await ContainerRegistryV2Client.ConnectAsync(containerDetails.ContainerRegistry);
+        var registryCatalog = await registryClient.GetCatalogAsync();
+
+        if (!registryCatalog.Repositories.Contains(containerDetails.ContainerRepository))
+        {
+            console.MarkupLine($"[red bold]Could not find container repository [blue]'{containerDetails.ContainerRepository}'[/] in registry[/]");
+            ActionCausesExitException.ExitNow(5013);
+        }
+
+        var tagList = await registryClient.GetTagsAsync(containerDetails.ContainerRepository);
+
+        if (!tagList.Tags.Contains(containerDetails.ContainerImageTag))
+        {
+            console.MarkupLine($"[red bold]Could not find container image tag [blue]'{containerDetails.ContainerImageTag}'[/] for repository [blue]'{containerDetails.ContainerRepository}'[/] in registry[/]");
+            ActionCausesExitException.ExitNow(5014);
+        }
+
+        var imageManifestList = await registryClient.GetManifestAsync(
+            containerDetails.ContainerRepository,
+            containerDetails.ContainerImageTag);
+
+        var image = await registryClient.GetDockerImageJsonBlobAsync(
+            containerDetails.ContainerRepository,
+            imageManifestList.Config.Digest);
+
+        if (image.Created < publishStartTime)
+        {
+            console.MarkupLine($"[red bold]Registry image [blue]'{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}'[/] is out of date[/]");
+            ActionCausesExitException.ExitNow(5015);
+        }
     }
 
     private static void AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
