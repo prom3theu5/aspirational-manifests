@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class ContainerBuildContextOption : BaseOption<string?>
 {
@@ -17,4 +17,6 @@ public sealed class ContainerBuildContextOption : BaseOption<string?>
     }
 
     public static ContainerBuildContextOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

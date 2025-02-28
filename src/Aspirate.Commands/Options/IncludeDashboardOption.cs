@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class IncludeDashboardOption : BaseOption<bool?>
 {
@@ -13,4 +13,6 @@ public sealed class IncludeDashboardOption : BaseOption<bool?>
     }
 
     public static IncludeDashboardOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

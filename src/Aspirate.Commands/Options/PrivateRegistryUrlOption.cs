@@ -16,4 +16,6 @@ public sealed class PrivateRegistryUrlOption : BaseOption<string?>
     }
 
     public static PrivateRegistryUrlOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

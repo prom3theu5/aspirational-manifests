@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Commands.Options;
+namespace Aspirate.Commands.Options;
 
 public sealed class ContainerImageTagOption : BaseOption<List<string>?>
 {
@@ -17,4 +17,6 @@ public sealed class ContainerImageTagOption : BaseOption<List<string>?>
     }
 
     public static ContainerImageTagOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

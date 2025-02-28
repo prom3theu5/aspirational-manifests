@@ -13,4 +13,6 @@ public sealed class PreferDockerfileOption : BaseOption<bool?>
     }
 
     public static PreferDockerfileOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }

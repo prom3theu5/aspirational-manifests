@@ -1,5 +1,19 @@
 # Changelog
 
+## [9.0.4](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.3...v9.0.4) (2025-02-28)
+
+
+### 🔥 Bug Fixes
+
+* docker compose port serialization. ComposeBuilder library doesn't automatically register the port type converter. ([#305](https://github.com/prom3theu5/aspirational-manifests/issues/305)) ([2eff1d4](https://github.com/prom3theu5/aspirational-manifests/commit/2eff1d4aa91c58158945f113bbc05e2957f6e9e7))
+
+## [9.0.3](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.2...v9.0.3) (2025-02-28)
+
+
+### 🔥 Bug Fixes
+
+* set 'clusterIP' to 'None' in the case of headless service. ([#298](https://github.com/prom3theu5/aspirational-manifests/issues/298)) ([4fdc5b8](https://github.com/prom3theu5/aspirational-manifests/commit/4fdc5b808e8a0aac84c925b45b12bdd897da3191))
+
 ## [9.0.2](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.1...v9.0.2) (2025-02-16)
 
 
