@@ -13,7 +13,8 @@ public sealed class ContainerCompositionService(
         MsBuildContainerProperties containerDetails,
         ContainerOptions options,
         bool nonInteractive = false,
-        string? runtimeIdentifier = null)
+        string? runtimeIdentifier = null,
+        bool verifyImageAge = false)
     {
         await CheckIfBuilderIsRunning(options.ContainerBuilder);
 
@@ -40,7 +41,10 @@ public sealed class ContainerCompositionService(
             ShowOutput = true,
         });
 
-        await VerifyImageAgeAsync(containerDetails, publishStartTime);
+        if (verifyImageAge)
+        {
+            await VerifyImageAgeAsync(containerDetails, publishStartTime);
+        }
 
         return true;
     }

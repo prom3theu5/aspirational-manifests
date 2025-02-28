@@ -13,6 +13,7 @@ public interface IContainerCompositionService
     /// <param name="options">Container options.</param>
     /// <param name="nonInteractive">Flag indicating whether the process should run in non-interactive mode.</param>
     /// <param name="runtimeIdentifier">The runtime identifier to use for project builds.</param>
+    /// <param name="verifyImageAge">Flag indicating whether the age of the image on the registry should be checked to confirm success of publish.</param>
     /// <returns>
     /// A task representing the asynchronous operation. The task result will be true if the container build and push was successful,
     /// or false if there was an error during the process.
@@ -21,7 +22,8 @@ public interface IContainerCompositionService
         MsBuildContainerProperties containerDetails,
         ContainerOptions options,
         bool nonInteractive = false,
-        string? runtimeIdentifier = null);
+        string? runtimeIdentifier = null,
+        bool verifyImageAge = false);
 
     /// <summary>
     /// Build and push a container for a Dockerfile.

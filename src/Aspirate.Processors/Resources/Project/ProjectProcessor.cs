@@ -70,7 +70,7 @@ public sealed class ProjectProcessor(
             .SetWithPrivateRegistry(options.WithPrivateRegistry.GetValueOrDefault())
             .Validate();
 
-    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive, string? runtimeIdentifier, bool preferDockerfile)
+    public async Task BuildAndPushProjectContainer(KeyValuePair<string, Resource> resource, ContainerOptions options, bool nonInteractive, string? runtimeIdentifier, bool preferDockerfile, bool verifyImageAge)
     {
         var project = resource.Value as ProjectResource;
 
@@ -100,7 +100,7 @@ public sealed class ProjectProcessor(
         }
         else
         {
-            await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, options, nonInteractive, runtimeIdentifier);
+            await containerCompositionService.BuildAndPushContainerForProject(project, containerDetails, options, nonInteractive, runtimeIdentifier, verifyImageAge);
         }
 
         _console.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done: [/] Building and Pushing container for project [blue]{resource.Key}[/]");

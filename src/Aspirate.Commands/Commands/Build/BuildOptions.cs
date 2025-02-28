@@ -13,4 +13,5 @@ public sealed class BuildOptions : BaseCommandOptions, IBuildOptions, IContainer
     public string? RuntimeIdentifier { get; set; }
     public List<string>? ComposeBuilds { get; set; }
     public bool PreferDockerfile { get; set; }
+    public bool VerifyImageAge { get; set; }
 }

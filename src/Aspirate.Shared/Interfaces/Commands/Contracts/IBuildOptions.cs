@@ -5,4 +5,5 @@ public interface IBuildOptions
     string? RuntimeIdentifier { get; set; }
     List<string>? ComposeBuilds { get; set; }
     bool PreferDockerfile { get; set; }
+    bool VerifyImageAge { get; set; }
 }
