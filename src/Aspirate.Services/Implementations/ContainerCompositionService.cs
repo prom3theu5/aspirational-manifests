@@ -11,7 +11,10 @@ public sealed class ContainerCompositionService(
         MsBuildContainerProperties containerDetails,
         ContainerOptions options,
         bool nonInteractive = false,
-        string? runtimeIdentifier = null)
+        string? runtimeIdentifier = null,
+        bool verifyImageAge = false,
+        string? privateRegistryUsername = null,
+        string? privateRegistryPassword = null)
     {
         await CheckIfBuilderIsRunning(options.ContainerBuilder);
 
@@ -27,6 +30,8 @@ public sealed class ContainerCompositionService(
         AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
+        var publishStartTime = DateTime.UtcNow;
+
         await shellExecutionService.ExecuteCommand(new()
         {
             Command = DotNetSdkLiterals.DotNetCommand,
@@ -35,6 +40,18 @@ public sealed class ContainerCompositionService(
             OnFailed = HandleBuildErrors,
             ShowOutput = true,
         });
+
+        if (verifyImageAge)
+        {
+            if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
+            {
+                await VerifyRegistryImageAgeAsync(containerDetails, publishStartTime, privateRegistryUsername, privateRegistryPassword);
+            }
+            else
+            {
+                await VerifyLocalImageAgeAsync(containerDetails, options, nonInteractive, publishStartTime);
+            }
+        }
 
         return true;
     }
@@ -176,6 +193,77 @@ public sealed class ContainerCompositionService(
 
         return console.Confirm(
             "[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.Would you like to retry the build explicitly allowing them?[/]");
+    }
+
+    private async Task VerifyLocalImageAgeAsync(MsBuildContainerProperties containerDetails, ContainerOptions options, bool? nonInteractive, DateTime publishStartTime)
+    {
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+
+        await CheckIfBuilderIsRunning(options.ContainerBuilder);
+
+        console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/]");
+
+        var inspectCreatedArgumentBuilder = ArgumentsBuilder
+            .Create()
+            .AppendArgument(DockerLiterals.InspectCommand, string.Empty, quoteValue: false)
+            .AppendArgument(DockerLiterals.FormatArgument, "{{ .Created }}", quoteValue: true)
+            .AppendArgument($"{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}", string.Empty, quoteValue: false);
+
+        var inspectCreatedResult = await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = options.ContainerBuilder,
+            ArgumentsBuilder = inspectCreatedArgumentBuilder,
+            NonInteractive = nonInteractive.GetValueOrDefault(),
+            ShowOutput = false,
+        });
+
+        if (inspectCreatedResult.Success)
+        {
+            return;
+        }
+
+        var created = DateTimeOffset.Parse(inspectCreatedResult.Output.Trim());
+
+        if (created < publishStartTime)
+        {
+            console.MarkupLine($"[red bold]Local image [blue]'{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}'[/] is out of date[/]");
+            ActionCausesExitException.ExitNow(5016);
+        }
+    }
+
+    private async Task VerifyRegistryImageAgeAsync(MsBuildContainerProperties containerDetails, DateTime publishStartTime, string? privateRegistryUsername, string? privateRegistryPassword)
+    {
+        console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/] on registry [blue]{containerDetails.ContainerRegistry}[/]");
+        var registryClient = await ContainerRegistryV2Client.ConnectAsync(containerDetails.ContainerRegistry, privateRegistryUsername, privateRegistryPassword);
+        var registryCatalog = await registryClient.GetCatalogAsync();
+
+        if (!registryCatalog.Repositories.Contains(containerDetails.ContainerRepository))
+        {
+            console.MarkupLine($"[red bold]Could not find container repository [blue]'{containerDetails.ContainerRepository}'[/] in registry[/]");
+            ActionCausesExitException.ExitNow(5013);
+        }
+
+        var tagList = await registryClient.GetTagsAsync(containerDetails.ContainerRepository);
+
+        if (!tagList.Tags.Contains(containerDetails.ContainerImageTag))
+        {
+            console.MarkupLine($"[red bold]Could not find container image tag [blue]'{containerDetails.ContainerImageTag}'[/] for repository [blue]'{containerDetails.ContainerRepository}'[/] in registry[/]");
+            ActionCausesExitException.ExitNow(5014);
+        }
+
+        var imageManifestList = await registryClient.GetManifestAsync(
+            containerDetails.ContainerRepository,
+            containerDetails.ContainerImageTag);
+
+        var image = await registryClient.GetDockerImageJsonBlobAsync(
+            containerDetails.ContainerRepository,
+            imageManifestList.Config.Digest);
+
+        if (image.Created < publishStartTime)
+        {
+            console.MarkupLine($"[red bold]Registry image [blue]'{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}'[/] is out of date[/]");
+            ActionCausesExitException.ExitNow(5015);
+        }
     }
 
     private static void AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)
