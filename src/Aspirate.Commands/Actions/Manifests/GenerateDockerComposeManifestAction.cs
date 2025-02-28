@@ -1,3 +1,7 @@
+using DockerComposeBuilder.Converters;
+using DockerComposeBuilder.Emitters;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using Volume = DockerComposeBuilder.Model.Volume;
 
 namespace Aspirate.Commands.Actions.Manifests;
@@ -53,7 +57,18 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
 
         composeFile.Version = null;
 
-        var composeFileString = composeFile.Serialize();
+        var serializer = new SerializerBuilder()
+            .WithTypeConverter(new YamlValueCollectionConverter())
+            .WithTypeConverter(new PublishedPortConverter())
+            .WithNamingConvention(UnderscoredNamingConvention.Instance)
+            .WithEventEmitter(nextEmitter => new FlowStyleStringSequences(nextEmitter))
+            .WithEventEmitter(nextEmitter => new FlowStringEnumConverter(nextEmitter))
+            .WithEventEmitter(nextEmitter => new ForceQuotedStringValuesEventEmitter(nextEmitter))
+            .WithEmissionPhaseObjectGraphVisitor(args => new YamlIEnumerableSkipEmptyObjectGraphVisitor(args.InnerVisitor))
+            .WithNewLine("\n")
+            .Build();
+
+        var composeFileString = serializer.Serialize(composeFile);
 
         WriteComposeOutputToOutputPath(outputPath, composeFileString);
     }

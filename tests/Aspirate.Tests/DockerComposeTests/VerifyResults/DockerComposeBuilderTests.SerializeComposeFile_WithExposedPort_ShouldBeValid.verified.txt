@@ -1,0 +1,9 @@
+﻿version: "3.8"
+services:
+  a-service:
+    image: "dotnetaspire/servicea"
+    build:
+      dockerfile: "a.dockerfile"
+    ports:
+    - target: 18888
+      published: 18888

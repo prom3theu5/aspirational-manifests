@@ -1,0 +1,23 @@
+﻿version: "3.8"
+services:
+  a-service:
+    image: "dotnetaspire/servicea"
+    build:
+      dockerfile: "a.dockerfile"
+    ports:
+    - target: 18888
+      published: 18888
+    - target: 18889
+      published: 18889
+    - target: 18890
+      published: 18890
+    - target: 18891
+      published: 18891
+    - target: 18891
+      published: 18891
+      protocol: "tcp"
+      name: "custom-name"
+    - target: 18891
+      published: 18891
+      protocol: "udp"
+      name: "custom-name-two"
