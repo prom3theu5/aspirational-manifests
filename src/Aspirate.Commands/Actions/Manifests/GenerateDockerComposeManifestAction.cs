@@ -91,7 +91,7 @@ public sealed class GenerateDockerComposeManifestAction(IServiceProvider service
         {
             if (service.Volumes is not null)
             {
-                volumes.AddRange(service.Volumes.Select(volume => new Volume { Name = volume.Split(':')[0] }));
+                volumes.AddRange(service.Volumes.Where(volume => !volume.Split(':')[0].Contains('/')).Select(volume => new Volume { Name = volume.Split(':')[0] }));
             }
         }
 
