@@ -297,4 +297,52 @@ public class ContainerRegistryV2ClientTests
         Assert.Single(tagList.Tags);
         Assert.Equal("1.2.3-alpha2", tagList.Tags.Single());
     }
+
+    [Fact]
+    public async Task GetManifest_ManifestShouldContainConfig()
+    {
+        // Arrange
+        var catalog = await ContainerRegistryClient.GetCatalogAsync();
+        var repository = catalog.Repositories.Single();
+        var tagList = await ContainerRegistryClient.GetTagsAsync(repository);
+        var tag = tagList.Tags.Single();
+
+        // Act
+        var manifest = await ContainerRegistryClient.GetManifestAsync(repository, tag);
+
+
+        // Assert
+        Assert.NotNull(manifest);
+        Assert.NotNull(manifest.Config);
+        Assert.NotNull(manifest.Config.Digest);
+        Assert.NotNull(manifest.Config.MediaType);
+        Assert.Equal("application/vnd.docker.container.image.v1+json", manifest.Config.MediaType);
+        Assert.Equal(3016, manifest.Config.Size);
+        Assert.Equal("sha256:727c8878fed3a91e240ca89ab5b177ec7887b8e094982289ea78240776c358b8", manifest.Config.Digest);
+    }
+
+    [Fact]
+    public async Task GetDockerImageJsonBlob_BlobShouldHaveCreatedDate()
+    {
+        // Arrange
+        var catalog = await ContainerRegistryClient.GetCatalogAsync();
+        var repository = catalog.Repositories.Single();
+        var tagList = await ContainerRegistryClient.GetTagsAsync(repository);
+        var tag = tagList.Tags.Single();
+        var manifest = await ContainerRegistryClient.GetManifestAsync(repository, tag);
+
+        // Act
+        var dockerImage = await ContainerRegistryClient.GetDockerImageJsonBlobAsync(repository, manifest.Config.Digest);
+
+        // Assert
+        Assert.NotNull(dockerImage);
+        Assert.Equal(2025, dockerImage.Created.Year);
+        Assert.Equal(3, dockerImage.Created.Month);
+        Assert.Equal(1, dockerImage.Created.Day);
+        Assert.Equal(0, dockerImage.Created.Hour);
+        Assert.Equal(48, dockerImage.Created.Minute);
+        Assert.Equal(57, dockerImage.Created.Second);
+        Assert.Equal(101, dockerImage.Created.Millisecond);
+        Assert.Equal(666, dockerImage.Created.Microsecond);
+    }
 }
