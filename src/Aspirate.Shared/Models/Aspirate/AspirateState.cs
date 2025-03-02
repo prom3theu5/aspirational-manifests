@@ -144,6 +144,9 @@ public class AspirateState :
     public bool PreferDockerfile { get; set; }
 
     [JsonIgnore]
+    public bool VerifyImageAge { get; set; }
+
+    [JsonIgnore]
     public string? AspireManifest { get; set; }
 
     [JsonIgnore]
