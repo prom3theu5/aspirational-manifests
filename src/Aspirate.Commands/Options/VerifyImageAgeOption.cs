@@ -16,4 +16,6 @@ public sealed class VerifyImageAgeOption : BaseOption<bool?>
     }
 
     public static VerifyImageAgeOption Instance { get; } = new();
+
+    public override bool IsSecret => false;
 }
