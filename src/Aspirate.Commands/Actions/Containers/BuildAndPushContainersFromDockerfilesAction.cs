@@ -14,9 +14,15 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
 
         HandleComposeOutputBuildSelectionForDockerfiles();
 
-        var dockerfileProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Dockerfile) as DockerfileProcessor;
+        var dockerfileProcessor =
+            Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Dockerfile) as IDockerBuildProcessor;
+
+        var cv1Processor =
+            Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.ContainerV1) as IDockerBuildProcessor;
 
         CacheContainerDetails(dockerfileProcessor);
+
+        CacheContainerDetails(cv1Processor);
 
         if (CurrentState.SkipBuild == true)
         {
@@ -25,6 +31,8 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         }
 
         await PerformBuildAndPushes(dockerfileProcessor);
+
+        await PerformBuildAndPushes(cv1Processor);
 
         return true;
     }
@@ -51,7 +59,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         }
     }
 
-    private void CacheContainerDetails(DockerfileProcessor? dockerfileProcessor)
+    private void CacheContainerDetails(IDockerBuildProcessor? dockerfileProcessor)
     {
         foreach (var resource in CurrentState.SelectedDockerfileComponents.Where(resource => CurrentState.ComposeBuilds?.Contains(resource.Key) != true))
         {
@@ -111,7 +119,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         }
     }
 
-    private async Task PerformBuildAndPushes(DockerfileProcessor? dockerfileProcessor)
+    private async Task PerformBuildAndPushes(IDockerBuildProcessor? dockerfileProcessor)
     {
         foreach (var resource in CurrentState.SelectedDockerfileComponents.Where(resource => CurrentState.ComposeBuilds?.Contains(resource.Key) != true))
         {
