@@ -1,3 +1,5 @@
+using Aspirate.Shared.Models.AspireManifests.Components.V1.Container;
+
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
@@ -39,17 +41,37 @@ public sealed class ContainerCompositionService(
         return true;
     }
 
-    public async Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, ContainerOptions options, bool? nonInteractive = false)
+    public async Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, ContainerOptions options, bool? nonInteractive = false) =>
+        await BuildAndPushContainerForDockerfile(
+            dockerfileResource.Context,
+            dockerfileResource.Env,
+            dockerfileResource.BuildArgs,
+            dockerfileResource.Path,
+            dockerfileResource.Name,
+            options,
+            nonInteractive);
+
+    public async Task<bool> BuildAndPushContainerForDockerfile(ContainerV1Resource containerV1Resource, ContainerOptions options, bool? nonInteractive = false) =>
+        await BuildAndPushContainerForDockerfile(
+            containerV1Resource.Build.Context,
+            containerV1Resource.Env,
+            containerV1Resource.Build.Args,
+            containerV1Resource.Build.Dockerfile,
+            containerV1Resource.Name,
+            options,
+            nonInteractive);
+
+    private async Task<bool> BuildAndPushContainerForDockerfile(string context, Dictionary<string, string>? env, Dictionary<string, string> buildArgs, string dockerfile, string resourceName, ContainerOptions options, bool? nonInteractive = false)
     {
         ArgumentNullException.ThrowIfNull(options, nameof(options));
 
         await CheckIfBuilderIsRunning(options.ContainerBuilder);
 
-        var fullDockerfilePath = filesystem.GetFullPath(dockerfileResource.Path);
+        var fullDockerfilePath = filesystem.GetFullPath(dockerfile);
 
-        var fullImages = options.ToImageNames(dockerfileResource.Name);
+        var fullImages = options.ToImageNames(resourceName);
 
-        var result = await BuildContainer(dockerfileResource, options.ContainerBuilder, nonInteractive, fullImages, fullDockerfilePath);
+        var result = await BuildContainer(context, env, buildArgs, options.ContainerBuilder, nonInteractive, fullImages, fullDockerfilePath);
 
         CheckSuccess(result);
 
@@ -95,7 +117,7 @@ public sealed class ContainerCompositionService(
         return new ShellCommandResult(true, string.Empty, string.Empty, 0);
     }
 
-    private Task<ShellCommandResult> BuildContainer(DockerfileResource dockerfileResource, string builder, bool? nonInteractive, List<string> tags, string fullDockerfilePath)
+    private Task<ShellCommandResult> BuildContainer(string context, Dictionary<string, string>? env, Dictionary<string, string> buildArgs, string builder, bool? nonInteractive, List<string> tags, string fullDockerfilePath)
     {
         var buildArgumentBuilder = ArgumentsBuilder
             .Create()
@@ -106,19 +128,19 @@ public sealed class ContainerCompositionService(
             buildArgumentBuilder.AppendArgument(DockerLiterals.TagArgument, tag.ToLower(), allowDuplicates: true);
         }
 
-        if (dockerfileResource.Env is not null)
+        if (env is not null)
         {
-            AddDockerBuildArgs(buildArgumentBuilder, dockerfileResource.Env);
+            AddDockerBuildArgs(buildArgumentBuilder, env);
         }
 
-        if (dockerfileResource.BuildArgs is not null)
+        if (buildArgs is not null)
         {
-            AddDockerBuildArgs(buildArgumentBuilder, dockerfileResource.BuildArgs);
+            AddDockerBuildArgs(buildArgumentBuilder, buildArgs);
         }
 
         buildArgumentBuilder
             .AppendArgument(DockerLiterals.DockerFileArgument, fullDockerfilePath)
-            .AppendArgument(dockerfileResource.Context, string.Empty, quoteValue: false);
+            .AppendArgument(context, string.Empty, quoteValue: false);
 
         return shellExecutionService.ExecuteCommand(new()
         {

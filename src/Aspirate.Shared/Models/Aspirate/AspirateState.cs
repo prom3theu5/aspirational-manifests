@@ -1,3 +1,5 @@
+using Aspirate.Shared.Models.AspireManifests.Components.V1.Container;
+
 namespace Aspirate.Shared.Models.Aspirate;
 
 public class AspirateState :
@@ -179,7 +181,9 @@ public class AspirateState :
     [JsonIgnore]
     public List<KeyValuePair<string, Resource>> SelectedDockerfileComponents =>
         LoadedAspireManifestResources
-            .Where(x => x.Value is DockerfileResource && AspireComponentsToProcess.Contains(x.Key))
+            .Where(x =>
+                (x.Value is DockerfileResource || (x.Value is ContainerV1Resource c && c.Build != null)) &&
+                AspireComponentsToProcess.Contains(x.Key))
             .ToList();
 
     [JsonIgnore]
