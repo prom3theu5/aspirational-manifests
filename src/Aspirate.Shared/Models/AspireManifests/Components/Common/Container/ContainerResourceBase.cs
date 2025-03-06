@@ -1,5 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests.Components.Common;
-
 namespace Aspirate.Shared.Models.AspireManifests.Components.Common.Container;
 
 public class ContainerResourceBase : Resource,
