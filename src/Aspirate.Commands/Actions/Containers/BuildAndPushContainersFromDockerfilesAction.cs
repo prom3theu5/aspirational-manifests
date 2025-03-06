@@ -1,5 +1,4 @@
 using Aspirate.Processors.Resources.AbstractProcessors;
-using Aspirate.Processors.Resources.Dockerfile;
 
 namespace Aspirate.Commands.Actions.Containers;
 
@@ -81,8 +80,10 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             return;
         }
 
-        var dockerFileEntries = CurrentState.LoadedAspireManifestResources.Where(x => x.Value is DockerfileResource)
-            .Select(x => x.Key).ToList();
+        var dockerFileEntries = CurrentState.LoadedAspireManifestResources
+            .Where(x => x.Value is DockerfileResource || (x.Value is ContainerV1Resource c && c.Build != null))
+            .Select(x => x.Key)
+            .ToList();
 
         var selectedEntries = Logger.Prompt(
                 new MultiSelectionPrompt<string>()

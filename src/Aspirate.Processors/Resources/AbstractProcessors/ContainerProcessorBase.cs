@@ -136,13 +136,20 @@ public abstract class ContainerProcessorBase<TContainerResource>(
         {
             service.WithImage(containerV0.Image.ToLowerInvariant());
         }
-        else if (container is ContainerV1Resource containerV1 && options.ComposeBuilds == true)
+        else if (container is ContainerV1Resource containerV1)
         {
-            service.WithBuild(builder =>
-                builder
-                    .WithContext(containerV1.Build.Context)
-                    .WithDockerfile(containerV1.Build.Dockerfile)
-                    .Build());
+            if (containerV1.Image != null)
+            {
+                service.WithImage(containerV1.Image.ToLowerInvariant());
+            }
+            else if (containerV1.Build != null && options.ComposeBuilds == true)
+            {
+                service.WithBuild(builder =>
+                    builder
+                        .WithContext(_fileSystem.GetFullPath(containerV1.Build.Context))
+                        .WithDockerfile(_fileSystem.GetFullPath(containerV1.Build.Dockerfile))
+                        .Build());
+            }
         }
 
         if (container.Args is not null)
