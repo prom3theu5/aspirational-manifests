@@ -11,6 +11,7 @@ global using Aspirate.Commands.Actions.Manifests;
 global using Aspirate.Commands.Actions.Secrets;
 global using Aspirate.Commands.Options;
 global using Aspirate.Processors;
+global using Aspirate.Processors.Resources.AbstractProcessors;
 global using Aspirate.Processors.Resources.Dockerfile;
 global using Aspirate.Processors.Transformation;
 global using Aspirate.Shared.Enums;
