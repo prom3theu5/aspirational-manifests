@@ -1,5 +1,3 @@
-using Aspirate.Shared.Models.AspireManifests.Components.V1.Container;
-
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(

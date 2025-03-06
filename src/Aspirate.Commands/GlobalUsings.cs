@@ -29,6 +29,7 @@ global using Aspirate.Shared.Models.AspireManifests.Components.V0;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0.Dapr;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0.Parameters;
+global using Aspirate.Shared.Models.AspireManifests.Components.V1.Container;
 global using Aspirate.Shared.Models.AspireManifests.Interfaces;
 global using DockerComposeBuilder.Builders;
 global using DockerComposeBuilder.Enums;

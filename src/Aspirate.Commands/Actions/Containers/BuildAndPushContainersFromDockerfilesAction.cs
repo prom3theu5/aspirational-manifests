@@ -1,6 +1,5 @@
 using Aspirate.Processors.Resources.AbstractProcessors;
 using Aspirate.Processors.Resources.Dockerfile;
-using Aspirate.Shared.Models.AspireManifests.Components.V1.Container;
 
 namespace Aspirate.Commands.Actions.Containers;
 
