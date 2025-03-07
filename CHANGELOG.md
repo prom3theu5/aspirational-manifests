@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.1.0](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.4...v9.1.0) (2025-03-07)
+
+
+### 🚀 New Features
+
+* Container v1 support ([#309](https://github.com/prom3theu5/aspirational-manifests/issues/309)) ([adcf54c](https://github.com/prom3theu5/aspirational-manifests/commit/adcf54cad015ab40f21c5712abaf87b2809cd4a2))
+
+
+### ⌨️ Code Refactoring
+
+* Resource warning/error improvements ([#310](https://github.com/prom3theu5/aspirational-manifests/issues/310)) ([810a9a1](https://github.com/prom3theu5/aspirational-manifests/commit/810a9a1bf3939aa20e4d2ea3c3cd29eaf2d9d61e))
+
 ## [9.0.4](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.3...v9.0.4) (2025-02-28)
 
 
