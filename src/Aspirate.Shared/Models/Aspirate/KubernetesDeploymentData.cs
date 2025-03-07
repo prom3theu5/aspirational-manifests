@@ -1,4 +1,4 @@
-using Volume = Aspirate.Shared.Models.AspireManifests.Components.V0.Volume;
+using Volume = Aspirate.Shared.Models.AspireManifests.Components.Common.Volume;
 
 namespace Aspirate.Shared.Models.Aspirate;
 

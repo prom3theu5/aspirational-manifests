@@ -10,7 +10,7 @@ public class DockerfileProcessor(
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService,
     IManifestWriter manifestWriter)
-    : BaseResourceProcessor(fileSystem, console, manifestWriter)
+    : BaseResourceProcessor(fileSystem, console, manifestWriter), IImageProcessor
 {
     /// <inheritdoc />
     public override string ResourceType => AspireComponentLiterals.Dockerfile;

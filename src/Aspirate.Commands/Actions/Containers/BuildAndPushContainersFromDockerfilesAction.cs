@@ -15,8 +15,9 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         HandleComposeOutputBuildSelectionForDockerfiles();
 
         var dockerfileProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Dockerfile) as DockerfileProcessor;
+        var containerV1Processor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.ContainerV1) as ContainerV1Processor;
 
-        CacheContainerDetails(dockerfileProcessor);
+        CacheContainerDetails(dockerfileProcessor, containerV1Processor);
 
         if (CurrentState.SkipBuild == true)
         {
@@ -24,7 +25,7 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             return true;
         }
 
-        await PerformBuildAndPushes(dockerfileProcessor);
+        await PerformBuildAndPushes(dockerfileProcessor, containerV1Processor);
 
         return true;
     }
@@ -51,18 +52,24 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         }
     }
 
-    private void CacheContainerDetails(DockerfileProcessor? dockerfileProcessor)
+    private void CacheContainerDetails(DockerfileProcessor dockerfileProcessor, ContainerV1Processor containerV1Processor)
     {
         foreach (var resource in CurrentState.SelectedDockerfileComponents.Where(resource => CurrentState.ComposeBuilds?.Contains(resource.Key) != true))
         {
-            dockerfileProcessor.PopulateContainerImageCacheWithImage(resource, new()
-            {
-                Registry = CurrentState.ContainerRegistry,
-                Prefix = CurrentState.ContainerRepositoryPrefix,
-                Tags = CurrentState.ContainerImageTags,
-            });
+            SelectImageProcessor(resource.Value, dockerfileProcessor, containerV1Processor)
+                .PopulateContainerImageCacheWithImage(resource, new()
+                {
+                    Registry = CurrentState.ContainerRegistry,
+                    Prefix = CurrentState.ContainerRepositoryPrefix,
+                    Tags = CurrentState.ContainerImageTags,
+                });
         }
     }
+
+    private IImageProcessor SelectImageProcessor(Resource resource, DockerfileProcessor dockerfileProcessor, ContainerV1Processor containerV1Processor) =>
+        resource is DockerfileResource ? dockerfileProcessor :
+        resource is ContainerV1Resource ? containerV1Processor :
+            throw new InvalidOperationException($"Unexpected resource type {resource?.GetType().Name}");
 
     private void SelectComposeItemsToIncludeAsComposeBuilds()
     {
@@ -71,8 +78,10 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
             return;
         }
 
-        var dockerFileEntries = CurrentState.LoadedAspireManifestResources.Where(x => x.Value is DockerfileResource)
-            .Select(x => x.Key).ToList();
+        var dockerFileEntries = CurrentState.LoadedAspireManifestResources
+            .Where(x => x.Value is DockerfileResource || (x.Value is ContainerV1Resource c && c.Build != null))
+            .Select(x => x.Key)
+            .ToList();
 
         var selectedEntries = Logger.Prompt(
                 new MultiSelectionPrompt<string>()
@@ -111,18 +120,19 @@ public sealed class BuildAndPushContainersFromDockerfilesAction(
         }
     }
 
-    private async Task PerformBuildAndPushes(DockerfileProcessor? dockerfileProcessor)
+    private async Task PerformBuildAndPushes(DockerfileProcessor dockerfileProcessor, ContainerV1Processor containerV1Processor)
     {
         foreach (var resource in CurrentState.SelectedDockerfileComponents.Where(resource => CurrentState.ComposeBuilds?.Contains(resource.Key) != true))
         {
-            await dockerfileProcessor.BuildAndPushContainerForDockerfile(resource, new()
-            {
-                ContainerBuilder = CurrentState.ContainerBuilder.ToLower(),
-                ImageName = resource.Key,
-                Registry = CurrentState.ContainerRegistry,
-                Prefix = CurrentState.ContainerRepositoryPrefix,
-                Tags = CurrentState.ContainerImageTags
-            }, CurrentState.NonInteractive);
+            await SelectImageProcessor(resource.Value, dockerfileProcessor, containerV1Processor)
+                .BuildAndPushContainerForDockerfile(resource, new()
+                {
+                    ContainerBuilder = CurrentState.ContainerBuilder.ToLower(),
+                    ImageName = resource.Key,
+                    Registry = CurrentState.ContainerRegistry,
+                    Prefix = CurrentState.ContainerRepositoryPrefix,
+                    Tags = CurrentState.ContainerImageTags
+                }, CurrentState.NonInteractive);
         }
     }
 

@@ -1,16 +1,16 @@
 namespace Aspirate.Processors.Resources.AbstractProcessors;
 
 /// <summary>
-/// A container component for version 0 of Aspire.
+/// A container component for version 1 of Aspire.
 /// </summary>
-public class ContainerProcessor(
+public class ContainerV1Processor(
     IFileSystem fileSystem,
     IAnsiConsole console,
     ISecretProvider secretProvider,
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService,
     IManifestWriter manifestWriter)
-        : ContainerProcessorBase<ContainerResource>(
+        : ContainerProcessorBase<ContainerV1Resource>(
             fileSystem,
             console,
             secretProvider,
@@ -19,5 +19,5 @@ public class ContainerProcessor(
             manifestWriter)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireComponentLiterals.Container;
+    public override string ResourceType => AspireComponentLiterals.ContainerV1;
 }
