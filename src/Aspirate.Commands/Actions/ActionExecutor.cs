@@ -74,6 +74,12 @@ public class ActionExecutor(IAnsiConsole console, IServiceProvider serviceProvid
             }
             catch (ActionCausesExitException exitException)
             {
+                // If we have an exception message, print it.
+                if (exitException.Message != null)
+                {
+                    console.MarkupLine($"[red bold]Error executing action [blue]'{executionAction.ActionKey}'[/]: {exitException.Message}[/]");
+                }
+
                 // Do nothing - the action is planned, and will skip the rest of the queue, returning the exit code.
                 console.MarkupLine($"[red bold]({exitException.ExitCode}): Aspirate will now exit.[/]");
                 return exitException.ExitCode;
