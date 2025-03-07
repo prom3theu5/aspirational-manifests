@@ -40,7 +40,7 @@ public class ManifestFileParserService(
 
             if (type == null)
             {
-                console.MarkupLine($"[yellow]Resource {resourceName} does not have a type. Skipping as UnsupportedResource.[/]");
+                console.MarkupLine($"[yellow]Resource '{resourceName}' does not have a type. Skipping as UnsupportedResource.[/]");
                 resources.Add(resourceName, new UnsupportedResource());
                 continue;
             }
@@ -48,9 +48,19 @@ public class ManifestFileParserService(
             var rawBytes = Encoding.UTF8.GetBytes(resourceElement.GetRawText());
             var reader = new Utf8JsonReader(rawBytes);
 
-            var resource = serviceProvider.GetKeyedService<IResourceProcessor>(type) is { } handler
-                ? handler.Deserialize(ref reader)
-                : new UnsupportedResource();
+            var resourceProcessor = serviceProvider.GetKeyedService<IResourceProcessor>(type);
+
+            Resource resource;
+
+            if (resourceProcessor != null)
+            {
+                resource = resourceProcessor.Deserialize(ref reader);
+            }
+            else
+            {
+                console.MarkupLine($"[yellow]Resource '{resourceName}' is unsupported type '{type}'. Skipping as UnsupportedResource.[/]");
+                resource = new UnsupportedResource();
+            }
 
             if (resource != null)
             {

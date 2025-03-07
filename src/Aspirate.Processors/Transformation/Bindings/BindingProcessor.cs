@@ -1,3 +1,5 @@
+using Aspirate.Shared.Exceptions;
+
 namespace Aspirate.Processors.Transformation.Bindings;
 
 public sealed class BindingProcessor : IBindingProcessor
@@ -22,7 +24,15 @@ public sealed class BindingProcessor : IBindingProcessor
 
     private static string? ParseBinding(string resourceName, string bindingName, string bindingProperty, JsonNode? rootNode)
     {
-        var bindingEntry = rootNode[resourceName][Literals.Bindings][bindingName].Deserialize<Binding>();
+        string GetPath()
+        {
+            return string.Join('.', resourceName, Literals.Bindings, bindingName, bindingProperty);
+        }
+
+        var resource = rootNode[resourceName] ??
+            throw new ActionCausesExitException(1500, $"Unknown resource '{resourceName}' in reference expression '{GetPath()}'.");
+
+        var bindingEntry = resource[Literals.Bindings][bindingName].Deserialize<Binding>();
 
         return bindingProperty switch
         {
@@ -31,7 +41,7 @@ public sealed class BindingProcessor : IBindingProcessor
             Literals.TargetPort => bindingEntry.TargetPort.ToString(),
             Literals.Url => HandleUrlBinding(resourceName, bindingName, bindingEntry),
             Literals.Scheme => bindingEntry.Scheme,
-            _ => throw new InvalidOperationException($"Unknown property {bindingProperty}.")
+            _ => throw new ActionCausesExitException(1501, $"Unknown property {bindingProperty} in reference expression '{GetPath()}'.")
         };
     }
 
