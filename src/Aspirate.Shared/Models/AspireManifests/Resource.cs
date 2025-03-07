@@ -8,6 +8,7 @@ namespace Aspirate.Shared.Models.AspireManifests;
 [JsonDerivedType(typeof(ProjectResource), typeDiscriminator: "aspire.project")]
 [JsonDerivedType(typeof(DockerfileResource), typeDiscriminator: "aspire.dockerfile")]
 [JsonDerivedType(typeof(ContainerResource), typeDiscriminator: "aspire.container")]
+[JsonDerivedType(typeof(ContainerV1Resource), typeDiscriminator: "aspire.container.v1")]
 [JsonDerivedType(typeof(DaprResource), typeDiscriminator: "aspire.dapr")]
 [JsonDerivedType(typeof(DaprComponentResource), typeDiscriminator: "aspire.daprcomponent")]
 [JsonDerivedType(typeof(ParameterResource), typeDiscriminator: "aspire.parameter")]

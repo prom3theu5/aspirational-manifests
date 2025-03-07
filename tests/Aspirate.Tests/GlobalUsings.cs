@@ -18,6 +18,7 @@ global using Aspirate.Shared.Literals;
 global using Aspirate.Shared.Models;
 global using Aspirate.Shared.Models.Aspirate;
 global using Aspirate.Shared.Models.AspireManifests.Components;
+global using Aspirate.Shared.Models.AspireManifests.Components.Common;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0;
 global using Aspirate.Shared.Models.AspireManifests.Components.V0.Parameters;
 global using Aspirate.Shared.Models.AspireManifests.Interfaces;

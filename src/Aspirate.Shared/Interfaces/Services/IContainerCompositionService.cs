@@ -40,4 +40,6 @@ public interface IContainerCompositionService
     /// The nonInteractive parameter can be set to true to suppress any interactive prompts during the build process.
     /// </remarks>
     Task<bool> BuildAndPushContainerForDockerfile(DockerfileResource dockerfileResource, ContainerOptions options, bool? nonInteractive);
+
+    Task<bool> BuildAndPushContainerForDockerfile(ContainerV1Resource containerV1Resource, ContainerOptions options, bool? nonInteractive);
 }
