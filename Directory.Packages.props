@@ -36,5 +36,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
+    <PackageVersion Include="Valleysoft.DockerCredsProvider" Version="2.2.4" />
   </ItemGroup>
 </Project>

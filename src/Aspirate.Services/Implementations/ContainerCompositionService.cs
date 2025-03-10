@@ -1,3 +1,6 @@
+using Valleysoft.DockerCredsProvider;
+using Aspirate.Shared.Models.ContainerRegistry;
+
 namespace Aspirate.Services.Implementations;
 
 public sealed class ContainerCompositionService(
@@ -11,7 +14,10 @@ public sealed class ContainerCompositionService(
         MsBuildContainerProperties containerDetails,
         ContainerOptions options,
         bool nonInteractive = false,
-        string? runtimeIdentifier = null)
+        string? runtimeIdentifier = null,
+        bool verifyImageAge = false,
+        string? privateRegistryUsername = null,
+        string? privateRegistryPassword = null)
     {
         await CheckIfBuilderIsRunning(options.ContainerBuilder);
 
@@ -27,6 +33,8 @@ public sealed class ContainerCompositionService(
         AddProjectPublishArguments(argumentsBuilder, fullProjectPath, runtimeIdentifier);
         AddContainerDetailsToArguments(argumentsBuilder, containerDetails);
 
+        var publishStartTime = DateTime.UtcNow;
+
         await shellExecutionService.ExecuteCommand(new()
         {
             Command = DotNetSdkLiterals.DotNetCommand,
@@ -35,6 +43,18 @@ public sealed class ContainerCompositionService(
             OnFailed = HandleBuildErrors,
             ShowOutput = true,
         });
+
+        if (verifyImageAge)
+        {
+            if (!string.IsNullOrEmpty(containerDetails.ContainerRegistry))
+            {
+                await VerifyRegistryImageAgeAsync(containerDetails, publishStartTime, privateRegistryUsername, privateRegistryPassword);
+            }
+            else
+            {
+                await VerifyLocalImageAgeAsync(containerDetails, options, nonInteractive, publishStartTime);
+            }
+        }
 
         return true;
     }
@@ -196,6 +216,165 @@ public sealed class ContainerCompositionService(
 
         return console.Confirm(
             "[red bold]Implicitly, dotnet publish does not allow duplicate filenames to be output to the artefact directory at build time.Would you like to retry the build explicitly allowing them?[/]");
+    }
+
+    private async Task VerifyLocalImageAgeAsync(MsBuildContainerProperties containerDetails, ContainerOptions options, bool? nonInteractive, DateTime publishStartTime)
+    {
+        ArgumentNullException.ThrowIfNull(options, nameof(options));
+
+        await CheckIfBuilderIsRunning(options.ContainerBuilder);
+
+        console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/]");
+
+        var inspectCreatedArgumentBuilder = ArgumentsBuilder
+            .Create()
+            .AppendArgument(DockerLiterals.InspectCommand, string.Empty, quoteValue: false)
+            .AppendArgument(DockerLiterals.FormatArgument, "{{ .Created }}", quoteValue: true)
+            .AppendArgument($"{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}", string.Empty, quoteValue: false);
+
+        var inspectCreatedResult = await shellExecutionService.ExecuteCommand(new()
+        {
+            Command = options.ContainerBuilder,
+            ArgumentsBuilder = inspectCreatedArgumentBuilder,
+            NonInteractive = nonInteractive.GetValueOrDefault(),
+            ShowOutput = false,
+        });
+
+        if (inspectCreatedResult.Success)
+        {
+            return;
+        }
+
+        var created = DateTimeOffset.Parse(inspectCreatedResult.Output.Trim());
+
+        if (created < publishStartTime)
+        {
+            console.MarkupLine($"[red bold]Local image [blue]'{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}'[/] is out of date[/]");
+            ActionCausesExitException.ExitNow(5016);
+        }
+    }
+
+    private async Task VerifyRegistryImageAgeAsync(MsBuildContainerProperties containerDetails, DateTime publishStartTime, string? privateRegistryUsername, string? privateRegistryPassword)
+    {
+        console.MarkupLine($"Verifying age of [blue]{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}[/] on registry [blue]{containerDetails.ContainerRegistry}[/]");
+
+        // Credentials passed directly to Aspirate have priority, so we only check the
+        // docker credentials if no values are explicitly passed in.
+        if (privateRegistryUsername is null && privateRegistryPassword is null)
+        {
+            try
+            {
+                // To retrieve the docker credentials, we use the Valleysoft.DockerCredsProvider
+                // package. This is what is used by the dotnet SDK so we can expect some degree
+                // of functional by using it ourselves.
+                var creds = await CredsProvider.GetCredentialsAsync(containerDetails.ContainerRegistry);
+
+                // Only password supported currently.
+                if (creds.Password is not null)
+                {
+                    console.MarkupLine($"Using docker credentials for user [blue]{creds.Username}[/]");
+                    privateRegistryUsername = creds.Username;
+                    privateRegistryPassword = creds.Password;
+                }
+            }
+            catch (CredsNotFoundException)
+            {
+                // Unfortunate to use exception handling for regular control flow, but that's
+                // the edesign of this library. No need to log, this can be swallowed.
+            }
+            catch (Exception e)
+            {
+                // However, we probably want to log errors otherwise. In any case, errors on
+                // this path aren't necessarily fatal, so don't give up.
+                console.MarkupLine($"[yellow bold]Error fetching docker credentials: {e.Message}[/]");
+            }
+        }
+
+        ContainerRegistryV2Client registryClient;
+        RegistryCatalogV2 registryCatalog;
+
+        try
+        {
+            // At this point, we don't want any failures to be blocking. The intent of this
+            // feature is to fail when the PublishContainer task is silently skipped by the
+            // dotnet SDK. Unfortuantely, querying a container registry for creation date
+            // (our means of confirming successful publish) is complicated by the different
+            // types of registries and their behaviors.
+            //
+            // The current implementation of ContainerRegistryV2Client has been tested against
+            // the official Docker registry 2.8.3 image, as well as Azure ACR. It DOES NOT
+            // work with the docker.io (no basic auth and lack of catalog support). Other
+            // registries in the ecosystem may fail as well.
+            //
+            // Unfortunately, MS has not made Microsoft.NET.Build.Containers.Registry public.
+            // However, reviewing the implementation reveals the effort necessary to support
+            // the various registries present in the ecosystem.
+            //
+            // Given all of this, we're only throwing a warning here. This gives users of the
+            // --verify-image-age flag notice that they may want to avoid it. It is worth
+            // noting this gap in functionality is also why image age verification is off by
+            // default.
+            registryClient = await ContainerRegistryV2Client.ConnectAsync(
+                containerDetails.ContainerRegistry,
+                privateRegistryUsername,
+                privateRegistryPassword);
+
+            registryCatalog = await registryClient.GetCatalogAsync();
+        }
+        catch (Exception e)
+        {
+            console.MarkupLine($"[yellow bold]Error querying container repository [blue]'{containerDetails.ContainerRepository}'[/]:[/]");
+
+            IEnumerable<Exception> exceptions = e is AggregateException ae ?
+                ae.Flatten().InnerExceptions :
+                [e];
+
+            foreach (var e2 in exceptions)
+            {
+                console.MarkupLine($"[yellow]{e2.Message}[/]");
+            }
+
+            return;
+        }
+
+        // Any failure at this point is considered fatal. If any unhandled exceptions arise, it is
+        // expected the user has some understanding of what's going on given that the functionality
+        // is opt-in.
+
+        // Here's the first check. If no repository exists that matches ours, the PublishContainer
+        // task was probably skipped by the dotnet SDK.
+        if (!registryCatalog.Repositories.Contains(containerDetails.ContainerRepository))
+        {
+
+            console.MarkupLine($"[red bold]Could not find container repository [blue]'{containerDetails.ContainerRepository}'[/] in registry[/]");
+            ActionCausesExitException.ExitNow(5013);
+        }
+
+        var tagList = await registryClient.GetTagsAsync(containerDetails.ContainerRepository);
+
+        // Here's the second check. If no tag matches ours, PublishContainer was probably skipped.
+        if (!tagList.Tags.Contains(containerDetails.ContainerImageTag))
+        {
+            console.MarkupLine($"[red bold]Could not find container image tag [blue]'{containerDetails.ContainerImageTag}'[/] for repository [blue]'{containerDetails.ContainerRepository}'[/] in registry[/]");
+            ActionCausesExitException.ExitNow(5014);
+        }
+
+        var imageManifestList = await registryClient.GetManifestAsync(
+            containerDetails.ContainerRepository,
+            containerDetails.ContainerImageTag);
+
+        var image = await registryClient.GetDockerImageJsonBlobAsync(
+            containerDetails.ContainerRepository,
+            imageManifestList.Config.Digest);
+
+        // Here's the third and final check. If a docker image exists for our expected repository
+        // and tag, but the creation date is before our attempted publish occurred, the
+        // PublishContainer task was most likely skipped, and the image is stale.
+        if (image.Created < publishStartTime)
+        {
+            console.MarkupLine($"[red bold]Registry image [blue]'{containerDetails.ContainerRepository}:{containerDetails.ContainerImageTag}'[/] is out of date[/]");
+            ActionCausesExitException.ExitNow(5015);
+        }
     }
 
     private static void AddProjectPublishArguments(ArgumentsBuilder argumentsBuilder, string fullProjectPath, string? runtimeIdentifier)

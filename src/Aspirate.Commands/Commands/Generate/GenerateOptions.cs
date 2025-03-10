@@ -27,6 +27,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public string? RuntimeIdentifier { get; set; }
     public List<string>? ComposeBuilds { get; set; }
     public bool PreferDockerfile { get; set; }
+    public bool VerifyImageAge { get; set; }
     public string? PrivateRegistryUrl { get; set; }
     public string? PrivateRegistryUsername { get; set; }
     public string? PrivateRegistryPassword { get; set; }
