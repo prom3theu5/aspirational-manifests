@@ -64,4 +64,21 @@ spec:
         - secretRef:
             name: {{name}}-secrets
         {{/if}}
+        {{#if hasBindMounts}}
+        volumeMounts:
+        {{#each bindMounts}}
+        - name: bindmount-{{@index}}
+          mountPath: {{target}}
+          readOnly: {{readOnly}}
+        {{/each}}
+        {{/if}}
       terminationGracePeriodSeconds: 180
+      {{#if hasBindMounts}}
+      volumes:
+      {{#each bindMounts}}
+      - name: bindmount-{{@index}}
+        hostPath:
+          path: {{source}}
+          type: DirectoryOrCreate
+      {{/each}}
+      {{/if}}

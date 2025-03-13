@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-namespace Aspirate.Services.Implementations;
-=======
 ﻿namespace Aspirate.Services.Implementations;
->>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
 
 public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
 {
