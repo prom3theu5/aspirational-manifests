@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Aspirate.Shared.Extensions;
 
 public static class KubernetesDeploymentDataExtensions
@@ -58,6 +60,67 @@ public static class KubernetesDeploymentDataExtensions
         };
     }
 
+    public static void SetVolumesAndVolumeMounts(KubernetesDeploymentData data, V1Deployment deployment)
+    {
+        var volumes = new List<V1Volume>();
+        var volumeMounts = new List<V1VolumeMount>();
+
+        if (data.HasBindMounts)
+        {
+            for (int i = 0; i < data.BindMounts.Count; i++)
+            {
+                var bindMount = data.BindMounts.ElementAt(i);
+
+                volumes.Add(new()
+                {
+                    Name = "bindmount-" + i,
+                    HostPath = new V1HostPathVolumeSource
+                    {
+                        Path = data.EnableMinikubeBindMounts.Equals(true) ? MinikubeLiterals.HostPathPrefix + bindMount.Target : bindMount.Target
+                    }
+                });
+
+                volumeMounts.Add(new()
+                {
+                    Name = "bindmount-" + i,
+                    MountPath = bindMount.Target,
+                    ReadOnlyProperty = bindMount.ReadOnly
+                });
+            }
+        }
+
+        if (deployment.Spec.Template.Spec.Containers.First().VolumeMounts != null)
+        {
+            foreach (var volumeMount in volumeMounts)
+            {
+                deployment.Spec.Template.Spec.Containers.First().VolumeMounts.Add(volumeMount);
+            }
+        }
+        else
+        {
+            if (volumeMounts.Count > 0)
+            {
+                deployment.Spec.Template.Spec.Containers.First().VolumeMounts = volumeMounts;
+            }
+        }
+
+
+        if (deployment.Spec.Template.Spec.Volumes != null)
+        {
+            foreach (var volume in volumes)
+            {
+                deployment.Spec.Template.Spec.Volumes.Add(volume);
+            }
+        }
+        else
+        {
+            if (volumes.Count > 0)
+            {
+                deployment.Spec.Template.Spec.Volumes = volumes;
+            }
+        }
+    }
+
     public static V1Container ToKubernetesContainer(this KubernetesDeploymentData data, bool useConfigMap = true, bool useSecrets = true)
     {
         var container = new V1Container
@@ -95,6 +158,20 @@ public static class KubernetesDeploymentDataExtensions
                 MountPath = x.Target,
             }).ToList();
         }
+
+        //if (data.HasBindMounts)
+        //{
+        //    int lastNum = 0;
+        //    foreach (var bindMount in data.BindMounts)
+        //    {
+        //        container.VolumeMounts.Add(new V1VolumeMount
+        //        {
+        //            Name = $"defaultMount{lastNum++}",
+        //            MountPath = bindMount.Target,
+        //            ReadOnlyProperty = bindMount.ReadOnly
+        //        });
+        //    }
+        //}
 
         return container;
     }
@@ -167,8 +244,34 @@ public static class KubernetesDeploymentDataExtensions
             deployment.Spec.Template.Spec.ImagePullSecrets = SetKubernetesImagePullSecrets;
         }
 
+        if (data.HasBindMounts)
+        {
+            SetVolumesAndVolumeMounts(data, deployment);
+        }
+
         return deployment;
     }
+
+    //private static string GetVolumeHostPath(string path)
+    //{
+    //    string dir = Directory.GetCurrentDirectory();
+
+    //    string[] subPaths = path.Split("/");
+
+    //    for (int i = 0; i < subPaths.Length; i++)
+    //    {
+    //        string currentSub = subPaths[i];
+    //        if (currentSub == "..")
+    //        {
+    //            dir = Directory.GetParent(dir).FullName;
+    //        }
+    //        else
+    //        {
+    //            dir = dir + Path.DirectorySeparatorChar + currentSub;
+    //        }
+    //    }
+    //    return dir;
+    //}
 
     public static V1StatefulSet ToKubernetesStatefulSet(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null, bool useConfigMap = true, bool useSecrets = true)
     {

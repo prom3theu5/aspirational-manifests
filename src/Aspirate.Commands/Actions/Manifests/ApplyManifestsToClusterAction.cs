@@ -1,7 +1,6 @@
 namespace Aspirate.Commands.Actions.Manifests;
 
 public sealed class ApplyManifestsToClusterAction(
-    IKubernetesService kubernetesClientService,
     IKubeCtlService kubeCtlService,
     ISecretProvider secretProvider,
     IFileSystem fileSystem,
@@ -17,8 +16,6 @@ public sealed class ApplyManifestsToClusterAction(
 
         try
         {
-            await kubernetesClientService.InteractivelySelectKubernetesCluster(CurrentState);
-
             await HandleDapr();
 
             await kustomizeService.WriteSecretsOutToTempFiles(CurrentState, secretFiles, secretProvider);

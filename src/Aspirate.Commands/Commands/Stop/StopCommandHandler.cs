@@ -5,5 +5,6 @@ public sealed class StopCommandHandler(IServiceProvider serviceProvider) : BaseC
     public override Task<int> HandleAsync(StopOptions options) =>
         ActionExecutor
             .QueueAction(nameof(StopDeployedKubernetesInstanceAction))
+            .QueueAction(nameof(KillMinikubeMountsAction))
             .ExecuteCommandsAsync();
 }

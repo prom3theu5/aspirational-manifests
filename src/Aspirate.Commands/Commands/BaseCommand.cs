@@ -39,6 +39,8 @@ public abstract class BaseCommand<TOptions, TOptionsHandler> : Command
 
         await stateService.RestoreState(stateOptions);
 
+        handler.CurrentState.CurrentCommand = Name;
+
         handler.CurrentState.PopulateStateFromOptions(options);
 
         LoadSecrets(options, secretService, handler);

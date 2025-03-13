@@ -11,6 +11,7 @@ public class KubernetesDeploymentData
     public Dictionary<string, string?> Secrets { get; private set; } = [];
     public Dictionary<string, string> Annotations { get; private set; } = [];
     public IReadOnlyCollection<Volume> Volumes { get; private set; } = [];
+    public IReadOnlyCollection<BindMount> BindMounts { get; private set; } = [];
     public IReadOnlyCollection<Ports> Ports { get; private set; } = [];
     public IReadOnlyCollection<string> Manifests { get; private set; } = [];
     public IReadOnlyCollection<string> Args { get; private set; } = [];
@@ -18,10 +19,12 @@ public class KubernetesDeploymentData
     public bool? IsProject {get; private set;}
     public bool? WithPrivateRegistry { get; private set; } = false;
     public bool? WithDashboard { get; private set; } = false;
+    public bool? EnableMinikubeBindMounts { get; private set; } = false;
     public string? ContainerImage {get; private set;}
     public string? Entrypoint {get; private set;}
     public string? ImagePullPolicy {get; private set;}
     public string? ServiceType { get; private set; } = "ClusterIP";
+    public string? MinikubeHostPathPrefix { get; private set; } = MinikubeLiterals.HostPathPrefix;
 
     public KubernetesDeploymentData SetName(string name)
     {
@@ -88,6 +91,12 @@ public class KubernetesDeploymentData
         return this;
     }
 
+    public KubernetesDeploymentData SetBindMounts(List<BindMount>? bindMounts)
+    {
+        BindMounts = bindMounts ?? [];
+        return this;
+    }
+
     public KubernetesDeploymentData SetWithPrivateRegistry(bool isPrivateRegistry)
     {
         WithPrivateRegistry = isPrivateRegistry;
@@ -109,6 +118,12 @@ public class KubernetesDeploymentData
     public KubernetesDeploymentData SetWithDashboard(bool? withDashboard)
     {
         WithDashboard = withDashboard ?? false;
+        return this;
+    }
+
+    public KubernetesDeploymentData SetEnableMinikubeBindMounts(bool? enableMinikubeMountAction, string? kubeContext)
+    {
+        EnableMinikubeBindMounts = kubeContext?.Equals("minikube", StringComparison.OrdinalIgnoreCase) == true && enableMinikubeMountAction == true;
         return this;
     }
 
@@ -156,6 +171,7 @@ public class KubernetesDeploymentData
 
     public bool HasPorts => Ports.Count > 0;
     public bool HasVolumes => Volumes.Count > 0;
+    public bool HasBindMounts => BindMounts.Count > 0;
     public bool HasAnySecrets => Secrets.Count > 0 && SecretsDisabled != true;
     public bool HasAnyAnnotations => Annotations.Count > 0;
     public bool HasArgs => Args.Count > 0;

@@ -5,7 +5,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>aspirate</AssemblyName>
     <PackAsTool>true</PackAsTool>
-    <ToolName>aspirate</ToolName>
+    <ToolName>aspiratedev</ToolName>
     <Version>0.1.0-preview</Version>
   </PropertyGroup>
 

@@ -129,6 +129,58 @@ public abstract class AspirateTestBase
         return state;
     }
 
+    protected AspirateState CreateAspirateStateWithBindMounts(bool nonInteractive = false, string? password = null)
+    {
+        var (postgres, params1) = CreatePostgresContainerResourceManualInput("postgrescontainer");
+        var (postgresTwo, params2) = CreatePostgresContainerResourceManualInput("postgrescontainer2");
+
+        var resources = new Dictionary<string, Resource>
+        {
+            { "postgrescontainer", postgres },
+            { "postgrescontainer2", postgresTwo },
+            { "postgresparams1", params1 },
+            { "postgresparams2", params2 },
+        };
+
+        (resources["postgrescontainer"] as IResourceWithBindMounts).BindMounts =
+        [
+            new()
+            {
+                Source = "../../../../folder/folder/cert",
+                Target = "/test/.aspnet/https",
+                ReadOnly = false
+            },
+            new()
+            {
+                Source = "../../../../folder/folder/temp/something",
+                Target = "/localdev/.aspnet/https",
+                ReadOnly = true
+            }
+        ];
+
+        (resources["postgrescontainer2"] as IResourceWithBindMounts).BindMounts =
+        [
+            new()
+            {
+                Source = "../../../../folder/folder/cert",
+                Target = "/test/.aspnet/https",
+                ReadOnly = false
+            },
+            new()
+            {
+                Source = "../../../../folder/folder/temp/something",
+                Target = "/localdev/.aspnet/https",
+                ReadOnly = true
+            }
+        ];
+
+        var state = CreateAspirateState(nonInteractive: nonInteractive, password: password);
+        state.LoadedAspireManifestResources = resources;
+        state.AspireComponentsToProcess = resources.Keys.ToList();
+
+        return state;
+    }
+
     private static (ContainerResource container, ParameterResource parameters) CreatePostgresContainerResourceManualInput(string resourceName, bool generatedInput = false, bool passwordsSet = false)
     {
         var postgres = new ContainerResource

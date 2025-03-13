@@ -5,6 +5,7 @@ public sealed class RemoveManifestsFromClusterAction(
     IServiceProvider serviceProvider,
     IFileSystem fileSystem,
     IDaprCliService daprCliService,
+    IMinikubeCliService minikubeCliService,
     ISecretProvider secretProvider) :
     BaseActionWithNonInteractiveValidation(serviceProvider)
 {

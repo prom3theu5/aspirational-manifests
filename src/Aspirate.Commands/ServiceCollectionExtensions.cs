@@ -1,4 +1,6 @@
-﻿namespace Aspirate.Commands;
+using Aspirate.Commands.Actions.KubeContext;
+
+namespace Aspirate.Commands;
 
 /// <summary>
 /// Extension methods for IServiceCollection to register services for AspirateState and AspirateActions.
@@ -40,12 +42,16 @@ public static class ServiceCollectionExtensions
             .RegisterAction<ApplyDaprAnnotationsAction>()
             .RegisterAction<PopulateInputsAction>()
             .RegisterAction<SaveSecretsAction>()
+            .RegisterAction<SaveBindMountsAction>()
             .RegisterAction<AskPrivateRegistryCredentialsAction>()
             .RegisterAction<IncludeAspireDashboardAction>()
             .RegisterAction<GenerateHelmChartAction>()
             .RegisterAction<CustomNamespaceAction>()
             .RegisterAction<RunKubernetesObjectsAction>()
-            .RegisterAction<StopDeployedKubernetesInstanceAction>();
+            .RegisterAction<ApplyMinikubeMountsAction>()
+            .RegisterAction<KillMinikubeMountsAction>()
+            .RegisterAction<StopDeployedKubernetesInstanceAction>()
+            .RegisterAction<SelectKubeContextAction>();
 
     /// <summary>
     /// Registers an implementation of <see cref="IAction"/> with the specified <typeparamref name="TImplementation"/> type.

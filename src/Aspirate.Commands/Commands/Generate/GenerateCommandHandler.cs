@@ -23,6 +23,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
+            .QueueAction(nameof(SelectKubeContextAction))
             .QueueAction(nameof(IncludeAspireDashboardAction))
             .QueueAction(nameof(PopulateInputsAction))
             .QueueAction(nameof(SubstituteValuesAspireManifestAction))
@@ -30,7 +31,8 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(PopulateContainerDetailsForProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))
-            .QueueAction(nameof(SaveSecretsAction));
+            .QueueAction(nameof(SaveSecretsAction))
+            .QueueAction(nameof(SaveBindMountsAction));
 
     private ActionExecutor BaseKubernetesActionSequence() =>
         BaseGenerateActionSequence()
