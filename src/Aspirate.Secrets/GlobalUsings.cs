@@ -1,0 +1,15 @@
+global using System.IO.Abstractions;
+global using System.Security.Cryptography;
+global using System.Text;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+global using Aspirate.Secrets.Protectors;
+global using Aspirate.Shared.Attributes;
+global using Aspirate.Shared.Enums;
+global using Aspirate.Shared.Interfaces.Secrets;
+global using Aspirate.Shared.Interfaces.Services;
+global using Aspirate.Shared.Models.Aspirate;
+global using Aspirate.Shared.Models.AspireManifests;
+global using Aspirate.Shared.Models.AspireManifests.Interfaces;
+global using Microsoft.Extensions.DependencyInjection;
+global using Spectre.Console;

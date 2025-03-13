@@ -1,0 +1,36 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "assigneesFromCodeOwners": true,
+  "ignoreDeps": ["Abp"],
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "automerge": false,
+      "labels": [
+        "dependencies"
+      ]
+    },
+    {
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "dependencies",
+        "breaking"
+      ]
+    }
+  ]
+}

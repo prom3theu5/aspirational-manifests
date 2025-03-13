@@ -1,0 +1,76 @@
+{
+  "profiles": {
+    "init": {
+      "commandName": "Project",
+      "commandLineArgs": "init",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
+    "init-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "init --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "generate": {
+      "commandName": "Project",
+      "commandLineArgs": "generate --skip-build",
+      "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
+      "hotReloadEnabled": false
+    },
+    "generate-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "generate --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "run": {
+      "commandName": "Project",
+      "commandLineArgs": "run --skip-build",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-aspire/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
+    "stop": {
+      "commandName": "Project",
+      "commandLineArgs": "stop",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-aspire/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
+    "build": {
+      "commandName": "Project",
+      "commandLineArgs": "build -ct hamburger -ct fries -ct mountaindew -ct icecream -ct pizza -ct hotdog -ct taco -ct burrito -ct sandwich -ct salad -ct soup -ct sushi -ct ramen -ct curry",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
+    "build-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "build --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "apply": {
+      "commandName": "Project",
+      "commandLineArgs": "apply",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-test/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
+    "apply-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "apply --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    },
+    "destroy": {
+      "commandName": "Project",
+      "commandLineArgs": "destroy",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
+      "hotReloadEnabled": false
+    },
+    "destroy-non-interactive": {
+      "commandName": "Project",
+      "commandLineArgs": "destroy --non-interactive",
+      "workingDirectory": "$(ProjectDir)/../../../aspire/samples/eShopLite/AppHost",
+      "hotReloadEnabled": false
+    }
+  }
+}

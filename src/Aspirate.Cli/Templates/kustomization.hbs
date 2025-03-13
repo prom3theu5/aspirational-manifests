@@ -1,0 +1,30 @@
+{{#if withNamespace}}
+namespace: {{namespace}}
+
+{{/if}}
+resources:
+{{#each manifests}}
+- {{this}}
+{{/each}}
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+{{#if hasAnyEnv}}
+configMapGenerator:
+- name: {{name}}-env
+  literals:
+  {{#each env}}
+    - {{@key}}={{this}}
+  {{/each}}
+    {{#if isProject}}
+    - ASPNETCORE_URLS=http://+:8080;
+    {{/if}}
+{{/if}}
+
+{{#if hasAnySecrets}}
+secretGenerator:
+- name: {{name}}-secrets
+  envs:
+  - .{{name}}.secrets
+{{/if}}

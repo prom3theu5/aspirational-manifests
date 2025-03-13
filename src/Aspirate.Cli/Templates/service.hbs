@@ -1,0 +1,21 @@
+{{#if hasPorts}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{name}}
+spec:
+  type: {{serviceType}}
+  selector:
+    app: {{name}}
+  ports:
+  {{#each ports}}
+  - name: {{name}}
+  {{#if externalPort}}
+    port: {{externalPort}}
+  {{else}}
+    port: {{internalPort}}
+  {{/if}}
+    targetPort: {{internalPort}}
+  {{/each}}
+{{/if}}

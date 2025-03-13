@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{name}}
+  labels:
+    app: {{name}}
+  {{#if hasAnyAnnotations}}
+  annotations:
+    {{#each annotations}}
+      {{@key}}: {{this}}
+  {{/each}}
+  {{/if}}
+spec:
+  serviceName: "{{name}}"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{name}}
+  template:
+    metadata:
+      labels:
+        app: {{name}}
+{{#if hasAnyAnnotations}}
+      annotations:
+      {{#each annotations}}
+        {{@key}}: {{this}}
+      {{/each}}
+{{/if}}
+    spec:
+    {{#if withPrivateRegistry}}
+      imagePullSecrets:
+        - name: image-pull-secret
+        {{/if}}
+      containers:
+        - name: {{name}}
+          image: {{containerImage}}
+          imagePullPolicy: {{imagePullPolicy}}
+          {{#if entrypoint}}
+          command:
+            - {{entrypoint}}
+          {{/if}}
+          {{#if hasArgs}}
+          args:
+          {{#each args}}
+            - '{{this}}'
+          {{/each}}
+          {{/if}}
+          {{#if hasPorts}}
+          ports:
+          {{#each ports}}
+            - containerPort: {{internalPort}}
+          {{/each}}
+          {{/if}}
+          {{#if hasAnyEnv}}
+          envFrom:
+            - configMapRef:
+                name: {{name}}-env
+          {{/if}}
+          {{#if hasAnySecrets}}
+            - secretRef:
+                name: {{name}}-secrets
+          {{/if}}
+      {{#if hasVolumes}}
+          volumeMounts:
+          {{#each volumes}}
+            - name: {{this.name}}
+              mountPath: {{this.target}}
+          {{/each}}
+      {{/if}}
+  {{#if hasVolumes}}
+  volumeClaimTemplates:
+  {{#each volumes}}
+    - metadata:
+        name: {{this.name}}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+      {{/each}}
+  {{/if}}

@@ -1,0 +1,21 @@
+{
+  "resources": {
+    "nextjs": {
+      "type": "dockerfile.v0",
+      "path": "../my-app-template/Dockerfile",
+      "context": "../my-app-template",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "{nextjs.bindings.http.targetPort}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http",
+          "targetPort": 3000
+        }
+      }
+    }
+  }
+}

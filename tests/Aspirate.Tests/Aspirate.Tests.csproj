@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="Spectre.Console.Testing" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
+        <PackageReference Include="Verify.Xunit" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Aspirate.Cli\Aspirate.Cli.csproj" />
+      <ProjectReference Include="..\..\src\Aspirate.Secrets\Aspirate.Secrets.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="TestData\**" />
+      <None Include="TestData\TestApp.csproj">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Include="TestData\Program.cs">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Include="TestData\*.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRepositoryWithPrefixShouldBeImage.verified.txt" />
+      <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRepositoryOrTagWithPrefixShouldBeImageLatest.verified.txt" />
+      <None Remove="ServiceTests\VerifyResults\ContainerDetailsServiceTests.GetContainerDetails_WhenCalled_ReturnsCorrectContainerDetails_properties=NoRegistryOrRepositoryOrTagWithPrefixShouldBeImageLatest.verified.txt" />
+      <None Update="TestData\project-no-binding.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\with-unsupported-resource.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,112 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspirate.Cli", "src\Aspirate.Cli\Aspirate.Cli.csproj", "{EFBECAE3-3385-4FB3-BAA7-631F695A6665}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{796B4241-81DD-4233-8DB5-FAE145D55F46}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{52460A37-4C13-45BA-BB17-C2C430A55BCD}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		Directory.Packages.props = Directory.Packages.props
+		LICENSE.TXT = LICENSE.TXT
+		nuget.config = nuget.config
+		README.md = README.md
+		renovate.json = renovate.json
+		build.cake = build.cake
+		dotnet-tools.json = dotnet-tools.json
+		.release-please-manifest.json = .release-please-manifest.json
+		release-please-config.json = release-please-config.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Shared", "src\Aspirate.Shared\Aspirate.Shared.csproj", "{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A093C5FC-06FF-4DD3-B0D6-55CEF555A55E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Tests", "tests\Aspirate.Tests\Aspirate.Tests.csproj", "{71D29864-F6B4-4E68-9345-94123C0BD1CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{8B1FEC50-8212-47F4-A2AC-7940C076B1DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{8F2F0EB2-5569-496F-8258-D19D570FC464}"
+	ProjectSection(SolutionItems) = preProject
+		.github\PULL_REQUEST_TEMPLATE\pull_request_template.md = .github\PULL_REQUEST_TEMPLATE\pull_request_template.md
+		.github\ISSUE_TEMPLATE\user-story.md = .github\ISSUE_TEMPLATE\user-story.md
+		.github\ISSUE_TEMPLATE\bug.md = .github\ISSUE_TEMPLATE\bug.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "actions", "actions", "{5644B29D-6060-409C-B1A8-04D7A26EF958}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pull-requests.yaml = .github\workflows\pull-requests.yaml
+		.github\workflows\main.yaml = .github\workflows\main.yaml
+		.github\workflows\docs.yaml = .github\workflows\docs.yaml
+		.github\workflows\conventional-commits.yaml = .github\workflows\conventional-commits.yaml
+		.github\workflows\release-please.yaml = .github\workflows\release-please.yaml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Secrets", "src\Aspirate.Secrets\Aspirate.Secrets.csproj", "{5801EDCE-B1D1-474C-8F2B-BB2927372867}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Commands", "src\Aspirate.Commands\Aspirate.Commands.csproj", "{BF110CDB-51B7-4320-84D1-464691D83A88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Processors", "src\Aspirate.Processors\Aspirate.Processors.csproj", "{86DA91EC-8297-48C9-A594-A70416464676}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aspirate.Services", "src\Aspirate.Services\Aspirate.Services.csproj", "{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5524CA16-0E5E-4F0D-965E-94E3B18DDD20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71D29864-F6B4-4E68-9345-94123C0BD1CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71D29864-F6B4-4E68-9345-94123C0BD1CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71D29864-F6B4-4E68-9345-94123C0BD1CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71D29864-F6B4-4E68-9345-94123C0BD1CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5801EDCE-B1D1-474C-8F2B-BB2927372867}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5801EDCE-B1D1-474C-8F2B-BB2927372867}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5801EDCE-B1D1-474C-8F2B-BB2927372867}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5801EDCE-B1D1-474C-8F2B-BB2927372867}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF110CDB-51B7-4320-84D1-464691D83A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF110CDB-51B7-4320-84D1-464691D83A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF110CDB-51B7-4320-84D1-464691D83A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF110CDB-51B7-4320-84D1-464691D83A88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86DA91EC-8297-48C9-A594-A70416464676}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86DA91EC-8297-48C9-A594-A70416464676}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86DA91EC-8297-48C9-A594-A70416464676}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86DA91EC-8297-48C9-A594-A70416464676}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EFBECAE3-3385-4FB3-BAA7-631F695A6665} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+		{5524CA16-0E5E-4F0D-965E-94E3B18DDD20} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+		{71D29864-F6B4-4E68-9345-94123C0BD1CC} = {A093C5FC-06FF-4DD3-B0D6-55CEF555A55E}
+		{8B1FEC50-8212-47F4-A2AC-7940C076B1DC} = {52460A37-4C13-45BA-BB17-C2C430A55BCD}
+		{8F2F0EB2-5569-496F-8258-D19D570FC464} = {8B1FEC50-8212-47F4-A2AC-7940C076B1DC}
+		{5644B29D-6060-409C-B1A8-04D7A26EF958} = {8B1FEC50-8212-47F4-A2AC-7940C076B1DC}
+		{5801EDCE-B1D1-474C-8F2B-BB2927372867} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+		{BF110CDB-51B7-4320-84D1-464691D83A88} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+		{86DA91EC-8297-48C9-A594-A70416464676} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+		{51BC5DA1-2390-4D75-B44D-B7D5D73B825A} = {796B4241-81DD-4233-8DB5-FAE145D55F46}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4990E3C8-4D86-44BB-BC2B-7D055DBC7958}
+	EndGlobalSection
+EndGlobal

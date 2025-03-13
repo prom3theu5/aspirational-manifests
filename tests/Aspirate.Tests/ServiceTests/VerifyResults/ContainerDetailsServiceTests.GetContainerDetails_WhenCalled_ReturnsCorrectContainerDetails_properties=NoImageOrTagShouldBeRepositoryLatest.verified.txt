@@ -1,0 +1,6 @@
+﻿{
+  ContainerRegistry: test-registry,
+  ContainerRepository: test-repository,
+  ContainerImageTag: latest,
+  FullContainerImage: test-registry/test-repository:latest
+}

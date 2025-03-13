@@ -1,0 +1,11 @@
+﻿version: "3.8"
+services:
+  a-service:
+    image: "dotnetaspire/servicea"
+    build:
+      context: "."
+      dockerfile: "a.dockerfile"
+      args:
+      - "ENV_1"
+      - "ENV_2=value"
+      - "ENV_3=value"

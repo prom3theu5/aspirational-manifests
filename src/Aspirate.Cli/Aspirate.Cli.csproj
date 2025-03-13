@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>aspirate</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolName>aspiratedev</ToolName>
+    <Version>0.1.0-preview</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>Aspirate</Title>
+    <Authors>David Sekula / Prom3theu5</Authors>
+    <Description>Automatic kustomize manifest generation for applications powered by the Microsoft .Net Aspire Cloud framework.</Description>
+    <PackageProjectUrl>https://github.com/prom3theu5/aspirational-manifests</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/prom3theu5/aspirational-manifests.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>aspire;kubernetes;aspirate;kustomize;manifests</PackageTags>
+    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>nuget-icon.png</PackageIcon>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aspirate.Commands\Aspirate.Commands.csproj" />
+    <ProjectReference Include="..\Aspirate.Secrets\Aspirate.Secrets.csproj" />
+    <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Aspirate.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+    <None Update="Templates\statefulset.hbs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\*.hbs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

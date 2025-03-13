@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Aspirate.Secrets\Aspirate.Secrets.csproj" />
+      <ProjectReference Include="..\Aspirate.Services\Aspirate.Services.csproj" />
+      <ProjectReference Include="..\Aspirate.Shared\Aspirate.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JsonPath.Net" />
+    </ItemGroup>
+
+</Project>
