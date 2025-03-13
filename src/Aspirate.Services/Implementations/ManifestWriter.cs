@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 namespace Aspirate.Services.Implementations;
+=======
+﻿namespace Aspirate.Services.Implementations;
+>>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
 
 public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
 {
@@ -144,7 +148,6 @@ public class ManifestWriter(IFileSystem fileSystem) : IManifestWriter
     {
         var templateFile = GetTemplateFilePath(inputFile, templatePath);
 
-        //Console.WriteLine(JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true }));
         var template = fileSystem.File.ReadAllText(templateFile);
         var handlebarTemplate = Handlebars.Compile(template);
         var output = handlebarTemplate(data);

@@ -14,8 +14,8 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --skip-build",
-      "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
+      "commandLineArgs": "generate --skip-build --output-format compose",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-test/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "generate-non-interactive": {
@@ -73,4 +73,8 @@
       "hotReloadEnabled": false
     }
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630

@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 using Aspirate.Shared.Models.AspireManifests;
 
+=======
+>>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
 namespace Aspirate.Shared.Extensions;
 
 public static class KubernetesDeploymentDataExtensions
@@ -98,20 +101,6 @@ public static class KubernetesDeploymentDataExtensions
             }).ToList();
         }
 
-        //if (data.HasBindMounts)
-        //{
-        //    int lastNum = 0;
-        //    foreach (var bindMount in data.BindMounts)
-        //    {
-        //        container.VolumeMounts.Add(new V1VolumeMount
-        //        {
-        //            Name = $"defaultMount{lastNum++}",
-        //            MountPath = bindMount.Target,
-        //            ReadOnlyProperty = bindMount.ReadOnly
-        //        });
-        //    }
-        //}
-
         return container;
     }
 
@@ -183,48 +172,8 @@ public static class KubernetesDeploymentDataExtensions
             deployment.Spec.Template.Spec.ImagePullSecrets = SetKubernetesImagePullSecrets;
         }
 
-        //if (data.HasBindMounts)
-        //{
-        //    for(int i = 0; i < data.BindMounts.Count(); i++)
-        //    {
-        //        var mount = data.BindMounts.ToArray()[i];
-        //        var volume = container.VolumeMounts.ToArray()[i];
-
-        //        deployment.Spec.Template.Spec.Volumes.Add(new V1Volume
-        //        {
-        //            Name = volume.Name,
-        //            HostPath = new V1HostPathVolumeSource
-        //            {
-        //                Path = GetVolumeHostPath(mount.Source),
-        //                Type = "DirectoryOrCreate"
-        //            },
-        //        });
-        //    }
-        //}
-
         return deployment;
     }
-
-    //private static string GetVolumeHostPath(string path)
-    //{
-    //    string dir = Directory.GetCurrentDirectory();
-
-    //    string[] subPaths = path.Split("/");
-
-    //    for (int i = 0; i < subPaths.Length; i++)
-    //    {
-    //        string currentSub = subPaths[i];
-    //        if (currentSub == "..")
-    //        {
-    //            dir = Directory.GetParent(dir).FullName;
-    //        }
-    //        else
-    //        {
-    //            dir = dir + Path.DirectorySeparatorChar + currentSub;
-    //        }
-    //    }
-    //    return dir;
-    //}
 
     public static V1StatefulSet ToKubernetesStatefulSet(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null, bool useConfigMap = true, bool useSecrets = true)
     {

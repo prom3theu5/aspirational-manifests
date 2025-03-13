@@ -168,7 +168,11 @@ public abstract class ContainerProcessorBase<TContainerResource>(
         }
 
         response.Service = newService.WithRestartPolicy(ERestartMode.UnlessStopped)
+<<<<<<< HEAD
             .WithVolumes(options.Resource.MapComposeVolumes(options.CurrentState?.OutputPath ?? Path.Combine(Environment.CurrentDirectory, AspirateLiterals.DefaultArtifactsPath)))
+=======
+            .WithVolumes(options.Resource.MapComposeVolumes())
+>>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
             .WithPortMappings(options.Resource.MapBindingsToPorts().MapPortsToDockerComposePorts())
             .Build();
 

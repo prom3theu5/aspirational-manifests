@@ -27,7 +27,7 @@ public static class ResourceExtensions
         return environment;
     }
 
-    public static List<Volume> KuberizeVolumeNames(this List<Volume> containerVolumes, KeyValuePair<string, Resource> resource)
+    public static List<Volume> KuberizeVolumeNames(this List<Volume> containerVolumes,  KeyValuePair<string, Resource> resource)
     {
         if (containerVolumes.Count == 0)
         {
@@ -47,21 +47,19 @@ public static class ResourceExtensions
         return containerVolumes;
     }
 
-    public static string[] MapComposeVolumes(this KeyValuePair<string, Resource> resource, string outputPath)
+    public static string[] MapComposeVolumes(this KeyValuePair<string, Resource> resource)
     {
         var composeVolumes = new List<string>();
 
-        if (resource.Value is IResourceWithVolumes resourceWithVolumes)
+        if (resource.Value is not IResourceWithVolumes resourceWithVolumes)
         {
-            KuberizeVolumeNames(resourceWithVolumes.Volumes, resource); 
-
-            composeVolumes.AddRange(resourceWithVolumes.Volumes.Where(x => !string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
+            return[];
         }
 
-        if (resource.Value is IResourceWithBindMounts resourceWithBindMounts)
-        {
-            composeVolumes.AddRange(resourceWithBindMounts.BindMounts.Select(volume => $"./{Path.GetRelativePath(outputPath, volume.Source).Replace(Path.DirectorySeparatorChar, '/')}:{volume.Target}"));
-        }
+
+        KuberizeVolumeNames(resourceWithVolumes.Volumes, resource);
+
+        composeVolumes.AddRange(resourceWithVolumes.Volumes.Where(x=>!string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
 
         return composeVolumes.ToArray();
     }
@@ -77,7 +75,11 @@ public static class ResourceExtensions
     }
 
     public static Port[] MapPortsToDockerComposePorts(this List<Ports> ports) =>
+<<<<<<< HEAD
         ports.Select(x => new Port
+=======
+        ports.Select(x=> new Port
+>>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
         {
             Target = x.InternalPort,
             Published = x.ExternalPort != 0 ? x.ExternalPort : x.InternalPort,
@@ -85,7 +87,11 @@ public static class ResourceExtensions
 
     public static void EnsureBindingsHavePorts(this Dictionary<string, Resource> resources)
     {
+<<<<<<< HEAD
         foreach (var resource in resources.Where(x => x.Value is IResourceWithBinding { Bindings: not null }))
+=======
+        foreach (var resource in resources.Where(x=>x.Value is IResourceWithBinding {Bindings: not null}))
+>>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
         {
             var bindingResource = resource.Value as IResourceWithBinding;
 
