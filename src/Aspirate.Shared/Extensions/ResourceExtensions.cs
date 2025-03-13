@@ -75,11 +75,7 @@ public static class ResourceExtensions
     }
 
     public static Port[] MapPortsToDockerComposePorts(this List<Ports> ports) =>
-<<<<<<< HEAD
-        ports.Select(x => new Port
-=======
         ports.Select(x=> new Port
->>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
         {
             Target = x.InternalPort,
             Published = x.ExternalPort != 0 ? x.ExternalPort : x.InternalPort,
@@ -87,11 +83,7 @@ public static class ResourceExtensions
 
     public static void EnsureBindingsHavePorts(this Dictionary<string, Resource> resources)
     {
-<<<<<<< HEAD
-        foreach (var resource in resources.Where(x => x.Value is IResourceWithBinding { Bindings: not null }))
-=======
         foreach (var resource in resources.Where(x=>x.Value is IResourceWithBinding {Bindings: not null}))
->>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
         {
             var bindingResource = resource.Value as IResourceWithBinding;
 

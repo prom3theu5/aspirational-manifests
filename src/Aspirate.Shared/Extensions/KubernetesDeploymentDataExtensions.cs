@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-using Aspirate.Shared.Models.AspireManifests;
-
-=======
->>>>>>> c2905d2ab854aaac7f86f3d63da3b93950e76630
 namespace Aspirate.Shared.Extensions;
 
 public static class KubernetesDeploymentDataExtensions
