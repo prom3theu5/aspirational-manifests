@@ -1,3 +1,5 @@
+using Aspirate.Commands.Actions.BindMounts;
+
 namespace Aspirate.Commands.Commands.Generate;
 
 public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<GenerateOptions>(serviceProvider)
@@ -30,7 +32,8 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(PopulateContainerDetailsForProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))
-            .QueueAction(nameof(SaveSecretsAction));
+            .QueueAction(nameof(SaveSecretsAction))
+            .QueueAction(nameof(SaveBindMountsAction));
 
     private ActionExecutor BaseKubernetesActionSequence() =>
         BaseGenerateActionSequence()

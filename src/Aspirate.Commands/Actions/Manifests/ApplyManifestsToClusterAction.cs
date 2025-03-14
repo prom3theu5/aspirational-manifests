@@ -7,6 +7,7 @@ public sealed class ApplyManifestsToClusterAction(
     IFileSystem fileSystem,
     IDaprCliService daprCliService,
     IKustomizeService kustomizeService,
+    IMinikubeCliService minikubeCliService,
     IServiceProvider serviceProvider) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public override async Task<bool> ExecuteAsync()
@@ -20,6 +21,8 @@ public sealed class ApplyManifestsToClusterAction(
             await kubernetesClientService.InteractivelySelectKubernetesCluster(CurrentState);
 
             await HandleDapr();
+
+            HandleMinikubeMounts();
 
             await kustomizeService.WriteSecretsOutToTempFiles(CurrentState, secretFiles, secretProvider);
             await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
@@ -38,6 +41,29 @@ public sealed class ApplyManifestsToClusterAction(
         {
             kustomizeService.CleanupSecretEnvFiles(CurrentState.DisableSecrets, secretFiles);
         }
+    }
+
+    private void HandleMinikubeMounts()
+    {
+        if (CurrentState.KubeContext != "minikube")
+        {
+            return;
+        }
+
+        Logger.MarkupLine("Applying volume mounts to minikube...");
+
+        var minikubeCliInstalled = minikubeCliService.IsMinikubeCliInstalledOnMachine();
+
+        if (!minikubeCliInstalled)
+        {
+            Logger.MarkupLine("[yellow]Minikube cli is required to perform Minikube volume mounts.[/]");
+            Logger.MarkupLine("[yellow]Please install minikube cli following the guide here:[blue]https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download/[/][/]");
+            Logger.MarkupLine("[yellow]Manifest deployment will continue, but Minikube volume mounts will not be applied by aspirate.[/]");
+            return;
+        }
+
+        minikubeCliService.ActivateMinikubeMount(CurrentState);
+
     }
 
     private async Task HandleDapr()

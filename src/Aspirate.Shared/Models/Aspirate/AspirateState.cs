@@ -130,6 +130,10 @@ public class AspirateState :
     public SecretState? SecretState { get; set; }
 
     [RestorableStateProperty]
+    [JsonPropertyName("bindMounts")]
+    public Dictionary<string, List<BindMount>>? BindMounts { get; set; }
+
+    [RestorableStateProperty]
     [JsonPropertyName("processAllComponents")]
     public bool? ProcessAllComponents { get; set; }
 
