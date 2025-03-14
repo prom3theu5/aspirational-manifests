@@ -14,7 +14,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --skip-build",
+      "commandLineArgs": "generate",
       "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
       "hotReloadEnabled": false
     },

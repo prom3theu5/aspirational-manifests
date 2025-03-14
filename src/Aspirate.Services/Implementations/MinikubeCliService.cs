@@ -44,7 +44,7 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = "minikube",
-                    Arguments = $"mount {bindMount.Source}:{bindMount.Target}",
+                    Arguments = $"mount {bindMount.Source}:/mnt{bindMount.Target}",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
