@@ -9,6 +9,7 @@
     <PackageReference Include="CliWrap" />
     <PackageReference Include="KubernetesClient" />
     <PackageReference Include="NuGet.Protocol" />
+    <PackageReference Include="System.Management" />
   </ItemGroup>
   
     <ItemGroup>

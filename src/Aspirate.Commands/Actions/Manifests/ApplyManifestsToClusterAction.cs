@@ -22,7 +22,7 @@ public sealed class ApplyManifestsToClusterAction(
 
             await HandleDapr();
 
-            HandleMinikubeMounts();
+            await Task.Run(HandleMinikubeMounts);
 
             await kustomizeService.WriteSecretsOutToTempFiles(CurrentState, secretFiles, secretProvider);
             await kubeCtlService.ApplyManifests(CurrentState.KubeContext, CurrentState.InputPath);
@@ -63,6 +63,7 @@ public sealed class ApplyManifestsToClusterAction(
         }
 
         minikubeCliService.ActivateMinikubeMount(CurrentState);
+        //minikubeCliService.KillMinikubeMounts();
 
     }
 

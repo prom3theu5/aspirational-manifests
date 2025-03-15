@@ -4,5 +4,5 @@ public interface IMinikubeCliService
 {
     bool IsMinikubeCliInstalledOnMachine();
     void ActivateMinikubeMount(AspirateState state);
-    Task<ShellCommandResult> KillMinikubeMounts();
+    void KillMinikubeMounts(AspirateState state);
 }

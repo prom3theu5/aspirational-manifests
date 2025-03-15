@@ -5,7 +5,6 @@ namespace Aspirate.Shared.Models.AspireManifests.Components.Common;
 public class BindMount
 {
     private string? _source;
-    //private const string WindowsDockerHostPath = "/run/desktop/mnt/host/";
 
     [JsonPropertyName("source")]
     public string? Source
@@ -20,6 +19,9 @@ public class BindMount
     [JsonPropertyName("readOnly")]
     public bool? ReadOnly { get; set; }
 
+    [JsonPropertyName("minikubeMountProcessId")]
+    public int? MinikubeMountProcessId { get; set; }
+
     private static string GetVolumeHostPath(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -31,19 +33,5 @@ public class BindMount
         string resolvedPath = Path.GetFullPath(Path.Combine(currentDir, path));
 
         return resolvedPath;
-
-        //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        //{
-        //    // Normalize for Docker Desktop on Windows (Minikube / Docker Desktop for Windows)
-        //    string mountPath = resolvedPath.ToLower()
-        //                                    .Replace(":", "")  // Remove drive letter colon
-        //                                    .Replace('\\', '/'); // Convert Windows-style slashes
-
-        //    return mountPath;
-        //}
-        //else
-        //{
-        //    return resolvedPath; // Linux paths are already in the correct format
-        //}
     }
 }

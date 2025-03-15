@@ -14,7 +14,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate",
+      "commandLineArgs": "generate --skip-build",
       "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
       "hotReloadEnabled": false
     },
@@ -63,7 +63,7 @@
     "destroy": {
       "commandName": "Project",
       "commandLineArgs": "destroy",
-      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
+      "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
       "hotReloadEnabled": false
     },
     "destroy-non-interactive": {

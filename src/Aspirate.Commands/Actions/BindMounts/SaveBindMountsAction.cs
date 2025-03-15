@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Aspirate.Shared.Models.AspireManifests.Components.Common;
 using Aspirate.Shared.Models.AspireManifests.Components.Common.Container;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,14 +12,18 @@ public sealed class SaveBindMountsAction(
         var values = new Dictionary<string, List<BindMount>>();
         foreach (var resource in CurrentState.AllSelectedSupportedComponents)
         {
-            var container = resource.Value as ContainerResourceBase;
+            var resourceWithBindMounts = resource.Value as IResourceWithBindMounts;
 
-            if (container.BindMounts.Count > 0)
+            if (resourceWithBindMounts?.BindMounts.Count > 0)
             {
-                values.Add(resource.Value.Name, container.BindMounts);
+                values.Add(resourceWithBindMounts.Name, resourceWithBindMounts.BindMounts);
             }
         }
-        CurrentState.BindMounts = values;
+
+        if (values.Count > 0)
+        {
+            CurrentState.BindMounts = values;
+        }
 
         return Task.FromResult(true);
     }
