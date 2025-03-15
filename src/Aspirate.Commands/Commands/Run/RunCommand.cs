@@ -27,5 +27,6 @@ public sealed class RunCommand : BaseCommand<RunOptions, RunCommandHandler>
        AddOption(PrivateRegistryEmailOption.Instance);
        AddOption(IncludeDashboardOption.Instance);
        AddOption(AllowClearNamespaceOption.Instance);
+       AddOption(DisableMinikubeMountActionOption.Instance);
     }
 }

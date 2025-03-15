@@ -5,6 +5,7 @@ public sealed class RemoveManifestsFromClusterAction(
     IServiceProvider serviceProvider,
     IFileSystem fileSystem,
     IDaprCliService daprCliService,
+    IMinikubeCliService minikubeCliService,
     ISecretProvider secretProvider) :
     BaseActionWithNonInteractiveValidation(serviceProvider)
 {
@@ -20,6 +21,7 @@ public sealed class RemoveManifestsFromClusterAction(
 
             CreateEmptySecretFiles(secretFiles);
             await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
+
             Logger.MarkupLine(
                 $"[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
 

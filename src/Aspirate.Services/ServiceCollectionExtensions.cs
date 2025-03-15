@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Services;
+namespace Aspirate.Services;
 
 /// <summary>
 /// Extension methods for IServiceCollection to add Aspirate services.
@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
             .AddAspirateConfigurationSupport()
             .AddContainerSupport()
             .AddDaprCliSupport()
+            .AddMinikubeCliSupport()
             .AddKubernetesSupport()
             .AddStateManagement()
             .AddSecretService()
@@ -67,6 +68,10 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddDaprCliSupport(this IServiceCollection services) =>
         services
             .AddSingleton<IDaprCliService, DaprCliService>();
+
+    private static IServiceCollection AddMinikubeCliSupport(this IServiceCollection services) =>
+        services
+            .AddSingleton<IMinikubeCliService, MinikubeCliService>();
 
     private static IServiceCollection AddStateManagement(this IServiceCollection services) =>
         services

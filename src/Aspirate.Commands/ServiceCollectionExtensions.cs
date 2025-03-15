@@ -1,4 +1,6 @@
-﻿namespace Aspirate.Commands;
+using Aspirate.Commands.Actions.BindMounts;
+
+namespace Aspirate.Commands;
 
 /// <summary>
 /// Extension methods for IServiceCollection to register services for AspirateState and AspirateActions.
@@ -40,11 +42,14 @@ public static class ServiceCollectionExtensions
             .RegisterAction<ApplyDaprAnnotationsAction>()
             .RegisterAction<PopulateInputsAction>()
             .RegisterAction<SaveSecretsAction>()
+            .RegisterAction<SaveBindMountsAction>()
             .RegisterAction<AskPrivateRegistryCredentialsAction>()
             .RegisterAction<IncludeAspireDashboardAction>()
             .RegisterAction<GenerateHelmChartAction>()
             .RegisterAction<CustomNamespaceAction>()
             .RegisterAction<RunKubernetesObjectsAction>()
+            .RegisterAction<ApplyMinikubeMountsAction>()
+            .RegisterAction<KillMinikubeMountsAction>()
             .RegisterAction<StopDeployedKubernetesInstanceAction>();
 
     /// <summary>

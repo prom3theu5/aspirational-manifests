@@ -78,7 +78,7 @@ spec:
       {{#each bindMounts}}
       - name: bindmount-{{@index}}
         hostPath:
-          path: {{source}}
+          path: /mnt{{target}}
           type: DirectoryOrCreate
       {{/each}}
       {{/if}}

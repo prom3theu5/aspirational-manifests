@@ -17,36 +17,21 @@ public class BindMount
     public string? Target { get; set; }
 
     [JsonPropertyName("readOnly")]
-    public bool ReadOnly { get; set; }
+    public bool? ReadOnly { get; set; }
+
+    [JsonPropertyName("minikubeMountProcessId")]
+    public int? MinikubeMountProcessId { get; set; }
 
     private static string GetVolumeHostPath(string path)
     {
-        path = path.Replace('\\', '/').Replace("//", "/");
-
-        string dir = Directory.GetCurrentDirectory();
-        string[] subPaths = path.Split("/");
-
-        for (int i = 0; i < subPaths.Length; i++)
+        if (string.IsNullOrWhiteSpace(path))
         {
-            string currentSub = subPaths[i];
-            if (currentSub == "..")
-            {
-                dir = Directory.GetParent(dir).FullName;
-            }
-            else
-            {
-                if (dir == Directory.GetDirectoryRoot(dir))
-                {
-                    dir += currentSub;
-                }
-                else
-                {
-                    dir = dir + Path.DirectorySeparatorChar + currentSub;
-                }
-            }
+            return "";
         }
 
-        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/run/desktop/mnt/host/" + dir.ToLower().Replace(":", "").Replace('\\', '/') : dir;
+        string currentDir = Directory.GetCurrentDirectory();
+        string resolvedPath = Path.GetFullPath(Path.Combine(currentDir, path));
+
+        return resolvedPath;
     }
 }
-

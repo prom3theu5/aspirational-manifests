@@ -130,6 +130,14 @@ public class AspirateState :
     public SecretState? SecretState { get; set; }
 
     [RestorableStateProperty]
+    [JsonPropertyName("bindMounts")]
+    public Dictionary<string, Dictionary<string, int?>>? BindMounts { get; set; }
+
+    [RestorableStateProperty]
+    [JsonPropertyName("disableMinikubeMountAction")]
+    public bool? DisableMinikubeMountAction { get; set; }
+
+    [RestorableStateProperty]
     [JsonPropertyName("processAllComponents")]
     public bool? ProcessAllComponents { get; set; }
 
