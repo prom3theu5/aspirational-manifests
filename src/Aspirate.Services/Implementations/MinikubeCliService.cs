@@ -13,6 +13,9 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
 {
     private string _minikubePath = "minikube";
 
+    private const string DefaultMountPath = "/mnt";
+    private const string MountCommand = "mount";
+
     public bool IsMinikubeCliInstalledOnMachine()
     {
         var result = shellExecutionService.IsCommandAvailable("minikube");
@@ -28,48 +31,46 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
 
     public void ActivateMinikubeMount(AspirateState state)
     {
+        int count = 0;
         foreach (var resourceWithMounts in state.BindMounts)
         {
-            var resource = resourceWithMounts.Key;
-            var bindMounts = resourceWithMounts.Value;
+            var source = resourceWithMounts.Key;
+            var targets = resourceWithMounts.Value;
 
-            foreach (var bindMount in bindMounts)
+            foreach (var target in targets.Keys)
             {
-                if (string.IsNullOrWhiteSpace(bindMount?.Source) || string.IsNullOrWhiteSpace(bindMount?.Target))
+                if (string.IsNullOrWhiteSpace(target))
                 {
-                    logger.WriteLine("Mount source or target was null or empty - skipping this mount.");
+                    logger.WriteLine("Mount target was null or empty - skipping this mount.");
                     continue;
                 }
 
+                string args = string.Concat(MountCommand, " ", source, ":", DefaultMountPath, target);
+
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = "minikube",
-                    Arguments = $"mount {bindMount.Source}:/mnt{bindMount.Target}",
+                    FileName = _minikubePath,
+                    Arguments = args,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true // Ensures the process doesn't open a terminal window
+                    CreateNoWindow = true
                 };
 
-                logger.MarkupLine($"[cyan]Opening minikube mount at: {bindMount.Source}:/mnt{bindMount.Target}[/]");
+                logger.MarkupLine($"[cyan]Executing: {_minikubePath} {args}[/]");
 
                 var process = Process.Start(startInfo);
 
-                if (IsChocolateyProcess(process))
+                if (IsChocolateyProcess(process) && count == 0)
                 {
                     logger.MarkupLine($"[blue]minikube runs through Chocolatey shim. Process path: {process.MainModule.FileName}[/]");
-                    logger.MarkupLine($"[blue]Will keep track of Chocolatey shim process.[/]");
                 }
 
-                bindMount.MinikubeMountProcessId = process.Id;
-
-                logger.MarkupLine($"[blue]minikube mount process Id: {process.Id} - process name: {process.ProcessName}[/]");
-
-                //results.Add(result);
+                targets[target] = process.Id;
             }
+            count++;
         }
-
-        //return results;
+        logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Started minikube mount processes [blue][/]");
     }
 
     public bool IsChocolateyProcess(Process process)
@@ -82,10 +83,13 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
         try
         {
             string processPath = process.MainModule?.FileName ?? "Unknown";
-            if (processPath.Contains("chocolatey\\bin"))
+
+            if (processPath.Contains("chocolatey"))
             {
                 return true;
             }
+
+            return false;
         }
         catch (Exception ex)
         {
@@ -101,9 +105,11 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
             var resource = resourceWithMounts.Key;
             var bindMounts = resourceWithMounts.Value;
 
-            foreach (var bindMount in bindMounts)
+            var processIds = bindMounts.Values;
+
+            foreach (var nullableProcessId in processIds)
             {
-                var processId = bindMount.MinikubeMountProcessId ?? 0;
+                int processId = nullableProcessId ?? 0;
 
                 if (processId > 0)
                 {
@@ -121,10 +127,7 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
                                     var childProcessId = Convert.ToInt32(obj["ProcessId"]);
                                     var childProcess = Process.GetProcessById(childProcessId);
 
-                                    if (childProcess != null)
-                                    {
-                                        childProcess.Kill();
-                                    }
+                                    childProcess?.Kill();
                                 }
                                 catch (Exception ex)
                                 {

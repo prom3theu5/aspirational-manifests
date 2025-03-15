@@ -7,4 +7,5 @@ public interface IRunOptions
     bool? SkipBuild { get; set; }
     string? ImagePullPolicy { get; set; }
     string? RuntimeIdentifier { get; set; }
+    //bool? DisableMinikubeMountAction { get; set; }
 }

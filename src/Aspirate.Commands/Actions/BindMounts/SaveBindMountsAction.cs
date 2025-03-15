@@ -9,20 +9,32 @@ public sealed class SaveBindMountsAction(
 {
     public override Task<bool> ExecuteAsync()
     {
-        var values = new Dictionary<string, List<BindMount>>();
-        foreach (var resource in CurrentState.AllSelectedSupportedComponents)
+        if (CurrentState.DisableMinikubeMountAction.Equals(false) || !CurrentState.DisableMinikubeMountAction.HasValue)
         {
-            var resourceWithBindMounts = resource.Value as IResourceWithBindMounts;
-
-            if (resourceWithBindMounts?.BindMounts.Count > 0)
+            var values = new Dictionary<string, Dictionary<string, int?>>();
+            foreach (var resource in CurrentState.AllSelectedSupportedComponents)
             {
-                values.Add(resourceWithBindMounts.Name, resourceWithBindMounts.BindMounts);
-            }
-        }
+                var resourceWithBindMounts = resource.Value as IResourceWithBindMounts;
 
-        if (values.Count > 0)
-        {
-            CurrentState.BindMounts = values;
+                if (resourceWithBindMounts?.BindMounts.Count > 0)
+                {
+                    foreach (var bindMount in resourceWithBindMounts.BindMounts)
+                    {
+                        if (!values.ContainsKey(bindMount.Source))
+                        {
+                            values[bindMount.Source] = [];
+                        }
+                        values[bindMount.Source].TryAdd(bindMount.Target, null);
+                    }
+
+                    //values.Add(resourceWithBindMounts.Name, resourceWithBindMounts.BindMounts);
+                }
+            }
+
+            if (values.Count > 0)
+            {
+                CurrentState.BindMounts = values;
+            }
         }
 
         return Task.FromResult(true);

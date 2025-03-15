@@ -48,6 +48,8 @@ public static class ServiceCollectionExtensions
             .RegisterAction<GenerateHelmChartAction>()
             .RegisterAction<CustomNamespaceAction>()
             .RegisterAction<RunKubernetesObjectsAction>()
+            .RegisterAction<ApplyMinikubeMountsAction>()
+            .RegisterAction<KillMinikubeMountsAction>()
             .RegisterAction<StopDeployedKubernetesInstanceAction>();
 
     /// <summary>

@@ -8,5 +8,6 @@ public sealed class DestroyCommand : BaseCommand<DestroyOptions, DestroyCommandH
     {
         AddOption(InputPathOption.Instance);
         AddOption(KubernetesContextOption.Instance);
+        AddOption(DisableMinikubeMountActionOption.Instance);
     }
 }

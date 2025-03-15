@@ -22,8 +22,6 @@ public sealed class RemoveManifestsFromClusterAction(
             CreateEmptySecretFiles(secretFiles);
             await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
 
-            await Task.Run(HandleMinikubeMounts);
-
             Logger.MarkupLine(
                 $"[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
 
@@ -149,15 +147,6 @@ public sealed class RemoveManifestsFromClusterAction(
 
                 Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Dapr removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
             }
-        }
-    }
-
-    private void HandleMinikubeMounts()
-    {
-        if (minikubeCliService.IsMinikubeCliInstalledOnMachine())
-        {
-            minikubeCliService.KillMinikubeMounts(CurrentState);
-            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Killed minikube mount processes [blue][/]");
         }
     }
 

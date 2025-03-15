@@ -20,6 +20,7 @@ public sealed class RunCommandHandler(IServiceProvider serviceProvider) : BaseCo
             .QueueAction(nameof(SaveSecretsAction))
             .QueueAction(nameof(SaveBindMountsAction))
             .QueueAction(nameof(CustomNamespaceAction))
+            .QueueAction(nameof(ApplyMinikubeMountsAction))
             .QueueAction(nameof(RunKubernetesObjectsAction))
             .ExecuteCommandsAsync();
 }
