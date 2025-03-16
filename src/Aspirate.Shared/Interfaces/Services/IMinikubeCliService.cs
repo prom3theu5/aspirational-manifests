@@ -3,6 +3,6 @@ namespace Aspirate.Shared.Interfaces.Services;
 public interface IMinikubeCliService
 {
     bool IsMinikubeCliInstalledOnMachine();
-    void ActivateMinikubeMount(AspirateState state);
+    Task ActivateMinikubeMount(AspirateState state);
     void KillMinikubeMounts(AspirateState state);
 }

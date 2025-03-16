@@ -6,7 +6,7 @@ public sealed class ApplyMinikubeMountsAction(
     public override async Task<bool> ExecuteAsync()
     {
         Logger.WriteRuler("[purple]Handling minikube mounts[/]");
-        await Task.Run(HandleMinikubeMounts);
+        await HandleMinikubeMounts();
 
         return true;
     }
@@ -18,7 +18,7 @@ public sealed class ApplyMinikubeMountsAction(
             Logger.ValidationFailed("Wont start minikube mounts as kubecontext is not set to minikube");
         }
     }
-    private void HandleMinikubeMounts()
+    private async Task HandleMinikubeMounts()
     {
         if (CurrentState.KubeContext != "minikube" || CurrentState.DisableMinikubeMountAction.Equals(true) || CurrentState.BindMounts == null)
         {
@@ -37,6 +37,6 @@ public sealed class ApplyMinikubeMountsAction(
             return;
         }
 
-        minikubeCliService.ActivateMinikubeMount(CurrentState);
+        await minikubeCliService.ActivateMinikubeMount(CurrentState);
     }
 }

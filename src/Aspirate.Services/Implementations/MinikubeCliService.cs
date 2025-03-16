@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
+using System.Transactions;
 
 namespace Aspirate.Services.Implementations;
 
@@ -22,7 +24,7 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
         return true;
     }
 
-    public void ActivateMinikubeMount(AspirateState state)
+    public async Task ActivateMinikubeMount(AspirateState state)
     {
         int count = 0;
         foreach (var resourceWithMounts in state.BindMounts)
@@ -63,6 +65,8 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
             }
             count++;
         }
+        logger.MarkupLine($"[yellow]60 second wait to let minikube mounts finish setting up[/]");
+        await Task.Delay(60000);
         logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Started minikube mount processes [blue][/]");
     }
 
