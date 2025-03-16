@@ -1,9 +1,10 @@
+
 {
   "profiles": {
     "init": {
       "commandName": "Project",
       "commandLineArgs": "init",
-      "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "init-non-interactive": {
@@ -14,8 +15,8 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --skip-build",
-      "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
+      "commandLineArgs": "generate --skip-build --output-format compose",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-test/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "generate-non-interactive": {
@@ -51,7 +52,7 @@
     "apply": {
       "commandName": "Project",
       "commandLineArgs": "apply",
-      "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
+      "workingDirectory": "/Users/prom3theu5/git/tests/new-test/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "apply-non-interactive": {
@@ -63,7 +64,7 @@
     "destroy": {
       "commandName": "Project",
       "commandLineArgs": "destroy",
-      "workingDirectory": "C:\\Users\\MKvamm\\source\\repos\\RIS\\src\\Ris.AppHost",
+      "workingDirectory": "/Users/prom3theu5/git/test-compose/AspireSample/AspireSample.AppHost",
       "hotReloadEnabled": false
     },
     "destroy-non-interactive": {
