@@ -1,4 +1,4 @@
-using Aspirate.Commands.Actions.BindMounts;
+using Aspirate.Commands.Actions.KubeContext;
 
 namespace Aspirate.Commands;
 
@@ -50,7 +50,8 @@ public static class ServiceCollectionExtensions
             .RegisterAction<RunKubernetesObjectsAction>()
             .RegisterAction<ApplyMinikubeMountsAction>()
             .RegisterAction<KillMinikubeMountsAction>()
-            .RegisterAction<StopDeployedKubernetesInstanceAction>();
+            .RegisterAction<StopDeployedKubernetesInstanceAction>()
+            .RegisterAction<SelectKubeContextAction>();
 
     /// <summary>
     /// Registers an implementation of <see cref="IAction"/> with the specified <typeparamref name="TImplementation"/> type.

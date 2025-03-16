@@ -1,11 +1,4 @@
-using System.Diagnostics;
-using System.Security.Cryptography;
-using Aspirate.Shared.Models.AspireManifests;
-using Aspirate.Shared.Models.AspireManifests.Components.Common.Container;
-using Aspirate.Shared.Models.AspireManifests.Components.V0.Container;
-using Aspirate.Shared.Models.AspireManifests.Interfaces;
-using Microsoft.Extensions.Logging;
-using System.Management;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Aspirate.Services.Implementations;
 
@@ -13,7 +6,7 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
 {
     private string _minikubePath = "minikube";
 
-    private const string DefaultMountPath = "/mnt";
+    private const string DefaultMountPath = "/mount";
     private const string MountCommand = "mount";
 
     public bool IsMinikubeCliInstalledOnMachine()
@@ -105,41 +98,36 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
             var resource = resourceWithMounts.Key;
             var bindMounts = resourceWithMounts.Value;
 
-            var processIds = bindMounts.Values;
+            var processIds = bindMounts.Values.Where(processId => processId > 0);
 
-            foreach (var nullableProcessId in processIds)
+            foreach (var processId in processIds)
             {
-                int processId = nullableProcessId ?? 0;
+                var process = Process.GetProcessById(processId);
 
-                if (processId > 0)
+                if (IsChocolateyProcess(process))
                 {
-                    var process = Process.GetProcessById(processId);
-
-                    if (IsChocolateyProcess(process))
-                    {
 #pragma warning disable CA1416
-                        using (var searcher = new ManagementObjectSearcher("SELECT ProcessId FROM Win32_Process WHERE ParentProcessId = " + processId))
+                    using (var searcher = new ManagementObjectSearcher("SELECT ProcessId FROM Win32_Process WHERE ParentProcessId = " + processId))
+                    {
+                        foreach (var obj in searcher.Get())
                         {
-                            foreach (var obj in searcher.Get())
+                            try
                             {
-                                try
-                                {
-                                    var childProcessId = Convert.ToInt32(obj["ProcessId"]);
-                                    var childProcess = Process.GetProcessById(childProcessId);
+                                var childProcessId = Convert.ToInt32(obj["ProcessId"]);
+                                var childProcess = Process.GetProcessById(childProcessId);
 
-                                    childProcess?.Kill();
-                                }
-                                catch (Exception ex)
-                                {
-                                    logger.WriteLine(ex.Message);
-                                    logger.WriteLine($"Could not end child process of process Id: {processId}");
-                                }
+                                childProcess?.Kill();
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.WriteLine(ex.Message);
+                                logger.WriteLine($"Could not end child process of process Id: {processId}");
                             }
                         }
-#pragma warning restore CA1416
                     }
-                    process.Kill();
+#pragma warning restore CA1416
                 }
+                process.Kill();
             }
         }
     }

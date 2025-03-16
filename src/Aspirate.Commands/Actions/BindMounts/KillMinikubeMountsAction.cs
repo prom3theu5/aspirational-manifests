@@ -1,8 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
-using Aspirate.Shared.Models.AspireManifests.Components.Common;
-using Aspirate.Shared.Models.AspireManifests.Components.Common.Container;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Aspirate.Commands.Actions.BindMounts;
 public sealed class KillMinikubeMountsAction(
     IServiceProvider serviceProvider,

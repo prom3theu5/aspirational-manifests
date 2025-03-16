@@ -131,7 +131,7 @@ public class AspirateState :
 
     [RestorableStateProperty]
     [JsonPropertyName("bindMounts")]
-    public Dictionary<string, Dictionary<string, int?>>? BindMounts { get; set; }
+    public Dictionary<string, Dictionary<string, int>>? BindMounts { get; set; }
 
     [RestorableStateProperty]
     [JsonPropertyName("disableMinikubeMountAction")]

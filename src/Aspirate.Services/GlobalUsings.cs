@@ -1,3 +1,5 @@
+global using System.Diagnostics;
+global using System.Management;
 global using System.IO.Abstractions;
 global using System.Reflection;
 global using System.Runtime.InteropServices;

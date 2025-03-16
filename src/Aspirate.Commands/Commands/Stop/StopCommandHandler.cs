@@ -1,5 +1,3 @@
-using Aspirate.Commands.Actions.BindMounts;
-
 namespace Aspirate.Commands.Commands.Stop;
 
 public sealed class StopCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<StopOptions>(serviceProvider)

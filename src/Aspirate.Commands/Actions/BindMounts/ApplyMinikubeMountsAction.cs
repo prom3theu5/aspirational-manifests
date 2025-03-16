@@ -1,12 +1,7 @@
-using System.Reflection.Metadata.Ecma335;
-using Aspirate.Shared.Models.AspireManifests.Components.Common;
-using Aspirate.Shared.Models.AspireManifests.Components.Common.Container;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Aspirate.Commands.Actions.BindMounts;
 public sealed class ApplyMinikubeMountsAction(
     IServiceProvider serviceProvider,
-    IMinikubeCliService minikubeCliService) : BaseAction(serviceProvider)
+    IMinikubeCliService minikubeCliService) : BaseActionWithNonInteractiveValidation(serviceProvider)
 {
     public override async Task<bool> ExecuteAsync()
     {
@@ -15,9 +10,17 @@ public sealed class ApplyMinikubeMountsAction(
 
         return true;
     }
+
+    public override void ValidateNonInteractiveState()
+    {
+        if (!CurrentState.ActiveKubernetesContextIsSet || CurrentState.KubeContext != "minikube")
+        {
+            Logger.ValidationFailed("Wont start minikube mounts as kubecontext is not set to minikube");
+        }
+    }
     private void HandleMinikubeMounts()
     {
-        if (CurrentState.KubeContext != "minikube" || CurrentState.DisableMinikubeMountAction.Equals(true))
+        if (CurrentState.KubeContext != "minikube" || CurrentState.DisableMinikubeMountAction.Equals(true) || CurrentState.BindMounts == null)
         {
             return;
         }

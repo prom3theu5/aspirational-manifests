@@ -5,6 +5,7 @@ global using System.Diagnostics.CodeAnalysis;
 global using System.IO.Abstractions;
 global using System.Text;
 global using Aspirate.Commands.Actions;
+global using Aspirate.Commands.Actions.BindMounts;
 global using Aspirate.Commands.Actions.Configuration;
 global using Aspirate.Commands.Actions.Containers;
 global using Aspirate.Commands.Actions.Manifests;

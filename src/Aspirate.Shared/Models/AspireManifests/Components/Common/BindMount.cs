@@ -1,16 +1,16 @@
-using System.Runtime.InteropServices;
-
 namespace Aspirate.Shared.Models.AspireManifests.Components.Common;
 
 public class BindMount
 {
+    public string? VolumeHostPath { get; set; } = "/mount";
+
     private string? _source;
 
     [JsonPropertyName("source")]
     public string? Source
     {
         get => _source;
-        set => _source = GetVolumeHostPath(value);
+        set => _source = GetSource(value);
     }
 
     [JsonPropertyName("target")]
@@ -19,10 +19,7 @@ public class BindMount
     [JsonPropertyName("readOnly")]
     public bool? ReadOnly { get; set; }
 
-    [JsonPropertyName("minikubeMountProcessId")]
-    public int? MinikubeMountProcessId { get; set; }
-
-    private static string GetVolumeHostPath(string path)
+    private static string GetSource(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
         {

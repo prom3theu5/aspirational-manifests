@@ -1,4 +1,4 @@
-using Aspirate.Commands.Actions.BindMounts;
+using Aspirate.Commands.Actions.KubeContext;
 
 namespace Aspirate.Commands.Commands.Run;
 
@@ -20,6 +20,7 @@ public sealed class RunCommandHandler(IServiceProvider serviceProvider) : BaseCo
             .QueueAction(nameof(SaveSecretsAction))
             .QueueAction(nameof(SaveBindMountsAction))
             .QueueAction(nameof(CustomNamespaceAction))
+            .QueueAction(nameof(SelectKubeContextAction))
             .QueueAction(nameof(ApplyMinikubeMountsAction))
             .QueueAction(nameof(RunKubernetesObjectsAction))
             .ExecuteCommandsAsync();

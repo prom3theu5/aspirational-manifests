@@ -21,7 +21,6 @@ public sealed class RemoveManifestsFromClusterAction(
 
             CreateEmptySecretFiles(secretFiles);
             await kubeCtlService.RemoveManifests(CurrentState.KubeContext, CurrentState.InputPath);
-
             Logger.MarkupLine(
                 $"[green]({EmojiLiterals.CheckMark}) Done:[/] Deployments removed from cluster [blue]'{CurrentState.KubeContext}'[/]");
 

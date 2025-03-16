@@ -16,7 +16,7 @@ public sealed class RunKubernetesObjectsAction(
             return true;
         }
 
-        await kubernetesService.InteractivelySelectKubernetesCluster(CurrentState);
+        //await kubernetesService.InteractivelySelectKubernetesCluster(CurrentState);
 
         var kubeObjects = kubernetesService.ConvertResourcesToKubeObjects(CurrentState.AllSelectedSupportedComponents, CurrentState, false);
         var client = kubernetesService.CreateClient(CurrentState.KubeContext);

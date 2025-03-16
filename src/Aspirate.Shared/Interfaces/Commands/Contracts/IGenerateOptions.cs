@@ -9,5 +9,4 @@ public interface IGenerateOptions
     string? ImagePullPolicy { get; set; }
     string? OutputFormat { get; set; }
     List<string>? Parameters { get; set; }
-    //bool? DisableMinikubeMountAction { get; set; }
 }
