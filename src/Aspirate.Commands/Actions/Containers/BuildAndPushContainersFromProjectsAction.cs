@@ -20,12 +20,12 @@ public sealed class BuildAndPushContainersFromProjectsAction(
             return true;
         }
 
-        var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
-
         Logger.MarkupLine("[bold]Building all project resources, and pushing containers[/]");
 
         foreach (var resource in CurrentState.SelectedProjectComponents)
         {
+            var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(resource.Value.Type) as BaseProjectProcessor;
+
             await projectProcessor.BuildAndPushProjectContainer(resource, new()
             {
                 ContainerBuilder = CurrentState.ContainerBuilder.ToLower(),

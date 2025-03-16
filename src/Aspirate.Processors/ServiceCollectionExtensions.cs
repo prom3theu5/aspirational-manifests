@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAspirateProcessors(this IServiceCollection services) =>
         services
             .RegisterProcessor<ProjectProcessor>(AspireComponentLiterals.Project)
+            .RegisterProcessor<ProjectV1Processor>(AspireComponentLiterals.ProjectV1)
             .RegisterProcessor<DockerfileProcessor>(AspireComponentLiterals.Dockerfile)
             .RegisterProcessor<ContainerProcessor>(AspireComponentLiterals.Container)
             .RegisterProcessor<ContainerV1Processor>(AspireComponentLiterals.ContainerV1)
