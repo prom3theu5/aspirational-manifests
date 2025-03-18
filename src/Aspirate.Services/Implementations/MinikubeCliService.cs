@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using System.Reflection.Metadata.Ecma335;
-using System.Transactions;
-
 namespace Aspirate.Services.Implementations;
 
 public class MinikubeCliService(IShellExecutionService shellExecutionService, IAnsiConsole logger, IServiceProvider serviceProvider) : IMinikubeCliService
