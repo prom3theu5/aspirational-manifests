@@ -2,7 +2,7 @@ namespace Aspirate.Shared.Models.AspireManifests.Components.Common;
 
 public class BindMount
 {
-    public string? VolumeHostPath { get; set; } = "/mount";
+    public string? MinikubeHostPathPrefix { get; set; } = "/mount";
 
     private string? _source;
 

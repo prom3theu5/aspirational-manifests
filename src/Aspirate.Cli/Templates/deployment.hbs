@@ -7,9 +7,9 @@ metadata:
     app: {{name}}
 {{#if hasAnyAnnotations}}
   annotations:
-  {{#each annotations}}
-    {{@key}}: {{this}}
-  {{/each}}
+{{#each annotations}}
+{{@key}}: {{this}}
+{{/each}}
 {{/if}}
 spec:
   minReadySeconds: 60
@@ -25,60 +25,60 @@ spec:
         app: {{name}}
 {{#if hasAnyAnnotations}}
       annotations:
-      {{#each annotations}}
-        {{@key}}: {{this}}
-      {{/each}}
+{{#each annotations}}
+{{@key}}: {{this}}
+{{/each}}
 {{/if}}
     spec:
-    {{#if withPrivateRegistry}}
+{{#if withPrivateRegistry}}
       imagePullSecrets:
       - name: image-pull-secret
-    {{/if}}
+{{/if}}
       containers:
       - name: {{name}}
         image: {{containerImage}}
         imagePullPolicy: {{imagePullPolicy}}
-        {{#if entrypoint}}
+{{#if entrypoint}}
         command:
           - {{entrypoint}}
-        {{/if}}
-        {{#if hasArgs}}
+{{/if}}
+{{#if hasArgs}}
         args:
-        {{#each args}}
+{{#each args}}
         - {{this}}
-        {{/each}}
-        {{/if}}
-        {{#if hasPorts}}
+{{/each}}
+{{/if}}
+{{#if hasPorts}}
         ports:
-        {{#each ports}}
+{{#each ports}}
         - name: {{name}}
           containerPort: {{internalPort}}
-        {{/each}}
-        {{/if}}
-        {{#if hasAnyEnv}}
+{{/each}}
+{{/if}}
+{{#if hasAnyEnv}}
         envFrom:
         - configMapRef:
             name: {{name}}-env
-        {{/if}}
-        {{#if hasAnySecrets}}
+{{/if}}
+{{#if hasAnySecrets}}
         - secretRef:
             name: {{name}}-secrets
-        {{/if}}
-        {{#if hasBindMounts}}
+{{/if}}
+{{#if hasBindMounts}}
         volumeMounts:
-        {{#each bindMounts}}
+{{#each bindMounts}}
         - name: bindmount-{{@index}}
           mountPath: {{target}}
           readOnly: {{readOnly}}
-        {{/each}}
-        {{/if}}
+{{/each}}
+{{/if}}
       terminationGracePeriodSeconds: 180
-      {{#if hasBindMounts}}
+{{#if hasBindMounts}}
       volumes:
-      {{#each bindMounts}}
+{{#each bindMounts}}
       - name: bindmount-{{@index}}
         hostPath:
-          path: {{volumeHostPath}}{{target}}
+          path: {{#if ../isMinikubeContext}}{{MinikubeHostPathPrefix}}{{/if}}{{target}}
           type: DirectoryOrCreate
-      {{/each}}
-      {{/if}}
+{{/each}}
+{{/if}}

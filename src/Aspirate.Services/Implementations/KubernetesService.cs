@@ -63,13 +63,18 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
             return;
         }
 
-        var shouldDeploy = logger.Confirm(
+        var contextWasSet = logger.Confirm(
             "[bold]Would you like to deploy the generated manifests to a kubernetes cluster defined in your kubeconfig file?[/]");
 
-        if (!shouldDeploy)
+        if (state.CurrentCommand is "apply" or "run" && !contextWasSet)
         {
             logger.MarkupLine("[yellow]Skipping deployment of manifests to cluster.[/]");
             ActionCausesExitException.ExitNow();
+        }
+
+        if (state.CurrentCommand is "generate" && !contextWasSet)
+        {
+            return;
         }
 
         state.KubeContext = await kubeCtlService.SelectKubernetesContextForDeployment();
@@ -274,6 +279,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
             WithPrivateRegistry = state.WithPrivateRegistry,
             WithDashboard = state.IncludeDashboard,
             EncodeSecrets = encodeSecrets,
+            CurrentState = state
         });
     }
 

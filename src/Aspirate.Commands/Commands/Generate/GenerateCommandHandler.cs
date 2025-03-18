@@ -23,6 +23,7 @@ public sealed class GenerateCommandHandler(IServiceProvider serviceProvider) : B
             .QueueAction(nameof(LoadConfigurationAction))
             .QueueAction(nameof(GenerateAspireManifestAction))
             .QueueAction(nameof(LoadAspireManifestAction))
+            .QueueAction(nameof(SelectKubeContextAction))
             .QueueAction(nameof(IncludeAspireDashboardAction))
             .QueueAction(nameof(PopulateInputsAction))
             .QueueAction(nameof(SubstituteValuesAspireManifestAction))

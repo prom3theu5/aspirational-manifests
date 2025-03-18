@@ -6,7 +6,7 @@ public sealed class SaveBindMountsAction(
     {
         Logger.WriteRuler("[purple]Handling minikube mounts[/]");
 
-        if (CurrentState.DisableMinikubeMountAction.Equals(false) || !CurrentState.DisableMinikubeMountAction.HasValue)
+        if (!CurrentState.DisableMinikubeMountAction.Equals(true))
         {
             var values = new Dictionary<string, Dictionary<string, int>>();
             foreach (var resource in CurrentState.AllSelectedSupportedComponents)
@@ -35,6 +35,16 @@ public sealed class SaveBindMountsAction(
                 Logger.WriteLine("No bindmounts to save.");
             }
         }
+        else
+        {
+            Logger.WriteLine("Minikube bindmounts actions disabled. Not saving in state.");
+        }
+
+        if (CurrentState.KubeContext == null || !CurrentState.KubeContext.Equals("minikube", StringComparison.OrdinalIgnoreCase))
+        {
+            Logger.WriteLine("Minikube was not set as the kubecontext to use. Will not add default minikube mount prefix to volumes hostpath in deployment files.");
+        }
+
 
         return Task.FromResult(true);
     }

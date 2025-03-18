@@ -19,6 +19,7 @@ public class KubernetesDeploymentData
     public bool? IsProject {get; private set;}
     public bool? WithPrivateRegistry { get; private set; } = false;
     public bool? WithDashboard { get; private set; } = false;
+    public bool? IsMinikubeContext { get; private set; } = false;
     public string? ContainerImage {get; private set;}
     public string? Entrypoint {get; private set;}
     public string? ImagePullPolicy {get; private set;}
@@ -116,6 +117,12 @@ public class KubernetesDeploymentData
     public KubernetesDeploymentData SetWithDashboard(bool? withDashboard)
     {
         WithDashboard = withDashboard ?? false;
+        return this;
+    }
+
+    public KubernetesDeploymentData SetIsMinikubeContext(string? kubeContext)
+    {
+        IsMinikubeContext = !string.IsNullOrWhiteSpace(kubeContext) && kubeContext.Equals("minikube", StringComparison.OrdinalIgnoreCase);
         return this;
     }
 

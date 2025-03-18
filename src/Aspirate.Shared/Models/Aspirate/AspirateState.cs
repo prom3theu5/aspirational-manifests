@@ -146,6 +146,9 @@ public class AspirateState :
     public bool? IsRunning { get; set; }
 
     [JsonIgnore]
+    public string? CurrentCommand { get; set; }
+
+    [JsonIgnore]
     public bool? SkipBuild { get; set; }
 
     [JsonIgnore]
