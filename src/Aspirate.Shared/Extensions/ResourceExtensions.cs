@@ -101,4 +101,19 @@ public static class ResourceExtensions
             }
         }
     }
+
+    public static List<BindMount> NormalizeBindMountSource(this List<BindMount>? bindMounts, IFileSystem fileSystem)
+    {
+        if (bindMounts == null || !bindMounts.Any())
+        {
+            return [];
+        }
+
+        return bindMounts.Select(b => new BindMount
+        {
+            Source = fileSystem.GetFullPath(b.Source),
+            Target = b.Target,
+            ReadOnly = b.ReadOnly
+        }).ToList();
+    }
 }

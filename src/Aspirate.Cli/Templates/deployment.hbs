@@ -78,7 +78,7 @@ spec:
       {{#each bindMounts}}
         - name: bindmount-{{@index}}
           hostPath:
-            path: {{#if ../isMinikubeContext}}{{MinikubeHostPathPrefix}}{{/if}}{{target}}
+            path: {{#if ../isMinikubeContext}}{{../MinikubeHostPathPrefix}}{{target}}{{else}}{{source}}{{/if}}
             type: DirectoryOrCreate
       {{/each}}
       {{/if}}

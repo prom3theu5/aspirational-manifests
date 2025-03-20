@@ -24,6 +24,7 @@ public class KubernetesDeploymentData
     public string? Entrypoint {get; private set;}
     public string? ImagePullPolicy {get; private set;}
     public string? ServiceType { get; private set; } = "ClusterIP";
+    public string? MinikubeHostPathPrefix { get; private set; } = MinikubeLiterals.HostPathPrefix;
 
     public KubernetesDeploymentData SetName(string name)
     {

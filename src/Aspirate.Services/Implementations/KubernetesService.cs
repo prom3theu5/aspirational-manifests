@@ -66,7 +66,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
         var contextWasSet = logger.Confirm(
             "[bold]Would you like to deploy the generated manifests to a kubernetes cluster defined in your kubeconfig file?[/]");
 
-        if (state.CurrentCommand is "apply" or "run" && !contextWasSet)
+        if (state.CurrentCommand is AspirateLiterals.ApplyCommand or AspirateLiterals.RunCommand && !contextWasSet)
         {
             logger.MarkupLine("[yellow]Skipping deployment of manifests to cluster.[/]");
             ActionCausesExitException.ExitNow();

@@ -96,7 +96,7 @@ public abstract class ContainerProcessorBase<TContainerResource>(
             .SetEnv(GetFilteredEnvironmentalVariables(options.Resource, options.DisableSecrets, options.WithDashboard))
             .SetAnnotations(container.Annotations)
             .SetVolumes(container.Volumes.KuberizeVolumeNames(options.Resource))
-            .SetBindMounts(container.BindMounts)
+            .SetBindMounts(container.BindMounts.NormalizeBindMountSource(_fileSystem))
             .SetIsMinikubeContext(options.CurrentState.KubeContext)
             .SetSecrets(GetSecretEnvironmentalVariables(options.Resource, options.DisableSecrets, options.WithDashboard))
             .SetSecretsFromSecretState(options.Resource, secretProvider, options.DisableSecrets)

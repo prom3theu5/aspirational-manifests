@@ -27,6 +27,7 @@ global using Aspirate.Shared.Models.AspireManifests.Components.V1.Container;
 global using Aspirate.Shared.Models.AspireManifests.Interfaces;
 global using Aspirate.Shared.Models.Kubernetes;
 global using Aspirate.Shared.Models.MsBuild;
+global using Aspirate.Shared.Models.Process;
 global using Aspirate.Shared.Outputs;
 global using CliWrap;
 global using CliWrap.Buffered;

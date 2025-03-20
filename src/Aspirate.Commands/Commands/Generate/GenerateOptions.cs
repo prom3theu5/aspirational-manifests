@@ -8,6 +8,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
     IPrivateRegistryCredentialsOptions,
     IDashboardOptions,
     ISecretState,
+    IKubernetesOptions,
     IMinikubeOptions
 {
     public string? ProjectPath { get; set; }
@@ -35,5 +36,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public bool? WithPrivateRegistry { get; set; }
     public bool? IncludeDashboard { get; set; }
     public bool? ReplaceSecrets { get; set; }
+    public string? InputPath { get; set; }
+    public string? KubeContext { get; set; }
     public bool? DisableMinikubeMountAction { get; set; }
 }

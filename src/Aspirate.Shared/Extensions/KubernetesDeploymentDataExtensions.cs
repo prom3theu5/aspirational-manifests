@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Aspirate.Shared.Extensions;
 
 public static class KubernetesDeploymentDataExtensions
@@ -56,6 +58,42 @@ public static class KubernetesDeploymentDataExtensions
             Type = "Opaque",
             Data = secrets,
         };
+    }
+
+    public static void SetVolumesAndVolumeMounts(KubernetesDeploymentData data, V1Deployment deployment)
+    {
+        deployment.Spec.Template.Spec.Volumes = [];
+        deployment.Spec.Template.Spec.Containers.FirstOrDefault().VolumeMounts = [];
+
+        var volumes = new List<V1Volume>();
+        var volumeMounts = new List<V1VolumeMount>();
+
+        if (data.HasBindMounts)
+        {
+            for (int i = 0; i < data.BindMounts.Count; i++)
+            {
+                var bindMount = data.BindMounts.ElementAt(i);
+
+                volumes.Add(new()
+                {
+                    Name = "bindmount-" + i,
+                    HostPath = new V1HostPathVolumeSource
+                    {
+                        Path = data.IsMinikubeContext.Equals(true) ? MinikubeLiterals.HostPathPrefix + bindMount.Target : bindMount.Target
+                    }
+                });
+
+                volumeMounts.Add(new()
+                {
+                    Name = "bindmount-" + i,
+                    MountPath = bindMount.Target,
+                    ReadOnlyProperty = bindMount.ReadOnly
+                });
+            }
+        }
+
+        deployment.Spec.Template.Spec.Containers.FirstOrDefault().VolumeMounts = volumeMounts;
+        deployment.Spec.Template.Spec.Volumes = volumes;
     }
 
     public static V1Container ToKubernetesContainer(this KubernetesDeploymentData data, bool useConfigMap = true, bool useSecrets = true)
@@ -165,6 +203,11 @@ public static class KubernetesDeploymentDataExtensions
         if (data.WithPrivateRegistry == true)
         {
             deployment.Spec.Template.Spec.ImagePullSecrets = SetKubernetesImagePullSecrets;
+        }
+
+        if (data.HasBindMounts)
+        {
+            SetVolumesAndVolumeMounts(data, deployment);
         }
 
         return deployment;

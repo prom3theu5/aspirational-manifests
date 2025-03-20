@@ -1,15 +1,17 @@
 namespace Aspirate.Services.Implementations;
 
-public class MinikubeCliService(IShellExecutionService shellExecutionService, IAnsiConsole logger, IServiceProvider serviceProvider) : IMinikubeCliService
+public class MinikubeCliService(IShellExecutionService shellExecutionService, IAnsiConsole logger, IProcessService processService) : IMinikubeCliService
 {
-    private string _minikubePath = "minikube";
+    public int DefaultDelay { get; set; } = 60000;
 
-    private const string DefaultMountPath = "/mount";
-    private const string MountCommand = "mount";
+    private string _minikubePath = MinikubeLiterals.Path;
+
+    private const string DefaultMountPath = MinikubeLiterals.HostPathPrefix;
+    private const string MountCommand = MinikubeLiterals.MountCommand;
 
     public bool IsMinikubeCliInstalledOnMachine()
     {
-        var result = shellExecutionService.IsCommandAvailable("minikube");
+        var result = shellExecutionService.IsCommandAvailable(_minikubePath);
 
         if (!result.IsAvailable)
         {
@@ -50,49 +52,31 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
 
                 logger.MarkupLine($"[cyan]Executing: {_minikubePath} {args}[/]");
 
-                var process = Process.Start(startInfo);
+                var process = processService.StartProcess(startInfo);
 
-                if (IsChocolateyProcess(process) && count == 0)
+                if (process == null)
                 {
-                    logger.MarkupLine($"[blue]minikube runs through Chocolatey shim. Process path: {process.MainModule.FileName}[/]");
+                    logger.WriteLine("[red]Failed to start minikube mount process[/]");
+                    continue;
+                }
+
+                if (processService.IsChocolateyProcess(process.Id) && count == 0)
+                {
+                    logger.MarkupLine($"[blue]minikube runs through Chocolatey shim.[/]");
                 }
 
                 targets[target] = process.Id;
             }
             count++;
         }
-        logger.MarkupLine($"[yellow]60 second wait to let minikube mounts finish setting up[/]");
-        await Task.Delay(60000);
+        logger.MarkupLine($"[yellow]{DefaultDelay / 1000} second wait to let minikube mounts finish setting up[/]");
+        await Task.Delay(DefaultDelay);
         logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Started minikube mount processes [blue][/]");
     }
 
-    public bool IsChocolateyProcess(Process process)
+    public async Task<bool> KillMinikubeMounts(AspirateState state)
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return false;
-        }
-
-        try
-        {
-            string processPath = process.MainModule?.FileName ?? "Unknown";
-
-            if (processPath.Contains("chocolatey"))
-            {
-                return true;
-            }
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            logger.WriteLine($"Error getting minikube process path: {ex.Message}");
-        }
-        return false;
-    }
-
-    public void KillMinikubeMounts(AspirateState state)
-    {
+        bool killedAll = true;
         foreach (var resourceWithMounts in state.BindMounts)
         {
             var resource = resourceWithMounts.Key;
@@ -102,33 +86,15 @@ public class MinikubeCliService(IShellExecutionService shellExecutionService, IA
 
             foreach (var processId in processIds)
             {
-                var process = Process.GetProcessById(processId);
+                var process = processService.GetProcessById(processId);
 
-                if (IsChocolateyProcess(process))
+                var result = await processService.KillProcess(processId);
+                if (!result)
                 {
-#pragma warning disable CA1416
-                    using (var searcher = new ManagementObjectSearcher("SELECT ProcessId FROM Win32_Process WHERE ParentProcessId = " + processId))
-                    {
-                        foreach (var obj in searcher.Get())
-                        {
-                            try
-                            {
-                                var childProcessId = Convert.ToInt32(obj["ProcessId"]);
-                                var childProcess = Process.GetProcessById(childProcessId);
-
-                                childProcess?.Kill();
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.WriteLine(ex.Message);
-                                logger.WriteLine($"Could not end child process of process Id: {processId}");
-                            }
-                        }
-                    }
-#pragma warning restore CA1416
+                    killedAll = false;
                 }
-                process.Kill();
             }
         }
+        return killedAll;
     }
 }

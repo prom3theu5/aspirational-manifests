@@ -11,12 +11,25 @@ public sealed class KillMinikubeMountsAction(
 
         return true;
     }
-    private void HandleMinikubeMounts()
+    private async void HandleMinikubeMounts()
     {
+        if (!CurrentState.KubeContext.Equals(MinikubeLiterals.Path, StringComparison.OrdinalIgnoreCase))
+        {
+            Logger.MarkupLine($"No minikube mounts to handle.");
+            return;
+        }
+
         if (minikubeCliService.IsMinikubeCliInstalledOnMachine() && (CurrentState.DisableMinikubeMountAction.Equals(false) || !CurrentState.DisableMinikubeMountAction.HasValue))
         {
-            minikubeCliService.KillMinikubeMounts(CurrentState);
-            Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Killed minikube mount processes [blue][/]");
+            var result = await minikubeCliService.KillMinikubeMounts(CurrentState);
+            if (result)
+            {
+                Logger.MarkupLine($"[green]({EmojiLiterals.CheckMark}) Done:[/] Killed minikube mount processes [blue][/]");
+            }
+            else
+            {
+                Logger.MarkupLine($"[red]({EmojiLiterals.Warning}) Done:[/] Could not kill all minikube mount processes [blue][/]");
+            }
         }
     }
 }

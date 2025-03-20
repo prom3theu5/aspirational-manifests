@@ -13,9 +13,9 @@ public sealed class ApplyMinikubeMountsAction(
 
     public override void ValidateNonInteractiveState()
     {
-        if (!CurrentState.ActiveKubernetesContextIsSet || CurrentState.KubeContext != "minikube")
+        if (!CurrentState.ActiveKubernetesContextIsSet)
         {
-            Logger.ValidationFailed("Wont start minikube mounts as kubecontext is not set to minikube");
+            Logger.ValidationFailed("Wont start minikube mounts as kubecontext is not set");
         }
     }
     private async Task HandleMinikubeMounts()
