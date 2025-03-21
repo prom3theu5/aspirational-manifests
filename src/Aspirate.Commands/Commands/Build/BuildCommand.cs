@@ -16,5 +16,6 @@ public sealed class BuildCommand : BaseCommand<BuildOptions, BuildCommandHandler
        AddOption(ContainerRegistryOption.Instance);
        AddOption(ContainerRepositoryPrefixOption.Instance);
        AddOption(RuntimeIdentifierOption.Instance);
+       AddOption(ComponentsOption.Instance);
     }
 }

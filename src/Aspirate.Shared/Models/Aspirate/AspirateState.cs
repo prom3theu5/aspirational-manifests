@@ -211,4 +211,10 @@ public class AspirateState :
 
     [JsonIgnore]
     public bool? ReplaceSecrets { get; set; }
+
+    [JsonIgnore]
+    public List<string>? CliSpecifiedComponents { get; set; }
+
+    [JsonIgnore]
+    public bool HasSelectedComponentsInCli => CliSpecifiedComponents is { Count: > 0 };
 }
