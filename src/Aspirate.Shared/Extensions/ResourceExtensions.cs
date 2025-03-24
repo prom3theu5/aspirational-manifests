@@ -53,13 +53,13 @@ public static class ResourceExtensions
 
         if (resource.Value is not IResourceWithVolumes resourceWithVolumes)
         {
-            return [];
+            return[];
         }
 
 
         KuberizeVolumeNames(resourceWithVolumes.Volumes, resource);
 
-        composeVolumes.AddRange(resourceWithVolumes.Volumes.Where(x => !string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
+        composeVolumes.AddRange(resourceWithVolumes.Volumes.Where(x=>!string.IsNullOrWhiteSpace(x.Name)).Select(volume => $"{volume.Name}:{volume.Target}"));
 
         return composeVolumes.ToArray();
     }

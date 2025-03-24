@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Aspirate.Shared.Extensions;
 
 public static class KubernetesDeploymentDataExtensions
@@ -159,20 +157,6 @@ public static class KubernetesDeploymentDataExtensions
             }).ToList();
         }
 
-        //if (data.HasBindMounts)
-        //{
-        //    int lastNum = 0;
-        //    foreach (var bindMount in data.BindMounts)
-        //    {
-        //        container.VolumeMounts.Add(new V1VolumeMount
-        //        {
-        //            Name = $"defaultMount{lastNum++}",
-        //            MountPath = bindMount.Target,
-        //            ReadOnlyProperty = bindMount.ReadOnly
-        //        });
-        //    }
-        //}
-
         return container;
     }
 
@@ -251,27 +235,6 @@ public static class KubernetesDeploymentDataExtensions
 
         return deployment;
     }
-
-    //private static string GetVolumeHostPath(string path)
-    //{
-    //    string dir = Directory.GetCurrentDirectory();
-
-    //    string[] subPaths = path.Split("/");
-
-    //    for (int i = 0; i < subPaths.Length; i++)
-    //    {
-    //        string currentSub = subPaths[i];
-    //        if (currentSub == "..")
-    //        {
-    //            dir = Directory.GetParent(dir).FullName;
-    //        }
-    //        else
-    //        {
-    //            dir = dir + Path.DirectorySeparatorChar + currentSub;
-    //        }
-    //    }
-    //    return dir;
-    //}
 
     public static V1StatefulSet ToKubernetesStatefulSet(this KubernetesDeploymentData data, Dictionary<string, string>? labels = null, bool useConfigMap = true, bool useSecrets = true)
     {

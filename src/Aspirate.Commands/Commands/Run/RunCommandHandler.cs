@@ -1,5 +1,3 @@
-using Aspirate.Commands.Actions.KubeContext;
-
 namespace Aspirate.Commands.Commands.Run;
 
 public sealed class RunCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<RunOptions>(serviceProvider)

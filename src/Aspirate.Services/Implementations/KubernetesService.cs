@@ -72,7 +72,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
             ActionCausesExitException.ExitNow();
         }
 
-        if (state.CurrentCommand is "generate" && !contextWasSet)
+        if (state.CurrentCommand is AspirateLiterals.GenerateCommand && !contextWasSet)
         {
             return;
         }

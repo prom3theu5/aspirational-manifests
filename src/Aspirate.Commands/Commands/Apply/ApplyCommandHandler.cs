@@ -1,5 +1,3 @@
-using Aspirate.Commands.Actions.KubeContext;
-
 namespace Aspirate.Commands.Commands.Apply;
 
 public sealed class ApplyCommandHandler(IServiceProvider serviceProvider) : BaseCommandOptionsHandler<ApplyOptions>(serviceProvider)

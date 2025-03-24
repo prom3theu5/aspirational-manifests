@@ -1,5 +1,3 @@
-using Aspirate.Commands.Commands.Generate;
-
 namespace Aspirate.Commands.Actions.KubeContext;
 public sealed class SelectKubeContextAction(
     IServiceProvider serviceProvider,

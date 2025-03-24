@@ -2,6 +2,7 @@ global using System.IO.Abstractions;
 global using System.IO.Abstractions.TestingHelpers;
 global using System.Runtime.CompilerServices;
 global using System.Text.Json;
+global using System.Diagnostics;
 global using Aspirate.Commands.Actions;
 global using Aspirate.Commands.Actions.Containers;
 global using Aspirate.Commands.Actions.Manifests;

@@ -1,5 +1,3 @@
-using Aspirate.Commands.Actions.KubeContext;
-
 namespace Aspirate.Commands;
 
 /// <summary>

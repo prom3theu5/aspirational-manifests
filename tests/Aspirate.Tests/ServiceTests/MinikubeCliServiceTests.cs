@@ -1,16 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using NSubstitute;
-using Spectre.Console;
-using VerifyTests;
-using Xunit;
-
 namespace Aspirate.Tests.ServiceTests;
 
 public class TestableMinikubeCliService(
@@ -298,7 +285,7 @@ public class FakeProcessService(bool testChocolatey) : IProcessService
 
     public bool IsChocolateyProcess(int processId)
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (!OperatingSystem.IsWindows())
         {
             return false;
         }

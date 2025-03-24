@@ -25,6 +25,13 @@ public sealed class SaveBindMountsAction(
             return Task.FromResult(true);
         }
 
+        if (!CurrentState.OutputFormat.Equals(OutputFormat.Kustomize.Value, StringComparison.OrdinalIgnoreCase))
+        {
+            Logger.WriteLine("Minikube bindmounts automation is currently only supported when using 'kustomize' output format. Not saving to state.");
+            CurrentState.EnableMinikubeMountAction = null;
+            return Task.FromResult(true);
+        }
+
         var values = new Dictionary<string, Dictionary<string, int>>();
         foreach (var resource in CurrentState.AllSelectedSupportedComponents)
         {
