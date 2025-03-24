@@ -10,7 +10,7 @@ public class SaveBindMountsActionTest : BaseActionTests<SaveBindMountsAction>
     private const string AppHostPath = $"{DefaultProjectPath}/source/repos/MyRepo/Aspire.AppHost";
     private const string MountPath1 = $"{DefaultProjectPath}/folder/folder/cert";
     private const string MountPath2 = $"{DefaultProjectPath}/folder/folder/temp/something";
-    
+
     [Fact]
     public async Task ExecuteAsync_InInteractiveMode_ReturnsCorrectResult()
     {
@@ -24,8 +24,11 @@ public class SaveBindMountsActionTest : BaseActionTests<SaveBindMountsAction>
         var console = new TestConsole();
         console.Profile.Capabilities.Interactive = true;
         EnterPasswordInput(console, "secret_password"); // postgrescontainer
+
         var state = CreateAspirateStateWithBindMounts();
         state.KubeContext = MinikubeLiterals.Path;
+        state.EnableMinikubeMountAction = true;
+
         var serviceProvider = CreateServiceProvider(state, console, fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
@@ -65,8 +68,11 @@ public class SaveBindMountsActionTest : BaseActionTests<SaveBindMountsAction>
 
         var console = new TestConsole();
         console.Profile.Capabilities.Interactive = false;
+
         var state = CreateAspirateStateWithBindMounts(nonInteractive: true);
         state.KubeContext = MinikubeLiterals.Path;
+        state.EnableMinikubeMountAction = true;
+
         var serviceProvider = CreateServiceProvider(state, console, fileSystem);
         var action = GetSystemUnderTest(serviceProvider);
 
