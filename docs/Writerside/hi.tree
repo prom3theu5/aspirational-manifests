@@ -27,5 +27,13 @@
         <toc-element topic="Applying-Secrets.md"/>
         <toc-element topic="Disable-Secret-Management.md"/>
     </toc-element>
+	<toc-element topic="Minikube-Mounts.md">
+		<toc-element topic="How-Minikube-Mounts-Works.md"/>
+		<toc-element topic="Minikube-Generate-Manifests-Example.md"/>
+		<toc-element topic="Minikube-Apply-Manifests-Example.md"/>
+		<toc-element topic="Minikube-Destroy-Manifests-Example.md"/>
+		<toc-element topic="Minikube-Run-Example.md"/>
+		<toc-element topic="Minikube-Stop-Example.md"/>
+	</toc-element>
     <toc-element topic="General-FAQ.md"/>
 </instance-profile>

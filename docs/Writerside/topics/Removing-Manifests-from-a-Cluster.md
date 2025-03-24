@@ -11,11 +11,14 @@ This will be used for removal.
 
 If you have a secret file, these secrets will be removed as well. This command does not prompt for a password, as secrets do not need to be decrypted to be removed from your cluster.
 
+If any minikube mount processes were started, they will be killed here.
+
 ## Cli Options (Optional)
 
-| Option            | Alias | Environmental Variable Counterpart | Description                                                                               |
-|-------------------|-------|------------------------------------|-------------------------------------------------------------------------------------------|
-| --input-path      | -i    | `ASPIRATE_INPUT_PATH`              | The path for the kustomize manifests directory. Defaults to `%output-dir%`                |
-| --kube-context    | -k    | `ASPIRATE_KUBERNETES_CONTEXT`      | The name of the kubernetes context within your kubeconfig to apply / deploy manifests to. |
-| --non-interactive |       | `ASPIRATE_NON_INTERACTIVE`         | Disables interactive mode for the command                                                 |
-| --disable-secrets |       | `ASPIRATE_DISABLE_SECRETS`         | Disables secrets management features.                                                     |
+| Option                        | Alias | Environmental Variable Counterpart         | Description                                                                                                              |
+|-------------------------------|-------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| --input-path                  | -i    | `ASPIRATE_INPUT_PATH`                      | The path for the kustomize manifests directory. Defaults to `%output-dir%`                                               |
+| --kube-context                | -k    | `ASPIRATE_KUBERNETES_CONTEXT`              | The name of the kubernetes context within your kubeconfig to apply / deploy manifests to.                                |
+| --non-interactive             |       | `ASPIRATE_NON_INTERACTIVE`                 | Disables interactive mode for the command                                                                                |
+| --disable-secrets             |       | `ASPIRATE_DISABLE_SECRETS`                 | Disables secrets management features.                                                                                    |
+| --enable-minikube-mount       | -em   | `ASPIRATE_ENABLE_MINIKUBE_MOUNT_ACTION`    | Enables automation of minikube bind mount processes, if context is 'minikube' and resource is container with bind mounts.|
