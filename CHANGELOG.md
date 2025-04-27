@@ -1,5 +1,18 @@
 # Changelog
 
+## [9.2.0](https://github.com/prom3theu5/aspirational-manifests/compare/v9.1.0...v9.2.0) (2025-04-27)
+
+
+### 🚀 New Features
+
+* added option to specify resources non-interactively ([#318](https://github.com/prom3theu5/aspirational-manifests/issues/318)) ([6ad05c1](https://github.com/prom3theu5/aspirational-manifests/commit/6ad05c192db3926c85b60dc066d0fa7e388751ef))
+* project.v1 support. ([#314](https://github.com/prom3theu5/aspirational-manifests/issues/314)) ([c3924e2](https://github.com/prom3theu5/aspirational-manifests/commit/c3924e23d8dd4cad5d5cb3e4d243efb84d5afbd0))
+
+
+### 🔥 Bug Fixes
+
+* Added table output null check to handle headless services. ([#321](https://github.com/prom3theu5/aspirational-manifests/issues/321)) ([d785f6c](https://github.com/prom3theu5/aspirational-manifests/commit/d785f6c5f36660bccfc8f3f9909fb323a98ad63e))
+
 ## [9.1.0](https://github.com/prom3theu5/aspirational-manifests/compare/v9.0.4...v9.1.0) (2025-03-07)
 
 
