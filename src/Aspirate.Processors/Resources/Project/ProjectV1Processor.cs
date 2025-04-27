@@ -1,9 +1,9 @@
-namespace Aspirate.Processors.Resources.Project;
+﻿namespace Aspirate.Processors.Resources.Project;
 
 /// <summary>
-/// A project component for version 0 of Aspire.
+/// A project component for version 1 of Aspire.
 /// </summary>
-public sealed class ProjectProcessor(
+public sealed class ProjectV1Processor(
     IFileSystem fileSystem,
     IAnsiConsole console,
     ISecretProvider secretProvider,
@@ -19,5 +19,5 @@ public sealed class ProjectProcessor(
         manifestWriter)
 {
     /// <inheritdoc />
-    public override string ResourceType => AspireComponentLiterals.Project;
+    public override string ResourceType => AspireComponentLiterals.ProjectV1;
 }
