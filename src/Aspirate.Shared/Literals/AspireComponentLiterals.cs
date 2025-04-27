@@ -4,6 +4,7 @@ namespace Aspirate.Shared.Literals;
 public static class AspireComponentLiterals
 {
     public const string Project = "project.v0";
+    public const string ProjectV1 = "project.v1";
 
     public const string Dockerfile = "dockerfile.v0";
 
