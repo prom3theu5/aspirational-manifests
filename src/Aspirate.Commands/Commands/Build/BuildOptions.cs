@@ -1,6 +1,6 @@
 namespace Aspirate.Commands.Commands.Build;
 
-public sealed class BuildOptions : BaseCommandOptions, IBuildOptions, IContainerOptions, IAspireOptions
+public sealed class BuildOptions : BaseCommandOptions, IBuildOptions, IContainerOptions, IAspireOptions, IComponentsOptions
 {
     public string? ProjectPath { get; set; }
     public string? AspireManifest { get; set; }
@@ -13,4 +13,5 @@ public sealed class BuildOptions : BaseCommandOptions, IBuildOptions, IContainer
     public string? RuntimeIdentifier { get; set; }
     public List<string>? ComposeBuilds { get; set; }
     public bool PreferDockerfile { get; set; }
+    public List<string>? CliSpecifiedComponents { get; set; }
 }
