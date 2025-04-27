@@ -1,4 +1,5 @@
 namespace Aspirate.Services.Implementations;
+
 public class ContainerDetailsService(IProjectPropertyService propertyService, IAnsiConsole console) : IContainerDetailsService
 {
     private static readonly StringBuilder _imageBuilder = new();

@@ -10,7 +10,7 @@ public class ContainerV1Processor(
     IContainerCompositionService containerCompositionService,
     IContainerDetailsService containerDetailsService,
     IManifestWriter manifestWriter)
-        : ContainerProcessorBase<ContainerV1Resource>(
+        : BaseContainerProcessor<ContainerV1Resource>(
             fileSystem,
             console,
             secretProvider,

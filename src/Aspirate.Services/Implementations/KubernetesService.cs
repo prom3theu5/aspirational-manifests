@@ -181,7 +181,7 @@ public class KubernetesService(IAnsiConsole logger, IKubeCtlService kubeCtlServi
             .AddColumn("Node Port")
             .AddColumn("Address");
 
-        foreach (var service in services.Items)
+        foreach (var service in services.Items.Where(x => x.Spec.Ports != null))
         {
             var serviceName = service.Metadata.Name;
             var serviceType = service.Spec.Type;

@@ -4,7 +4,7 @@ namespace Aspirate.Processors.Resources.AbstractProcessors;
 /// <summary>
 /// A base container component shared between Aspire version 0 and 1.
 /// </summary>
-public abstract class ContainerProcessorBase<TContainerResource>(
+public abstract class BaseContainerProcessor<TContainerResource>(
     IFileSystem fileSystem,
     IAnsiConsole console,
     ISecretProvider secretProvider,
