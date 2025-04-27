@@ -24,12 +24,12 @@ public sealed class PopulateContainerDetailsForProjectsAction(
 
     private async Task HandleProjects()
     {
-        var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(AspireComponentLiterals.Project) as ProjectProcessor;
-
         Logger.MarkupLine("[bold]Gathering container details for each project in selected components[/]");
 
         foreach (var resource in CurrentState.SelectedProjectComponents)
         {
+            var projectProcessor = Services.GetRequiredKeyedService<IResourceProcessor>(resource.Value.Type) as BaseProjectProcessor;
+
             await projectProcessor.PopulateContainerDetailsCacheForProject(resource, new()
             {
                 Registry = CurrentState.ContainerRegistry,
