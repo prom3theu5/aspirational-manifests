@@ -54,7 +54,10 @@ public class KustomizeService(IFileSystem fileSystem, IShellExecutionService she
 
         foreach (var resourceSecrets in secretProvider.State.Secrets.Where(x => x.Value.Keys.Count > 0))
         {
-            var resourcePath = fileSystem.Path.Combine(state.OutputPath, resourceSecrets.Key);
+            var manifestPath = (state.OutputPath ?? state.InputPath) ??
+                throw new InvalidOperationException("Could not write secret, manifest path not set.");
+
+            var resourcePath = fileSystem.Path.Combine(manifestPath, resourceSecrets.Key);
 
             if (!fileSystem.Directory.Exists(resourcePath))
             {
