@@ -8,7 +8,9 @@ public sealed class GenerateOptions : BaseCommandOptions,
     IPrivateRegistryCredentialsOptions,
     IDashboardOptions,
     ISecretState,
-    IComponentsOptions
+    IComponentsOptions,
+    IKubernetesOptions,
+    IMinikubeOptions
 {
     public string? ProjectPath { get; set; }
     public string? AspireManifest { get; set; }
@@ -36,4 +38,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
     public bool? IncludeDashboard { get; set; }
     public bool? ReplaceSecrets { get; set; }
     public List<string>? CliSpecifiedComponents { get; set; }
+    public string? InputPath { get; set; }
+    public string? KubeContext { get; set; }
+    public bool? EnableMinikubeMountAction { get; set; }
 }

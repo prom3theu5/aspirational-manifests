@@ -27,7 +27,7 @@ public static class ResourceExtensions
         return environment;
     }
 
-    public static List<Volume> KuberizeVolumeNames(this List<Volume> containerVolumes,  KeyValuePair<string, Resource> resource)
+    public static List<Volume> KuberizeVolumeNames(this List<Volume> containerVolumes, KeyValuePair<string, Resource> resource)
     {
         if (containerVolumes.Count == 0)
         {
@@ -100,5 +100,20 @@ public static class ResourceExtensions
                 }
             }
         }
+    }
+
+    public static List<BindMount> NormalizeBindMountSource(this List<BindMount>? bindMounts, IFileSystem fileSystem)
+    {
+        if (bindMounts == null || !bindMounts.Any())
+        {
+            return [];
+        }
+
+        return bindMounts.Select(b => new BindMount
+        {
+            Source = fileSystem.GetFullPath(b.Source),
+            Target = b.Target,
+            ReadOnly = b.ReadOnly
+        }).ToList();
     }
 }

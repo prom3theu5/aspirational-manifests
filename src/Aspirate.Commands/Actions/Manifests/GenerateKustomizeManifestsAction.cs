@@ -61,7 +61,8 @@ public sealed class GenerateKustomizeManifestsAction(
             TemplatePath = CurrentState.TemplatePath,
             DisableSecrets =  CurrentState.DisableSecrets,
             WithPrivateRegistry = CurrentState.WithPrivateRegistry,
-            WithDashboard = CurrentState.IncludeDashboard
+            WithDashboard = CurrentState.IncludeDashboard,
+            CurrentState = CurrentState
         });
 
         if (success && !CurrentState.IsNotDeployable(resource.Value) && resource.Value is not DaprComponentResource)

@@ -10,5 +10,6 @@ public sealed class ApplyCommand : BaseCommand<ApplyOptions, ApplyCommandHandler
         AddOption(KubernetesContextOption.Instance);
         AddOption(SecretPasswordOption.Instance);
         AddOption(RollingRestartOption.Instance);
+        AddOption(EnableMinikubeMountActionOption.Instance);
     }
 }

@@ -5,5 +5,6 @@ public sealed class DestroyCommandHandler(IServiceProvider serviceProvider) : Ba
     public override Task<int> HandleAsync(DestroyOptions options) =>
         ActionExecutor
             .QueueAction(nameof(RemoveManifestsFromClusterAction))
+            .QueueAction(nameof(KillMinikubeMountsAction))
             .ExecuteCommandsAsync();
 }

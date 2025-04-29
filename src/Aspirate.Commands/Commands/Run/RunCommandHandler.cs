@@ -15,8 +15,11 @@ public sealed class RunCommandHandler(IServiceProvider serviceProvider) : BaseCo
             .QueueAction(nameof(BuildAndPushContainersFromProjectsAction))
             .QueueAction(nameof(BuildAndPushContainersFromDockerfilesAction))
             .QueueAction(nameof(AskImagePullPolicyAction))
+            .QueueAction(nameof(SelectKubeContextAction))
             .QueueAction(nameof(SaveSecretsAction))
+            .QueueAction(nameof(SaveBindMountsAction))
             .QueueAction(nameof(CustomNamespaceAction))
+            .QueueAction(nameof(ApplyMinikubeMountsAction))
             .QueueAction(nameof(RunKubernetesObjectsAction))
             .ExecuteCommandsAsync();
 }

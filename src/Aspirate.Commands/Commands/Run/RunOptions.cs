@@ -5,7 +5,8 @@ public sealed class RunOptions : BaseCommandOptions,
     IAspireOptions,
     IPrivateRegistryCredentialsOptions,
     IDashboardOptions,
-    IRunOptions
+    IRunOptions,
+    IMinikubeOptions
 {
     public string? ProjectPath { get; set; }
     public string? AspireManifest { get; set; }
@@ -26,4 +27,5 @@ public sealed class RunOptions : BaseCommandOptions,
     public string? PrivateRegistryEmail { get; set; }
     public bool? WithPrivateRegistry { get; set; }
     public bool? IncludeDashboard { get; set; }
+    public bool? EnableMinikubeMountAction { get; set; }
 }

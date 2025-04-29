@@ -4,6 +4,8 @@ public sealed class ApplyCommandHandler(IServiceProvider serviceProvider) : Base
 {
     public override Task<int> HandleAsync(ApplyOptions optionses) =>
         ActionExecutor
+            .QueueAction(nameof(SelectKubeContextAction))
+            .QueueAction(nameof(ApplyMinikubeMountsAction))
             .QueueAction(nameof(ApplyManifestsToClusterAction))
             .ExecuteCommandsAsync();
 }

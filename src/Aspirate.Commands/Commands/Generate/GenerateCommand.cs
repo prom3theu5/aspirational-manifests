@@ -33,5 +33,7 @@ public sealed class GenerateCommand : BaseCommand<GenerateOptions, GenerateComma
        AddOption(ReplaceSecretsOption.Instance);
        AddOption(ParameterResourceValueOption.Instance);
        AddOption(ComponentsOption.Instance);
+       AddOption(EnableMinikubeMountActionOption.Instance);
+       AddOption(KubernetesContextOption.Instance);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Aspirate.Services;
+namespace Aspirate.Services;
 
 /// <summary>
 /// Extension methods for IServiceCollection to add Aspirate services.
@@ -18,10 +18,12 @@ public static class ServiceCollectionExtensions
             .AddAspirateConfigurationSupport()
             .AddContainerSupport()
             .AddDaprCliSupport()
+            .AddMinikubeCliSupport()
             .AddKubernetesSupport()
             .AddStateManagement()
             .AddSecretService()
-            .AddVersionChecks();
+            .AddVersionChecks()
+            .AddProcessService();
 
     /// <summary>
     /// Adds the password generator implementation to the service collection.
@@ -68,6 +70,10 @@ public static class ServiceCollectionExtensions
         services
             .AddSingleton<IDaprCliService, DaprCliService>();
 
+    private static IServiceCollection AddMinikubeCliSupport(this IServiceCollection services) =>
+        services
+            .AddSingleton<IMinikubeCliService, MinikubeCliService>();
+
     private static IServiceCollection AddStateManagement(this IServiceCollection services) =>
         services
             .AddSingleton<IStateService, StateService>();
@@ -87,6 +93,9 @@ public static class ServiceCollectionExtensions
     /// <returns>The modified service collection.</returns>
     private static IServiceCollection AddShellExecution(this IServiceCollection services) =>
         services.AddSingleton<IShellExecutionService, ShellExecutionService>();
+
+    private static IServiceCollection AddProcessService(this IServiceCollection services) =>
+        services.AddSingleton<IProcessService, ProcessService>();
 
     /// <summary>
     /// Adds container support to the IServiceCollection. </summary> <param name="services">The IServiceCollection to add the container support to.</param> <returns>The modified IServiceCollection with the added container support.</returns>

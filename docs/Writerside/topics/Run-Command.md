@@ -20,6 +20,7 @@ To clean-up after using the run command, you can use the `Stop` command.
     ```
 
 This deletes anything added to the Namespace within the state file, and removes the namespace.
+This also kills any started minikube mount processes. 
 
 ## Cli Options (Optional)
 
@@ -49,3 +50,4 @@ This deletes anything added to the Namespace within the state file, and removes 
 | --include-dashboard           |       | `ASPIRATE_INCLUDE_DASHBOARD`           | Boolean flag to specify if the Aspire dashboard should also be included in deployments.                                                                                        |
 | --clear-namespace             |       | `ASPIRATE_ALLOW_CLEAR_NAMESPACE`       | Boolean flag to specify the specified namespace should automatically be cleaned during a deployment.                                                                           |
 | --launch-profile              | -lp   | 'ASPIRATE_LAUNCH_PROFILE'              | The launch profile to use when building the Aspire Manifest.                                                                                                                   |
+| --enable-minikube-mount       | -em   | `ASPIRATE_ENABLE_MINIKUBE_MOUNT_ACTION`| Enables automation of minikube bind mount processes, if context is 'minikube'.                                                                                                 |
