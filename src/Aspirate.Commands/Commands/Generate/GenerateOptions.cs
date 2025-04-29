@@ -8,7 +8,7 @@ public sealed class GenerateOptions : BaseCommandOptions,
     IPrivateRegistryCredentialsOptions,
     IDashboardOptions,
     ISecretState,
-    IComponentsOptions
+    IComponentsOptions,
     IKubernetesOptions,
     IMinikubeOptions
 {
